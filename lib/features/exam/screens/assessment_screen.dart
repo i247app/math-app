@@ -184,7 +184,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final allowQuestionNavigation = widget.allowQuestionNavigation;
     final showQuestionNavigation = widget.showQuestionNavigation;
     final submittedExam = result.exam!;
+    final submittedUserExamId = submittedExam.userExamId;
     final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
+    final reviewDetailId = submittedUserExamId ?? submittedExamId;
 
     navigator.pushReplacement(
       MaterialPageRoute<void>(
@@ -195,7 +197,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             totalQuestions: totalQuestions,
             examService: examService,
             profileId: profileId,
-            onViewDetails: submittedExamId == null
+            onViewDetails: reviewDetailId == null
                 ? null
                 : () {
                     Navigator.of(resultContext).push(
@@ -203,8 +205,14 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                         builder: (_) => RepositoryProvider<ExamService>.value(
                           value: examService,
                           child: ExamReviewScreen(
-                            examId: submittedExamId,
-                            initialExam: submittedExam,
+                            examId: submittedUserExamId == null
+                                ? submittedExamId
+                                : null,
+                            userExamId: submittedUserExamId,
+                            profileId: profileId ?? submittedExam.profileId,
+                            initialExam: submittedUserExamId == null
+                                ? submittedExam
+                                : null,
                           ),
                         ),
                       ),

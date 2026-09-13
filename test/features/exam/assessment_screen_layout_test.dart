@@ -271,6 +271,37 @@ void main() {
   );
 
   testWidgets(
+    'completed assessment review loads the entire journey by user exam id',
+    (tester) async {
+      final service = _CompletedJourneyReviewExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Completed set'),
+        examService: service,
+        initialGrade: 5,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < assessmentCorrectAnswerTarget - 1) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('placement-view-details')));
+      await tester.pumpAndSettle();
+
+      expect(service.requestedDetailId, 91001);
+      expect(service.requestedUserExamId, 91001);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'shows question seven skeleton while generating the resolved next set',
     (tester) async {
       final service = _PendingGenerateExamService();
@@ -370,18 +401,18 @@ Future<void> _pumpAssessment(
   addTearDown(lingo.dispose);
 
   await tester.pumpWidget(
-    MaterialApp(
-      theme: ThemeData(
-        extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-      ),
-      home: MediaQuery(
-        data: MediaQueryData(
-          size: const Size(430, 844),
-          padding: EdgeInsets.only(bottom: bottomInset),
-          viewPadding: EdgeInsets.only(bottom: bottomInset),
+    LingoScope(
+      lingo: lingo,
+      child: MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
         ),
-        child: LingoScope(
-          lingo: lingo,
+        home: MediaQuery(
+          data: MediaQueryData(
+            size: const Size(430, 844),
+            padding: EdgeInsets.only(bottom: bottomInset),
+            viewPadding: EdgeInsets.only(bottom: bottomInset),
+          ),
           child: AiAssessmentScreen(
             examService: examService ?? _UnusedExamService(),
             examType: examType,
@@ -430,6 +461,58 @@ class _PendingSubmitExamService implements ExamService {
     submitCalls++;
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _CompletedJourneyReviewExamService implements ExamService {
+  int? requestedDetailId;
+  int? requestedUserExamId;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    return GeneratedExam(
+      examId: examId,
+      userAiExamId: examId,
+      userExamId: 91001,
+      profileId: profileId,
+      examType: examTypeAssessment,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {}
+
+  @override
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+  }) async {
+    requestedDetailId = detailId;
+    requestedUserExamId = userExamId;
+    return GeneratedExam(
+      userExamId: userExamId,
+      grade: 5,
+      grading: const ExamGrading(correctNumber: 6, totalQuestions: 6),
+      answers: List<SubmitExamAnswer>.generate(
+        6,
+        (index) => SubmitExamAnswer(questionNumber: index + 1, label: 'A'),
+      ),
+      questions: _setQuestions('Journey').take(6).toList(growable: false),
+    );
   }
 
   @override

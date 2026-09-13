@@ -11,11 +11,13 @@ class ExamReviewScreen extends StatelessWidget {
     super.key,
     this.examId,
     this.userExamId,
+    this.profileId,
     this.initialExam,
   }) : assert(examId != null || userExamId != null);
 
   final int? examId;
   final int? userExamId;
+  final int? profileId;
   final GeneratedExam? initialExam;
 
   @override
@@ -27,7 +29,7 @@ class ExamReviewScreen extends StatelessWidget {
       detailId: detailId,
       detailLoader: (detailId) => examService.getExamDetail(
         detailId,
-        profileId: initialExam?.profileId,
+        profileId: profileId ?? initialExam?.profileId,
         userExamId: userExamId,
       ),
       initialDetail: initialExam,
