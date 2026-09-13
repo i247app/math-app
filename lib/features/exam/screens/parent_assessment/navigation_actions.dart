@@ -113,6 +113,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           profileId: profileId,
           allowQuestionNavigation: false,
           showQuestionNavigation: false,
+          isResumedAssessment: true,
           onResultBack: () {
             if (!mounted) return;
             final navigator = Navigator.of(context);

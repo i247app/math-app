@@ -255,7 +255,7 @@ class AssessmentController extends ChangeNotifier {
     );
   }
 
-  Future<void> submitCurrentSetAndUpdateStatus(String status) async {
+  Future<void> updateStatusForExit(String status) async {
     if (_isSubmittingExam || _isUpdatingExitStatus) {
       return;
     }
@@ -266,16 +266,20 @@ class AssessmentController extends ChangeNotifier {
 
     _isUpdatingExitStatus = true;
     try {
-      final selectedAnswers = _answersForExam(currentExam);
-      final answersForExit = selectedAnswers.isEmpty
-          ? const <SubmitExamAnswer>[
-              SubmitExamAnswer(
-                questionNumber: assessmentExitPlaceholderQuestionNumber,
-                label: assessmentExitPlaceholderAnswerLabel,
-              ),
-            ]
-          : selectedAnswers;
-      final submittedExam = await _submitSet(currentExam, answersForExit);
+      final existingUserExamId = userExamId;
+      if (existingUserExamId != null && existingUserExamId > 0) {
+        await _examService.updateUserExamStatus(
+          userExamId: existingUserExamId,
+          status: status,
+          profileId: profileId ?? currentExam.profileId,
+        );
+        return;
+      }
+
+      final submittedExam = await _submitSet(
+        currentExam,
+        _answersForExit(currentExam),
+      );
       final submittedUserExamId = submittedExam.userExamId;
       if (submittedUserExamId == null || submittedUserExamId <= 0) {
         throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
@@ -286,6 +290,30 @@ class AssessmentController extends ChangeNotifier {
         profileId:
             profileId ?? submittedExam.profileId ?? currentExam.profileId,
       );
+    } finally {
+      _isUpdatingExitStatus = false;
+    }
+  }
+
+  Future<void> submitCurrentSetForExit() async {
+    if (_isSubmittingExam || _isUpdatingExitStatus) {
+      return;
+    }
+    final currentExam = _exam;
+    if (currentExam == null || currentExam.questions.isEmpty) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamToSubmit));
+    }
+
+    _isUpdatingExitStatus = true;
+    try {
+      final submittedExam = await _submitSet(
+        currentExam,
+        _answersForExit(currentExam),
+      );
+      final submittedUserExamId = submittedExam.userExamId;
+      if (submittedUserExamId == null || submittedUserExamId <= 0) {
+        throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+      }
     } finally {
       _isUpdatingExitStatus = false;
     }
@@ -682,6 +710,19 @@ class AssessmentController extends ChangeNotifier {
             questionNumber: exam.questions[index].questionNumber,
             label: label,
           ),
+    ];
+  }
+
+  List<SubmitExamAnswer> _answersForExit(GeneratedExam exam) {
+    final selectedAnswers = _answersForExam(exam);
+    if (selectedAnswers.isNotEmpty) {
+      return selectedAnswers;
+    }
+    return const <SubmitExamAnswer>[
+      SubmitExamAnswer(
+        questionNumber: assessmentExitPlaceholderQuestionNumber,
+        label: assessmentExitPlaceholderAnswerLabel,
+      ),
     ];
   }
 

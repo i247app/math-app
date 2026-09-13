@@ -38,6 +38,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.onResultBack,
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
+    this.isResumedAssessment = false,
   });
 
   final ExamService? examService;
@@ -51,6 +52,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final VoidCallback? onResultBack;
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
+  final bool isResumedAssessment;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -337,7 +339,14 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     }
     return showAssessmentExitDialog(
       dialogContext,
-      onUpdateStatus: _controller.submitCurrentSetAndUpdateStatus,
+      onUpdateStatus: (status) {
+        if (status == assessmentActiveStatus) {
+          return widget.isResumedAssessment
+              ? Future<void>.value()
+              : _controller.submitCurrentSetForExit();
+        }
+        return _controller.updateStatusForExit(status);
+      },
     );
   }
 

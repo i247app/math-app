@@ -470,9 +470,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
     await tester.pumpAndSettle();
 
-    expect(examService.submittedAnswers, hasLength(2));
-    expect(examService.updatedUserExamId, 8100);
-    expect(examService.updatedStatus, 'ACTIVE');
+    expect(examService.submittedAnswers, isNull);
+    expect(examService.updatedUserExamId, isNull);
+    expect(examService.updatedStatus, isNull);
     expect(find.byType(AiAssessmentScreen), findsNothing);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
     expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);

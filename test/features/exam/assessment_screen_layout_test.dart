@@ -285,17 +285,15 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
     await tester.pumpAndSettle();
 
-    expect(service.events, <String>['submit:1', 'status:CANCEL:9001']);
-    expect(service.submittedAnswers, hasLength(1));
-    expect(service.submittedAnswers!.single.questionNumber, 1);
-    expect(service.submittedAnswers!.single.label, 'A');
+    expect(service.events, <String>['status:CANCEL:7001']);
+    expect(service.submittedAnswers, isNull);
     expect(service.statusUpdates, <(int, String)>[
-      (9001, assessmentCanceledStatus),
+      (7001, assessmentCanceledStatus),
     ]);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('leaving an assessment updates its status to ACTIVE', (
+  testWidgets('leaving a new assessment submits without updating ACTIVE', (
     tester,
   ) async {
     final service = _ExitStatusExamService();
@@ -310,12 +308,56 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
     await tester.pumpAndSettle();
 
-    expect(service.events, <String>['submit:1', 'status:ACTIVE:9001']);
+    expect(service.events, <String>['submit:1']);
     expect(service.submittedAnswers, hasLength(1));
     expect(service.submittedAnswers!.single.questionNumber, 1);
     expect(service.submittedAnswers!.single.label, 'A');
+    expect(service.statusUpdates, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaving a resumed active assessment does not call an API', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+      isResumedAssessment: true,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canceling a resumed assessment only updates CANCEL', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+      isResumedAssessment: true,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, <String>['status:CANCEL:7001']);
+    expect(service.submittedAnswers, isNull);
     expect(service.statusUpdates, <(int, String)>[
-      (9001, assessmentActiveStatus),
+      (7001, assessmentCanceledStatus),
     ]);
     expect(tester.takeException(), isNull);
   });
@@ -329,6 +371,7 @@ void main() {
       tester,
       examService: service,
       examType: examTypeAssessment,
+      initialUserExamId: null,
     );
 
     await tester.tap(find.byIcon(Icons.close_rounded).first);
@@ -352,6 +395,9 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('submit-loader')), findsNothing);
+    expect(service.submittedAnswers, hasLength(1));
+    expect(service.submittedAnswers!.single.questionNumber, 1);
+    expect(service.submittedAnswers!.single.label, 'A');
 
     submitCompleter.complete(
       const GeneratedExam(
@@ -363,7 +409,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(service.events, <String>['submit:1', 'status:ACTIVE:9001']);
+    expect(service.events, <String>['submit:1']);
+    expect(service.statusUpdates, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
@@ -573,6 +620,8 @@ Future<void> _pumpAssessment(
   ExamService? examService,
   int initialGrade = 0,
   String examType = examTypePractice,
+  int? initialUserExamId = 7001,
+  bool isResumedAssessment = false,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -598,12 +647,13 @@ Future<void> _pumpAssessment(
           child: AiAssessmentScreen(
             examService: examService ?? _UnusedExamService(),
             examType: examType,
+            isResumedAssessment: isResumedAssessment,
             allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
               examId: 1,
               aiExamId: 7,
-              userExamId: 7001,
+              userExamId: initialUserExamId,
               examType: examType,
               grade: initialGrade,
               questions:
