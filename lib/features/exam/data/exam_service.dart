@@ -2,6 +2,7 @@ import 'package:numi/features/exam/models/exam.dart';
 
 const examTypeAssessment = 'ASSESSMENT';
 const examTypePractice = 'PRACTICE';
+const examTypeGrade = 'GRADE';
 
 abstract interface class ExamService {
   Future<GeneratedExam> generateAssessmentExam({

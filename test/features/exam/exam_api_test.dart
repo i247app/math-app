@@ -53,6 +53,7 @@ void main() {
     expect(body, isNot(contains('chapters')));
     expect(exam.examId, 2);
     expect(exam.aiExamId, 7);
+    expect(exam.userExamId, 99);
     expect(exam.questions.single.rightAnswer, 'A');
     expect(exam.questions.single.correctAnswer, '4');
   });
@@ -332,9 +333,11 @@ Map<String, dynamic> _body(RequestOptions options) =>
 Map<String, dynamic> _examResponse() => <String, dynamic>{
   'mstatus': 200,
   'status': 'Success',
+  'user_exam_id': 99,
   'exam': <String, dynamic>{
     'ai_exam_id': 7,
     'user_ai_exam_id': 2,
+    'user_exam_id': 99,
     'profile_id': 21,
     'exam_type': 'ASSESSMENT',
     'grade': 2,

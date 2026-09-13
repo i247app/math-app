@@ -137,6 +137,25 @@ class AssessmentController extends ChangeNotifier {
   bool get isGeneratingExam => _isGeneratingExam || _isTransitioningSet;
   bool get isTransitioningSet => _isTransitioningSet;
   bool get isSubmittingExam => _isSubmittingExam;
+  int? get userExamId {
+    final currentId = _exam?.userExamId;
+    if (currentId != null && currentId > 0) {
+      return currentId;
+    }
+    for (final submittedExam in _submittedSets.values.toList().reversed) {
+      final submittedId = submittedExam.userExamId;
+      if (submittedId != null && submittedId > 0) {
+        return submittedId;
+      }
+    }
+    for (final completedSet in _completedSets.reversed) {
+      final completedId = completedSet.exam.userExamId;
+      if (completedId != null && completedId > 0) {
+        return completedId;
+      }
+    }
+    return null;
+  }
 
   ExamQuestion? get currentQuestion {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
@@ -190,6 +209,18 @@ class AssessmentController extends ChangeNotifier {
       }
     }
     return null;
+  }
+
+  Future<void> updateCurrentUserExamStatus(String status) async {
+    final currentUserExamId = userExamId;
+    if (currentUserExamId == null) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+    }
+    await _examService.updateUserExamStatus(
+      userExamId: currentUserExamId,
+      status: status,
+      profileId: profileId ?? _exam?.profileId,
+    );
   }
 
   bool? isAnswerCorrect(ExamAnswer answer) {

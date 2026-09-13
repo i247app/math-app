@@ -122,6 +122,7 @@ class GenerateExamResponseDto {
   const GenerateExamResponseDto({
     required this.mstatus,
     this.exam,
+    this.userExamId,
     this.status,
     this.mmessage,
     this.debug,
@@ -129,6 +130,8 @@ class GenerateExamResponseDto {
 
   final int mstatus;
   final GeneratedExamDto? exam;
+  @JsonKey(name: 'user_exam_id', fromJson: _intFromJson)
+  final int? userExamId;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -453,6 +456,7 @@ class GeneratedExamDto {
   const GeneratedExamDto({
     this.aiExamId,
     this.userAiExamId,
+    this.userExamId,
     this.profileId,
     this.status,
     this.examType,
@@ -472,6 +476,8 @@ class GeneratedExamDto {
   final int? aiExamId;
   @JsonKey(fromJson: _intFromJson)
   final int? userAiExamId;
+  @JsonKey(fromJson: _intFromJson)
+  final int? userExamId;
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
   final String? status;

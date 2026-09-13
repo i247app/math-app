@@ -13,6 +13,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.d
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 
 class _UnusedExamService implements ExamService {
   @override
@@ -220,6 +221,94 @@ void main() {
 
     expect(find.text('First question'), findsOneWidget);
     expect(find.text('Second question'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('assessment exit dialog close keeps the attempt open', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
+    expect(find.text('Hủy bài làm'), findsOneWidget);
+    expect(find.text('Thoát'), findsOneWidget);
+    final cancelButtonRect = tester.getRect(
+      find.byKey(const ValueKey('assessment-cancel-attempt')),
+    );
+    final leaveButtonRect = tester.getRect(
+      find.byKey(const ValueKey('assessment-leave-active')),
+    );
+    expect(cancelButtonRect.top, leaveButtonRect.top);
+    expect(cancelButtonRect.bottom, leaveButtonRect.bottom);
+    expect(cancelButtonRect.height, 42);
+    final cancelTextRect = tester.getRect(find.text('Hủy bài làm'));
+    final leaveTextRect = tester.getRect(find.text('Thoát'));
+    expect(cancelTextRect.left, greaterThan(cancelButtonRect.left));
+    expect(cancelTextRect.right, lessThan(cancelButtonRect.right));
+    expect(leaveTextRect.left, greaterThan(leaveButtonRect.left));
+    expect(leaveTextRect.right, lessThan(leaveButtonRect.right));
+
+    await tester.tap(
+      find.byKey(const ValueKey('assessment-exit-dialog-close')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.statusUpdates, isEmpty);
+    expect(find.text('12 + 8 = ?'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canceling an assessment updates its status to CANCEL', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(service.statusUpdates, <(int, String)>[
+      (7001, assessmentCanceledStatus),
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaving an assessment updates its status to ACTIVE', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(service.statusUpdates, <(int, String)>[
+      (7001, assessmentActiveStatus),
+    ]);
     expect(tester.takeException(), isNull);
   });
 
@@ -459,6 +548,7 @@ Future<void> _pumpAssessment(
               id: 1,
               examId: 1,
               aiExamId: 7,
+              userExamId: 7001,
               examType: examType,
               grade: initialGrade,
               questions:
@@ -499,6 +589,22 @@ class _PendingSubmitExamService implements ExamService {
     submitCalls++;
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ExitStatusExamService implements ExamService {
+  final List<(int, String)> statusUpdates = <(int, String)>[];
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    statusUpdates.add((userExamId, status));
   }
 
   @override

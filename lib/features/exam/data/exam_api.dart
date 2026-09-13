@@ -43,7 +43,7 @@ class ExamApi implements ExamService {
       throw ExamException(AppStrings.current(AppKeys.examHasNoQuestions));
     }
 
-    return exam.toModel();
+    return exam.toModel(userExamId: response.userExamId);
   }
 
   @override

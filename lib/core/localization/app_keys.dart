@@ -16,6 +16,11 @@ class AppKeys {
   static const continueUpper = 'continue_upper';
   static const attemptExitTitle = 'attempt_exit_title';
   static const attemptExitMessage = 'attempt_exit_message';
+  static const assessmentExitTitle = 'assessment_exit_title';
+  static const assessmentExitMessage = 'assessment_exit_message';
+  static const assessmentCancelAttempt = 'assessment_cancel_attempt';
+  static const assessmentLeaveAttempt = 'assessment_leave_attempt';
+  static const assessmentStatusUpdateFailed = 'assessment_status_update_failed';
   static const exitUpper = 'exit_upper';
   static const unsavedChangesExitTitle = 'unsaved_changes_exit_title';
   static const unsavedChangesExitMessage = 'unsaved_changes_exit_message';

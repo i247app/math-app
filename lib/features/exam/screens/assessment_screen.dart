@@ -331,6 +331,16 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     return result ?? false;
   }
 
+  Future<bool> _confirmAttemptExit(BuildContext dialogContext) {
+    if (!_controller.isAssessment) {
+      return showAttemptExitDialog(dialogContext);
+    }
+    return showAssessmentExitDialog(
+      dialogContext,
+      onUpdateStatus: _controller.updateCurrentUserExamStatus,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
@@ -487,7 +497,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             controller: _exitController,
             shouldConfirm: hasActiveAttempt,
             isExitBlocked: isBusy,
-            confirmExit: showAttemptExitDialog,
+            confirmExit: _confirmAttemptExit,
             child: screen,
           );
         },

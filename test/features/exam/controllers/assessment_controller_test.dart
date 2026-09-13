@@ -105,6 +105,34 @@ void main() {
   });
 
   test(
+    'updates the current assessment journey status by user exam id',
+    () async {
+      final service = _RecordingExamService();
+      final controller = AssessmentController(
+        examService: service,
+        examType: examTypeAssessment,
+        profileId: 21,
+        initialExam: const GeneratedExam(
+          examId: 7,
+          userExamId: 501,
+          profileId: 21,
+          examType: examTypeAssessment,
+          questions: <ExamQuestion>[],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      await controller.updateCurrentUserExamStatus('CANCEL');
+      await controller.updateCurrentUserExamStatus('ACTIVE');
+
+      expect(service.statusUpdates, <(int, String)>[
+        (501, 'CANCEL'),
+        (501, 'ACTIVE'),
+      ]);
+    },
+  );
+
+  test(
     'does not report incorrect when the server omits the correct answer',
     () {
       const examWithoutCorrectAnswer = GeneratedExam(

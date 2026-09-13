@@ -86,7 +86,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     modifyDt: submittedDt,
     aiExamId: aiExamId,
     userAiExamId: userAiExamId,
-    userExamId: userExamId ?? stats?.userExamId,
+    userExamId: userExamId ?? this.userExamId ?? stats?.userExamId,
     grade: grade,
     level: level,
     numQuestions: numQuestions,
