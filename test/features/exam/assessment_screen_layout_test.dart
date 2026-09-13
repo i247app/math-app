@@ -286,7 +286,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.events, <String>['submit:1', 'status:CANCEL:9001']);
-    expect(service.submittedAnswers, isEmpty);
+    expect(service.submittedAnswers, hasLength(1));
+    expect(service.submittedAnswers!.single.questionNumber, 1);
+    expect(service.submittedAnswers!.single.label, 'A');
     expect(service.statusUpdates, <(int, String)>[
       (9001, assessmentCanceledStatus),
     ]);
@@ -309,7 +311,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.events, <String>['submit:1', 'status:ACTIVE:9001']);
-    expect(service.submittedAnswers, isEmpty);
+    expect(service.submittedAnswers, hasLength(1));
+    expect(service.submittedAnswers!.single.questionNumber, 1);
+    expect(service.submittedAnswers!.single.label, 'A');
     expect(service.statusUpdates, <(int, String)>[
       (9001, assessmentActiveStatus),
     ]);

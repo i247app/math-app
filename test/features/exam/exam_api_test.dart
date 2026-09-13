@@ -356,6 +356,60 @@ void main() {
     );
   });
 
+  test('clears the synthetic Q1/A exit answer when resuming', () async {
+    final api = _apiReturning((_) {
+      return <String, dynamic>{
+        'mstatus': 200,
+        'status': 'Success',
+        'exams': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'user_ai_exam_id': 41,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 0,
+            'status': 'ACTIVE',
+            'questions': List<Map<String, dynamic>>.generate(
+              3,
+              (index) => <String, dynamic>{
+                'question_number': index + 1,
+                'question_name': 'Resume question ${index + 1}',
+                'right_answer_label': 'A',
+                'right_answer_content': '${index + 2}',
+                'answers': <Map<String, dynamic>>[
+                  <String, dynamic>{'label': 'A', 'content': '${index + 2}'},
+                  <String, dynamic>{'label': 'B', 'content': '0'},
+                ],
+              },
+            ),
+          },
+        ],
+        'stats': <String, dynamic>{
+          'correct_number': 1,
+          'score_percentage': 0,
+          'skipped_number': 0,
+          'total_questions': 1,
+          'exam_type': 'ASSESSMENT',
+          'status': 'ACTIVE',
+          'user_exam_id': 99,
+          'grade': 0,
+        },
+        'details': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'user_ai_exam_id': 41,
+            'question_number': 1,
+            'selected_label': 'A',
+          },
+        ],
+      };
+    });
+
+    final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
+
+    expect(exam.questions, hasLength(3));
+    expect(exam.answers, isEmpty);
+    expect(exam.resumeQuestionIndex, 0);
+  });
+
   test('loads the new exam statistics endpoint', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {

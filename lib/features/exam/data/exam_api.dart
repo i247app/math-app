@@ -5,6 +5,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/data/exam_conversion.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 
@@ -401,18 +402,28 @@ GeneratedExam _activeJourneySetToModel({
             (detail.userAiExamId == null && response.exams.length == 1);
       })
       .toList(growable: false);
+  final hasOnlyExitPlaceholder = isAssessmentExitPlaceholderAnswer(
+    answerCount: activeDetails.length,
+    questionNumber: activeDetails.firstOrNull?.questionNumber,
+    answerLabel: activeDetails.firstOrNull?.selectedLabel,
+  );
   final submittedAnswers = <SubmitExamAnswerDto>[
-    for (final detail in activeDetails)
+    for (final detail
+        in hasOnlyExitPlaceholder
+            ? const <ExamDetailAnswerDto>[]
+            : activeDetails)
       if (detail.selectedLabel?.trim().isNotEmpty == true)
         SubmitExamAnswerDto(
           questionNumber: detail.questionNumber,
           label: detail.selectedLabel!.trim(),
         ),
   ];
-  final resumeQuestionIndex = _activeResumeQuestionIndex(
-    details: activeDetails,
-    questions: activeExam.questions,
-  );
+  final resumeQuestionIndex = hasOnlyExitPlaceholder
+      ? 0
+      : _activeResumeQuestionIndex(
+          details: activeDetails,
+          questions: activeExam.questions,
+        );
 
   if (activeExam.questions.isNotEmpty) {
     return activeExam.toModel(

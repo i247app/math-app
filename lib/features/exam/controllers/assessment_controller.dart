@@ -6,6 +6,7 @@ import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 const assessmentCorrectAnswerTarget =
@@ -265,10 +266,16 @@ class AssessmentController extends ChangeNotifier {
 
     _isUpdatingExitStatus = true;
     try {
-      final submittedExam = await _submitSet(
-        currentExam,
-        _answersForExam(currentExam),
-      );
+      final selectedAnswers = _answersForExam(currentExam);
+      final answersForExit = selectedAnswers.isEmpty
+          ? const <SubmitExamAnswer>[
+              SubmitExamAnswer(
+                questionNumber: assessmentExitPlaceholderQuestionNumber,
+                label: assessmentExitPlaceholderAnswerLabel,
+              ),
+            ]
+          : selectedAnswers;
+      final submittedExam = await _submitSet(currentExam, answersForExit);
       final submittedUserExamId = submittedExam.userExamId;
       if (submittedUserExamId == null || submittedUserExamId <= 0) {
         throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
