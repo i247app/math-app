@@ -54,6 +54,10 @@ class AssessmentSetScore {
 
   bool get failed => isComplete && !passed;
 
+  bool get isExactlyFiftyPercent {
+    return isComplete && correctCount * 2 == totalQuestions;
+  }
+
   bool areFirstQuestionsCorrect(int count) {
     if (totalQuestions < count) {
       return false;
@@ -144,9 +148,9 @@ class AssessmentFlowPolicy {
   static const int maximumGrade = 5;
   static const int generatedQuestionCount = 10;
   static const int firstQuestionsUpgradeTarget = 6;
-  static const int consecutiveIncorrectTarget = 4;
+  static const int consecutiveIncorrectTarget = 5;
   static const int earlyDowngradeQuestionCount = 5;
-  static const int earlyDowngradeIncorrectTarget = 4;
+  static const int earlyDowngradeIncorrectTarget = 5;
 
   static int clampGrade(int grade) {
     return grade.clamp(minimumGrade, maximumGrade);
@@ -215,6 +219,10 @@ class AssessmentFlowPolicy {
 
     if (!score.isComplete) {
       return AssessmentFlowDecision(AssessmentFlowAction.continueSet, state);
+    }
+
+    if (score.isExactlyFiftyPercent && !score.questionThreeAndSixCorrect) {
+      return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
 
     return switch (state.mode) {
@@ -290,12 +298,9 @@ class AssessmentFlowPolicy {
 
   static AssessmentFlowDecision _failNormalSet(AssessmentFlowState state) {
     final failedState = state.copyWith(isFailed: true);
-    if (state.grade == minimumGrade) {
-      return AssessmentFlowDecision(AssessmentFlowAction.submit, failedState);
-    }
     return _generate(
       failedState,
-      grade: state.grade - 1,
+      grade: state.grade == minimumGrade ? state.grade : state.grade - 1,
       mode: AssessmentFlowMode.recovery,
     );
   }

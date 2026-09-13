@@ -442,7 +442,7 @@ void main() {
   );
 
   testWidgets(
-    'four consecutive wrong answers in the first five fail at question four',
+    'five consecutive wrong answers in the first five fail at question five',
     (tester) async {
       final service = _PendingGenerateExamService();
       await _pumpAssessment(
@@ -453,17 +453,17 @@ void main() {
         examType: examTypeAssessment,
       );
 
-      for (var index = 0; index < 4; index++) {
+      for (var index = 0; index < 5; index++) {
         await tester.tap(find.byType(AssessmentAnswerButton).at(1));
         await tester.pump();
-        if (index < 3) {
+        if (index < 4) {
           await tester.tap(find.byType(AssessmentBottomActionButton).last);
           await tester.pump();
         }
       }
 
       expect(service.submitCalls, 1);
-      expect(service.submittedAnswers, hasLength(4));
+      expect(service.submittedAnswers, hasLength(5));
       expect(service.generateCalls, 1);
       expect(service.requestedGradeLabels, <String?>['Lớp 1']);
       expect(
