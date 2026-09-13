@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 void main() {
@@ -293,6 +295,7 @@ void main() {
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 1,
+            'num_questions': 3,
             'status': 'ACTIVE',
             'questions': List<Map<String, dynamic>>.generate(
               3,
@@ -367,6 +370,7 @@ void main() {
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 0,
+            'num_questions': 3,
             'status': 'ACTIVE',
             'questions': List<Map<String, dynamic>>.generate(
               3,
@@ -409,6 +413,104 @@ void main() {
     expect(exam.answers, isEmpty);
     expect(exam.resumeQuestionIndex, 0);
   });
+
+  test(
+    'loads the full active set before resuming a placeholder-only journey',
+    () async {
+      final requests = <RequestOptions>[];
+      final api = _apiReturning((options) {
+        requests.add(options);
+        final body = _body(options);
+        if (body['user_exam_id'] == 99) {
+          return <String, dynamic>{
+            'mstatus': 200,
+            'status': 'Success',
+            'exams': <Map<String, dynamic>>[
+              <String, dynamic>{
+                'ai_exam_id': 7,
+                'user_ai_exam_id': 41,
+                'profile_id': 21,
+                'exam_type': 'ASSESSMENT',
+                'grade': 0,
+                'num_questions': 10,
+                // Submitting Q1/A creates the journey but leaves it ACTIVE.
+                'status': 'SUBMITTED',
+              },
+            ],
+            'stats': <String, dynamic>{
+              'correct_number': 0,
+              'score_percentage': 0,
+              'skipped_number': 9,
+              'total_questions': 1,
+              'exam_type': 'ASSESSMENT',
+              'status': 'ACTIVE',
+              'user_exam_id': 99,
+              'grade': 0,
+            },
+            'details': <Map<String, dynamic>>[
+              <String, dynamic>{
+                'user_ai_exam_id': 41,
+                'question_number': 1,
+                'selected_label': 'A',
+              },
+            ],
+          };
+        }
+
+        expect(body, containsPair('user_ai_exam_id', 41));
+        expect(body, isNot(contains('user_exam_id')));
+        return <String, dynamic>{
+          'mstatus': 200,
+          'status': 'Success',
+          'exam': <String, dynamic>{
+            'ai_exam_id': 7,
+            'user_ai_exam_id': 41,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 0,
+            'num_questions': 10,
+            'status': 'SUBMITTED',
+            'questions': List<Map<String, dynamic>>.generate(
+              10,
+              (index) => <String, dynamic>{
+                'question_number': index + 1,
+                'question_name': 'Resume question ${index + 1}',
+                'right_answer_label': 'B',
+                'right_answer_content': '${index + 2}',
+                'answers': <Map<String, dynamic>>[
+                  <String, dynamic>{'label': 'A', 'content': '0'},
+                  <String, dynamic>{'label': 'B', 'content': '${index + 2}'},
+                ],
+              },
+            ),
+          },
+        };
+      });
+
+      final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
+
+      expect(requests, hasLength(2));
+      expect(exam.examId, 41);
+      expect(exam.userExamId, 99);
+      expect(exam.examStatus, 'ACTIVE');
+      expect(exam.questions, hasLength(10));
+      expect(exam.answers, isEmpty);
+      expect(exam.resumeQuestionIndex, 0);
+
+      final controller = AssessmentController(
+        examService: api,
+        initialExam: exam,
+        profileId: 21,
+      );
+      addTearDown(controller.dispose);
+      controller.selectAnswer(exam.questions.first.answers.first);
+
+      expect(
+        controller.prepareAssessmentFlow(),
+        AssessmentFlowAction.continueSet,
+      );
+    },
+  );
 
   test('loads the new exam statistics endpoint', () async {
     late RequestOptions captured;

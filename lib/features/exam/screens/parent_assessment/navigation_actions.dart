@@ -70,6 +70,9 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
   }
 
   Future<void> _openActiveAssessment(GeneratedExam summaryExam) async {
+    if (_isOpeningActiveAssessment) {
+      return;
+    }
     final userExamId = summaryExam.userExamId;
     final profileId = profileStableId(widget.activeProfile);
     if (userExamId == null || userExamId <= 0 || profileId == null) {
@@ -77,31 +80,48 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     }
 
     HapticFeedback.selectionClick();
-    final result = await showActiveAssessmentDialog(
-      context,
-      onCancel: () => widget.examService.updateUserExamStatus(
-        userExamId: userExamId,
-        status: assessmentCanceledStatus,
-        profileId: profileId,
-      ),
-      onContinue: () => widget.examService.getExamDetail(
+    _updateState(() {
+      _isOpeningActiveAssessment = true;
+      _errorMessage = null;
+    });
+
+    final detailLoadFailedMessage = context.readText(
+      AppKeys.examDetailLoadFailed,
+    );
+    final GeneratedExam resumedExam;
+    try {
+      resumedExam = await widget.examService.getExamDetail(
         userExamId,
         profileId: profileId,
         userExamId: userExamId,
-      ),
-    );
-    if (!mounted || result == null) {
+      );
+      if (resumedExam.questions.isEmpty) {
+        throw ExamException(detailLoadFailedMessage);
+      }
+    } on ExamException catch (error) {
+      if (mounted) {
+        _updateState(() {
+          _isOpeningActiveAssessment = false;
+          _errorMessage = error.message;
+        });
+        _showActiveAssessmentLoadError(error.message);
+      }
       return;
-    }
-    if (result.action == ActiveAssessmentDialogAction.canceled) {
-      await _loadAssessments(page: 1);
+    } catch (_) {
+      if (mounted) {
+        _updateState(() {
+          _isOpeningActiveAssessment = false;
+          _errorMessage = detailLoadFailedMessage;
+        });
+        _showActiveAssessmentLoadError(detailLoadFailedMessage);
+      }
       return;
     }
 
-    final resumedExam = result.exam;
-    if (resumedExam == null || resumedExam.questions.isEmpty) {
+    if (!mounted) {
       return;
     }
+    _updateState(() => _isOpeningActiveAssessment = false);
     final assessmentTabRoute = ModalRoute.of(context);
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
@@ -129,6 +149,15 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     if (mounted && _showAssessmentContent) {
       await _loadAssessments(page: 1);
     }
+  }
+
+  void _showActiveAssessmentLoadError(String message) {
+    if (Scaffold.maybeOf(context) == null) {
+      return;
+    }
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _openLearningProgress() {

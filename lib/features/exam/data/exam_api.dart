@@ -200,7 +200,37 @@ class ExamApi implements ExamService {
 
     final isEntireJourney = validUserExamId != null;
     if (isEntireJourney) {
-      return _journeyDetailToModel(response, validUserExamId);
+      final activeExam = _activeJourneyExam(response);
+      var detailedActiveExam = _matchingDetailedActiveExam(
+        response.exam,
+        activeExam,
+      );
+      detailedActiveExam ??= _matchingDetailedActiveExam(
+        activeExam,
+        activeExam,
+      );
+      final activeUserAiExamId = activeExam?.userAiExamId;
+      if (activeExam != null &&
+          detailedActiveExam == null &&
+          activeUserAiExamId != null &&
+          activeUserAiExamId > 0) {
+        final activeSetResponse = await _runExamRequest(
+          () => _getExamDetailResponse(
+            userAiExamId: activeUserAiExamId,
+            userExamId: null,
+            profileId: validProfileId,
+          ),
+        );
+        detailedActiveExam = _matchingDetailedActiveExam(
+          activeSetResponse.exam,
+          activeExam,
+        );
+      }
+      return _journeyDetailToModel(
+        response,
+        validUserExamId,
+        detailedActiveExam: detailedActiveExam,
+      );
     }
 
     final exam = response.exam;
@@ -315,27 +345,20 @@ class ExamApi implements ExamService {
 
 GeneratedExam _journeyDetailToModel(
   ExamDetailResponseDto response,
-  int userExamId,
-) {
+  int userExamId, {
+  GeneratedExamDto? detailedActiveExam,
+}) {
   final stats = response.stats;
-  GeneratedExamDto? activeExam;
-  for (final candidate in response.exams.reversed) {
-    final status = candidate.status?.trim().toUpperCase();
-    if (status == 'ACTIVE' || status == 'IN_PROGRESS') {
-      activeExam = candidate;
-      break;
-    }
-  }
-  final journeyStatus = stats?.status?.trim().toUpperCase();
-  if (activeExam == null &&
-      (journeyStatus == 'ACTIVE' || journeyStatus == 'IN_PROGRESS') &&
-      response.exams.isNotEmpty) {
-    activeExam = response.exams.last;
-  }
+  final activeExam = _activeJourneyExam(response);
   if (activeExam != null) {
     return _activeJourneySetToModel(
       response: response,
-      activeExam: activeExam,
+      activeExam: detailedActiveExam ?? activeExam,
+      activeUserAiExamId: activeExam.userAiExamId,
+      activeStatus: stats?.status ?? activeExam.status,
+      expectedQuestionCount:
+          activeExam.numQuestions ??
+          AssessmentFlowPolicy.generatedQuestionCount,
       userExamId: userExamId,
     );
   }
@@ -390,9 +413,11 @@ GeneratedExam _journeyDetailToModel(
 GeneratedExam _activeJourneySetToModel({
   required ExamDetailResponseDto response,
   required GeneratedExamDto activeExam,
+  required int? activeUserAiExamId,
+  required String? activeStatus,
+  required int expectedQuestionCount,
   required int userExamId,
 }) {
-  final activeUserAiExamId = activeExam.userAiExamId;
   final activeDetails = response.details
       .where((detail) {
         if (activeUserAiExamId == null) {
@@ -425,25 +450,27 @@ GeneratedExam _activeJourneySetToModel({
           questions: activeExam.questions,
         );
 
-  if (activeExam.questions.isNotEmpty) {
+  if (activeExam.questions.length >= expectedQuestionCount) {
     return activeExam.toModel(
       submittedAnswers: submittedAnswers,
       stats: response.stats,
       userExamId: userExamId,
+      userAiExamIdOverride: activeUserAiExamId,
+      examStatusOverride: activeStatus,
       resumeQuestionIndex: resumeQuestionIndex,
     );
   }
-  if (activeDetails.isEmpty) {
+  if (activeDetails.length < expectedQuestionCount) {
     throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
   }
 
   return GeneratedExam(
-    examId: activeExam.userAiExamId,
+    examId: activeUserAiExamId,
     aiExamId: activeExam.aiExamId,
-    userAiExamId: activeExam.userAiExamId,
+    userAiExamId: activeUserAiExamId,
     userExamId: userExamId,
     profileId: activeExam.profileId,
-    examStatus: activeExam.status,
+    examStatus: activeStatus,
     examType: activeExam.examType ?? examTypeAssessment,
     grade: activeExam.grade,
     level: activeExam.level,
@@ -472,6 +499,53 @@ GeneratedExam _activeJourneySetToModel({
         )
         .toList(growable: false),
   );
+}
+
+GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {
+  for (final candidate in response.exams.reversed) {
+    if (_isActiveExamStatus(candidate.status)) {
+      return candidate;
+    }
+  }
+
+  if (_isActiveExamStatus(response.exam?.status)) {
+    return response.exam;
+  }
+
+  if (!_isActiveExamStatus(response.stats?.status)) {
+    return null;
+  }
+  if (response.exams.isNotEmpty) {
+    return response.exams.last;
+  }
+  return response.exam;
+}
+
+GeneratedExamDto? _matchingDetailedActiveExam(
+  GeneratedExamDto? detailedExam,
+  GeneratedExamDto? activeExam,
+) {
+  if (detailedExam == null || detailedExam.questions.isEmpty) {
+    return null;
+  }
+  final expectedQuestionCount =
+      activeExam?.numQuestions ??
+      detailedExam.numQuestions ??
+      AssessmentFlowPolicy.generatedQuestionCount;
+  if (detailedExam.questions.length < expectedQuestionCount) {
+    return null;
+  }
+  final detailedId = detailedExam.userAiExamId;
+  final activeId = activeExam?.userAiExamId;
+  if (detailedId != null && activeId != null && detailedId != activeId) {
+    return null;
+  }
+  return detailedExam;
+}
+
+bool _isActiveExamStatus(String? status) {
+  final normalizedStatus = status?.trim().toUpperCase();
+  return normalizedStatus == 'ACTIVE' || normalizedStatus == 'IN_PROGRESS';
 }
 
 int? _activeResumeQuestionIndex({

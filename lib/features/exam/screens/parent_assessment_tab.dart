@@ -18,6 +18,7 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/learning_progress_screen.dart';
@@ -32,8 +33,6 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_p
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
-import 'package:numi/features/exam/widgets/parent_assessment/active_assessment_dialog.dart';
-import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 
 part 'parent_assessment/data_actions.dart';
 part 'parent_assessment/navigation_actions.dart';
@@ -90,6 +89,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   String? _errorMessage;
   int _loadRequestId = 0;
   bool _showAssessmentContent = false;
+  bool _isOpeningActiveAssessment = false;
 
   @override
   void initState() {

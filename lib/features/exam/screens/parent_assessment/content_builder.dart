@@ -15,6 +15,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
   }) {
     final colors = context.themeColors;
     final shouldShowProgressChart = _allEntries.length > 1;
+    final resumableActiveEntry = _activeEntry;
     final activeEntry = _searchController.text.trim().isEmpty
         ? _activeEntry
         : null;
@@ -37,7 +38,12 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 13),
-        child: ParentAssessmentTabBanner(onTap: _openAssessmentDirectly),
+        child: ParentAssessmentTabBanner(
+          isLoading: resumableActiveEntry != null && _isOpeningActiveAssessment,
+          onTap: resumableActiveEntry == null
+              ? _openAssessmentDirectly
+              : () => _openActiveAssessment(resumableActiveEntry.exam),
+        ),
       ),
       ParentAssessmentSearchField(controller: _searchController),
       if (shouldShowProgressChart) ...[
@@ -63,6 +69,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
           padding: const EdgeInsets.only(top: 16),
           child: _initialFadeIn(
             child: ParentAssessmentActiveCard(
+              isLoading: _isOpeningActiveAssessment,
               onTap: () => _openActiveAssessment(activeEntry.exam),
             ),
           ),

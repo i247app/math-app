@@ -6,9 +6,14 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ParentAssessmentActiveCard extends StatelessWidget {
-  const ParentAssessmentActiveCard({super.key, required this.onTap});
+  const ParentAssessmentActiveCard({
+    super.key,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class ParentAssessmentActiveCard extends StatelessWidget {
       color: colors.warningSurface,
       borderRadius: radius,
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: radius,
         child: Ink(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -135,24 +140,35 @@ class ParentAssessmentActiveCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          onPressed: onTap,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                context.getText(
-                                  AppKeys.parentAssessmentContinue,
+                          onPressed: isLoading ? null : onTap,
+                          child: isLoading
+                              ? SizedBox.square(
+                                  dimension: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: colors.onAccent,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      context.getText(
+                                        AppKeys.parentAssessmentContinue,
+                                      ),
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                        fontSize: FontSize.xxs,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 15,
+                                    ),
+                                  ],
                                 ),
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: FontSize.xxs,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.arrow_forward_rounded, size: 15),
-                            ],
-                          ),
                         ),
                       ),
                     ),

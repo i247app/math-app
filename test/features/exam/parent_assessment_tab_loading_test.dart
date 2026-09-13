@@ -435,26 +435,17 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(ParentAssessmentActiveCard),
-        matching: find.byType(Image),
-      ),
-      findsOneWidget,
-    );
+    expect(find.byType(AiAssessmentScreen), findsNothing);
 
-    await tester.ensureVisible(find.byType(ParentAssessmentActiveCard));
-    await tester.tap(find.byType(ParentAssessmentActiveCard));
+    await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
 
     expect(
       find.byKey(const ValueKey('active-assessment-dialog')),
-      findsOneWidget,
+      findsNothing,
     );
-    await tester.tap(find.byKey(const ValueKey('active-assessment-continue')));
-    await tester.pumpAndSettle();
-
     expect(examService.requestedDetailId, 8100);
     expect(examService.requestedUserExamId, 8100);
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
@@ -476,6 +467,17 @@ void main() {
     expect(find.byType(AiAssessmentScreen), findsNothing);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
     expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
+
+    await tester.tap(
+      find.byKey(const ValueKey('parent-assessment-active-continue')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('active-assessment-dialog')),
+      findsNothing,
+    );
+    expect(find.byType(AiAssessmentScreen), findsOneWidget);
   });
 
   testWidgets(
@@ -515,10 +517,17 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      await tester.ensureVisible(find.byType(ParentAssessmentActiveCard));
-      await tester.tap(find.byType(ParentAssessmentActiveCard));
+
+      expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+      expect(find.byType(AiAssessmentScreen), findsNothing);
+
+      await tester.tap(find.byType(ParentAssessmentTabBanner));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('active-assessment-cancel')));
+      expect(find.byType(AiAssessmentScreen), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close_rounded).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
       await tester.pumpAndSettle();
 
       expect(examService.updatedUserExamId, 8100);
