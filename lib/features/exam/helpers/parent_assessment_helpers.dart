@@ -137,6 +137,15 @@ String homeExamDateLabel(GeneratedExam exam) {
 String homeExamTitle(BuildContext context, GeneratedExam exam) {
   final title = exam.title?.trim();
   if (title != null && title.isNotEmpty) return title;
+  final numericGrade = exam.grade;
+  if (numericGrade != null) {
+    if (numericGrade == 0) {
+      return context.getText(AppKeys.kindergartenMathAssessment);
+    }
+    return context.formatText(AppKeys.gradeMathAssessment, {
+      'grade': numericGrade,
+    });
+  }
   final grade = exam.grading?.aiDetectGrade?.trim();
   if (grade != null && grade.isNotEmpty) {
     return '${context.getText(AppKeys.mathAssessment)} $grade';
