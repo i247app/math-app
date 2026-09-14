@@ -123,10 +123,10 @@ void main() {
       expect(decision.nextState.grade, 3);
     });
 
-    test('50 percent without both Q3 and Q6 stops at the current grade', () {
+    test('50 percent without Q3 or Q6 stops at the current grade', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(grade: 3),
-        _score(correct: 5, answered: 10),
+        _score(correctIndexes: const <int>{0, 1, 3, 4, 6}, answered: 10),
       );
 
       expect(decision.action, AssessmentFlowAction.submit);
@@ -135,16 +135,39 @@ void main() {
       expect(decision.nextState.isFailed, isFalse);
     });
 
-    test('50 percent with Q3 and Q6 correct upgrades one grade', () {
+    test('50 percent with only Q3 correct upgrades one grade', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(grade: 2),
-        _score(correctIndexes: const <int>{0, 2, 4, 5, 8}, answered: 10),
+        _score(correctIndexes: const <int>{0, 2, 4, 7, 8}, answered: 10),
       );
 
       expect(decision.action, AssessmentFlowAction.generateSet);
       expect(decision.nextState.grade, 3);
       expect(decision.nextState.mode, AssessmentFlowMode.normal);
       expect(decision.nextState.isFailed, isFalse);
+    });
+
+    test('50 percent with only Q6 correct upgrades one grade', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(grade: 2),
+        _score(correctIndexes: const <int>{0, 1, 4, 5, 8}, answered: 10),
+      );
+
+      expect(decision.action, AssessmentFlowAction.generateSet);
+      expect(decision.nextState.grade, 3);
+      expect(decision.nextState.mode, AssessmentFlowMode.normal);
+      expect(decision.nextState.isFailed, isFalse);
+    });
+
+    test('more than 50 percent with either Q3 or Q6 upgrades one grade', () {
+      final decision = AssessmentFlowPolicy.decide(
+        const AssessmentFlowState(grade: 2),
+        _score(correctIndexes: const <int>{0, 1, 3, 4, 5, 8}, answered: 10),
+      );
+
+      expect(decision.action, AssessmentFlowAction.generateSet);
+      expect(decision.nextState.grade, 3);
+      expect(decision.nextState.mode, AssessmentFlowMode.normal);
     });
 
     test('normal pass without both Q3 and Q6 submits at the same grade', () {
@@ -180,7 +203,7 @@ void main() {
       expect(decision.nextState.isFailed, isTrue);
     });
 
-    test('recovery also upgrades at 50 percent when Q3 and Q6 are correct', () {
+    test('recovery upgrades at 50 percent when only Q3 is correct', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(
           grade: 2,
@@ -188,7 +211,7 @@ void main() {
           isFailed: true,
           setNumber: 2,
         ),
-        _score(correctIndexes: const <int>{0, 2, 4, 5, 8}, answered: 10),
+        _score(correctIndexes: const <int>{0, 2, 4, 7, 8}, answered: 10),
       );
 
       expect(decision.action, AssessmentFlowAction.generateSet);
@@ -213,7 +236,7 @@ void main() {
       expect(decision.nextState.grade, 2);
     });
 
-    test('recovery at 50 percent without both Q3 and Q6 stops', () {
+    test('recovery at 50 percent without Q3 or Q6 stops', () {
       final decision = AssessmentFlowPolicy.decide(
         const AssessmentFlowState(
           grade: 2,

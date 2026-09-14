@@ -103,21 +103,19 @@ class AssessmentSetScore {
         !correctQuestionIndexes.contains(index);
   }
 
-  bool get requiredQuestionsAreCorrect {
-    return answeredQuestionIndexes.contains(2) &&
-        answeredQuestionIndexes.contains(5) &&
-        !isQuestionWrong(2) &&
-        !isQuestionWrong(5);
+  bool isQuestionCorrect(int index) {
+    return answeredQuestionIndexes.contains(index) &&
+        correctQuestionIndexes.contains(index);
   }
 
-  bool get hasWrongRequiredQuestion {
-    return isQuestionWrong(2) || isQuestionWrong(5);
+  bool get hasUpgradeAnchorQuestionCorrect {
+    return isQuestionCorrect(2) || isQuestionCorrect(5);
   }
 
   bool get canUpgradeOneGrade {
     return isComplete &&
         wrongCount * 2 <= totalQuestions &&
-        requiredQuestionsAreCorrect;
+        hasUpgradeAnchorQuestionCorrect;
   }
 }
 
@@ -198,7 +196,7 @@ class AssessmentFlowPolicy {
       return AssessmentFlowDecision(AssessmentFlowAction.continueSet, state);
     }
 
-    if (score.isExactlyFiftyPercent && score.hasWrongRequiredQuestion) {
+    if (score.isExactlyFiftyPercent && !score.hasUpgradeAnchorQuestionCorrect) {
       return AssessmentFlowDecision(AssessmentFlowAction.submit, state);
     }
 

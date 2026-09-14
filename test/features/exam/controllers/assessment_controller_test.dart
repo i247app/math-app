@@ -358,35 +358,59 @@ void main() {
     expect(service.generatedGradeLabels, <String?>['Mẫu giáo']);
   });
 
-  test(
-    '50 percent without both Q3 and Q6 stops without changing grade',
-    () async {
-      final service = _RecordingExamService();
-      final controller = AssessmentController(
-        examService: service,
-        initialExam: _tenQuestionExam(examId: 81, grade: 2),
+  test('50 percent without Q3 or Q6 stops without changing grade', () async {
+    final service = _RecordingExamService();
+    final controller = AssessmentController(
+      examService: service,
+      initialExam: _tenQuestionExam(examId: 81, grade: 2),
+    );
+    addTearDown(controller.dispose);
+    const correctIndexes = <int>{0, 1, 3, 4, 6};
+
+    AssessmentFlowAction action = AssessmentFlowAction.continueSet;
+    for (var index = 0; index < 10; index++) {
+      controller.selectAnswer(
+        correctIndexes.contains(index) ? answers.last : answers.first,
       );
-      addTearDown(controller.dispose);
-      const correctIndexes = <int>{0, 1, 3, 4, 6};
-
-      AssessmentFlowAction action = AssessmentFlowAction.continueSet;
-      for (var index = 0; index < 10; index++) {
-        controller.selectAnswer(
-          correctIndexes.contains(index) ? answers.last : answers.first,
-        );
-        action = await controller.advanceAssessmentFlow();
-        if (index < 9) {
-          expect(controller.goToNextQuestion(), isTrue);
-        }
+      action = await controller.advanceAssessmentFlow();
+      if (index < 9) {
+        expect(controller.goToNextQuestion(), isTrue);
       }
+    }
 
-      expect(action, AssessmentFlowAction.submit);
-      expect(controller.currentGrade, 2);
-      expect(controller.flowMode, AssessmentFlowMode.normal);
-      expect(controller.isFailed, isFalse);
-      expect(service.generatedGradeLabels, isEmpty);
-    },
-  );
+    expect(action, AssessmentFlowAction.submit);
+    expect(controller.currentGrade, 2);
+    expect(controller.flowMode, AssessmentFlowMode.normal);
+    expect(controller.isFailed, isFalse);
+    expect(service.generatedGradeLabels, isEmpty);
+  });
+
+  test('50 percent with only Q3 correct generates grade plus one', () async {
+    final service = _RecordingExamService();
+    final controller = AssessmentController(
+      examService: service,
+      initialExam: _tenQuestionExam(examId: 82, grade: 2),
+    );
+    addTearDown(controller.dispose);
+    const correctIndexes = <int>{0, 2, 4, 7, 8};
+
+    AssessmentFlowAction action = AssessmentFlowAction.continueSet;
+    for (var index = 0; index < 10; index++) {
+      controller.selectAnswer(
+        correctIndexes.contains(index) ? answers.last : answers.first,
+      );
+      action = await controller.advanceAssessmentFlow();
+      if (index < 9) {
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    expect(action, AssessmentFlowAction.generateSet);
+    expect(controller.currentGrade, 3);
+    expect(controller.flowMode, AssessmentFlowMode.normal);
+    expect(controller.isFailed, isFalse);
+    expect(service.generatedGradeLabels, <String?>['Lớp 3']);
+  });
 
   test('grade 5 submits only the first six correct answers', () async {
     final service = _RecordingExamService();
