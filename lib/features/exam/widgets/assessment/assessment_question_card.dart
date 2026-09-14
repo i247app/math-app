@@ -20,13 +20,14 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final mathQuestion = _mathQuestionParts(question);
-    final isPictorialQuestion = _containsPictorialSymbols(question);
+    final displayQuestion = _normalizeBreakableWhitespace(question);
+    final mathQuestion = _mathQuestionParts(displayQuestion);
+    final isPictorialQuestion = _containsPictorialSymbols(displayQuestion);
 
     return Container(
       constraints: BoxConstraints(
         minHeight: _minimumHeightFor(
-          question,
+          displayQuestion,
           isMathQuestion: mathQuestion != null,
           isPictorialQuestion: isPictorialQuestion,
         ),
@@ -48,8 +49,16 @@ class AssessmentQuestionCard extends StatelessWidget {
               expression: mathQuestion.expression,
               color: colors.textPrimary,
             )
-          : _questionText(colors),
+          : _questionText(colors, displayQuestion),
     );
+  }
+
+  String _normalizeBreakableWhitespace(String value) {
+    return value
+        .replaceAll('\u00A0', ' ')
+        .replaceAll('\u202F', ' ')
+        .replaceAll('\u2060', '')
+        .replaceAll('\uFEFF', '');
   }
 
   double _minimumHeightFor(
@@ -117,16 +126,22 @@ class AssessmentQuestionCard extends StatelessWidget {
     );
   }
 
-  Widget _questionText(AppThemeColors colors) {
-    return Text(
-      question,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: colors.textPrimary,
-        fontSize: _fontSizeFor(question),
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: 0,
+  Widget _questionText(AppThemeColors colors, String displayQuestion) {
+    return SizedBox(
+      width: double.infinity,
+      child: Text(
+        displayQuestion,
+        textAlign: TextAlign.center,
+        softWrap: true,
+        maxLines: null,
+        overflow: TextOverflow.visible,
+        style: TextStyle(
+          color: colors.textPrimary,
+          fontSize: _fontSizeFor(displayQuestion),
+          fontWeight: FontWeight.w600,
+          height: 1.2,
+          letterSpacing: 0,
+        ),
       ),
     );
   }
