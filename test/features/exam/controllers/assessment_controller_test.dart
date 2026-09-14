@@ -413,7 +413,7 @@ void main() {
     );
     expect(service.generatedGradeLabels, isEmpty);
     expect(service.submittedAnswers, hasLength(6));
-    expect(service.statusUpdates, <(int, String)>[(9088, 'COMPLETE')]);
+    expect(service.statusUpdates, isEmpty);
   });
 
   test('practice exams still require every question to be answered', () async {
@@ -451,6 +451,115 @@ void main() {
     );
     expect(service.submittedAnswers, isNull);
   });
+
+  test('practice keeps the first answer while allowing retries', () {
+    final controller = AssessmentController(
+      examService: _UnusedExamService(),
+      examType: examTypePractice,
+      initialExam: _tenQuestionExam(
+        examId: 89,
+        grade: 2,
+        examType: examTypePractice,
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    controller.selectAnswer(answers.first);
+    expect(controller.selectedAnswerLabels[0], 'A');
+    expect(controller.selectedAnswerFeedbackCorrect, isFalse);
+    expect(controller.canContinue, isFalse);
+
+    controller.clearIncorrectPracticeFeedback();
+    expect(controller.selectedAnswerLabel, isNull);
+    expect(controller.selectedAnswerLabels[0], 'A');
+
+    controller.selectAnswer(answers.last);
+    expect(controller.selectedAnswerLabels[0], 'A');
+    expect(controller.selectedAnswerLabel, 'B');
+    expect(controller.selectedAnswerFeedbackCorrect, isTrue);
+    expect(controller.canContinue, isTrue);
+  });
+
+  test('practice submits the first six perfect first attempts', () async {
+    final service = _RecordingExamService();
+    final controller = AssessmentController(
+      examService: service,
+      examType: examTypePractice,
+      initialExam: _tenQuestionExam(
+        examId: 90,
+        grade: 3,
+        examType: examTypePractice,
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    AssessmentFlowAction action = AssessmentFlowAction.continueSet;
+    for (var index = 0; index < 6; index++) {
+      controller.selectAnswer(answers.last);
+      action = controller.preparePracticeFlow();
+      if (index < 5) {
+        expect(action, AssessmentFlowAction.continueSet);
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    expect(action, AssessmentFlowAction.submit);
+    final result = await controller.submitCurrentExam();
+    expect(result.status, AssessmentSubmitStatus.submitted);
+    expect(service.submittedAnswers, hasLength(6));
+    expect(
+      service.submittedAnswers!.every((answer) => answer.label == 'B'),
+      isTrue,
+    );
+    expect(service.statusUpdates, isEmpty);
+    expect(result.exam?.examType, examTypePractice);
+    expect(result.exam?.questions, hasLength(10));
+    expect(result.exam?.answers, hasLength(6));
+    expect(result.exam?.grading?.correctNumber, 6);
+    expect(result.exam?.grading?.totalQuestions, 6);
+  });
+
+  test(
+    'practice submits after first-attempt mistakes exceed fifty percent',
+    () async {
+      final service = _RecordingExamService();
+      final controller = AssessmentController(
+        examService: service,
+        examType: examTypePractice,
+        initialExam: _tenQuestionExam(
+          examId: 91,
+          grade: 4,
+          examType: examTypePractice,
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      AssessmentFlowAction action = AssessmentFlowAction.continueSet;
+      for (var index = 0; index < 6; index++) {
+        controller.selectAnswer(answers.first);
+        expect(controller.canContinue, isFalse);
+        controller.clearIncorrectPracticeFeedback();
+        controller.selectAnswer(answers.last);
+        expect(controller.canContinue, isTrue);
+        action = controller.preparePracticeFlow();
+        if (index < 5) {
+          expect(action, AssessmentFlowAction.continueSet);
+          expect(controller.goToNextQuestion(), isTrue);
+        }
+      }
+
+      expect(action, AssessmentFlowAction.submit);
+      final result = await controller.submitCurrentExam();
+      expect(result.status, AssessmentSubmitStatus.submitted);
+      expect(service.submittedAnswers, hasLength(6));
+      expect(
+        service.submittedAnswers!.every((answer) => answer.label == 'A'),
+        isTrue,
+      );
+      expect(result.exam?.grading?.correctNumber, 0);
+      expect(result.exam?.grading?.totalQuestions, 6);
+    },
+  );
 }
 
 class _UnusedExamService implements ExamService {
@@ -468,6 +577,7 @@ class _RecordingExamService implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) async {
     generatedGradeLabels.add(gradeLabel);
     final grade =
@@ -510,11 +620,15 @@ class _RecordingExamService implements ExamService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-GeneratedExam _tenQuestionExam({required int examId, required int grade}) {
+GeneratedExam _tenQuestionExam({
+  required int examId,
+  required int grade,
+  String examType = examTypeAssessment,
+}) {
   return GeneratedExam(
     examId: examId,
     aiExamId: 7000 + examId,
-    examType: examTypeAssessment,
+    examType: examType,
     grade: grade,
     questions: List<ExamQuestion>.generate(
       10,

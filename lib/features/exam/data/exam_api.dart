@@ -24,8 +24,16 @@ class ExamApi implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) async {
     final validProfileId = _requireProfileId(profileId);
+    final normalizedExamType = examType.trim().toUpperCase();
+    final validUserExamId = userExamId != null && userExamId > 0
+        ? userExamId
+        : null;
+    if (normalizedExamType == examTypePractice && validUserExamId == null) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+    }
     final GenerateExamResponseDto response;
     response = await _runExamRequest(
       () => _generateExam(
@@ -35,6 +43,9 @@ class ExamApi implements ExamService {
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),
           level: 1,
+          userExamId: normalizedExamType == examTypePractice
+              ? validUserExamId
+              : null,
         ),
       ),
     );
@@ -44,7 +55,7 @@ class ExamApi implements ExamService {
       throw ExamException(AppStrings.current(AppKeys.examHasNoQuestions));
     }
 
-    return exam.toModel(userExamId: response.userExamId);
+    return exam.toModel(userExamId: response.userExamId ?? validUserExamId);
   }
 
   @override

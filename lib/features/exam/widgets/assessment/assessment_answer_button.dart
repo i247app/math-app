@@ -10,24 +10,31 @@ class AssessmentAnswerButton extends StatelessWidget {
     required this.answer,
     required this.selected,
     required this.onTap,
+    this.feedbackCorrect,
   });
 
   final ExamAnswer answer;
   final bool selected;
   final VoidCallback onTap;
+  final bool? feedbackCorrect;
 
   static const double _borderRadius = 20;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final borderColor = selected
-        ? colors.brandStrong
-        : Colors.black.withValues(alpha: 0);
+    final feedbackColor = switch (feedbackCorrect) {
+      true => colors.success,
+      false => colors.error,
+      null => null,
+    };
+    final borderColor =
+        feedbackColor ??
+        (selected ? colors.brandStrong : Colors.black.withValues(alpha: 0));
     final isNumeric = isNumericAssessmentContent(answer.content);
-    final textColor = selected && isNumeric
-        ? colors.brandStrong
-        : colors.textPrimary;
+    final textColor =
+        feedbackColor ??
+        (selected && isNumeric ? colors.brandStrong : colors.textPrimary);
 
     return Material(
       color: Colors.transparent,
@@ -40,7 +47,13 @@ class AssessmentAnswerButton extends StatelessWidget {
           curve: Curves.easeOutCubic,
           constraints: BoxConstraints(minHeight: isNumeric ? 90 : 76),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE8F8F8) : colors.elevatedSurface,
+            color: feedbackCorrect == true
+                ? colors.successSurface
+                : feedbackCorrect == false
+                ? colors.errorSurface
+                : selected
+                ? const Color(0xFFE8F8F8)
+                : colors.elevatedSurface,
             borderRadius: BorderRadius.circular(_borderRadius),
             border: Border.all(color: borderColor, width: 2),
             boxShadow: [
@@ -65,7 +78,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: selected
-                        ? colors.brandStrong
+                        ? feedbackColor ?? colors.brandStrong
                         : const Color(0xFFEFFFFC),
                     shape: BoxShape.circle,
                   ),
@@ -98,6 +111,24 @@ class AssessmentAnswerButton extends StatelessWidget {
                           style: _answerTextStyle(textColor, isNumeric),
                         ),
                 ),
+                if (feedbackCorrect != null) ...[
+                  const SizedBox(width: 10),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: Icon(
+                      feedbackCorrect!
+                          ? Icons.check_circle_rounded
+                          : Icons.cancel_rounded,
+                      key: ValueKey<String>(
+                        feedbackCorrect!
+                            ? 'assessment-answer-feedback-correct'
+                            : 'assessment-answer-feedback-incorrect',
+                      ),
+                      color: feedbackColor,
+                      size: 28,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

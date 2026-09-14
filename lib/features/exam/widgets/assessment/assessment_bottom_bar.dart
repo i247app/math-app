@@ -12,6 +12,7 @@ class AssessmentBottomBar extends StatelessWidget {
     super.key,
     required this.bottomInset,
     required this.canGoBack,
+    required this.canContinue,
     required this.allQuestionsAnswered,
     required this.isSubmitting,
     this.isTransitioning = false,
@@ -22,6 +23,7 @@ class AssessmentBottomBar extends StatelessWidget {
 
   final double bottomInset;
   final bool canGoBack;
+  final bool canContinue;
   final bool allQuestionsAnswered;
   final bool isSubmitting;
   final bool isTransitioning;
@@ -66,7 +68,9 @@ class AssessmentBottomBar extends StatelessWidget {
               background: AppColors.brandTealSolid,
               foreground: colors.onBrand,
               labelFontSize: FontSize.normal,
-              onTap: isSubmitting || isTransitioning ? null : onContinue,
+              onTap: isSubmitting || isTransitioning || !canContinue
+                  ? null
+                  : onContinue,
             ),
           ),
         ],

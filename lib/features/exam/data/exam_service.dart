@@ -9,6 +9,7 @@ abstract interface class ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   });
 
   Future<List<GeneratedExam>> listExams({int? userId, int? profileId});

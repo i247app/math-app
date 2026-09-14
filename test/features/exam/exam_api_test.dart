@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
@@ -52,12 +53,35 @@ void main() {
     expect(body, isNot(contains('purpose')));
     expect(body, isNot(contains('type_of_exam')));
     expect(body, isNot(contains('previous_exam_id')));
+    expect(body, isNot(contains('user_exam_id')));
     expect(body, isNot(contains('chapters')));
     expect(exam.examId, 2);
     expect(exam.aiExamId, 7);
     expect(exam.userExamId, 99);
     expect(exam.questions.single.rightAnswer, 'A');
     expect(exam.questions.single.correctAnswer, '4');
+  });
+
+  test('generates PRACTICE with its assessment journey id', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return _examResponse();
+    });
+
+    final exam = await api.generateAssessmentExam(
+      examType: examTypePractice,
+      profileId: 21,
+      gradeLabel: 'Lớp 2',
+      userExamId: 99,
+    );
+
+    final body = _body(captured);
+    expect(captured.path, '/exams/generate');
+    expect(body, containsPair('exam_type', examTypePractice));
+    expect(body, containsPair('grade', 2));
+    expect(body, containsPair('user_exam_id', 99));
+    expect(exam.userExamId, 99);
   });
 
   test('defaults an omitted assessment grade to kindergarten', () async {

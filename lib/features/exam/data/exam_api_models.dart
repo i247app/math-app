@@ -10,6 +10,7 @@ class GenerateExamRequest {
     required this.examType,
     required this.grade,
     required this.level,
+    this.userExamId,
   });
 
   final int profileId;
@@ -17,6 +18,7 @@ class GenerateExamRequest {
   final String examType;
   final int grade;
   final int level;
+  final int? userExamId;
 
   factory GenerateExamRequest.fromJson(Map<String, dynamic> json) =>
       _$GenerateExamRequestFromJson(json);

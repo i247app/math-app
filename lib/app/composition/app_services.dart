@@ -30,6 +30,7 @@ import 'package:numi/features/exam/data/ai_shake_service.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
 import 'package:numi/features/exam/data/exam_snapshot_store.dart';
 import 'package:numi/features/exam/data/cached_exam_snapshot_store.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
 
@@ -52,6 +53,8 @@ class AppServices {
     HomeLayoutService? homeLayoutService,
     ExamShakeService? examShakeService,
     ExamSnapshotStore examSnapshotStore = const CachedExamSnapshotStore(),
+    PendingAssessmentCompletionStore pendingAssessmentCompletionStore =
+        const SecurePendingAssessmentCompletionStore(),
     SessionDataCleaner sessionDataCleaner = const AppSessionDataCleaner(),
     DashboardTabFactory? dashboardTabFactory,
     DashboardNavigator dashboardNavigator = const AppDashboardNavigator(),
@@ -83,6 +86,7 @@ class AppServices {
       examShakeService:
           examShakeService ?? AIShakeService(networkClient: client),
       examSnapshotStore: examSnapshotStore,
+      pendingAssessmentCompletionStore: pendingAssessmentCompletionStore,
       dashboardTabFactory:
           dashboardTabFactory ??
           AppDashboardTabFactory(examSnapshotStore: examSnapshots),
@@ -111,6 +115,7 @@ class AppServices {
     required this.homeLayoutService,
     required this.examShakeService,
     required this.examSnapshotStore,
+    required this.pendingAssessmentCompletionStore,
     required this.sessionDataCleaner,
     required this.dashboardTabFactory,
     required this.dashboardNavigator,
@@ -132,6 +137,7 @@ class AppServices {
   final HomeLayoutService homeLayoutService;
   final ExamShakeService examShakeService;
   final ExamSnapshotStore examSnapshotStore;
+  final PendingAssessmentCompletionStore pendingAssessmentCompletionStore;
   final SessionDataCleaner sessionDataCleaner;
   final DashboardTabFactory dashboardTabFactory;
   final DashboardNavigator dashboardNavigator;

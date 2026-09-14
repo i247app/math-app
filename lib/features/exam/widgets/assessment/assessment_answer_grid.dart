@@ -8,10 +8,12 @@ class AssessmentAnswerGrid extends StatelessWidget {
     super.key,
     required this.answers,
     required this.selectedAnswerLabel,
+    this.selectedAnswerFeedbackCorrect,
     required this.onSelected,
   });
   final List<ExamAnswer> answers;
   final String? selectedAnswerLabel;
+  final bool? selectedAnswerFeedbackCorrect;
   final ValueChanged<ExamAnswer> onSelected;
 
   @override
@@ -32,6 +34,9 @@ class AssessmentAnswerGrid extends StatelessWidget {
             AssessmentAnswerButton(
               answer: answers[index],
               selected: answers[index].label == selectedAnswerLabel,
+              feedbackCorrect: answers[index].label == selectedAnswerLabel
+                  ? selectedAnswerFeedbackCorrect
+                  : null,
               onTap: () => onSelected(answers[index]),
             ),
             if (index < answers.length - 1) const SizedBox(height: 8),
@@ -55,6 +60,9 @@ class AssessmentAnswerGrid extends StatelessWidget {
         return AssessmentAnswerButton(
           answer: answer,
           selected: answer.label == selectedAnswerLabel,
+          feedbackCorrect: answer.label == selectedAnswerLabel
+              ? selectedAnswerFeedbackCorrect
+              : null,
           onTap: () => onSelected(answer),
         );
       },

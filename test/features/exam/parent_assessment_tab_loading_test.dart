@@ -551,6 +551,7 @@ class _PendingExamService implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) async => _testExam;
 
   @override
@@ -576,6 +577,7 @@ class _CountingExamService implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) async => _testExam;
 
   @override

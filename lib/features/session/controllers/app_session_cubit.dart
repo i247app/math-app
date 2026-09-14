@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
+import 'package:numi/features/exam/helpers/pending_assessment_completion_reconciler.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
@@ -17,10 +20,14 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     required AuthService authService,
     required ProfileSessionResolver profileResolver,
     required NotificationPingService notificationPingService,
+    ExamService? examService,
+    PendingAssessmentCompletionStore? pendingAssessmentCompletionStore,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
        _authService = authService,
        _profileResolver = profileResolver,
        _notificationPingService = notificationPingService,
+       _examService = examService,
+       _pendingAssessmentCompletionStore = pendingAssessmentCompletionStore,
        super(
          initialSession == null
              ? const AppSessionState()
@@ -38,10 +45,13 @@ class AppSessionCubit extends Cubit<AppSessionState> {
   final ProfileSessionResolver _profileResolver;
   final AuthService _authService;
   final NotificationPingService _notificationPingService;
+  final ExamService? _examService;
+  final PendingAssessmentCompletionStore? _pendingAssessmentCompletionStore;
   int _sessionEpoch;
   int _operationRevision = 0;
   Future<void>? _pendingLogout;
   Future<void>? _pendingProfileSelection;
+  bool _isReconcilingPendingCompletions = false;
 
   bool _isCurrent(int revision) => !isClosed && revision == _operationRevision;
 
@@ -155,6 +165,26 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     );
   }
 
+  void _retryPendingAssessmentCompletions(List<StudentProfile> profiles) {
+    final examService = _examService;
+    final completionStore = _pendingAssessmentCompletionStore;
+    if (examService == null ||
+        completionStore == null ||
+        _isReconcilingPendingCompletions) {
+      return;
+    }
+    _isReconcilingPendingCompletions = true;
+    unawaited(
+      reconcilePendingAssessmentCompletions(
+        examService: examService,
+        completionStore: completionStore,
+        allowedProfileIds: <int>{
+          for (final profile in profiles) ?profileStableId(profile),
+        },
+      ).whenComplete(() => _isReconcilingPendingCompletions = false),
+    );
+  }
+
   Future<void> logout() {
     if (isClosed) return Future<void>.value();
     final existing = _pendingLogout;
@@ -202,6 +232,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
             (isNewParentAccount || state.shouldShowChildProfileDialog),
       ),
     );
+    _retryPendingAssessmentCompletions(session.profiles);
   }
 
   void consumeChildProfileDialog() {

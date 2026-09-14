@@ -9,7 +9,9 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
@@ -39,6 +41,7 @@ class AiAssessmentScreen extends StatefulWidget {
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
     this.isResumedAssessment = false,
+    this.pendingCompletionStore,
   });
 
   final ExamService? examService;
@@ -53,6 +56,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
   final bool isResumedAssessment;
+  final PendingAssessmentCompletionStore? pendingCompletionStore;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -60,12 +64,17 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
+  late final PendingAssessmentCompletionStore _pendingCompletionStore;
+  Timer? _practiceFeedbackTimer;
   final GuardedExitController<AiAssessmentResult> _exitController =
       GuardedExitController<AiAssessmentResult>();
 
   @override
   void initState() {
     super.initState();
+    _pendingCompletionStore =
+        widget.pendingCompletionStore ??
+        const SecurePendingAssessmentCompletionStore();
     _controller = AssessmentController(
       examService: widget.examService ?? context.read<ExamService>(),
       initialExam: widget.initialExam,
@@ -81,6 +90,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   @override
   void dispose() {
+    _practiceFeedbackTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -99,6 +109,19 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   void selectAnswer(ExamAnswer answer) {
     HapticFeedback.selectionClick();
     _controller.selectAnswer(answer);
+    if (_controller.isPractice) {
+      _practiceFeedbackTimer?.cancel();
+      if (_controller.selectedAnswerFeedbackCorrect == false) {
+        final questionIndex = _controller.questionIndex;
+        _practiceFeedbackTimer = Timer(
+          const Duration(milliseconds: 650),
+          () => _controller.clearIncorrectPracticeFeedback(
+            questionIndex: questionIndex,
+          ),
+        );
+      }
+      return;
+    }
     _advanceFlowAfterAnswer();
   }
 
@@ -138,6 +161,21 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   Future<void> _goToNextQuestion() async {
+    if (_controller.isPractice) {
+      if (!_controller.canContinue) {
+        HapticFeedback.selectionClick();
+        return;
+      }
+      HapticFeedback.mediumImpact();
+      final action = _controller.preparePracticeFlow();
+      if (action == AssessmentFlowAction.submit) {
+        await submitCurrentExam();
+        return;
+      }
+      _moveToNextQuestion();
+      return;
+    }
+
     if (!_controller.isAssessment) {
       if (_controller.allQuestionsAnswered) {
         await submitCurrentExam();
@@ -185,7 +223,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
     final navigator = Navigator.of(context);
     final examService = _controller.examService;
-    final fallbackExamType = widget.examType;
     final finalGrade = _controller.currentGrade;
     final gradeLabel = _controller.currentGradeLabel;
     final correctAnswers = _controller.totalCorrectAnswerCount;
@@ -195,9 +232,81 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     final allowQuestionNavigation = widget.allowQuestionNavigation;
     final showQuestionNavigation = widget.showQuestionNavigation;
     final submittedExam = result.exam!;
-    final submittedUserExamId = submittedExam.userExamId;
+    final submittedUserExamId =
+        submittedExam.userExamId ?? _controller.userExamId;
     final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
     final reviewDetailId = submittedUserExamId ?? submittedExamId;
+    final pendingProfileId = profileId ?? submittedExam.profileId;
+    if ((_controller.isAssessment || _controller.isPractice) &&
+        submittedUserExamId != null &&
+        submittedUserExamId > 0 &&
+        pendingProfileId != null &&
+        pendingProfileId > 0) {
+      try {
+        await _pendingCompletionStore.markPending(
+          userExamId: submittedUserExamId,
+          profileId: pendingProfileId,
+        );
+      } catch (_) {
+        // The result remains usable; startup recovery is best effort.
+      }
+      if (!mounted) {
+        return;
+      }
+    }
+
+    if (_controller.isPractice) {
+      navigator.pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (resultContext) {
+            return PracticeResultScreen(
+              grade: finalGrade,
+              correctAnswers: correctAnswers,
+              totalQuestions: totalQuestions,
+              examService: examService,
+              profileId: profileId,
+              userExamId: submittedUserExamId,
+              pendingCompletionStore: _pendingCompletionStore,
+              onViewDetails: submittedExamId == null
+                  ? null
+                  : () {
+                      Navigator.of(resultContext).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => RepositoryProvider<ExamService>.value(
+                            value: examService,
+                            child: ExamReviewScreen(
+                              examId: submittedExamId,
+                              profileId: profileId ?? submittedExam.profileId,
+                              initialExam: submittedExam,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+              onPracticeAgainGenerated: (generatedExam) {
+                Navigator.of(resultContext).pushReplacement(
+                  MaterialPageRoute<void>(
+                    builder: (_) => AiAssessmentScreen(
+                      examService: examService,
+                      initialExam: generatedExam,
+                      examType: examTypePractice,
+                      gradeLabel: gradeLabel,
+                      profileId: profileId,
+                      onResultBack: onResultBack,
+                      allowQuestionNavigation: allowQuestionNavigation,
+                      showQuestionNavigation: showQuestionNavigation,
+                      pendingCompletionStore: _pendingCompletionStore,
+                    ),
+                  ),
+                );
+              },
+              onBack: onResultBack,
+            );
+          },
+        ),
+      );
+      return;
+    }
 
     navigator.pushReplacement(
       MaterialPageRoute<void>(
@@ -208,6 +317,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             totalQuestions: totalQuestions,
             examService: examService,
             profileId: profileId,
+            userExamId: submittedUserExamId,
+            pendingCompletionStore: _pendingCompletionStore,
             onViewDetails: reviewDetailId == null
                 ? null
                 : () {
@@ -235,12 +346,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                   builder: (_) => AiAssessmentScreen(
                     examService: examService,
                     initialExam: generatedExam,
-                    examType: generatedExam.examType ?? fallbackExamType,
+                    examType: generatedExam.examType ?? examTypePractice,
                     gradeLabel: gradeLabel,
                     profileId: profileId,
                     onResultBack: onResultBack,
                     allowQuestionNavigation: allowQuestionNavigation,
                     showQuestionNavigation: showQuestionNavigation,
+                    pendingCompletionStore: _pendingCompletionStore,
                   ),
                 ),
               );
@@ -469,6 +581,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             answers: currentQuestion.answers,
                                             selectedAnswerLabel:
                                                 _controller.selectedAnswerLabel,
+                                            selectedAnswerFeedbackCorrect:
+                                                _controller
+                                                    .selectedAnswerFeedbackCorrect,
                                             onSelected: selectAnswer,
                                           ),
                                         ],
@@ -485,6 +600,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                         allQuestionsAnswered:
                                             _controller.allQuestionsAnswered &&
                                             !_controller.isAssessment,
+                                        canContinue:
+                                            !_controller.isPractice ||
+                                            _controller.canContinue,
                                         isSubmitting: isSubmittingExam,
                                         isTransitioning: isTransitioningSet,
                                         onBack: goToPreviousQuestion,

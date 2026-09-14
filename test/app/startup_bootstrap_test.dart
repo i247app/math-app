@@ -4,6 +4,8 @@ import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/app/startup_bootstrap.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
@@ -115,4 +117,73 @@ void main() {
     expect(profileService.requestedUserId, isNull);
     expect(result.initialSession, isNull);
   });
+
+  test('retries pending assessment completion after session restore', () async {
+    final authService = _FakeAuthService(
+      const LoginUser(id: 7, phone: '0901234567'),
+    );
+    final profileService = _FakeProfileService(const <StudentProfile>[
+      StudentProfile(
+        profileId: 71,
+        userId: 7,
+        name: 'Learner',
+        isDefault: true,
+      ),
+    ]);
+    final completionStore = _MemoryCompletionStore();
+    final examService = _CompletionExamService();
+    final services = AppServices(
+      authService: authService,
+      profileService: profileService,
+      examService: examService,
+      pendingAssessmentCompletionStore: completionStore,
+    );
+
+    await StartupBootstrap(services: services).run();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(examService.completedUserExamId, 901);
+    expect(examService.completedProfileId, 71);
+    expect(completionStore.items, isEmpty);
+  });
+}
+
+class _MemoryCompletionStore implements PendingAssessmentCompletionStore {
+  final List<PendingAssessmentCompletion> items = <PendingAssessmentCompletion>[
+    const PendingAssessmentCompletion(userExamId: 901, profileId: 71),
+  ];
+
+  @override
+  Future<List<PendingAssessmentCompletion>> readAll() async =>
+      List<PendingAssessmentCompletion>.from(items);
+
+  @override
+  Future<void> markPending({
+    required int userExamId,
+    required int profileId,
+  }) async {}
+
+  @override
+  Future<void> remove(int userExamId) async {
+    items.removeWhere((item) => item.userExamId == userExamId);
+  }
+}
+
+class _CompletionExamService implements ExamService {
+  int? completedUserExamId;
+  int? completedProfileId;
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    expect(status, 'COMPLETE');
+    completedUserExamId = userExamId;
+    completedProfileId = profileId;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

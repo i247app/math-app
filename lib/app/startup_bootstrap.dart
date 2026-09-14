@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/network/api_metadata.dart';
@@ -8,6 +10,8 @@ import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
+import 'package:numi/features/exam/helpers/pending_assessment_completion_reconciler.dart';
+import 'package:numi/features/profile/models/profile.dart';
 
 class StartupBootstrapResult {
   const StartupBootstrapResult({
@@ -77,6 +81,18 @@ class StartupBootstrap {
       authService,
       services,
     ).timeout(sessionTimeout, onTimeout: () => null);
+    if (initialSession != null) {
+      unawaited(
+        reconcilePendingAssessmentCompletions(
+          examService: services.examService,
+          completionStore: services.pendingAssessmentCompletionStore,
+          allowedProfileIds: <int>{
+            for (final profile in initialSession.profiles)
+              ?profileStableId(profile),
+          },
+        ),
+      );
+    }
 
     return StartupBootstrapResult(
       lingoProvider: lingoProvider,

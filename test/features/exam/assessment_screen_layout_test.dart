@@ -7,8 +7,10 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
@@ -76,6 +78,96 @@ void main() {
     }
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('practice shows retry feedback until the correct answer', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: '2 + 2 = ?',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '4'),
+            ExamAnswer(label: 'B', content: '5'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: '3 + 3 = ?',
+          questionNumber: 2,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '6'),
+            ExamAnswer(label: 'B', content: '7'),
+          ],
+        ),
+      ],
+    );
+
+    final continueButton = find.byType(AssessmentBottomActionButton).last;
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNull,
+    );
+
+    await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNull,
+    );
+
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
+      findsNothing,
+    );
+
+    await tester.tap(find.byType(AssessmentAnswerButton).first);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-correct')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'practice first-six pass submits first attempts and shows score',
+    (tester) async {
+      final service = _ImmediatePracticeSubmitService();
+      await _pumpAssessment(
+        tester,
+        examService: service,
+        initialGrade: 3,
+        questions: _setQuestions('Practice'),
+      );
+
+      for (var index = 0; index < 6; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pump();
+      }
+      await tester.pumpAndSettle();
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(6));
+      expect(find.byType(PracticeResultScreen), findsOneWidget);
+      expect(find.text('6/6'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'shows submit immediately after answering the last unanswered question',
@@ -465,12 +557,15 @@ void main() {
     'completed assessment review loads the entire journey by user exam id',
     (tester) async {
       final service = _CompletedJourneyReviewExamService();
+      final completionStore = _RecordingPendingCompletionStore();
       await _pumpAssessment(
         tester,
         questions: _setQuestions('Completed set'),
         examService: service,
         initialGrade: 5,
         examType: examTypeAssessment,
+        profileId: 21,
+        pendingCompletionStore: completionStore,
       );
 
       for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
@@ -482,6 +577,9 @@ void main() {
         }
       }
       await tester.pumpAndSettle();
+
+      expect(completionStore.pendingUserExamId, 91001);
+      expect(completionStore.pendingProfileId, 21);
 
       await tester.tap(find.byKey(const ValueKey('placement-view-details')));
       await tester.pumpAndSettle();
@@ -622,6 +720,8 @@ Future<void> _pumpAssessment(
   String examType = examTypePractice,
   int? initialUserExamId = 7001,
   bool isResumedAssessment = false,
+  int? profileId,
+  PendingAssessmentCompletionStore? pendingCompletionStore,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -647,7 +747,9 @@ Future<void> _pumpAssessment(
           child: AiAssessmentScreen(
             examService: examService ?? _UnusedExamService(),
             examType: examType,
+            profileId: profileId,
             isResumedAssessment: isResumedAssessment,
+            pendingCompletionStore: pendingCompletionStore,
             allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
@@ -680,6 +782,28 @@ Future<void> _pumpAssessment(
   await tester.pump();
 }
 
+class _RecordingPendingCompletionStore
+    implements PendingAssessmentCompletionStore {
+  int? pendingUserExamId;
+  int? pendingProfileId;
+
+  @override
+  Future<List<PendingAssessmentCompletion>> readAll() async =>
+      const <PendingAssessmentCompletion>[];
+
+  @override
+  Future<void> markPending({
+    required int userExamId,
+    required int profileId,
+  }) async {
+    pendingUserExamId = userExamId;
+    pendingProfileId = profileId;
+  }
+
+  @override
+  Future<void> remove(int userExamId) async {}
+}
+
 class _PendingSubmitExamService implements ExamService {
   final Completer<GeneratedExam> _submitCompleter = Completer<GeneratedExam>();
   int submitCalls = 0;
@@ -694,6 +818,33 @@ class _PendingSubmitExamService implements ExamService {
     submitCalls++;
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ImmediatePracticeSubmitService implements ExamService {
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      userAiExamId: examId,
+      userExamId: 93001,
+      profileId: profileId,
+      examType: examTypePractice,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
   }
 
   @override
@@ -817,6 +968,7 @@ class _PendingGenerateExamService implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) {
     generateCalls++;
     requestedGradeLabels.add(gradeLabel);

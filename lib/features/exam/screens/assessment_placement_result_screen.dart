@@ -12,7 +12,9 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
@@ -27,6 +29,8 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     required this.totalQuestions,
     this.examService,
     this.profileId,
+    this.userExamId,
+    this.pendingCompletionStore,
     this.onTestAgainGenerated,
     this.onViewDetails,
     this.onBack,
@@ -37,6 +41,8 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final int totalQuestions;
   final ExamService? examService;
   final int? profileId;
+  final int? userExamId;
+  final PendingAssessmentCompletionStore? pendingCompletionStore;
   final ValueChanged<GeneratedExam>? onTestAgainGenerated;
   final VoidCallback? onViewDetails;
   final VoidCallback? onBack;
@@ -49,7 +55,9 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
 class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
   late final ExamService _examService;
+  late final PendingAssessmentCompletionStore _pendingCompletionStore;
   bool _isGeneratingAgain = false;
+  bool _isCompletingJourney = false;
 
   int get _grade => AssessmentFlowPolicy.clampGrade(widget.grade);
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
@@ -59,6 +67,9 @@ class _AssessmentPlacementResultScreenState
   void initState() {
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
+    _pendingCompletionStore =
+        widget.pendingCompletionStore ??
+        const SecurePendingAssessmentCompletionStore();
   }
 
   Future<void> _generateAgain(String examType) async {
@@ -70,6 +81,7 @@ class _AssessmentPlacementResultScreenState
         examType: examType,
         gradeLabel: AssessmentFlowPolicy.gradeLabel(_grade),
         profileId: widget.profileId,
+        userExamId: examType == examTypePractice ? widget.userExamId : null,
       );
       if (!mounted) {
         return;
@@ -114,14 +126,61 @@ class _AssessmentPlacementResultScreenState
     );
   }
 
-  void _exitResult() {
+  Future<void> _exitResult() async {
+    if (_isGeneratingAgain || _isCompletingJourney) {
+      return;
+    }
     HapticFeedback.mediumImpact();
+    setState(() => _isCompletingJourney = true);
+    try {
+      await completeAssessmentJourney(
+        examService: _examService,
+        completionStore: _pendingCompletionStore,
+        userExamId: widget.userExamId,
+        profileId: widget.profileId,
+      );
+    } on ExamException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _isCompletingJourney = false);
+      _showStatusError(error.message);
+      return;
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _isCompletingJourney = false);
+      _showStatusError(
+        AppStrings.current(AppKeys.assessmentStatusUpdateFailed),
+      );
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
     final onBack = widget.onBack;
     if (onBack != null) {
       onBack();
       return;
     }
     exitToGradeSelection(context);
+  }
+
+  void _showStatusError(String message) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.getText(AppKeys.assessmentResultTitle)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.getText(AppKeys.close)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _viewDetails() {
@@ -143,7 +202,7 @@ class _AssessmentPlacementResultScreenState
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
-              child: _isGeneratingAgain
+              child: _isGeneratingAgain || _isCompletingJourney
                   ? const AssessmentTestAgainLoader()
                   : _buildResultContent(context),
             ),
@@ -190,6 +249,7 @@ class _AssessmentPlacementResultScreenState
                         border: Border.all(color: colors.border),
                       ),
                       child: ExamHeaderIconButton(
+                        key: const ValueKey('placement-result-close'),
                         icon: Icons.close_rounded,
                         color: colors.brandStrong,
                         size: 36,

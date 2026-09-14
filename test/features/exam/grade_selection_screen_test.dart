@@ -35,6 +35,7 @@ class _FailingExamService implements ExamService {
     String examType = examTypeAssessment,
     String? gradeLabel,
     int? profileId,
+    int? userExamId,
   }) {
     requestedGradeLabels.add(gradeLabel);
     throw const ExamException('Generation failed');

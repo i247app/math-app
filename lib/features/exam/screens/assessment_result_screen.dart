@@ -81,6 +81,9 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
         examType: examType,
         gradeLabel: gradeLabel,
         profileId: widget.profileId,
+        userExamId: examType == examTypePractice
+            ? widget.exam?.userExamId
+            : null,
       );
       if (!mounted) {
         return;

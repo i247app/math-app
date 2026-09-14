@@ -8,6 +8,8 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
@@ -163,6 +165,88 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('practice again generates PRACTICE at the placement grade', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final service = _RecordingPracticeService();
+    GeneratedExam? generatedExam;
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 4,
+            correctAnswers: 6,
+            totalQuestions: 10,
+            examService: service,
+            profileId: 21,
+            userExamId: 99,
+            onTestAgainGenerated: (exam) => generatedExam = exam,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('placement-practice-again')));
+    await tester.pump();
+
+    expect(service.requestedExamType, examTypePractice);
+    expect(service.requestedGradeLabel, 'Lớp 4');
+    expect(service.requestedProfileId, 21);
+    expect(service.requestedUserExamId, 99);
+    expect(generatedExam?.examType, examTypePractice);
+    expect(generatedExam?.grade, 4);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('closes the result only after completing the journey', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final service = _RecordingPracticeService();
+    final completionStore = _RecordingCompletionStore();
+    var didClose = false;
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 2,
+            correctAnswers: 6,
+            totalQuestions: 10,
+            examService: service,
+            profileId: 21,
+            userExamId: 99,
+            pendingCompletionStore: completionStore,
+            onBack: () => didClose = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('placement-result-close')));
+    await tester.pump();
+
+    expect(service.completedUserExamId, 99);
+    expect(service.completedStatus, 'COMPLETE');
+    expect(completionStore.removedUserExamId, 99);
+    expect(didClose, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('English grade and actions stay inside their bounds', (
     tester,
   ) async {
@@ -244,4 +328,74 @@ class _UnusedExamService implements ExamService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _RecordingPracticeService implements ExamService {
+  String? requestedExamType;
+  String? requestedGradeLabel;
+  int? requestedProfileId;
+  int? requestedUserExamId;
+  int? completedUserExamId;
+  String? completedStatus;
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? profileId,
+    int? userExamId,
+  }) async {
+    requestedExamType = examType;
+    requestedGradeLabel = gradeLabel;
+    requestedProfileId = profileId;
+    requestedUserExamId = userExamId;
+    return const GeneratedExam(
+      examId: 401,
+      examType: examTypePractice,
+      grade: 4,
+      questions: <ExamQuestion>[
+        ExamQuestion(
+          questionName: '10 + 5 = ?',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '15'),
+            ExamAnswer(label: 'B', content: '14'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    completedUserExamId = userExamId;
+    completedStatus = status;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _RecordingCompletionStore implements PendingAssessmentCompletionStore {
+  int? removedUserExamId;
+
+  @override
+  Future<List<PendingAssessmentCompletion>> readAll() async =>
+      const <PendingAssessmentCompletion>[];
+
+  @override
+  Future<void> markPending({
+    required int userExamId,
+    required int profileId,
+  }) async {}
+
+  @override
+  Future<void> remove(int userExamId) async {
+    removedUserExamId = userExamId;
+  }
 }

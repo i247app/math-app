@@ -7,6 +7,7 @@ import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
+import 'package:numi/features/exam/helpers/practice_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 const assessmentCorrectAnswerTarget =
@@ -97,6 +98,9 @@ class AssessmentController extends ChangeNotifier {
   int _questionIndex = 0;
   int _questionNumberOffset = 0;
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
+  final Map<int, String> _practiceFeedbackAnswerLabels = <int, String>{};
+  final Map<int, bool?> _practiceFeedbackCorrectness = <int, bool?>{};
+  final Set<int> _practiceSolvedQuestionIndexes = <int>{};
   final List<AssessmentSetRecord> _completedSets = <AssessmentSetRecord>[];
   final Map<int, GeneratedExam> _submittedSets = <int, GeneratedExam>{};
   String? _errorMessage;
@@ -115,9 +119,15 @@ class AssessmentController extends ChangeNotifier {
         examTypeAssessment;
   }
 
+  bool get _isPractice {
+    return (_exam?.examType ?? examType).trim().toUpperCase() ==
+        examTypePractice;
+  }
+
   ExamService get examService => _examService;
   GeneratedExam? get exam => _exam;
   bool get isAssessment => _isAssessment;
+  bool get isPractice => _isPractice;
   int get questionIndex => _questionIndex;
   int get questionNumberOffset => _questionNumberOffset;
   int get progressQuestionIndex => _isTransitioningSet ? 1 : _questionIndex + 1;
@@ -168,12 +178,27 @@ class AssessmentController extends ChangeNotifier {
     return questions[_questionIndex];
   }
 
-  String? get selectedAnswerLabel => _selectedAnswerLabels[_questionIndex];
+  String? get selectedAnswerLabel => _isPractice
+      ? _practiceFeedbackAnswerLabels[_questionIndex]
+      : _selectedAnswerLabels[_questionIndex];
 
-  bool get canContinue => selectedAnswerLabel != null;
+  bool? get selectedAnswerFeedbackCorrect =>
+      _isPractice ? _practiceFeedbackCorrectness[_questionIndex] : null;
+
+  bool get canContinue => _isPractice
+      ? _practiceSolvedQuestionIndexes.contains(_questionIndex)
+      : selectedAnswerLabel != null;
 
   int? get firstUnansweredQuestionIndex {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
+    if (_isPractice) {
+      for (var index = 0; index < questions.length; index++) {
+        if (!_practiceSolvedQuestionIndexes.contains(index)) {
+          return index;
+        }
+      }
+      return null;
+    }
     return _firstUnansweredIndex(questions);
   }
 
@@ -368,6 +393,9 @@ class AssessmentController extends ChangeNotifier {
     _questionIndex = 0;
     _questionNumberOffset = 0;
     _selectedAnswerLabels.clear();
+    _practiceFeedbackAnswerLabels.clear();
+    _practiceFeedbackCorrectness.clear();
+    _practiceSolvedQuestionIndexes.clear();
     _completedSets.clear();
     _submittedSets.clear();
     _pendingGenerationDecision = null;
@@ -419,12 +447,52 @@ class AssessmentController extends ChangeNotifier {
       return;
     }
     _allowsPartialSubmit = false;
+    if (_isPractice) {
+      if (_practiceSolvedQuestionIndexes.contains(_questionIndex)) {
+        return;
+      }
+      _selectedAnswerLabels.putIfAbsent(_questionIndex, () => answer.label);
+      final isCorrect = isAnswerCorrect(answer);
+      _practiceFeedbackAnswerLabels[_questionIndex] = answer.label;
+      _practiceFeedbackCorrectness[_questionIndex] = isCorrect;
+      if (isCorrect != false) {
+        _practiceSolvedQuestionIndexes.add(_questionIndex);
+      }
+      notifyListeners();
+      return;
+    }
     if (_selectedAnswerLabels[_questionIndex] == answer.label) {
       _selectedAnswerLabels.remove(_questionIndex);
     } else {
       _selectedAnswerLabels[_questionIndex] = answer.label;
     }
     notifyListeners();
+  }
+
+  void clearIncorrectPracticeFeedback({int? questionIndex}) {
+    final targetIndex = questionIndex ?? _questionIndex;
+    if (!_isPractice || _practiceFeedbackCorrectness[targetIndex] != false) {
+      return;
+    }
+    _practiceFeedbackAnswerLabels.remove(targetIndex);
+    _practiceFeedbackCorrectness.remove(targetIndex);
+    notifyListeners();
+  }
+
+  AssessmentFlowAction preparePracticeFlow() {
+    if (!_isPractice ||
+        _isTransitioningSet ||
+        _isSubmittingExam ||
+        !canContinue) {
+      return AssessmentFlowAction.continueSet;
+    }
+    final score = _currentPracticeSetScore;
+    if (!PracticeFlowPolicy.shouldSubmit(score)) {
+      return AssessmentFlowAction.continueSet;
+    }
+    _allowsPartialSubmit = !score.isComplete;
+    notifyListeners();
+    return AssessmentFlowAction.submit;
   }
 
   Future<AssessmentFlowAction> advanceAssessmentFlow() async {
@@ -505,7 +573,9 @@ class AssessmentController extends ChangeNotifier {
 
   bool goToNextQuestion() {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
-    if (_isTransitioningSet || _questionIndex >= questions.length - 1) {
+    if (_isTransitioningSet ||
+        (_isPractice && !canContinue) ||
+        _questionIndex >= questions.length - 1) {
       return false;
     }
 
@@ -545,17 +615,6 @@ class AssessmentController extends ChangeNotifier {
 
     try {
       final submittedExam = await _submitSet(currentExam, answers);
-      if (_isAssessment) {
-        final userExamId = submittedExam.userExamId;
-        if (userExamId == null || userExamId <= 0) {
-          throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
-        }
-        await _examService.updateUserExamStatus(
-          userExamId: userExamId,
-          status: 'COMPLETE',
-          profileId: profileId ?? currentExam.profileId,
-        );
-      }
       return AssessmentSubmitResult.submitted(submittedExam);
     } on ExamException catch (error) {
       _errorMessage = error.message;
@@ -592,6 +651,15 @@ class AssessmentController extends ChangeNotifier {
       totalQuestions: questions.length,
       answeredQuestionIndexes: _selectedAnswerLabels.keys.toSet(),
       correctQuestionIndexes: correctIndexes,
+    );
+  }
+
+  PracticeSetScore get _currentPracticeSetScore {
+    final assessmentScore = _currentSetScore;
+    return PracticeSetScore(
+      totalQuestions: assessmentScore.totalQuestions,
+      answeredQuestionIndexes: assessmentScore.answeredQuestionIndexes,
+      correctQuestionIndexes: assessmentScore.correctQuestionIndexes,
     );
   }
 
@@ -744,12 +812,90 @@ class AssessmentController extends ChangeNotifier {
       answers: answers,
       profileId: profileId ?? exam.profileId,
     );
-    _submittedSets[examId] = submittedExam;
+    final cachedExam = _isPractice
+        ? _practiceReviewExam(
+            sourceExam: exam,
+            submittedExam: submittedExam,
+            answers: answers,
+          )
+        : submittedExam;
+    _submittedSets[examId] = cachedExam;
     final submittedProfileId =
-        profileId ?? submittedExam.profileId ?? exam.profileId;
-    ExamCache.seedDetail(submittedExam);
+        profileId ?? cachedExam.profileId ?? exam.profileId;
+    ExamCache.seedDetail(cachedExam);
     ExamCache.invalidateLists(profileId: submittedProfileId);
-    return submittedExam;
+    return cachedExam;
+  }
+
+  GeneratedExam _practiceReviewExam({
+    required GeneratedExam sourceExam,
+    required GeneratedExam submittedExam,
+    required List<SubmitExamAnswer> answers,
+  }) {
+    final correctNumber = _correctAnswerCountFor(sourceExam, answers);
+    final totalQuestions = answers.length;
+    final grading = ExamGrading(
+      aiDetectGrade: submittedExam.grading?.aiDetectGrade,
+      aiReview: submittedExam.grading?.aiReview,
+      correctNumber: correctNumber,
+      scorePercentage: totalQuestions == 0
+          ? 0
+          : ((correctNumber * 100) / totalQuestions).round(),
+      skippedNumber: 0,
+      totalQuestions: totalQuestions,
+    );
+    return GeneratedExam(
+      id: submittedExam.id ?? sourceExam.id,
+      examId: submittedExam.examId ?? sourceExam.examId,
+      profileId: submittedExam.profileId ?? sourceExam.profileId,
+      examStatus: submittedExam.examStatus ?? sourceExam.examStatus,
+      examType: sourceExam.examType ?? submittedExam.examType,
+      title: submittedExam.title ?? sourceExam.title,
+      shortText: submittedExam.shortText ?? sourceExam.shortText,
+      userId: submittedExam.userId ?? sourceExam.userId,
+      createDt: submittedExam.createDt ?? sourceExam.createDt,
+      modifyDt: submittedExam.modifyDt ?? sourceExam.modifyDt,
+      aiExamId: submittedExam.aiExamId ?? sourceExam.aiExamId,
+      userAiExamId: submittedExam.userAiExamId ?? sourceExam.userAiExamId,
+      userExamId: sourceExam.userExamId ?? submittedExam.userExamId,
+      grade: sourceExam.grade ?? submittedExam.grade,
+      level: submittedExam.level ?? sourceExam.level,
+      numQuestions: submittedExam.numQuestions ?? sourceExam.numQuestions,
+      startedDt: submittedExam.startedDt ?? sourceExam.startedDt,
+      submittedDt: submittedExam.submittedDt ?? sourceExam.submittedDt,
+      grading: grading,
+      answers: List<SubmitExamAnswer>.unmodifiable(answers),
+      questions: sourceExam.questions,
+    );
+  }
+
+  int _correctAnswerCountFor(
+    GeneratedExam exam,
+    List<SubmitExamAnswer> answers,
+  ) {
+    var correctCount = 0;
+    for (final submittedAnswer in answers) {
+      final question = exam.questions
+          .where(
+            (candidate) =>
+                candidate.questionNumber == submittedAnswer.questionNumber,
+          )
+          .firstOrNull;
+      if (question == null) {
+        continue;
+      }
+      final answer = question.answers
+          .where(
+            (candidate) =>
+                _normalizedAnswerValue(candidate.label) ==
+                _normalizedAnswerValue(submittedAnswer.label),
+          )
+          .firstOrNull;
+      if (answer != null && _isAnswerCorrect(question, answer) == true) {
+        correctCount++;
+      }
+    }
+    return correctCount;
   }
 
   Future<_SubmittedSetResult> _requestSubmittedSet(
