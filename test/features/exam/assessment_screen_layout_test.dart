@@ -7,7 +7,6 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
@@ -661,7 +660,6 @@ void main() {
     'completed assessment review loads the entire journey by user exam id',
     (tester) async {
       final service = _CompletedJourneyReviewExamService();
-      final completionStore = _RecordingPendingCompletionStore();
       await _pumpAssessment(
         tester,
         questions: _setQuestions('Completed set'),
@@ -669,7 +667,6 @@ void main() {
         initialGrade: 5,
         examType: examTypeAssessment,
         profileId: 21,
-        pendingCompletionStore: completionStore,
       );
 
       for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
@@ -684,8 +681,10 @@ void main() {
       await tester.tap(find.byType(AssessmentBottomActionButton).last);
       await tester.pumpAndSettle();
 
-      expect(completionStore.pendingUserExamId, 91001);
-      expect(completionStore.pendingProfileId, 21);
+      expect(service.completedUserExamId, 91001);
+      expect(service.completedProfileId, 21);
+      expect(service.completedStatus, 'COMPLETE');
+      expect(service.events, <String>['submit', 'status:COMPLETE']);
 
       await tester.tap(find.byKey(const ValueKey('placement-view-details')));
       await tester.pumpAndSettle();
@@ -833,7 +832,6 @@ Future<void> _pumpAssessment(
   int? initialUserExamId = 7001,
   bool isResumedAssessment = false,
   int? profileId,
-  PendingAssessmentCompletionStore? pendingCompletionStore,
 }) async {
   tester.view.physicalSize = const Size(430, 844);
   tester.view.devicePixelRatio = 1;
@@ -861,7 +859,6 @@ Future<void> _pumpAssessment(
             examType: examType,
             profileId: profileId,
             isResumedAssessment: isResumedAssessment,
-            pendingCompletionStore: pendingCompletionStore,
             allowQuestionNavigation: allowQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
@@ -892,28 +889,6 @@ Future<void> _pumpAssessment(
   );
 
   await tester.pump();
-}
-
-class _RecordingPendingCompletionStore
-    implements PendingAssessmentCompletionStore {
-  int? pendingUserExamId;
-  int? pendingProfileId;
-
-  @override
-  Future<List<PendingAssessmentCompletion>> readAll() async =>
-      const <PendingAssessmentCompletion>[];
-
-  @override
-  Future<void> markPending({
-    required int userExamId,
-    required int profileId,
-  }) async {
-    pendingUserExamId = userExamId;
-    pendingProfileId = profileId;
-  }
-
-  @override
-  Future<void> remove(int userExamId) async {}
 }
 
 class _PendingSubmitExamService implements ExamService {
@@ -1008,6 +983,10 @@ class _ExitStatusExamService implements ExamService {
 class _CompletedJourneyReviewExamService implements ExamService {
   int? requestedDetailId;
   int? requestedUserExamId;
+  int? completedUserExamId;
+  int? completedProfileId;
+  String? completedStatus;
+  final List<String> events = <String>[];
 
   @override
   Future<GeneratedExam> submitExam({
@@ -1015,6 +994,7 @@ class _CompletedJourneyReviewExamService implements ExamService {
     required List<SubmitExamAnswer> answers,
     int? profileId,
   }) async {
+    events.add('submit');
     return GeneratedExam(
       examId: examId,
       userAiExamId: examId,
@@ -1031,7 +1011,12 @@ class _CompletedJourneyReviewExamService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
-  }) async {}
+  }) async {
+    events.add('status:$status');
+    completedUserExamId = userExamId;
+    completedProfileId = profileId;
+    completedStatus = status;
+  }
 
   @override
   Future<GeneratedExam> getExamDetail(

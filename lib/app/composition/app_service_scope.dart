@@ -18,7 +18,6 @@ import 'package:numi/features/profile/data/school_service.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_snapshot_store.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
 
@@ -64,9 +63,6 @@ class AppServiceScope extends StatelessWidget {
         ),
         RepositoryProvider<ExamSnapshotStore>.value(
           value: services.examSnapshotStore,
-        ),
-        RepositoryProvider<PendingAssessmentCompletionStore>.value(
-          value: services.pendingAssessmentCompletionStore,
         ),
         RepositoryProvider<SessionDataCleaner>.value(
           value: services.sessionDataCleaner,

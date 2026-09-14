@@ -5,8 +5,6 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/notifications/data/notification_ping_service.dart';
-import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
@@ -80,57 +78,15 @@ class _FakeNotificationPingService implements NotificationPingService {
   }
 }
 
-class _PendingCompletionStore implements PendingAssessmentCompletionStore {
-  final List<PendingAssessmentCompletion> items = <PendingAssessmentCompletion>[
-    const PendingAssessmentCompletion(userExamId: 901, profileId: 71),
-  ];
-
-  @override
-  Future<List<PendingAssessmentCompletion>> readAll() async =>
-      List<PendingAssessmentCompletion>.from(items);
-
-  @override
-  Future<void> markPending({
-    required int userExamId,
-    required int profileId,
-  }) async {}
-
-  @override
-  Future<void> remove(int userExamId) async {
-    items.removeWhere((item) => item.userExamId == userExamId);
-  }
-}
-
-class _CompletionExamService implements ExamService {
-  int? completedUserExamId;
-
-  @override
-  Future<void> updateUserExamStatus({
-    required int userExamId,
-    required String status,
-    int? profileId,
-  }) async {
-    expect(status, 'COMPLETE');
-    completedUserExamId = userExamId;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 AppSessionCubit _buildCubit({
   _FakeAuthService? authService,
   ProfileSessionResolver? profileResolver,
   _FakeNotificationPingService? notificationPingService,
-  ExamService? examService,
-  PendingAssessmentCompletionStore? pendingAssessmentCompletionStore,
 }) => AppSessionCubit(
   authService: authService ?? _FakeAuthService(),
   profileResolver: profileResolver ?? _FakeProfileSessionResolver(),
   notificationPingService:
       notificationPingService ?? _FakeNotificationPingService(),
-  examService: examService,
-  pendingAssessmentCompletionStore: pendingAssessmentCompletionStore,
 );
 
 void main() {
@@ -151,27 +107,6 @@ void main() {
         await cubit.close();
       },
     );
-
-    test('retries pending completion after an interactive login', () async {
-      final completionStore = _PendingCompletionStore();
-      final examService = _CompletionExamService();
-      final cubit = _buildCubit(
-        examService: examService,
-        pendingAssessmentCompletionStore: completionStore,
-      );
-
-      cubit.authenticate(
-        const AuthenticatedSession(
-          user: LoginUser(id: 7, phone: '0901234567'),
-          profiles: <StudentProfile>[StudentProfile(profileId: 71, userId: 7)],
-        ),
-      );
-      await Future<void>.delayed(Duration.zero);
-
-      expect(examService.completedUserExamId, 901);
-      expect(completionStore.items, isEmpty);
-      await cubit.close();
-    });
 
     test(
       'tracks restore then clears all session-owned data on logout',

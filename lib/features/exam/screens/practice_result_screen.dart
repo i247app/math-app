@@ -12,9 +12,7 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
-import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/exam/widgets/assessment_result/result_action_button.dart';
@@ -32,7 +30,6 @@ class PracticeResultScreen extends StatefulWidget {
     this.examService,
     this.profileId,
     this.userExamId,
-    this.pendingCompletionStore,
     this.onPracticeAgainGenerated,
     this.onViewDetails,
     this.onBack,
@@ -44,7 +41,6 @@ class PracticeResultScreen extends StatefulWidget {
   final ExamService? examService;
   final int? profileId;
   final int? userExamId;
-  final PendingAssessmentCompletionStore? pendingCompletionStore;
   final ValueChanged<GeneratedExam>? onPracticeAgainGenerated;
   final VoidCallback? onViewDetails;
   final VoidCallback? onBack;
@@ -55,9 +51,7 @@ class PracticeResultScreen extends StatefulWidget {
 
 class _PracticeResultScreenState extends State<PracticeResultScreen> {
   late final ExamService _examService;
-  late final PendingAssessmentCompletionStore _pendingCompletionStore;
   bool _isGeneratingAgain = false;
-  bool _isCompletingJourney = false;
 
   int get _grade => AssessmentFlowPolicy.clampGrade(widget.grade);
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
@@ -67,9 +61,6 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
   void initState() {
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
-    _pendingCompletionStore =
-        widget.pendingCompletionStore ??
-        const SecurePendingAssessmentCompletionStore();
   }
 
   Future<void> _generatePracticeAgain() async {
@@ -125,57 +116,17 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
     );
   }
 
-  Future<void> _exitResult() async {
-    if (_isGeneratingAgain || _isCompletingJourney) {
+  void _exitResult() {
+    if (_isGeneratingAgain) {
       return;
     }
     HapticFeedback.mediumImpact();
-    setState(() => _isCompletingJourney = true);
-    try {
-      await completeAssessmentJourney(
-        examService: _examService,
-        completionStore: _pendingCompletionStore,
-        userExamId: widget.userExamId,
-        profileId: widget.profileId,
-      );
-    } on ExamException catch (error) {
-      _handleCompletionFailure(error.message);
-      return;
-    } catch (_) {
-      _handleCompletionFailure(
-        AppStrings.current(AppKeys.assessmentStatusUpdateFailed),
-      );
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
     final onBack = widget.onBack;
     if (onBack != null) {
       onBack();
       return;
     }
     exitToGradeSelection(context);
-  }
-
-  void _handleCompletionFailure(String message) {
-    if (!mounted) {
-      return;
-    }
-    setState(() => _isCompletingJourney = false);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.getText(AppKeys.assessmentResultTitle)),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(context.getText(AppKeys.close)),
-          ),
-        ],
-      ),
-    );
   }
 
   void _viewDetails() {
@@ -197,7 +148,7 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
-              child: _isGeneratingAgain || _isCompletingJourney
+              child: _isGeneratingAgain
                   ? const AssessmentTestAgainLoader()
                   : _buildResultContent(context),
             ),

@@ -8,9 +8,10 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
@@ -41,7 +42,6 @@ class AiAssessmentScreen extends StatefulWidget {
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
     this.isResumedAssessment = false,
-    this.pendingCompletionStore,
   });
 
   final ExamService? examService;
@@ -56,7 +56,6 @@ class AiAssessmentScreen extends StatefulWidget {
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
   final bool isResumedAssessment;
-  final PendingAssessmentCompletionStore? pendingCompletionStore;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -64,17 +63,14 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
-  late final PendingAssessmentCompletionStore _pendingCompletionStore;
   Timer? _practiceFeedbackTimer;
+  bool _isCompletingAssessment = false;
   final GuardedExitController<AiAssessmentResult> _exitController =
       GuardedExitController<AiAssessmentResult>();
 
   @override
   void initState() {
     super.initState();
-    _pendingCompletionStore =
-        widget.pendingCompletionStore ??
-        const SecurePendingAssessmentCompletionStore();
     _controller = AssessmentController(
       examService: widget.examService ?? context.read<ExamService>(),
       initialExam: widget.initialExam,
@@ -218,23 +214,23 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         submittedExam.userExamId ?? _controller.userExamId;
     final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
     final reviewDetailId = submittedUserExamId ?? submittedExamId;
-    final pendingProfileId = profileId ?? submittedExam.profileId;
-    if ((_controller.isAssessment || _controller.isPractice) &&
-        submittedUserExamId != null &&
-        submittedUserExamId > 0 &&
-        pendingProfileId != null &&
-        pendingProfileId > 0) {
+    if (_controller.isAssessment) {
+      setState(() => _isCompletingAssessment = true);
       try {
-        await _pendingCompletionStore.markPending(
+        await completeAssessmentJourney(
+          examService: examService,
           userExamId: submittedUserExamId,
-          profileId: pendingProfileId,
+          profileId: profileId ?? submittedExam.profileId,
         );
-      } catch (_) {
-        // The result remains usable; startup recovery is best effort.
-      }
-      if (!mounted) {
+      } on Exception catch (error) {
+        if (!mounted) {
+          return;
+        }
+        setState(() => _isCompletingAssessment = false);
+        _showAssessmentCompletionError(error);
         return;
       }
+      if (!mounted) return;
     }
 
     if (_controller.isPractice) {
@@ -248,7 +244,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               examService: examService,
               profileId: profileId,
               userExamId: submittedUserExamId,
-              pendingCompletionStore: _pendingCompletionStore,
               onViewDetails: submittedExamId == null
                   ? null
                   : () {
@@ -277,7 +272,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                       onResultBack: onResultBack,
                       allowQuestionNavigation: allowQuestionNavigation,
                       showQuestionNavigation: showQuestionNavigation,
-                      pendingCompletionStore: _pendingCompletionStore,
                     ),
                   ),
                 );
@@ -300,7 +294,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             examService: examService,
             profileId: profileId,
             userExamId: submittedUserExamId,
-            pendingCompletionStore: _pendingCompletionStore,
             onViewDetails: reviewDetailId == null
                 ? null
                 : () {
@@ -334,7 +327,6 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                     onResultBack: onResultBack,
                     allowQuestionNavigation: allowQuestionNavigation,
                     showQuestionNavigation: showQuestionNavigation,
-                    pendingCompletionStore: _pendingCompletionStore,
                   ),
                 ),
               );
@@ -342,6 +334,25 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             onBack: onResultBack,
           );
         },
+      ),
+    );
+  }
+
+  void _showAssessmentCompletionError(Object error) {
+    final message = error is ExamException
+        ? error.message
+        : context.readText(AppKeys.assessmentStatusUpdateFailed);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.getText(AppKeys.assessmentResultTitle)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.getText(AppKeys.close)),
+          ),
+        ],
       ),
     );
   }
@@ -462,7 +473,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
           final errorMessage = _controller.errorMessage;
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
           final isTransitioningSet = _controller.isTransitioningSet;
-          final isSubmittingExam = _controller.isSubmittingExam;
+          final isSubmittingExam =
+              _controller.isSubmittingExam || _isCompletingAssessment;
           final hasActiveAttempt = questions.isNotEmpty;
           final isBusy =
               isGeneratingQuestion || isTransitioningSet || isSubmittingExam;

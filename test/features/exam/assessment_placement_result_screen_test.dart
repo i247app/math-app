@@ -8,7 +8,6 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/pending_assessment_completion_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
@@ -206,12 +205,11 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('closes the result only after completing the journey', (
+  testWidgets('closing the result does not update assessment status', (
     tester,
   ) async {
     final lingo = LingoProvider();
     final service = _RecordingPracticeService();
-    final completionStore = _RecordingCompletionStore();
     var didClose = false;
     addTearDown(lingo.dispose);
 
@@ -229,7 +227,6 @@ void main() {
             examService: service,
             profileId: 21,
             userExamId: 99,
-            pendingCompletionStore: completionStore,
             onBack: () => didClose = true,
           ),
         ),
@@ -240,9 +237,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('placement-result-close')));
     await tester.pump();
 
-    expect(service.completedUserExamId, 99);
-    expect(service.completedStatus, 'COMPLETE');
-    expect(completionStore.removedUserExamId, 99);
+    expect(service.completedUserExamId, isNull);
+    expect(service.completedStatus, isNull);
     expect(didClose, isTrue);
     expect(tester.takeException(), isNull);
   });
@@ -379,23 +375,4 @@ class _RecordingPracticeService implements ExamService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _RecordingCompletionStore implements PendingAssessmentCompletionStore {
-  int? removedUserExamId;
-
-  @override
-  Future<List<PendingAssessmentCompletion>> readAll() async =>
-      const <PendingAssessmentCompletion>[];
-
-  @override
-  Future<void> markPending({
-    required int userExamId,
-    required int profileId,
-  }) async {}
-
-  @override
-  Future<void> remove(int userExamId) async {
-    removedUserExamId = userExamId;
-  }
 }

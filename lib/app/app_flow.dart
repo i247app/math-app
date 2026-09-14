@@ -183,8 +183,6 @@ class _AppFlowState extends State<AppFlow> {
                 authService: widget.authService ?? context.read<AuthService>(),
                 profileResolver: context.read(),
                 notificationPingService: context.read(),
-                examService: context.read(),
-                pendingAssessmentCompletionStore: context.read(),
               );
               context.read<SessionScopedRepositoryRegistry>().updateSession(
                 isAuthenticated: cubit.state.isAuthenticated,
