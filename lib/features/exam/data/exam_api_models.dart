@@ -298,6 +298,7 @@ class ExamStatsDto {
     this.lastSubmittedDt,
     this.review,
     this.inProgressExam,
+    this.inProgressExams = const <GeneratedExamDto>[],
   });
 
   final int correctNumber;
@@ -314,6 +315,8 @@ class ExamStatsDto {
   final DateTime? lastSubmittedDt;
   final String? review;
   final GeneratedExamDto? inProgressExam;
+  @JsonKey(defaultValue: <GeneratedExamDto>[])
+  final List<GeneratedExamDto> inProgressExams;
 
   factory ExamStatsDto.fromJson(Map<String, dynamic> json) =>
       _$ExamStatsDtoFromJson(json);

@@ -87,7 +87,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   }
 
   bool _isCompletedAssessmentStats(ExamStats stats) {
-    if (_hasResumableInProgressExam(stats)) {
+    if (_activeInProgressExam(stats) != null) {
       return false;
     }
     final status = stats.status?.trim().toUpperCase();
@@ -102,21 +102,35 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   }
 
   bool _isActiveAssessmentStats(ExamStats stats) {
-    return _hasResumableInProgressExam(stats);
+    return _activeInProgressExam(stats) != null;
   }
 
-  bool _hasResumableInProgressExam(ExamStats stats) {
-    final inProgressExam = stats.inProgressExam;
-    if (inProgressExam == null || inProgressExam.questions.isEmpty) {
-      return false;
+  GeneratedExam? _activeInProgressExam(ExamStats stats) {
+    final outerStatusIsActive = _isActiveExamStatus(stats.status);
+    final candidates = stats.inProgressExams
+        .where(
+          (exam) =>
+              exam.questions.isNotEmpty &&
+              (outerStatusIsActive || _isActiveExamStatus(exam.examStatus)),
+        )
+        .toList(growable: false);
+    if (candidates.isEmpty) {
+      return null;
     }
-    final status = inProgressExam.examStatus?.trim().toUpperCase();
+    return candidates.reduce(
+      (latest, exam) =>
+          examDate(exam).isAfter(examDate(latest)) ? exam : latest,
+    );
+  }
+
+  bool _isActiveExamStatus(String? value) {
+    final status = value?.trim().toUpperCase();
     return status == 'ACTIVE' || status == 'IN_PROGRESS';
   }
 
   ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {
-    final inProgressExam = stats.inProgressExam;
-    if (_hasResumableInProgressExam(stats) && inProgressExam != null) {
+    final inProgressExam = _activeInProgressExam(stats);
+    if (inProgressExam != null) {
       return ParentAssessmentEntry(exam: inProgressExam);
     }
     final submittedAt = stats.lastSubmittedDt?.toIso8601String();

@@ -622,7 +622,7 @@ class _PopulatedExamService extends _CountingExamService {
         totalQuestions: 20,
         examType: examTypeAssessment,
         userExamId: 8001,
-        status: 'COMPLETE',
+        status: 'ACTIVE',
         grade: 2,
         level: 1,
         lastSubmittedDt: DateTime.utc(2026, 9, 10, 20, 35),
@@ -662,7 +662,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
         grade: 1,
         level: 1,
         lastSubmittedDt: DateTime.utc(2026, 9, 13, 8, 30),
-        inProgressExam: _activeResumeExam,
+        inProgressExams: const <GeneratedExam>[_activeResumeExam],
       ),
     ];
   }

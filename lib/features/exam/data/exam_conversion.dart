@@ -188,18 +188,25 @@ extension ExamProgressResponseDtoConversion on ExamProgressResponseDto {
 }
 
 extension ExamStatsDtoConversion on ExamStatsDto {
-  ExamStats toModel() => ExamStats(
-    correctNumber: correctNumber,
-    scorePercentage: scorePercentage,
-    skippedNumber: skippedNumber,
-    totalQuestions: totalQuestions,
-    examType: examType,
-    userExamId: userExamId,
-    status: status,
-    grade: grade,
-    level: level,
-    lastSubmittedDt: lastSubmittedDt,
-    review: review,
-    inProgressExam: inProgressExam?.toModel(userExamId: userExamId),
-  );
+  ExamStats toModel() {
+    final activeExams = <GeneratedExam>[
+      ...inProgressExams.map((exam) => exam.toModel(userExamId: userExamId)),
+      if (inProgressExam != null)
+        inProgressExam!.toModel(userExamId: userExamId),
+    ];
+    return ExamStats(
+      correctNumber: correctNumber,
+      scorePercentage: scorePercentage,
+      skippedNumber: skippedNumber,
+      totalQuestions: totalQuestions,
+      examType: examType,
+      userExamId: userExamId,
+      status: status,
+      grade: grade,
+      level: level,
+      lastSubmittedDt: lastSubmittedDt,
+      review: review,
+      inProgressExams: activeExams,
+    );
+  }
 }
