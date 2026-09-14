@@ -120,7 +120,7 @@ void main() {
     );
     expect(
       tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
-      isNull,
+      isNotNull,
     );
 
     await tester.pump(const Duration(milliseconds: 700));

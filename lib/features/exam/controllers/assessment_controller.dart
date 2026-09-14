@@ -100,7 +100,6 @@ class AssessmentController extends ChangeNotifier {
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
   final Map<int, String> _practiceSelectedAnswerLabels = <int, String>{};
   final Map<int, bool?> _practiceFeedbackCorrectness = <int, bool?>{};
-  final Set<int> _practiceSolvedQuestionIndexes = <int>{};
   final List<AssessmentSetRecord> _completedSets = <AssessmentSetRecord>[];
   final Map<int, GeneratedExam> _submittedSets = <int, GeneratedExam>{};
   String? _errorMessage;
@@ -185,20 +184,10 @@ class AssessmentController extends ChangeNotifier {
   bool? get selectedAnswerFeedbackCorrect =>
       _isPractice ? _practiceFeedbackCorrectness[_questionIndex] : null;
 
-  bool get canContinue => _isPractice
-      ? _practiceSolvedQuestionIndexes.contains(_questionIndex)
-      : selectedAnswerLabel != null;
+  bool get canContinue => selectedAnswerLabel != null;
 
   int? get firstUnansweredQuestionIndex {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
-    if (_isPractice) {
-      for (var index = 0; index < questions.length; index++) {
-        if (!_practiceSolvedQuestionIndexes.contains(index)) {
-          return index;
-        }
-      }
-      return null;
-    }
     return _firstUnansweredIndex(questions);
   }
 
@@ -395,7 +384,6 @@ class AssessmentController extends ChangeNotifier {
     _selectedAnswerLabels.clear();
     _practiceSelectedAnswerLabels.clear();
     _practiceFeedbackCorrectness.clear();
-    _practiceSolvedQuestionIndexes.clear();
     _completedSets.clear();
     _submittedSets.clear();
     _pendingGenerationDecision = null;
@@ -452,9 +440,6 @@ class AssessmentController extends ChangeNotifier {
       final isCorrect = isAnswerCorrect(answer);
       _practiceSelectedAnswerLabels[_questionIndex] = answer.label;
       _practiceFeedbackCorrectness[_questionIndex] = isCorrect;
-      if (isCorrect != false) {
-        _practiceSolvedQuestionIndexes.add(_questionIndex);
-      }
       notifyListeners();
       return;
     }

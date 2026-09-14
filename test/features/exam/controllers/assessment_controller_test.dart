@@ -491,7 +491,7 @@ void main() {
     controller.selectAnswer(answers.first);
     expect(controller.selectedAnswerLabels[0], 'A');
     expect(controller.selectedAnswerFeedbackCorrect, isFalse);
-    expect(controller.canContinue, isFalse);
+    expect(controller.canContinue, isTrue);
 
     controller.clearPracticeFeedback();
     expect(controller.selectedAnswerLabel, 'A');
@@ -572,7 +572,7 @@ void main() {
       AssessmentFlowAction action = AssessmentFlowAction.continueSet;
       for (var index = 0; index < 6; index++) {
         controller.selectAnswer(answers.first);
-        expect(controller.canContinue, isFalse);
+        expect(controller.canContinue, isTrue);
         controller.clearPracticeFeedback();
         controller.selectAnswer(answers.last);
         expect(controller.canContinue, isTrue);
