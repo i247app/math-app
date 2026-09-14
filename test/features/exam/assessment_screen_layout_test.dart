@@ -507,7 +507,7 @@ void main() {
   });
 
   testWidgets(
-    'grade 5 assessment submits immediately after the sixth correct answer',
+    'grade 5 assessment submits after confirming the sixth correct answer',
     (tester) async {
       final service = _PendingSubmitExamService();
       final questions = List<ExamQuestion>.generate(
@@ -538,6 +538,11 @@ void main() {
           await tester.pump();
         }
       }
+
+      expect(service.submitCalls, 0);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
 
       expect(service.submitCalls, 1);
       expect(
@@ -616,6 +621,8 @@ void main() {
           await tester.pump();
         }
       }
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
       await tester.pumpAndSettle();
 
       expect(completionStore.pendingUserExamId, 91001);
@@ -631,7 +638,7 @@ void main() {
   );
 
   testWidgets(
-    'five consecutive wrong answers in the first five fail at question five',
+    'five consecutive wrong answers fail after confirming question five',
     (tester) async {
       final service = _PendingGenerateExamService();
       await _pumpAssessment(
@@ -650,6 +657,12 @@ void main() {
           await tester.pump();
         }
       }
+
+      expect(service.submitCalls, 0);
+      expect(service.generateCalls, 0);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
 
       expect(service.submitCalls, 1);
       expect(service.submittedAnswers, hasLength(5));
