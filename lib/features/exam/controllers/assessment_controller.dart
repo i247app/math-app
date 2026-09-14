@@ -98,7 +98,7 @@ class AssessmentController extends ChangeNotifier {
   int _questionIndex = 0;
   int _questionNumberOffset = 0;
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
-  final Map<int, String> _practiceFeedbackAnswerLabels = <int, String>{};
+  final Map<int, String> _practiceSelectedAnswerLabels = <int, String>{};
   final Map<int, bool?> _practiceFeedbackCorrectness = <int, bool?>{};
   final Set<int> _practiceSolvedQuestionIndexes = <int>{};
   final List<AssessmentSetRecord> _completedSets = <AssessmentSetRecord>[];
@@ -179,7 +179,7 @@ class AssessmentController extends ChangeNotifier {
   }
 
   String? get selectedAnswerLabel => _isPractice
-      ? _practiceFeedbackAnswerLabels[_questionIndex]
+      ? _practiceSelectedAnswerLabels[_questionIndex]
       : _selectedAnswerLabels[_questionIndex];
 
   bool? get selectedAnswerFeedbackCorrect =>
@@ -393,7 +393,7 @@ class AssessmentController extends ChangeNotifier {
     _questionIndex = 0;
     _questionNumberOffset = 0;
     _selectedAnswerLabels.clear();
-    _practiceFeedbackAnswerLabels.clear();
+    _practiceSelectedAnswerLabels.clear();
     _practiceFeedbackCorrectness.clear();
     _practiceSolvedQuestionIndexes.clear();
     _completedSets.clear();
@@ -448,12 +448,9 @@ class AssessmentController extends ChangeNotifier {
     }
     _allowsPartialSubmit = false;
     if (_isPractice) {
-      if (_practiceSolvedQuestionIndexes.contains(_questionIndex)) {
-        return;
-      }
       _selectedAnswerLabels.putIfAbsent(_questionIndex, () => answer.label);
       final isCorrect = isAnswerCorrect(answer);
-      _practiceFeedbackAnswerLabels[_questionIndex] = answer.label;
+      _practiceSelectedAnswerLabels[_questionIndex] = answer.label;
       _practiceFeedbackCorrectness[_questionIndex] = isCorrect;
       if (isCorrect != false) {
         _practiceSolvedQuestionIndexes.add(_questionIndex);
@@ -469,12 +466,12 @@ class AssessmentController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearIncorrectPracticeFeedback({int? questionIndex}) {
+  void clearPracticeFeedback({int? questionIndex}) {
     final targetIndex = questionIndex ?? _questionIndex;
-    if (!_isPractice || _practiceFeedbackCorrectness[targetIndex] != false) {
+    if (!_isPractice ||
+        !_practiceFeedbackCorrectness.containsKey(targetIndex)) {
       return;
     }
-    _practiceFeedbackAnswerLabels.remove(targetIndex);
     _practiceFeedbackCorrectness.remove(targetIndex);
     notifyListeners();
   }

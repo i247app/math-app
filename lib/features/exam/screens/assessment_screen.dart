@@ -111,13 +111,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     _controller.selectAnswer(answer);
     if (_controller.isPractice) {
       _practiceFeedbackTimer?.cancel();
-      if (_controller.selectedAnswerFeedbackCorrect == false) {
+      if (_controller.selectedAnswerFeedbackCorrect != null) {
         final questionIndex = _controller.questionIndex;
         _practiceFeedbackTimer = Timer(
           const Duration(milliseconds: 650),
-          () => _controller.clearIncorrectPracticeFeedback(
-            questionIndex: questionIndex,
-          ),
+          () => _controller.clearPracticeFeedback(questionIndex: questionIndex),
         );
       }
       return;

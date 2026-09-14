@@ -128,11 +128,34 @@ void main() {
       find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
       findsNothing,
     );
+    final wrongAnswerAfterFeedback = tester.widget<AssessmentAnswerButton>(
+      find.byType(AssessmentAnswerButton).at(1),
+    );
+    expect(wrongAnswerAfterFeedback.selected, isTrue);
+    expect(wrongAnswerAfterFeedback.feedbackCorrect, isNull);
 
     await tester.tap(find.byType(AssessmentAnswerButton).first);
     await tester.pump();
     expect(
       find.byKey(const ValueKey('assessment-answer-feedback-correct')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+
+    await tester.pump(const Duration(milliseconds: 700));
+    final correctAnswerAfterFeedback = tester.widget<AssessmentAnswerButton>(
+      find.byType(AssessmentAnswerButton).first,
+    );
+    expect(correctAnswerAfterFeedback.selected, isTrue);
+    expect(correctAnswerAfterFeedback.feedbackCorrect, isNull);
+
+    await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
       findsOneWidget,
     );
     expect(

@@ -493,14 +493,25 @@ void main() {
     expect(controller.selectedAnswerFeedbackCorrect, isFalse);
     expect(controller.canContinue, isFalse);
 
-    controller.clearIncorrectPracticeFeedback();
-    expect(controller.selectedAnswerLabel, isNull);
+    controller.clearPracticeFeedback();
+    expect(controller.selectedAnswerLabel, 'A');
+    expect(controller.selectedAnswerFeedbackCorrect, isNull);
     expect(controller.selectedAnswerLabels[0], 'A');
 
     controller.selectAnswer(answers.last);
     expect(controller.selectedAnswerLabels[0], 'A');
     expect(controller.selectedAnswerLabel, 'B');
     expect(controller.selectedAnswerFeedbackCorrect, isTrue);
+    expect(controller.canContinue, isTrue);
+
+    controller.clearPracticeFeedback();
+    expect(controller.selectedAnswerLabel, 'B');
+    expect(controller.selectedAnswerFeedbackCorrect, isNull);
+
+    controller.selectAnswer(answers.first);
+    expect(controller.selectedAnswerLabels[0], 'A');
+    expect(controller.selectedAnswerLabel, 'A');
+    expect(controller.selectedAnswerFeedbackCorrect, isFalse);
     expect(controller.canContinue, isTrue);
   });
 
@@ -562,7 +573,7 @@ void main() {
       for (var index = 0; index < 6; index++) {
         controller.selectAnswer(answers.first);
         expect(controller.canContinue, isFalse);
-        controller.clearIncorrectPracticeFeedback();
+        controller.clearPracticeFeedback();
         controller.selectAnswer(answers.last);
         expect(controller.canContinue, isTrue);
         action = controller.preparePracticeFlow();
