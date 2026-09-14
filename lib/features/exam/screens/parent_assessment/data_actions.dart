@@ -87,6 +87,9 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   }
 
   bool _isCompletedAssessmentStats(ExamStats stats) {
+    if (_hasResumableInProgressExam(stats)) {
+      return false;
+    }
     final status = stats.status?.trim().toUpperCase();
     if (status == 'CANCEL' || status == 'CANCELED' || status == 'CANCELLED') {
       return false;
@@ -99,11 +102,23 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   }
 
   bool _isActiveAssessmentStats(ExamStats stats) {
-    final status = stats.status?.trim().toUpperCase();
+    return _hasResumableInProgressExam(stats);
+  }
+
+  bool _hasResumableInProgressExam(ExamStats stats) {
+    final inProgressExam = stats.inProgressExam;
+    if (inProgressExam == null || inProgressExam.questions.isEmpty) {
+      return false;
+    }
+    final status = inProgressExam.examStatus?.trim().toUpperCase();
     return status == 'ACTIVE' || status == 'IN_PROGRESS';
   }
 
   ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {
+    final inProgressExam = stats.inProgressExam;
+    if (_hasResumableInProgressExam(stats) && inProgressExam != null) {
+      return ParentAssessmentEntry(exam: inProgressExam);
+    }
     final submittedAt = stats.lastSubmittedDt?.toIso8601String();
     final detectedGrade = stats.grade == null ? null : 'Lớp ${stats.grade}';
     return ParentAssessmentEntry(

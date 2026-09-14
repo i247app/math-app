@@ -192,6 +192,7 @@ class ExamStats {
     this.level,
     this.lastSubmittedDt,
     this.review,
+    this.inProgressExam,
   });
 
   final int correctNumber;
@@ -205,6 +206,7 @@ class ExamStats {
   final int? level;
   final DateTime? lastSubmittedDt;
   final String? review;
+  final GeneratedExam? inProgressExam;
 }
 
 class ExamGrading {

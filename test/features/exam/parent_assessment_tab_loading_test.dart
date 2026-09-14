@@ -397,7 +397,7 @@ void main() {
     expect(find.text('12 + 8 = ?'), findsOneWidget);
   });
 
-  testWidgets('active assessment resumes at the first unanswered question', (
+  testWidgets('active assessment resumes from stats without loading detail', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -446,8 +446,8 @@ void main() {
       find.byKey(const ValueKey('active-assessment-dialog')),
       findsNothing,
     );
-    expect(examService.requestedDetailId, 8100);
-    expect(examService.requestedUserExamId, 8100);
+    expect(examService.requestedDetailId, isNull);
+    expect(examService.requestedUserExamId, isNull);
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
     expect(find.text('Resume question 3'), findsOneWidget);
     final assessment = tester.widget<AiAssessmentScreen>(
@@ -658,10 +658,11 @@ class _ActiveAssessmentExamService extends _CountingExamService {
         totalQuestions: 5,
         examType: examTypeAssessment,
         userExamId: 8100,
-        status: 'ACTIVE',
+        status: 'COMPLETE',
         grade: 1,
         level: 1,
         lastSubmittedDt: DateTime.utc(2026, 9, 13, 8, 30),
+        inProgressExam: _activeResumeExam,
       ),
     ];
   }
@@ -674,7 +675,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
   }) async {
     requestedDetailId = detailId;
     requestedUserExamId = userExamId;
-    return _activeResumeExam;
+    throw StateError('Resume must use in_progress_exam from /exams/stats.');
   }
 
   @override
@@ -741,7 +742,7 @@ const _activeResumeExam = GeneratedExam(
   examId: 8200,
   userAiExamId: 8200,
   userExamId: 8100,
-  examStatus: 'ACTIVE',
+  examStatus: 'IN_PROGRESS',
   examType: examTypeAssessment,
   grade: 1,
   answers: <SubmitExamAnswer>[

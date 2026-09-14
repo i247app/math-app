@@ -553,6 +553,27 @@ void main() {
             'score_percentage': 65,
             'skipped_number': 0,
             'total_questions': 20,
+            'in_progress_exam': <String, dynamic>{
+              'ai_exam_id': 14,
+              'user_ai_exam_id': 27,
+              'profile_id': 21,
+              'exam_type': 'ASSESSMENT',
+              'grade': 2,
+              'num_questions': 1,
+              'status': 'IN_PROGRESS',
+              'title': 'Lớp 2',
+              'questions': <Map<String, dynamic>>[
+                <String, dynamic>{
+                  'question_name': 'Resume from stats',
+                  'question_number': 1,
+                  'right_answer_content': '4',
+                  'right_answer_label': 'A',
+                  'answers': <Map<String, dynamic>>[
+                    <String, dynamic>{'content': '4', 'label': 'A'},
+                  ],
+                },
+              ],
+            },
           },
         ],
       };
@@ -566,6 +587,13 @@ void main() {
     expect(stats.single.status, 'COMPLETE');
     expect(stats.single.userExamId, 99);
     expect(stats.single.scorePercentage, 65);
+    expect(stats.single.inProgressExam?.userExamId, 99);
+    expect(stats.single.inProgressExam?.userAiExamId, 27);
+    expect(stats.single.inProgressExam?.examStatus, 'IN_PROGRESS');
+    expect(
+      stats.single.inProgressExam?.questions.single.questionName,
+      'Resume from stats',
+    );
   });
 }
 

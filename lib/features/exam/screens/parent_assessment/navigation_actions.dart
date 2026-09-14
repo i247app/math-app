@@ -73,9 +73,8 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     if (_isOpeningActiveAssessment) {
       return;
     }
-    final userExamId = summaryExam.userExamId;
     final profileId = profileStableId(widget.activeProfile);
-    if (userExamId == null || userExamId <= 0 || profileId == null) {
+    if (profileId == null) {
       return;
     }
 
@@ -85,36 +84,13 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       _errorMessage = null;
     });
 
-    final detailLoadFailedMessage = context.readText(
-      AppKeys.examDetailLoadFailed,
-    );
-    final GeneratedExam resumedExam;
-    try {
-      resumedExam = await widget.examService.getExamDetail(
-        userExamId,
-        profileId: profileId,
-        userExamId: userExamId,
-      );
-      if (resumedExam.questions.isEmpty) {
-        throw ExamException(detailLoadFailedMessage);
-      }
-    } on ExamException catch (error) {
-      if (mounted) {
-        _updateState(() {
-          _isOpeningActiveAssessment = false;
-          _errorMessage = error.message;
-        });
-        _showActiveAssessmentLoadError(error.message);
-      }
-      return;
-    } catch (_) {
-      if (mounted) {
-        _updateState(() {
-          _isOpeningActiveAssessment = false;
-          _errorMessage = detailLoadFailedMessage;
-        });
-        _showActiveAssessmentLoadError(detailLoadFailedMessage);
-      }
+    if (summaryExam.questions.isEmpty) {
+      final message = context.readText(AppKeys.examDetailLoadFailed);
+      _updateState(() {
+        _isOpeningActiveAssessment = false;
+        _errorMessage = message;
+      });
+      _showActiveAssessmentLoadError(message);
       return;
     }
 
@@ -127,9 +103,9 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       MaterialPageRoute<void>(
         builder: (_) => AiAssessmentScreen(
           examService: widget.examService,
-          initialExam: resumedExam,
-          examType: resumedExam.examType ?? examTypeAssessment,
-          gradeLabel: AssessmentFlowPolicy.gradeLabel(resumedExam.grade ?? 0),
+          initialExam: summaryExam,
+          examType: summaryExam.examType ?? examTypeAssessment,
+          gradeLabel: AssessmentFlowPolicy.gradeLabel(summaryExam.grade ?? 0),
           profileId: profileId,
           allowQuestionNavigation: false,
           showQuestionNavigation: false,

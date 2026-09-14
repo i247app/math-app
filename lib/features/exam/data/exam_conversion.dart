@@ -200,5 +200,6 @@ extension ExamStatsDtoConversion on ExamStatsDto {
     level: level,
     lastSubmittedDt: lastSubmittedDt,
     review: review,
+    inProgressExam: inProgressExam?.toModel(userExamId: userExamId),
   );
 }

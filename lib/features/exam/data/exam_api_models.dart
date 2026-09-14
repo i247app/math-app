@@ -283,7 +283,7 @@ class ExamStatsResponseDto {
   Map<String, dynamic> toJson() => _$ExamStatsResponseDtoToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamStatsDto {
   const ExamStatsDto({
     required this.correctNumber,
@@ -297,6 +297,7 @@ class ExamStatsDto {
     this.level,
     this.lastSubmittedDt,
     this.review,
+    this.inProgressExam,
   });
 
   final int correctNumber;
@@ -312,6 +313,7 @@ class ExamStatsDto {
   final int? level;
   final DateTime? lastSubmittedDt;
   final String? review;
+  final GeneratedExamDto? inProgressExam;
 
   factory ExamStatsDto.fromJson(Map<String, dynamic> json) =>
       _$ExamStatsDtoFromJson(json);
