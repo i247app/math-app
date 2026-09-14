@@ -126,10 +126,14 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   void _advanceFlowAfterAnswer() {
-    final action = _controller.prepareAssessmentFlow();
-    if (action == AssessmentFlowAction.submit) {
-      unawaited(submitCurrentExam());
-      return;
+    // A completed set is resolved only when the user presses Continue. This
+    // keeps the last answer visible and avoids submitting immediately on tap.
+    if (!_controller.allQuestionsAnswered) {
+      final action = _controller.prepareAssessmentFlow();
+      if (action == AssessmentFlowAction.submit) {
+        unawaited(submitCurrentExam());
+        return;
+      }
     }
     unawaited(_advanceEarlyFailureAfterAnswer());
   }

@@ -554,6 +554,46 @@ void main() {
   );
 
   testWidgets(
+    'assessment keeps Continue on the last question and submits when pressed',
+    (tester) async {
+      final service = _PendingSubmitExamService();
+      const correctIndexes = <int>{0, 1, 3, 4, 6};
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Final set'),
+        examService: service,
+        initialGrade: 2,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 10; index++) {
+        await tester.tap(
+          find
+              .byType(AssessmentAnswerButton)
+              .at(correctIndexes.contains(index) ? 0 : 1),
+        );
+        await tester.pump();
+        if (index < 9) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 0);
+      expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(10));
+      expect(find.byKey(const ValueKey('submit-loader')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'completed assessment review loads the entire journey by user exam id',
     (tester) async {
       final service = _CompletedJourneyReviewExamService();
