@@ -666,25 +666,30 @@ class AssessmentController extends ChangeNotifier {
     }
 
     final targetGrade = decision.nextState.grade;
-    final generatedSetRequest = _pendingGeneratedExam == null
-        ? _requestSet(targetGrade)
-        : Future<_GeneratedSetResult>.value(
-            _GeneratedSetResult.success(_pendingGeneratedExam!),
-          );
-    final results = await Future.wait<Object>(<Future<Object>>[
-      _requestSubmittedSet(currentExam, _answersForExam(currentExam)),
-      generatedSetRequest,
-    ]);
-    final submittedSetResult = results[0] as _SubmittedSetResult;
-    final generatedSetResult = results[1] as _GeneratedSetResult;
+    final submittedSetResult = await _requestSubmittedSet(
+      currentExam,
+      _answersForExam(currentExam),
+    );
+    if (submittedSetResult.exam == null) {
+      _isTransitioningSet = false;
+      _errorMessage =
+          submittedSetResult.errorMessage ??
+          AppStrings.current(AppKeys.submitExamFailed);
+      _errorRetryAction = AssessmentRetryAction.generate;
+      notifyListeners();
+      return false;
+    }
+
+    final generatedSetResult = _pendingGeneratedExam == null
+        ? await _requestSet(targetGrade)
+        : _GeneratedSetResult.success(_pendingGeneratedExam!);
     if (generatedSetResult.exam != null) {
       _pendingGeneratedExam = generatedSetResult.exam;
     }
 
-    if (submittedSetResult.exam == null || generatedSetResult.exam == null) {
+    if (generatedSetResult.exam == null) {
       _isTransitioningSet = false;
       _errorMessage =
-          submittedSetResult.errorMessage ??
           generatedSetResult.errorMessage ??
           AppStrings.current(AppKeys.createQuestionFailed);
       _errorRetryAction = AssessmentRetryAction.generate;

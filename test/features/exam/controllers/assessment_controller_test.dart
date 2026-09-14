@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
@@ -273,6 +275,42 @@ void main() {
       expect(controller.totalAnsweredQuestionCount, 7);
     },
   );
+
+  test('waits for submit to finish before generating the next set', () async {
+    final service = _SequentialTransitionExamService();
+    final controller = AssessmentController(
+      examService: service,
+      initialExam: _tenQuestionExam(examId: 92, grade: 0),
+    );
+    addTearDown(controller.dispose);
+
+    for (var index = 0; index < 6; index++) {
+      controller.selectAnswer(answers.last);
+      if (index < 5) {
+        expect(
+          await controller.advanceAssessmentFlow(),
+          AssessmentFlowAction.continueSet,
+        );
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    final transition = controller.advanceAssessmentFlow();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(service.events, <String>['submit:start']);
+    expect(service.generateCalls, 0);
+
+    service.completeSubmit();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(service.events, <String>['submit:start', 'generate:start']);
+    expect(service.generateCalls, 1);
+
+    service.completeGenerate();
+    expect(await transition, AssessmentFlowAction.generateSet);
+    expect(controller.currentGrade, 2);
+  });
 
   test(
     'does not generate when a missed first six continues the current set',
@@ -649,6 +687,55 @@ class _RecordingExamService implements ExamService {
     int? profileId,
   }) async {
     statusUpdates.add((userExamId, status));
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _SequentialTransitionExamService implements ExamService {
+  final Completer<GeneratedExam> _submitCompleter = Completer<GeneratedExam>();
+  final Completer<GeneratedExam> _generateCompleter =
+      Completer<GeneratedExam>();
+  final List<String> events = <String>[];
+  int generateCalls = 0;
+
+  void completeSubmit() {
+    _submitCompleter.complete(
+      const GeneratedExam(
+        examId: 92,
+        userExamId: 9092,
+        examType: examTypeAssessment,
+        examStatus: 'SUBMITTED',
+        questions: <ExamQuestion>[],
+      ),
+    );
+  }
+
+  void completeGenerate() {
+    _generateCompleter.complete(_tenQuestionExam(examId: 93, grade: 2));
+  }
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) {
+    events.add('submit:start');
+    return _submitCompleter.future;
+  }
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? profileId,
+    int? userExamId,
+  }) {
+    generateCalls++;
+    events.add('generate:start');
+    return _generateCompleter.future;
   }
 
   @override
