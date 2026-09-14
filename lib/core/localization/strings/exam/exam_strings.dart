@@ -60,6 +60,8 @@ const examStrings = <String, Map<String, String>>{
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
     AppKeys.placementResultViewDetails: 'Xem chi tiết',
     AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
+    AppKeys.examReviewPracticeBannerTitle: 'Bé cần luyện thêm',
+    AppKeys.examReviewPracticeBannerAction: 'Luyện tập ngay',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
     AppKeys.numiAiReview: 'Numi AI nhận xét',
     AppKeys.defaultAiReview:
@@ -129,6 +131,8 @@ const examStrings = <String, Map<String, String>>{
         'You answered {correct}/{total} questions correctly',
     AppKeys.placementResultViewDetails: 'View details',
     AppKeys.placementResultPracticeAgain: 'Practice again',
+    AppKeys.examReviewPracticeBannerTitle: 'More practice recommended',
+    AppKeys.examReviewPracticeBannerAction: 'Practice now',
     AppKeys.scoreUpper: 'SCORE',
     AppKeys.numiAiReview: 'Numi AI review',
     AppKeys.defaultAiReview:

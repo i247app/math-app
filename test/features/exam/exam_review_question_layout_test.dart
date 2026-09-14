@@ -6,6 +6,7 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_button.dart';
@@ -140,12 +141,56 @@ void main() {
 
     expect(service.requestedUserExamId, 912345);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
+    expect(
+      find.byKey(const ValueKey('exam-review-practice-banner')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('practice banner generates from the final journey set', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final service = _JourneyDetailService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: RepositoryProvider<ExamService>.value(
+          value: service,
+          child: LingoScope(
+            lingo: lingo,
+            child: const ExamReviewScreen(userExamId: 912345),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Phép cộng trong phạm vi 100'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('exam-review-practice-banner')));
+    await tester.pumpAndSettle();
+
+    expect(service.requestedExamType, examTypePractice);
+    expect(service.requestedGradeLabel, 'Lớp 4');
+    expect(service.requestedProfileId, 42);
+    expect(service.requestedPracticeUserExamId, 912345);
+    expect(find.byType(AiAssessmentScreen), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
 
 class _JourneyDetailService implements ExamService {
   int? requestedUserExamId;
+  String? requestedExamType;
+  String? requestedGradeLabel;
+  int? requestedProfileId;
+  int? requestedPracticeUserExamId;
 
   @override
   Future<GeneratedExam> getExamDetail(
@@ -156,6 +201,10 @@ class _JourneyDetailService implements ExamService {
     requestedUserExamId = userExamId;
     return const GeneratedExam(
       userExamId: 912345,
+      profileId: 42,
+      grade: 2,
+      lastSetGrade: 4,
+      lastSetShortText: 'Phép cộng trong phạm vi 100',
       grading: ExamGrading(correctNumber: 1, totalQuestions: 1),
       answers: <SubmitExamAnswer>[
         SubmitExamAnswer(questionNumber: 1, label: 'A'),
@@ -172,6 +221,37 @@ class _JourneyDetailService implements ExamService {
           ],
           rightAnswer: 'A',
           correctAnswer: '2',
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? profileId,
+    int? userExamId,
+  }) async {
+    requestedExamType = examType;
+    requestedGradeLabel = gradeLabel;
+    requestedProfileId = profileId;
+    requestedPracticeUserExamId = userExamId;
+    return const GeneratedExam(
+      examId: 77,
+      userExamId: 912345,
+      profileId: 42,
+      examType: examTypePractice,
+      grade: 4,
+      questions: <ExamQuestion>[
+        ExamQuestion(
+          questionName: 'Practice question',
+          questionNumber: 1,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '1'),
+            ExamAnswer(label: 'B', content: '2'),
+          ],
+          rightAnswer: 'A',
         ),
       ],
     );

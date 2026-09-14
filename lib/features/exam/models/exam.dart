@@ -145,6 +145,8 @@ class GeneratedExam {
     this.userAiExamId,
     this.userExamId,
     this.grade,
+    this.lastSetGrade,
+    this.lastSetShortText,
     this.level,
     this.numQuestions,
     this.startedDt,
@@ -169,6 +171,8 @@ class GeneratedExam {
   final int? userAiExamId;
   final int? userExamId;
   final int? grade;
+  final int? lastSetGrade;
+  final String? lastSetShortText;
   final int? level;
   final int? numQuestions;
   final String? startedDt;

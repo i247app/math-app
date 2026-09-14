@@ -832,6 +832,10 @@ class AppKeys {
       'placement_result_correct_summary';
   static const placementResultViewDetails = 'placement_result_view_details';
   static const placementResultPracticeAgain = 'placement_result_practice_again';
+  static const examReviewPracticeBannerTitle =
+      'exam_review_practice_banner_title';
+  static const examReviewPracticeBannerAction =
+      'exam_review_practice_banner_action';
   static const scoreUpper = 'score_upper';
   static const numiAiReview = 'numi_ai_review';
   static const defaultAiReview = 'default_ai_review';

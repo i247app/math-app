@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_loading_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
+
+typedef ExamReviewPracticeStarter = Future<void> Function(GeneratedExam exam);
 
 /// Shared review-detail layout used by exam and classroom-exercise entry
 /// screens. Source-specific screens provide the detail loader and data model.
@@ -20,6 +26,7 @@ class ReviewDetailScreen extends StatefulWidget {
     this.initialDetail,
     this.allowRetry = true,
     this.cacheKey,
+    this.onPractice,
   });
 
   final int detailId;
@@ -27,6 +34,7 @@ class ReviewDetailScreen extends StatefulWidget {
   final GeneratedExam? initialDetail;
   final bool allowRetry;
   final Object? cacheKey;
+  final ExamReviewPracticeStarter? onPractice;
 
   @override
   State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
@@ -34,6 +42,7 @@ class ReviewDetailScreen extends StatefulWidget {
 
 class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   late final ExamReviewController _controller;
+  bool _isGeneratingPractice = false;
 
   @override
   void initState() {
@@ -85,6 +94,45 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
     }
   }
 
+  Future<void> _startPractice(GeneratedExam exam) async {
+    final onPractice = widget.onPractice;
+    if (onPractice == null || _isGeneratingPractice) {
+      return;
+    }
+    HapticFeedback.mediumImpact();
+    setState(() => _isGeneratingPractice = true);
+    try {
+      await onPractice(exam);
+    } on ExamException catch (error) {
+      _showPracticeError(error.message);
+    } catch (_) {
+      _showPracticeError(AppStrings.current(AppKeys.testAgainCreateFailed));
+    } finally {
+      if (mounted) {
+        setState(() => _isGeneratingPractice = false);
+      }
+    }
+  }
+
+  void _showPracticeError(String message) {
+    if (!mounted) {
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.getText(AppKeys.testAgainDialogTitle)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.getText(AppKeys.close)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
@@ -128,6 +176,10 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                     onAnswerSelected: _selectAnswer,
                     onPrevious: _goToPreviousQuestion,
                     onNext: _goToNextQuestion,
+                    onPractice: widget.onPractice == null
+                        ? null
+                        : () => _startPractice(exam),
+                    isGeneratingPractice: _isGeneratingPractice,
                   );
                 },
               ),

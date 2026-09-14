@@ -7,6 +7,7 @@ import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_practice_banner.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_loading_section.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_result_question_list.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_retry_question_view.dart';
@@ -30,6 +31,8 @@ class ExamReviewContent extends StatelessWidget {
     required this.onAnswerSelected,
     required this.onPrevious,
     required this.onNext,
+    this.onPractice,
+    this.isGeneratingPractice = false,
   });
 
   final GeneratedExam exam;
@@ -46,6 +49,8 @@ class ExamReviewContent extends StatelessWidget {
   final void Function(int questionNumber, String label) onAnswerSelected;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
+  final VoidCallback? onPractice;
+  final bool isGeneratingPractice;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +73,16 @@ class ExamReviewContent extends StatelessWidget {
               child: ExamReviewInlineError(
                 message: errorMessage!,
                 onRetry: onRetry,
+              ),
+            ),
+          ],
+          if (onPractice != null) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ExamReviewPracticeBanner(
+                focusText: exam.lastSetShortText,
+                isLoading: isGeneratingPractice,
+                onTap: onPractice!,
               ),
             ),
           ],

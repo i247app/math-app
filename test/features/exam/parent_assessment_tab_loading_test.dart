@@ -481,6 +481,49 @@ void main() {
   });
 
   testWidgets(
+    'completed journey does not show continue when an inner exam is still active',
+    (tester) async {
+      final lingo = LingoProvider();
+      final examService = _ActiveAssessmentExamService(outerStatus: 'COMPLETE');
+      addTearDown(lingo.dispose);
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: ParentAssessmentTab(
+              user: const LoginUser(id: 981245),
+              activeProfile: const StudentProfile(
+                profileId: 981245,
+                role: 'STUDENT',
+              ),
+              isActive: true,
+              activeRefreshTick: 0,
+              initialGrades: const <GradeModel>[],
+              gradeService: _FakeGradeService(),
+              examService: examService,
+              bottomPadding: 0,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(
+        find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.byType(ParentAssessmentActiveCard), findsNothing);
+      expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
+      expect(find.byType(AiAssessmentScreen), findsNothing);
+    },
+  );
+
+  testWidgets(
     'canceling an active assessment updates status and removes card',
     (tester) async {
       final lingo = LingoProvider();
@@ -633,6 +676,9 @@ class _PopulatedExamService extends _CountingExamService {
 }
 
 class _ActiveAssessmentExamService extends _CountingExamService {
+  _ActiveAssessmentExamService({this.outerStatus = 'ACTIVE'});
+
+  final String outerStatus;
   bool _isCanceled = false;
   int? requestedDetailId;
   int? requestedUserExamId;
@@ -658,7 +704,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
         totalQuestions: 5,
         examType: examTypeAssessment,
         userExamId: 8100,
-        status: 'COMPLETE',
+        status: outerStatus,
         grade: 1,
         level: 1,
         lastSubmittedDt: DateTime.utc(2026, 9, 13, 8, 30),

@@ -218,10 +218,24 @@ void main() {
             'grade': 1,
             'level': 1,
             'num_questions': 10,
-            'status': 'SUBMITTED',
+            'status': 'ACTIVE',
             'title': 'Lớp 1 - Cấp độ 1',
             'started_dt': '2026-09-12T08:00:00Z',
             'submitted_dt': '2026-09-12T08:02:00Z',
+          },
+          <String, dynamic>{
+            'ai_exam_id': 8,
+            'user_ai_exam_id': 3,
+            'profile_id': 21,
+            'exam_type': 'ASSESSMENT',
+            'grade': 3,
+            'level': 1,
+            'num_questions': 10,
+            'status': 'SUBMITTED',
+            'title': 'Lớp 3 - Cấp độ 1',
+            'short_text': 'Phân số cơ bản',
+            'started_dt': '2026-09-12T08:03:00Z',
+            'submitted_dt': '2026-09-12T08:05:00Z',
           },
         ],
         'stats': <String, dynamic>{
@@ -293,6 +307,9 @@ void main() {
     );
     expect(exam.grading?.totalQuestions, 2);
     expect(exam.grading?.correctNumber, 1);
+    expect(exam.grade, 1);
+    expect(exam.lastSetGrade, 3);
+    expect(exam.lastSetShortText, 'Phân số cơ bản');
     expect(exam.questions.last.answers, hasLength(4));
     expect(exam.questions.last.rightAnswer, 'A');
     expect(exam.answers.last.label, 'B');

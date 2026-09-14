@@ -91,6 +91,8 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     userAiExamId: userAiExamIdOverride ?? userAiExamId,
     userExamId: userExamId ?? this.userExamId ?? stats?.userExamId,
     grade: grade,
+    lastSetGrade: grade,
+    lastSetShortText: shortText,
     level: level,
     numQuestions: numQuestions,
     startedDt: startedDt,

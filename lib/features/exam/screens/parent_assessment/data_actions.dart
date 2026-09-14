@@ -91,13 +91,12 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
       return false;
     }
     final status = stats.status?.trim().toUpperCase();
-    if (status == 'CANCEL' || status == 'CANCELED' || status == 'CANCELLED') {
+    if (status == 'CANCEL') {
       return false;
     }
     return status == null ||
         status.isEmpty ||
         status == 'COMPLETE' ||
-        status == 'COMPLETED' ||
         status == 'SUBMITTED';
   }
 
@@ -106,6 +105,9 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   }
 
   GeneratedExam? _activeInProgressExam(ExamStats stats) {
+    if (_isTerminalExamStatus(stats.status)) {
+      return null;
+    }
     final outerStatusIsActive = _isActiveExamStatus(stats.status);
     final candidates = stats.inProgressExams
         .where(
@@ -126,6 +128,11 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   bool _isActiveExamStatus(String? value) {
     final status = value?.trim().toUpperCase();
     return status == 'ACTIVE' || status == 'IN_PROGRESS';
+  }
+
+  bool _isTerminalExamStatus(String? value) {
+    final status = value?.trim().toUpperCase();
+    return status == 'COMPLETE' || status == 'SUBMITTED' || status == 'CANCEL';
   }
 
   ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {

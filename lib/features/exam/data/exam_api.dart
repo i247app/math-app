@@ -400,6 +400,8 @@ GeneratedExam _journeyDetailToModel(
     examType: stats.examType ?? lastExam?.examType ?? examTypeAssessment,
     userExamId: userExamId,
     grade: stats.grade ?? lastExam?.grade,
+    lastSetGrade: lastExam?.grade ?? stats.grade,
+    lastSetShortText: lastExam?.shortText,
     level: stats.level ?? lastExam?.level,
     numQuestions: stats.totalQuestions,
     title: lastExam?.title,
@@ -484,6 +486,8 @@ GeneratedExam _activeJourneySetToModel({
     examStatus: activeStatus,
     examType: activeExam.examType ?? examTypeAssessment,
     grade: activeExam.grade,
+    lastSetGrade: activeExam.grade,
+    lastSetShortText: activeExam.shortText,
     level: activeExam.level,
     numQuestions: activeDetails.length,
     title: activeExam.title,
@@ -513,6 +517,9 @@ GeneratedExam _activeJourneySetToModel({
 }
 
 GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {
+  if (response.stats?.status?.trim().toUpperCase() == 'COMPLETE') {
+    return null;
+  }
   for (final candidate in response.exams.reversed) {
     if (_isActiveExamStatus(candidate.status)) {
       return candidate;
