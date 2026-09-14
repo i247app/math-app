@@ -141,11 +141,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   Future<void> _goToNextQuestion() async {
+    if ((_controller.isAssessment || _controller.isPractice) &&
+        !_controller.canContinue) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
     if (_controller.isPractice) {
-      if (!_controller.canContinue) {
-        HapticFeedback.selectionClick();
-        return;
-      }
       HapticFeedback.mediumImpact();
       final action = _controller.preparePracticeFlow();
       if (action == AssessmentFlowAction.submit) {
@@ -581,7 +583,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             _controller.allQuestionsAnswered &&
                                             !_controller.isAssessment,
                                         canContinue:
-                                            !_controller.isPractice ||
+                                            (!_controller.isAssessment &&
+                                                !_controller.isPractice) ||
                                             _controller.canContinue,
                                         isSubmitting: isSubmittingExam,
                                         isTransitioning: isTransitioningSet,

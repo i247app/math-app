@@ -29,7 +29,7 @@ void main() {
     ],
   );
 
-  test('can continue before answering the current question', () {
+  test('cannot continue before answering the current assessment question', () {
     final controller = AssessmentController(
       examService: _UnusedExamService(),
       initialExam: exam,
@@ -37,6 +37,10 @@ void main() {
     addTearDown(controller.dispose);
 
     expect(controller.canContinue, isFalse);
+    expect(controller.goToNextQuestion(), isFalse);
+    expect(controller.questionIndex, 0);
+
+    controller.selectAnswer(answers.first);
     expect(controller.goToNextQuestion(), isTrue);
     expect(controller.questionIndex, 1);
     expect(controller.canContinue, isFalse);
@@ -85,7 +89,7 @@ void main() {
     expect(controller.isSelectedAnswerCorrect, isNull);
   });
 
-  test('tapping the selected answer again unselects it', () {
+  test('tapping the selected assessment answer keeps it selected', () {
     final controller = AssessmentController(
       examService: _UnusedExamService(),
       initialExam: exam,
@@ -97,11 +101,10 @@ void main() {
     expect(controller.canContinue, isTrue);
 
     controller.selectAnswer(answers.first);
-    expect(controller.selectedAnswerLabel, isNull);
-    expect(controller.canContinue, isFalse);
-    expect(controller.firstUnansweredQuestionIndex, 0);
+    expect(controller.selectedAnswerLabel, answers.first.label);
+    expect(controller.canContinue, isTrue);
+    expect(controller.firstUnansweredQuestionIndex, 1);
 
-    controller.selectAnswer(answers.first);
     controller.selectAnswer(answers.last);
     expect(controller.selectedAnswerLabel, answers.last.label);
   });

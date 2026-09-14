@@ -79,6 +79,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'assessment requires an answer and keeps the selected answer checked',
+    (tester) async {
+      await _pumpAssessment(tester, examType: examTypeAssessment);
+
+      final continueButton = find.byType(AssessmentBottomActionButton).last;
+      final firstAnswer = find.byType(AssessmentAnswerButton).first;
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNull,
+      );
+
+      await tester.tap(firstAnswer);
+      await tester.pump();
+      expect(
+        tester.widget<AssessmentAnswerButton>(firstAnswer).selected,
+        isTrue,
+      );
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNotNull,
+      );
+
+      await tester.tap(firstAnswer);
+      await tester.pump();
+      expect(
+        tester.widget<AssessmentAnswerButton>(firstAnswer).selected,
+        isTrue,
+      );
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNotNull,
+      );
+    },
+  );
+
   testWidgets('practice shows retry feedback until the correct answer', (
     tester,
   ) async {

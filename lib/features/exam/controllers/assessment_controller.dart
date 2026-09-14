@@ -434,8 +434,8 @@ class AssessmentController extends ChangeNotifier {
     if (_isTransitioningSet || _isSubmittingExam) {
       return;
     }
-    _allowsPartialSubmit = false;
     if (_isPractice) {
+      _allowsPartialSubmit = false;
       _selectedAnswerLabels.putIfAbsent(_questionIndex, () => answer.label);
       final isCorrect = isAnswerCorrect(answer);
       _practiceSelectedAnswerLabels[_questionIndex] = answer.label;
@@ -444,10 +444,10 @@ class AssessmentController extends ChangeNotifier {
       return;
     }
     if (_selectedAnswerLabels[_questionIndex] == answer.label) {
-      _selectedAnswerLabels.remove(_questionIndex);
-    } else {
-      _selectedAnswerLabels[_questionIndex] = answer.label;
+      return;
     }
+    _allowsPartialSubmit = false;
+    _selectedAnswerLabels[_questionIndex] = answer.label;
     notifyListeners();
   }
 
@@ -478,7 +478,10 @@ class AssessmentController extends ChangeNotifier {
   }
 
   Future<AssessmentFlowAction> advanceAssessmentFlow() async {
-    if (!_isAssessment || _isTransitioningSet || _isSubmittingExam) {
+    if (!_isAssessment ||
+        _isTransitioningSet ||
+        _isSubmittingExam ||
+        !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
 
@@ -514,7 +517,10 @@ class AssessmentController extends ChangeNotifier {
 
   /// Evaluates automatic submit without generating a speculative next set.
   AssessmentFlowAction prepareAssessmentFlow() {
-    if (!_isAssessment || _isTransitioningSet || _isSubmittingExam) {
+    if (!_isAssessment ||
+        _isTransitioningSet ||
+        _isSubmittingExam ||
+        !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
 
@@ -556,7 +562,7 @@ class AssessmentController extends ChangeNotifier {
   bool goToNextQuestion() {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
     if (_isTransitioningSet ||
-        (_isPractice && !canContinue) ||
+        ((_isAssessment || _isPractice) && !canContinue) ||
         _questionIndex >= questions.length - 1) {
       return false;
     }
