@@ -443,9 +443,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('leaving a new assessment submits without updating ACTIVE', (
-    tester,
-  ) async {
+  testWidgets('leaving a new assessment does not call an API', (tester) async {
     final service = _ExitStatusExamService();
     await _pumpAssessment(
       tester,
@@ -458,10 +456,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
     await tester.pumpAndSettle();
 
-    expect(service.events, <String>['submit:1']);
-    expect(service.submittedAnswers, hasLength(1));
-    expect(service.submittedAnswers!.single.questionNumber, 1);
-    expect(service.submittedAnswers!.single.label, 'A');
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
     expect(service.statusUpdates, isEmpty);
     expect(tester.takeException(), isNull);
   });
@@ -512,11 +508,10 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('exit submit keeps the question screen still behind the dialog', (
+  testWidgets('canceling without a user exam id does not submit', (
     tester,
   ) async {
-    final submitCompleter = Completer<GeneratedExam>();
-    final service = _ExitStatusExamService(submitCompleter: submitCompleter);
+    final service = _ExitStatusExamService();
     await _pumpAssessment(
       tester,
       examService: service,
@@ -526,40 +521,11 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.close_rounded).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
-    await tester.pump();
-
-    expect(
-      find.byKey(const ValueKey('assessment-exit-dialog')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: find.byKey(const ValueKey('assessment-leave-active')),
-        matching: find.byType(CircularProgressIndicator),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('question-content-layout')),
-      findsOneWidget,
-    );
-    expect(find.byKey(const ValueKey('submit-loader')), findsNothing);
-    expect(service.submittedAnswers, hasLength(1));
-    expect(service.submittedAnswers!.single.questionNumber, 1);
-    expect(service.submittedAnswers!.single.label, 'A');
-
-    submitCompleter.complete(
-      const GeneratedExam(
-        examId: 1,
-        userExamId: 9001,
-        examType: examTypeAssessment,
-        questions: <ExamQuestion>[],
-      ),
-    );
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
     await tester.pumpAndSettle();
 
-    expect(service.events, <String>['submit:1']);
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
     expect(service.statusUpdates, isEmpty);
     expect(tester.takeException(), isNull);
   });
@@ -939,9 +905,6 @@ class _ImmediatePracticeSubmitService implements ExamService {
 }
 
 class _ExitStatusExamService implements ExamService {
-  _ExitStatusExamService({this.submitCompleter});
-
-  final Completer<GeneratedExam>? submitCompleter;
   final List<(int, String)> statusUpdates = <(int, String)>[];
   final List<String> events = <String>[];
   List<SubmitExamAnswer>? submittedAnswers;
@@ -954,10 +917,6 @@ class _ExitStatusExamService implements ExamService {
   }) async {
     events.add('submit:$examId');
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
-    final pendingSubmit = submitCompleter;
-    if (pendingSubmit != null) {
-      return pendingSubmit.future;
-    }
     return const GeneratedExam(
       examId: 1,
       userExamId: 9001,

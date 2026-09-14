@@ -6,7 +6,6 @@ import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
-import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/helpers/practice_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
@@ -273,61 +272,18 @@ class AssessmentController extends ChangeNotifier {
     if (_isSubmittingExam || _isUpdatingExitStatus) {
       return;
     }
-    final currentExam = _exam;
-    if (currentExam == null || currentExam.questions.isEmpty) {
-      throw ExamException(AppStrings.current(AppKeys.missingExamToSubmit));
-    }
-
-    _isUpdatingExitStatus = true;
-    try {
-      final existingUserExamId = userExamId;
-      if (existingUserExamId != null && existingUserExamId > 0) {
-        await _examService.updateUserExamStatus(
-          userExamId: existingUserExamId,
-          status: status,
-          profileId: profileId ?? currentExam.profileId,
-        );
-        return;
-      }
-
-      final submittedExam = await _submitSet(
-        currentExam,
-        _answersForExit(currentExam),
-      );
-      final submittedUserExamId = submittedExam.userExamId;
-      if (submittedUserExamId == null || submittedUserExamId <= 0) {
-        throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
-      }
-      await _examService.updateUserExamStatus(
-        userExamId: submittedUserExamId,
-        status: status,
-        profileId:
-            profileId ?? submittedExam.profileId ?? currentExam.profileId,
-      );
-    } finally {
-      _isUpdatingExitStatus = false;
-    }
-  }
-
-  Future<void> submitCurrentSetForExit() async {
-    if (_isSubmittingExam || _isUpdatingExitStatus) {
+    final existingUserExamId = userExamId;
+    if (existingUserExamId == null || existingUserExamId <= 0) {
       return;
     }
-    final currentExam = _exam;
-    if (currentExam == null || currentExam.questions.isEmpty) {
-      throw ExamException(AppStrings.current(AppKeys.missingExamToSubmit));
-    }
 
     _isUpdatingExitStatus = true;
     try {
-      final submittedExam = await _submitSet(
-        currentExam,
-        _answersForExit(currentExam),
+      await _examService.updateUserExamStatus(
+        userExamId: existingUserExamId,
+        status: status,
+        profileId: profileId ?? _exam?.profileId,
       );
-      final submittedUserExamId = submittedExam.userExamId;
-      if (submittedUserExamId == null || submittedUserExamId <= 0) {
-        throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
-      }
     } finally {
       _isUpdatingExitStatus = false;
     }
@@ -771,19 +727,6 @@ class AssessmentController extends ChangeNotifier {
             questionNumber: exam.questions[index].questionNumber,
             label: label,
           ),
-    ];
-  }
-
-  List<SubmitExamAnswer> _answersForExit(GeneratedExam exam) {
-    final selectedAnswers = _answersForExam(exam);
-    if (selectedAnswers.isNotEmpty) {
-      return selectedAnswers;
-    }
-    return const <SubmitExamAnswer>[
-      SubmitExamAnswer(
-        questionNumber: assessmentExitPlaceholderQuestionNumber,
-        label: assessmentExitPlaceholderAnswerLabel,
-      ),
     ];
   }
 

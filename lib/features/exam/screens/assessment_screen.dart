@@ -446,9 +446,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       dialogContext,
       onUpdateStatus: (status) {
         if (status == assessmentActiveStatus) {
-          return widget.isResumedAssessment
-              ? Future<void>.value()
-              : _controller.submitCurrentSetForExit();
+          return Future<void>.value();
         }
         return _controller.updateStatusForExit(status);
       },
