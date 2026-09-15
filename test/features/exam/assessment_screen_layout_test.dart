@@ -97,6 +97,48 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('assessment keeps the exit button after the first question', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      examType: examTypeAssessment,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: 'First question',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: 'Second question',
+          questionNumber: 2,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+      ],
+    );
+
+    await tester.tap(find.byType(AssessmentAnswerButton).first);
+    await tester.tap(find.byType(AssessmentBottomActionButton).last);
+    await tester.pump();
+
+    expect(find.text('Second question'), findsOneWidget);
+    final leftButton = tester.widget<AssessmentBottomActionButton>(
+      find.byType(AssessmentBottomActionButton).first,
+    );
+    expect(leftButton.label, 'THOÁT');
+    expect(leftButton.icon, Icons.logout_rounded);
+    expect(leftButton.background, AppColors.red700);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'assessment requires an answer and keeps the selected answer checked',
     (tester) async {

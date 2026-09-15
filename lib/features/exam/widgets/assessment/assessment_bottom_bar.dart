@@ -16,6 +16,7 @@ class AssessmentBottomBar extends StatelessWidget {
     required this.allQuestionsAnswered,
     required this.isSubmitting,
     this.isTransitioning = false,
+    this.alwaysShowExit = false,
     required this.onBack,
     required this.onExit,
     required this.onContinue,
@@ -28,6 +29,7 @@ class AssessmentBottomBar extends StatelessWidget {
   final bool allQuestionsAnswered;
   final bool isSubmitting;
   final bool isTransitioning;
+  final bool alwaysShowExit;
   final VoidCallback onBack;
   final VoidCallback onExit;
   final VoidCallback onContinue;
@@ -36,6 +38,7 @@ class AssessmentBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final showSubmit = allQuestionsAnswered;
+    final showExit = alwaysShowExit || !canGoBack;
     return Container(
       height: contentHeight + bottomInset,
       padding: EdgeInsets.fromLTRB(14, 12, 14, 24 + bottomInset),
@@ -46,19 +49,19 @@ class AssessmentBottomBar extends StatelessWidget {
           Expanded(
             child: AssessmentBottomActionButton(
               label: context.getText(
-                canGoBack ? AppKeys.previousQuestionUpper : AppKeys.exitUpper,
+                showExit ? AppKeys.exitUpper : AppKeys.previousQuestionUpper,
               ),
-              icon: canGoBack ? Icons.arrow_back_rounded : Icons.logout_rounded,
-              background: canGoBack ? AppColors.brandOrange : AppColors.red700,
+              icon: showExit ? Icons.logout_rounded : Icons.arrow_back_rounded,
+              background: showExit ? AppColors.red700 : AppColors.brandOrange,
               foreground: colors.onAccent,
               disabledBackground: colors.disabledBackground,
               disabledForeground: colors.disabledForeground,
               labelFontSize: FontSize.normal,
               onTap: isSubmitting || isTransitioning
                   ? null
-                  : canGoBack
-                  ? onBack
-                  : onExit,
+                  : showExit
+                  ? onExit
+                  : onBack,
             ),
           ),
           Expanded(

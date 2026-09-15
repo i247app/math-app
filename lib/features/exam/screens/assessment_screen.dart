@@ -659,6 +659,8 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             _controller.canContinue,
                                         isSubmitting: isSubmittingExam,
                                         isTransitioning: isTransitioningSet,
+                                        alwaysShowExit:
+                                            _controller.isAssessment,
                                         onBack: goToPreviousQuestion,
                                         onExit: _exitController.requestExit,
                                         onContinue: goToNextQuestion,
