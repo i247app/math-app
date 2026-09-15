@@ -199,6 +199,7 @@ class ExamDetailResponseDto {
     this.exam,
     this.exams = const <GeneratedExamDto>[],
     this.stats,
+    this.practicePreview,
     this.details = const <ExamDetailAnswerDto>[],
     this.status,
     this.mmessage,
@@ -209,6 +210,7 @@ class ExamDetailResponseDto {
   final GeneratedExamDto? exam;
   final List<GeneratedExamDto> exams;
   final ExamStatsDto? stats;
+  final ExamPracticePreviewDto? practicePreview;
   final List<ExamDetailAnswerDto> details;
   final String? status;
   final String? mmessage;
@@ -218,6 +220,76 @@ class ExamDetailResponseDto {
       _$ExamDetailResponseDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExamDetailResponseDtoToJson(this);
+}
+
+class ExamPracticePreviewDto {
+  const ExamPracticePreviewDto({
+    this.baseUserAiExamId,
+    this.mode,
+    this.strongTopics = const <ExamPracticeTopicDto>[],
+    this.weakTopics = const <ExamPracticeTopicDto>[],
+  });
+
+  final int? baseUserAiExamId;
+  final String? mode;
+  final List<ExamPracticeTopicDto> strongTopics;
+  final List<ExamPracticeTopicDto> weakTopics;
+
+  factory ExamPracticePreviewDto.fromJson(Map<String, dynamic> json) {
+    return ExamPracticePreviewDto(
+      baseUserAiExamId: _intFromJson(json['base_user_ai_exam_id']),
+      mode: json['mode']?.toString(),
+      strongTopics: _practiceTopicsFromJson(json['strong_topics']),
+      weakTopics: _practiceTopicsFromJson(json['weak_topics']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'base_user_ai_exam_id': baseUserAiExamId,
+    'mode': mode,
+    'strong_topics': strongTopics.map((topic) => topic.toJson()).toList(),
+    'weak_topics': weakTopics.map((topic) => topic.toJson()).toList(),
+  };
+}
+
+class ExamPracticeTopicDto {
+  const ExamPracticeTopicDto({
+    required this.topic,
+    this.answered = 0,
+    this.wrong = 0,
+  });
+
+  final String topic;
+  final int answered;
+  final int wrong;
+
+  factory ExamPracticeTopicDto.fromJson(Map<String, dynamic> json) {
+    return ExamPracticeTopicDto(
+      topic: json['topic']?.toString().trim() ?? '',
+      answered: _intFromJson(json['answered']) ?? 0,
+      wrong: _intFromJson(json['wrong']) ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'topic': topic,
+    'answered': answered,
+    'wrong': wrong,
+  };
+}
+
+List<ExamPracticeTopicDto> _practiceTopicsFromJson(Object? value) {
+  if (value is! List) {
+    return const <ExamPracticeTopicDto>[];
+  }
+  return value
+      .whereType<Map>()
+      .map(
+        (topic) =>
+            ExamPracticeTopicDto.fromJson(Map<String, dynamic>.from(topic)),
+      )
+      .where((topic) => topic.topic.isNotEmpty)
+      .toList(growable: false);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)

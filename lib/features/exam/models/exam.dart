@@ -147,6 +147,7 @@ class GeneratedExam {
     this.grade,
     this.lastSetGrade,
     this.lastSetShortText,
+    this.practiceWeakTopics = const <ExamPracticeTopic>[],
     this.level,
     this.numQuestions,
     this.startedDt,
@@ -173,6 +174,7 @@ class GeneratedExam {
   final int? grade;
   final int? lastSetGrade;
   final String? lastSetShortText;
+  final List<ExamPracticeTopic> practiceWeakTopics;
   final int? level;
   final int? numQuestions;
   final String? startedDt;
@@ -181,6 +183,18 @@ class GeneratedExam {
   final List<SubmitExamAnswer> answers;
   final int? resumeQuestionIndex;
   final List<ExamQuestion> questions;
+}
+
+class ExamPracticeTopic {
+  const ExamPracticeTopic({
+    required this.topic,
+    required this.answered,
+    required this.wrong,
+  });
+
+  final String topic;
+  final int answered;
+  final int wrong;
 }
 
 class ExamStats {

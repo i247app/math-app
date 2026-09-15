@@ -271,6 +271,19 @@ void main() {
           'last_submitted_dt': '2026-09-12T08:02:00Z',
           'review': 'Journey review',
         },
+        'practice_preview': <String, dynamic>{
+          'base_user_ai_exam_id': 3,
+          'mode': 'RETRY_WEAK',
+          'strong_topics': <Map<String, dynamic>>[],
+          'weak_topics': <Map<String, dynamic>>[
+            <String, dynamic>{'topic': 'phép đếm', 'answered': 3, 'wrong': 3},
+            <String, dynamic>{
+              'topic': 'trừ không nhớ',
+              'answered': 1,
+              'wrong': 1,
+            },
+          ],
+        },
         'details': <Map<String, dynamic>>[
           <String, dynamic>{
             'question_number': 1,
@@ -331,6 +344,12 @@ void main() {
     expect(exam.grade, 1);
     expect(exam.lastSetGrade, 3);
     expect(exam.lastSetShortText, 'Phân số cơ bản');
+    expect(
+      exam.practiceWeakTopics.map((topic) => topic.topic),
+      orderedEquals(<String>['phép đếm', 'trừ không nhớ']),
+    );
+    expect(exam.practiceWeakTopics.first.answered, 3);
+    expect(exam.practiceWeakTopics.first.wrong, 3);
     expect(exam.questions.last.answers, hasLength(4));
     expect(exam.questions.last.rightAnswer, 'A');
     expect(exam.answers.last.label, 'B');

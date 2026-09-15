@@ -59,6 +59,15 @@ class ExamReviewContent extends StatelessWidget {
         ? 0
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
+    final weakTopics = exam.practiceWeakTopics
+        .map((topic) => topic.topic.trim())
+        .where((topic) => topic.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+    final weakTopicText = _formatTopicList(
+      weakTopics,
+      conjunction: context.getText(AppKeys.examReviewTopicConjunction),
+    );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -80,7 +89,9 @@ class ExamReviewContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ExamReviewPracticeBanner(
-                focusText: exam.lastSetShortText,
+                focusText: weakTopicText.isNotEmpty
+                    ? weakTopicText
+                    : exam.lastSetShortText,
                 isLoading: isGeneratingPractice,
                 onTap: onPractice!,
               ),
@@ -127,4 +138,24 @@ class ExamReviewContent extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatTopicList(List<String> topics, {required String conjunction}) {
+  if (topics.isEmpty) {
+    return '';
+  }
+  if (topics.length == 1) {
+    return topics.single;
+  }
+
+  final normalizedConjunction = conjunction.trim();
+  final finalSeparator = normalizedConjunction.isEmpty
+      ? ', '
+      : ' $normalizedConjunction ';
+  if (topics.length == 2) {
+    return '${topics.first}$finalSeparator${topics.last}';
+  }
+
+  return '${topics.take(topics.length - 1).join(', ')}'
+      '$finalSeparator${topics.last}';
 }

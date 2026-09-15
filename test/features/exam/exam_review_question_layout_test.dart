@@ -172,7 +172,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Phép cộng trong phạm vi 100'), findsOneWidget);
+    const topicSummary = 'Phép đếm, Trừ không nhớ và Trừ trong phạm vi 5';
+    expect(find.text(topicSummary), findsOneWidget);
+    expect(find.text('Phép cộng trong phạm vi 100'), findsNothing);
+    final topicText = tester.widget<Text>(find.text(topicSummary));
+    expect(topicText.maxLines, 3);
+    expect(topicText.overflow, TextOverflow.clip);
     await tester.tap(find.byKey(const ValueKey('exam-review-practice-banner')));
     await tester.pumpAndSettle();
 
@@ -205,6 +210,11 @@ class _JourneyDetailService implements ExamService {
       grade: 2,
       lastSetGrade: 4,
       lastSetShortText: 'Phép cộng trong phạm vi 100',
+      practiceWeakTopics: <ExamPracticeTopic>[
+        ExamPracticeTopic(topic: 'Phép đếm', answered: 3, wrong: 3),
+        ExamPracticeTopic(topic: 'Trừ không nhớ', answered: 1, wrong: 1),
+        ExamPracticeTopic(topic: 'Trừ trong phạm vi 5', answered: 1, wrong: 1),
+      ],
       grading: ExamGrading(correctNumber: 1, totalQuestions: 1),
       answers: <SubmitExamAnswer>[
         SubmitExamAnswer(questionNumber: 1, label: 'A'),

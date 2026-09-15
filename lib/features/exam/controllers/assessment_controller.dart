@@ -842,6 +842,9 @@ class AssessmentController extends ChangeNotifier {
       userAiExamId: submittedExam.userAiExamId ?? sourceExam.userAiExamId,
       userExamId: sourceExam.userExamId ?? submittedExam.userExamId,
       grade: sourceExam.grade ?? submittedExam.grade,
+      practiceWeakTopics: sourceExam.practiceWeakTopics.isNotEmpty
+          ? sourceExam.practiceWeakTopics
+          : submittedExam.practiceWeakTopics,
       level: submittedExam.level ?? sourceExam.level,
       numQuestions: submittedExam.numQuestions ?? sourceExam.numQuestions,
       startedDt: submittedExam.startedDt ?? sourceExam.startedDt,

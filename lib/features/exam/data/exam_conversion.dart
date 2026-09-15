@@ -68,6 +68,11 @@ extension ExamResultDtoConversion on ExamResultDto {
   );
 }
 
+extension ExamPracticeTopicDtoConversion on ExamPracticeTopicDto {
+  ExamPracticeTopic toModel() =>
+      ExamPracticeTopic(topic: topic, answered: answered, wrong: wrong);
+}
+
 extension GeneratedExamDtoConversion on GeneratedExamDto {
   GeneratedExam toModel({
     List<SubmitExamAnswerDto> submittedAnswers = const <SubmitExamAnswerDto>[],
@@ -77,6 +82,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     int? userAiExamIdOverride,
     String? examStatusOverride,
     int? resumeQuestionIndex,
+    List<ExamPracticeTopic> practiceWeakTopics = const <ExamPracticeTopic>[],
   }) => GeneratedExam(
     id: userAiExamIdOverride ?? userAiExamId,
     examId: userAiExamIdOverride ?? userAiExamId,
@@ -93,6 +99,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     grade: grade,
     lastSetGrade: grade,
     lastSetShortText: shortText,
+    practiceWeakTopics: practiceWeakTopics,
     level: level,
     numQuestions: numQuestions,
     startedDt: startedDt,

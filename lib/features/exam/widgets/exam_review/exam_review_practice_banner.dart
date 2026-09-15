@@ -82,8 +82,8 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                         Expanded(
                           child: Text(
                             normalizedFocus,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            overflow: TextOverflow.clip,
                             style: GoogleFonts.andika(
                               color: colors.textPrimary,
                               fontSize: FontSize.small,

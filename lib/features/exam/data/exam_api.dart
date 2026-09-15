@@ -265,6 +265,7 @@ class ExamApi implements ExamService {
       submittedAnswers: submittedAnswers,
       useSequentialQuestionNumbers: isEntireJourney,
       userExamId: validUserExamId,
+      practiceWeakTopics: _practiceWeakTopics(response),
     );
   }
 
@@ -404,6 +405,7 @@ GeneratedExam _journeyDetailToModel(
     grade: stats.grade ?? lastExam?.grade,
     lastSetGrade: lastExam?.grade ?? stats.grade,
     lastSetShortText: lastExam?.shortText,
+    practiceWeakTopics: _practiceWeakTopics(response),
     level: stats.level ?? lastExam?.level,
     numQuestions: stats.totalQuestions,
     title: lastExam?.title,
@@ -473,6 +475,7 @@ GeneratedExam _activeJourneySetToModel({
       userAiExamIdOverride: activeUserAiExamId,
       examStatusOverride: activeStatus,
       resumeQuestionIndex: resumeQuestionIndex,
+      practiceWeakTopics: _practiceWeakTopics(response),
     );
   }
   if (activeDetails.length < expectedQuestionCount) {
@@ -490,6 +493,7 @@ GeneratedExam _activeJourneySetToModel({
     grade: activeExam.grade,
     lastSetGrade: activeExam.grade,
     lastSetShortText: activeExam.shortText,
+    practiceWeakTopics: _practiceWeakTopics(response),
     level: activeExam.level,
     numQuestions: activeDetails.length,
     title: activeExam.title,
@@ -516,6 +520,13 @@ GeneratedExam _activeJourneySetToModel({
         )
         .toList(growable: false),
   );
+}
+
+List<ExamPracticeTopic> _practiceWeakTopics(ExamDetailResponseDto response) {
+  return response.practicePreview?.weakTopics
+          .map((topic) => topic.toModel())
+          .toList(growable: false) ??
+      const <ExamPracticeTopic>[];
 }
 
 GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {

@@ -835,6 +835,7 @@ class AppKeys {
   static const placementResultPracticeAgain = 'placement_result_practice_again';
   static const examReviewPracticeBannerTitle =
       'exam_review_practice_banner_title';
+  static const examReviewTopicConjunction = 'exam_review_topic_conjunction';
   static const examReviewPracticeBannerAction =
       'exam_review_practice_banner_action';
   static const scoreUpper = 'score_upper';
