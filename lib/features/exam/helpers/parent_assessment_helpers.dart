@@ -137,12 +137,21 @@ String homeExamDateLabel(GeneratedExam exam) {
 String homeExamTitle(BuildContext context, GeneratedExam exam) {
   final numericGrade = exam.grade;
   final level = exam.level;
-  if (exam.examType?.trim().toUpperCase() == examTypeGrade &&
+  final normalizedExamType = exam.examType?.trim().toUpperCase();
+  if (normalizedExamType == examTypeGrade &&
       numericGrade != null &&
       level != null) {
     return context.formatText(AppKeys.gradeLevelExamTitle, {
       'grade': numericGrade,
       'level': level,
+    });
+  }
+  if (normalizedExamType == examTypeAssessment && numericGrade != null) {
+    if (numericGrade == 0) {
+      return context.getText(AppKeys.assessmentListKindergartenTitle);
+    }
+    return context.formatText(AppKeys.assessmentListGradeTitle, {
+      'grade': numericGrade,
     });
   }
 

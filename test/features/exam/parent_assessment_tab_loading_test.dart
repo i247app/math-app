@@ -251,6 +251,10 @@ void main() {
     expect(statsCard.exam.grading?.correctNumber, 13);
     expect(statsCard.exam.grading?.totalQuestions, 20);
     expect(statsCard.onTap, isNotNull);
+    final gradeBadge = tester.widget<Text>(
+      find.byKey(const ValueKey<String>('parent-assessment-grade-badge')),
+    );
+    expect(gradeBadge.data, '2');
 
     await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();

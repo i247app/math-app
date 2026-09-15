@@ -77,6 +77,14 @@ abstract final class AppColors {
   static const mascotBorder = Color(0xFF974320);
   static const aiAccentSurface = Color(0xFFE8FEFF);
 
+  // Assessment grade identity colors (kindergarten through grade 5).
+  static const grade0 = Color(0xFFFC6128);
+  static const grade1 = Color(0xFFE84B5B);
+  static const grade2 = Color(0xFFF4B62D);
+  static const grade3 = Color(0xFF22A06B);
+  static const grade4 = Color(0xFF2388C7);
+  static const grade5 = Color(0xFF7656C9);
+
   // Welcome
   static const welcomeTeal = Color(0xFF058A95);
   static const welcomeTitle = Color(0xFF203D68);

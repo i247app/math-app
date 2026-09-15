@@ -23,8 +23,6 @@ class AssessmentResultListItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final percent = exam.grading?.scorePercentage;
-    final scoreStyle = parentAssessmentScoreStyle(context, percent);
     final dateParts = parentAssessmentDateParts(exam.createDt);
     final shortText = homeExamShortText(exam);
     final radius = BorderRadius.circular(24);
@@ -55,10 +53,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ParentAssessmentScoreBadge(
-                percentage: percent,
-                color: scoreStyle.color,
-              ),
+              ParentAssessmentScoreBadge(grade: exam.grade),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12),

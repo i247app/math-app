@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+Color parentAssessmentGradeColor(int? grade) {
+  return switch (grade) {
+    0 => AppColors.grade0,
+    1 => AppColors.grade1,
+    2 => AppColors.grade2,
+    3 => AppColors.grade3,
+    4 => AppColors.grade4,
+    5 => AppColors.grade5,
+    _ => AppColors.textCoolMuted,
+  };
+}
 
 ({Color color, String label}) parentAssessmentScoreStyle(
   BuildContext context,
