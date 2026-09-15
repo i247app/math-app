@@ -17,6 +17,7 @@ class AssessmentBottomBar extends StatelessWidget {
     required this.isSubmitting,
     this.isTransitioning = false,
     required this.onBack,
+    required this.onExit,
     required this.onContinue,
   });
   static const double contentHeight = 84;
@@ -28,6 +29,7 @@ class AssessmentBottomBar extends StatelessWidget {
   final bool isSubmitting;
   final bool isTransitioning;
   final VoidCallback onBack;
+  final VoidCallback onExit;
   final VoidCallback onContinue;
 
   @override
@@ -43,16 +45,20 @@ class AssessmentBottomBar extends StatelessWidget {
         children: [
           Expanded(
             child: AssessmentBottomActionButton(
-              label: context.getText(AppKeys.previousQuestionUpper),
-              icon: Icons.arrow_back_rounded,
-              background: AppColors.brandOrange,
+              label: context.getText(
+                canGoBack ? AppKeys.previousQuestionUpper : AppKeys.exitUpper,
+              ),
+              icon: canGoBack ? Icons.arrow_back_rounded : Icons.logout_rounded,
+              background: canGoBack ? AppColors.brandOrange : AppColors.red700,
               foreground: colors.onAccent,
               disabledBackground: colors.disabledBackground,
               disabledForeground: colors.disabledForeground,
               labelFontSize: FontSize.normal,
-              onTap: canGoBack && !isSubmitting && !isTransitioning
+              onTap: isSubmitting || isTransitioning
+                  ? null
+                  : canGoBack
                   ? onBack
-                  : null,
+                  : onExit,
             ),
           ),
           Expanded(

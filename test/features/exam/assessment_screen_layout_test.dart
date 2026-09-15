@@ -7,6 +7,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
@@ -62,19 +63,37 @@ void main() {
     final previousButton = tester.widget<AssessmentBottomActionButton>(
       actionButtons.first,
     );
-    expect(previousButton.onTap, isNull);
-    expect(
-      previousButton.disabledBackground,
-      AppThemeColors.light.disabledBackground,
-    );
-    expect(
-      previousButton.disabledForeground,
-      AppThemeColors.light.disabledForeground,
-    );
+    expect(previousButton.onTap, isNotNull);
+    expect(previousButton.label, 'THOÁT');
+    expect(previousButton.icon, Icons.logout_rounded);
+    expect(previousButton.background, AppColors.red700);
     for (final element in actionButtons.evaluate()) {
       final button = find.byWidget(element.widget);
       expect(tester.getBottomLeft(button).dy, lessThanOrEqualTo(844 - 48));
     }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('first question exit button uses the header exit flow', (
+    tester,
+  ) async {
+    await _pumpAssessment(tester, examType: examTypeAssessment);
+
+    final bottomBar = find.byType(AssessmentBottomBar);
+    final exitButton = find
+        .descendant(
+          of: bottomBar,
+          matching: find.byType(AssessmentBottomActionButton),
+        )
+        .first;
+    await tester.tap(exitButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
