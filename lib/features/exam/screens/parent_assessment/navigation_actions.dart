@@ -14,7 +14,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       _errorMessage = null;
     });
     _resetAssessmentScrollAfterBuild();
-    unawaited(_loadAssessments(page: 1));
+    unawaited(_loadAssessments(page: 1, openExamWhenEmpty: true));
   }
 
   void _showGradeContentAndLoad() {
@@ -34,7 +34,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       _pagination = null;
     });
     _resetAssessmentScrollAfterBuild();
-    unawaited(_loadAssessments(page: 1));
+    unawaited(_loadAssessments(page: 1, openExamWhenEmpty: true));
   }
 
   void _showAssessmentLanding() {
@@ -45,6 +45,8 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     _updateState(() {
       _showAssessmentContent = false;
       _contentExamType = examTypeAssessment;
+      _isLoading = false;
+      _loadRequestId++;
     });
     _resetAssessmentScrollAfterBuild();
   }

@@ -26,7 +26,7 @@ import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 
 void main() {
-  testWidgets('loads content with a skeleton only after the first banner tap', (
+  testWidgets('first banner loads stats then starts assessment when empty', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -90,11 +90,8 @@ void main() {
 
     expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
     expect(find.byType(ParentAssessmentEmptyPoster), findsNothing);
-    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
-    expect(find.byType(ParentAssessmentSearchField), findsOneWidget);
-
-    await tester.tap(find.byType(ParentAssessmentTabBanner));
-    await tester.pumpAndSettle();
+    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
+    expect(find.byType(ParentAssessmentSearchField), findsNothing);
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
     expect(
@@ -320,7 +317,7 @@ void main() {
     );
   });
 
-  testWidgets('second banner opens the GRADE list before grade selection', (
+  testWidgets('second banner loads GRADE stats then opens grade selection', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -369,12 +366,7 @@ void main() {
 
     expect(examService.statsCalls, 1);
     expect(examService.requestedExamTypes, const <String>[examTypeGrade]);
-    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
-    expect(find.byType(GradeSelectionScreen), findsNothing);
-
-    await tester.tap(find.byType(ParentAssessmentTabBanner));
-    await tester.pumpAndSettle();
-
+    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
     expect(find.byType(GradeSelectionScreen), findsOneWidget);
     final gradeSelection = tester.widget<GradeSelectionScreen>(
       find.byType(GradeSelectionScreen),

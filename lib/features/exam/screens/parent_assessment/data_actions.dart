@@ -11,7 +11,10 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
         '$useActiveStudentProfileData';
   }
 
-  Future<void> _loadAssessments({int? page}) async {
+  Future<void> _loadAssessments({
+    int? page,
+    bool openExamWhenEmpty = false,
+  }) async {
     final requestId = ++_loadRequestId;
     final targetPage = page ?? _pagination?.page ?? 1;
     final profileId = profileStableId(widget.activeProfile);
@@ -24,6 +27,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
     var loadedAllEntries = const <ParentAssessmentEntry>[];
     ParentAssessmentEntry? loadedActiveEntry;
     var failed = false;
+    var loadedStats = false;
 
     if (profileId != null && profileId > 0) {
       try {
@@ -31,6 +35,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
           profileId: profileId,
           examType: _contentExamType,
         );
+        loadedStats = true;
         final activeEntries =
             stats
                 .where(_isActiveAssessmentStats)
@@ -84,6 +89,16 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
           ? context.readText(AppKeys.parentExamLoadFailed)
           : null;
     });
+
+    final hasNoVisibleExam =
+        loadedAllEntries.isEmpty && loadedActiveEntry == null;
+    if (openExamWhenEmpty && loadedStats && !failed && hasNoVisibleExam) {
+      if (_contentExamType == examTypeGrade) {
+        await _openAssessmentWithGradeSelection();
+      } else {
+        await _openAssessmentDirectly();
+      }
+    }
   }
 
   bool _isCompletedAssessmentStats(ExamStats stats) {
