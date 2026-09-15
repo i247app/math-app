@@ -406,6 +406,20 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('12 + 8 = ?'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    expect(examService.statsCalls, 2);
+    expect(examService.requestedExamTypes, const <String>[
+      examTypeGrade,
+      examTypeGrade,
+    ]);
   });
 
   testWidgets('active assessment resumes from stats without loading detail', (

@@ -189,6 +189,14 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
         return;
       }
 
+      if (result == null && widget.examType == examTypeGrade) {
+        final onResultBack = widget.onResultBack;
+        if (onResultBack != null) {
+          onResultBack();
+          return;
+        }
+      }
+
       if (result == AiAssessmentResult.generationFailed) {
         setState(() => showGenerationFailed = true);
         return;
