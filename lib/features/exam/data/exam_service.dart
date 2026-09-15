@@ -51,5 +51,6 @@ abstract interface class ExamService {
     int detailId, {
     int? profileId,
     int? userExamId,
+    String examType = examTypeAssessment,
   });
 }

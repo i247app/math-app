@@ -190,6 +190,7 @@ class ExamApi implements ExamService {
     int detailId, {
     int? profileId,
     int? userExamId,
+    String examType = examTypeAssessment,
   }) async {
     final validUserExamId = userExamId != null && userExamId > 0
         ? userExamId
@@ -203,11 +204,16 @@ class ExamApi implements ExamService {
 
     final ExamDetailResponseDto response;
     final validProfileId = _requireProfileId(profileId);
+    final normalizedExamType = examType.trim().toUpperCase();
+    final validExamType = normalizedExamType.isEmpty
+        ? examTypeAssessment
+        : normalizedExamType;
     response = await _runExamRequest(
       () => _getExamDetailResponse(
         userAiExamId: validUserAiExamId,
         userExamId: validUserExamId,
         profileId: validProfileId,
+        examType: validExamType,
       ),
     );
 
@@ -232,6 +238,7 @@ class ExamApi implements ExamService {
             userAiExamId: activeUserAiExamId,
             userExamId: null,
             profileId: validProfileId,
+            examType: validExamType,
           ),
         );
         detailedActiveExam = _matchingDetailedActiveExam(
@@ -325,9 +332,11 @@ class ExamApi implements ExamService {
     int? userAiExamId,
     int? userExamId,
     required int profileId,
+    required String examType,
   }) {
     return _postResponse('/exams/detail', <String, dynamic>{
       'profile_id': profileId,
+      'exam_type': examType,
       'user_ai_exam_id': ?userAiExamId,
       'user_exam_id': ?userExamId,
     }, ExamDetailResponseDto.fromJson);

@@ -217,10 +217,25 @@ void main() {
     final body = _body(captured);
     expect(captured.path, '/exams/detail');
     expect(body, containsPair('profile_id', 21));
+    expect(body, containsPair('exam_type', examTypeAssessment));
     expect(body, containsPair('user_ai_exam_id', 2));
     expect(body, isNot(contains('user_exam_id')));
     expect(exam.answers.single.questionNumber, 1);
     expect(exam.answers.single.label, 'A');
+  });
+
+  test('sends GRADE exam type when loading grade detail', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return _examResponse();
+    });
+
+    await api.getExamDetail(2, profileId: 21, examType: examTypeGrade);
+
+    final body = _body(captured);
+    expect(captured.path, '/exams/detail');
+    expect(body, containsPair('exam_type', examTypeGrade));
   });
 
   test('loads an entire assessment journey by user_exam_id', () async {
@@ -328,6 +343,7 @@ void main() {
     final body = _body(captured);
     expect(captured.path, '/exams/detail');
     expect(body, containsPair('profile_id', 21));
+    expect(body, containsPair('exam_type', examTypeAssessment));
     expect(body, containsPair('user_exam_id', 99));
     expect(body, isNot(contains('user_ai_exam_id')));
     expect(exam.userExamId, 99);

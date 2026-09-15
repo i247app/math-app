@@ -982,6 +982,7 @@ class _CompletedJourneyReviewExamService implements ExamService {
     int detailId, {
     int? profileId,
     int? userExamId,
+    String examType = examTypeAssessment,
   }) async {
     requestedDetailId = detailId;
     requestedUserExamId = userExamId;

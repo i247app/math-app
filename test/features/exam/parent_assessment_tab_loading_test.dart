@@ -735,6 +735,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
     int detailId, {
     int? profileId,
     int? userExamId,
+    String examType = examTypeAssessment,
   }) async {
     requestedDetailId = detailId;
     requestedUserExamId = userExamId;

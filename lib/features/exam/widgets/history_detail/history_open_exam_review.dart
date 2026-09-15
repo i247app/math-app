@@ -16,7 +16,11 @@ void historyOpenExamReview(BuildContext context, GeneratedExam exam) {
   HapticFeedback.selectionClick();
   Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) => ExamReviewScreen(examId: examId, initialExam: exam),
+      builder: (_) => ExamReviewScreen(
+        examId: examId,
+        examType: exam.examType,
+        initialExam: exam,
+      ),
     ),
   );
 }

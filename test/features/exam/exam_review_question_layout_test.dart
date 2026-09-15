@@ -202,6 +202,7 @@ class _JourneyDetailService implements ExamService {
     int detailId, {
     int? profileId,
     int? userExamId,
+    String examType = examTypeAssessment,
   }) async {
     requestedUserExamId = userExamId;
     return const GeneratedExam(

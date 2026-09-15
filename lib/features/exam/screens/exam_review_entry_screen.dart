@@ -18,12 +18,14 @@ class ExamReviewScreen extends StatelessWidget {
     this.examId,
     this.userExamId,
     this.profileId,
+    this.examType,
     this.initialExam,
   }) : assert(examId != null || userExamId != null);
 
   final int? examId;
   final int? userExamId;
   final int? profileId;
+  final String? examType;
   final GeneratedExam? initialExam;
 
   @override
@@ -31,16 +33,24 @@ class ExamReviewScreen extends StatelessWidget {
     final examService = context.read<ExamService>();
     final detailId = userExamId ?? examId!;
     final isEntireJourney = userExamId != null;
+    final resolvedExamType =
+        (examType ?? initialExam?.examType ?? examTypeAssessment)
+            .trim()
+            .toUpperCase();
     return ReviewDetailScreen(
       detailId: detailId,
       detailLoader: (detailId) => examService.getExamDetail(
         detailId,
         profileId: profileId ?? initialExam?.profileId,
         userExamId: userExamId,
+        examType: resolvedExamType,
       ),
       initialDetail: initialExam,
       cacheKey: isEntireJourney
-          ? (type: 'assessment-journey', userExamId: userExamId)
+          ? (
+              type: '${resolvedExamType.toLowerCase()}-journey',
+              userExamId: userExamId,
+            )
           : null,
       onPractice: isEntireJourney
           ? (detail) async {

@@ -87,6 +87,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         builder: (_) => ExamReviewScreen(
           examId: userExamId == null ? userAiExamId : null,
           userExamId: userExamId,
+          examType: exam.examType ?? _contentExamType,
           initialExam: exam,
         ),
       ),

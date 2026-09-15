@@ -308,6 +308,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                             child: ExamReviewScreen(
                               examId: submittedExamId,
                               profileId: profileId ?? submittedExam.profileId,
+                              examType: widget.examType,
                               initialExam: submittedExam,
                             ),
                           ),
@@ -362,6 +363,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                 : null,
                             userExamId: submittedUserExamId,
                             profileId: profileId ?? submittedExam.profileId,
+                            examType: widget.examType,
                             initialExam: submittedUserExamId == null
                                 ? submittedExam
                                 : null,
