@@ -400,13 +400,13 @@ void main() {
       tester
           .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
           .allowQuestionNavigation,
-      isTrue,
+      isFalse,
     );
     expect(
       tester
           .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
           .showQuestionNavigation,
-      isTrue,
+      isFalse,
     );
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('12 + 8 = ?'), findsOneWidget);

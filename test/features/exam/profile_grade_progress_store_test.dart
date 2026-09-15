@@ -41,4 +41,15 @@ void main() {
     expect((await store.read(11)).grade, 3);
     expect((await store.read(11)).level, 7);
   });
+
+  test('saves an explicit downgraded result for the profile', () async {
+    await store.saveIfHigher(
+      11,
+      const ProfileGradeProgress(grade: 3, level: 7),
+    );
+    await store.save(11, const ProfileGradeProgress(grade: 3, level: 6));
+
+    expect((await store.read(11)).grade, 3);
+    expect((await store.read(11)).level, 6);
+  });
 }

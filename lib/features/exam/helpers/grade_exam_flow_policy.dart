@@ -18,7 +18,7 @@ class GradeExamOutcome {
 /// It reuses the assessment signals, but never generates another set:
 /// first six correct advances two levels; at least 50% with question 3 or 6
 /// correct advances one level; a pass without an anchor keeps the attempted
-/// level. A failed attempt never lowers the profile's saved progress.
+/// level. A failed attempt on the profile's current grade drops one level.
 class GradeExamFlowPolicy {
   const GradeExamFlowPolicy._();
 
@@ -38,24 +38,30 @@ class GradeExamFlowPolicy {
     final failedFirstFive = score.areFirstQuestionsWrong(
       AssessmentFlowPolicy.earlyFailQuestionCount,
     );
+    final firstSixPerfect = score.areFirstQuestionsPerfect(
+      AssessmentFlowPolicy.firstQuestionsUpgradeTarget,
+    );
+    if (firstSixPerfect) {
+      final achieved = _advance(normalizedAttempt, 2);
+      return GradeExamOutcome(
+        progress: achieved.isHigherThan(savedProgress)
+            ? achieved
+            : savedProgress,
+        passed: true,
+        levelIncrease: 2,
+      );
+    }
     final reachedFiftyPercent =
         score.isComplete && score.correctCount * 2 >= score.totalQuestions;
     if (failedFirstFive || !reachedFiftyPercent) {
       return GradeExamOutcome(
-        progress: savedProgress,
+        progress: _downgrade(normalizedAttempt, savedProgress),
         passed: false,
-        levelIncrease: 0,
+        levelIncrease: -1,
       );
     }
 
-    final levelIncrease =
-        score.areFirstQuestionsPerfect(
-          AssessmentFlowPolicy.firstQuestionsUpgradeTarget,
-        )
-        ? 2
-        : score.hasUpgradeAnchorQuestionCorrect
-        ? 1
-        : 0;
+    final levelIncrease = score.hasUpgradeAnchorQuestionCorrect ? 1 : 0;
     final achieved = _advance(normalizedAttempt, levelIncrease);
     return GradeExamOutcome(
       progress: achieved.isHigherThan(savedProgress) ? achieved : savedProgress,
@@ -88,5 +94,18 @@ class GradeExamFlowPolicy {
       level = maximumLevel;
     }
     return ProfileGradeProgress(grade: grade, level: level);
+  }
+
+  static ProfileGradeProgress _downgrade(
+    ProfileGradeProgress attempted,
+    ProfileGradeProgress savedProgress,
+  ) {
+    if (attempted.grade != savedProgress.grade) {
+      return savedProgress;
+    }
+    return ProfileGradeProgress(
+      grade: attempted.grade,
+      level: (attempted.level - 1).clamp(minimumLevel, maximumLevel),
+    );
   }
 }

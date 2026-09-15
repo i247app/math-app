@@ -109,6 +109,78 @@ void main() {
     expect(controller.selectedAnswerLabel, answers.last.label);
   });
 
+  test('GRADE is ready to submit immediately after six perfect answers', () {
+    const correctAnswer = ExamAnswer(label: 'A', content: '1');
+    final controller = AssessmentController(
+      examService: _UnusedExamService(),
+      examType: examTypeGrade,
+      initialExam: GeneratedExam(
+        examType: examTypeGrade,
+        grade: 2,
+        level: 3,
+        questions: List<ExamQuestion>.generate(
+          10,
+          (index) => ExamQuestion(
+            questionName: 'Question ${index + 1}',
+            questionNumber: index + 1,
+            answers: const <ExamAnswer>[correctAnswer],
+            rightAnswer: 'A',
+          ),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    for (var index = 0; index < 6; index++) {
+      controller.selectAnswer(correctAnswer);
+      if (index < 5) {
+        expect(controller.shouldSubmitGrade, isFalse);
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    expect(controller.questionIndex, 5);
+    expect(controller.shouldSubmitGrade, isTrue);
+    expect(controller.prepareGradeFlow(), AssessmentFlowAction.submit);
+    expect(controller.shouldAutoSubmitAssessment, isTrue);
+  });
+
+  test('GRADE is ready to submit immediately after five wrong answers', () {
+    const wrongAnswer = ExamAnswer(label: 'B', content: '2');
+    final controller = AssessmentController(
+      examService: _UnusedExamService(),
+      examType: examTypeGrade,
+      initialExam: GeneratedExam(
+        examType: examTypeGrade,
+        grade: 2,
+        level: 3,
+        questions: List<ExamQuestion>.generate(
+          10,
+          (index) => ExamQuestion(
+            questionName: 'Question ${index + 1}',
+            questionNumber: index + 1,
+            answers: const <ExamAnswer>[wrongAnswer],
+            rightAnswer: 'A',
+          ),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    for (var index = 0; index < 5; index++) {
+      controller.selectAnswer(wrongAnswer);
+      if (index < 4) {
+        expect(controller.shouldSubmitGrade, isFalse);
+        expect(controller.goToNextQuestion(), isTrue);
+      }
+    }
+
+    expect(controller.questionIndex, 4);
+    expect(controller.shouldSubmitGrade, isTrue);
+    expect(controller.prepareGradeFlow(), AssessmentFlowAction.submit);
+    expect(controller.shouldAutoSubmitAssessment, isTrue);
+  });
+
   test(
     'updates the current assessment journey status by user exam id',
     () async {

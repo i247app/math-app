@@ -60,6 +60,11 @@ class _MemoryGradeProgressStore implements ProfileGradeProgressStore {
   Future<ProfileGradeProgress> read(int profileId) async => progress;
 
   @override
+  Future<void> save(int profileId, ProfileGradeProgress candidate) async {
+    progress = candidate;
+  }
+
+  @override
   Future<ProfileGradeProgress> saveIfHigher(
     int profileId,
     ProfileGradeProgress candidate,

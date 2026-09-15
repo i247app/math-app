@@ -40,6 +40,8 @@ class ProfileGradeProgress {
 abstract interface class ProfileGradeProgressStore {
   Future<ProfileGradeProgress> read(int profileId);
 
+  Future<void> save(int profileId, ProfileGradeProgress progress);
+
   Future<ProfileGradeProgress> saveIfHigher(
     int profileId,
     ProfileGradeProgress progress,
@@ -63,6 +65,16 @@ class SecureProfileGradeProgressStore implements ProfileGradeProgressStore {
     final allProgress = await _readAll();
     return ProfileGradeProgress.fromJson(allProgress['$profileId']) ??
         ProfileGradeProgress.initial;
+  }
+
+  @override
+  Future<void> save(int profileId, ProfileGradeProgress progress) async {
+    if (profileId <= 0) {
+      return;
+    }
+    final allProgress = await _readAll();
+    allProgress['$profileId'] = progress.toJson();
+    await _storage.write(key: _storageKey, value: jsonEncode(allProgress));
   }
 
   @override

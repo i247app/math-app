@@ -165,6 +165,16 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       return;
     }
 
+    if (_controller.isGrade) {
+      HapticFeedback.mediumImpact();
+      if (_controller.prepareGradeFlow() == AssessmentFlowAction.submit) {
+        await submitCurrentExam();
+        return;
+      }
+      _moveToNextQuestion();
+      return;
+    }
+
     if (!_controller.isAssessment) {
       if (_controller.allQuestionsAnswered) {
         await submitCurrentExam();
@@ -202,6 +212,10 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   Future<void> submitCurrentExam() async {
     HapticFeedback.mediumImpact();
+    final isGradeSubmission = _controller.isGrade;
+    if (isGradeSubmission && mounted) {
+      setState(() => _isCompletingAssessment = true);
+    }
     ProfileGradeProgress? savedGradeProgress;
     if (_controller.isGrade) {
       try {
@@ -217,6 +231,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         : _controller.gradeOutcome(savedGradeProgress);
     final result = await _controller.submitCurrentExam();
     if (!mounted || result.status != AssessmentSubmitStatus.submitted) {
+      if (mounted && isGradeSubmission) {
+        setState(() => _isCompletingAssessment = false);
+      }
       if (result.status == AssessmentSubmitStatus.unanswered) {
         HapticFeedback.selectionClick();
       }
@@ -258,7 +275,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       if (!mounted) return;
       if (_controller.isGrade) {
         try {
-          await _gradeProgressStore.saveIfHigher(
+          await _gradeProgressStore.save(
             profileId ?? submittedExam.profileId ?? 0,
             gradeOutcome?.progress ??
                 ProfileGradeProgress(grade: finalGrade, level: finalLevel),
@@ -592,11 +609,13 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                                     .toSet(),
                                           onQuestionSelected:
                                               widget.allowQuestionNavigation &&
+                                                  !_controller.isGrade &&
                                                   !isTransitioningSet
                                               ? goToQuestion
                                               : null,
                                           showQuestionNavigation:
-                                              widget.showQuestionNavigation,
+                                              widget.showQuestionNavigation &&
+                                              !_controller.isGrade,
                                         ),
                                         const SizedBox(height: 16),
                                         if (isTransitioningSet)

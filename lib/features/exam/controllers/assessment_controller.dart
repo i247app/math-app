@@ -455,6 +455,29 @@ class AssessmentController extends ChangeNotifier {
     );
   }
 
+  bool get shouldSubmitGrade {
+    if (!_isGrade) {
+      return false;
+    }
+    final score = _currentSetScore;
+    return score.areFirstQuestionsWrong(
+          AssessmentFlowPolicy.earlyFailQuestionCount,
+        ) ||
+        score.areFirstQuestionsPerfect(
+          AssessmentFlowPolicy.firstQuestionsUpgradeTarget,
+        ) ||
+        score.isComplete;
+  }
+
+  AssessmentFlowAction prepareGradeFlow() {
+    if (!shouldSubmitGrade || _isSubmittingExam || _isTransitioningSet) {
+      return AssessmentFlowAction.continueSet;
+    }
+    _allowsPartialSubmit = !_currentSetScore.isComplete;
+    notifyListeners();
+    return AssessmentFlowAction.submit;
+  }
+
   Future<AssessmentFlowAction> advanceAssessmentFlow() async {
     if (!_isAssessment ||
         _isTransitioningSet ||
