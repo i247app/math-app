@@ -178,6 +178,12 @@ void main() {
     final topicText = tester.widget<Text>(find.text(topicSummary));
     expect(topicText.maxLines, 3);
     expect(topicText.overflow, TextOverflow.clip);
+    expect(
+      tester
+          .getSize(find.byKey(const ValueKey('exam-review-practice-banner')))
+          .height,
+      126,
+    );
     await tester.tap(find.byKey(const ValueKey('exam-review-practice-banner')));
     await tester.pumpAndSettle();
 

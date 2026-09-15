@@ -34,7 +34,7 @@ class ExamReviewPracticeBanner extends StatelessWidget {
         onTap: isLoading ? null : onTap,
         borderRadius: radius,
         child: Ink(
-          height: 150,
+          height: 126,
           decoration: BoxDecoration(
             borderRadius: radius,
             border: Border.all(color: colors.border.withValues(alpha: 0.65)),
@@ -48,21 +48,21 @@ class ExamReviewPracticeBanner extends StatelessWidget {
             clipBehavior: Clip.hardEdge,
             children: [
               Positioned(
-                right: -4,
-                bottom: -18,
-                width: 156,
-                height: 156,
+                right: -2,
+                bottom: -16,
+                width: 132,
+                height: 132,
                 child: Image.asset(
                   'assets/images/assessment-active-mascot.png',
                   fit: BoxFit.contain,
-                  cacheWidth: 420,
-                  cacheHeight: 420,
+                  cacheWidth: 360,
+                  cacheHeight: 360,
                   filterQuality: FilterQuality.high,
                 ),
               ),
               Positioned.fill(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 15, 142, 14),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 118, 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -72,13 +72,13 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.andika(
                           color: colors.textPrimary,
-                          fontSize: FontSize.normal,
+                          fontSize: FontSize.small,
                           fontWeight: FontWeight.w800,
                           height: 1.15,
                         ),
                       ),
                       if (hasFocus) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 1),
                         Expanded(
                           child: Text(
                             normalizedFocus,
@@ -86,9 +86,9 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                             overflow: TextOverflow.clip,
                             style: GoogleFonts.andika(
                               color: colors.textPrimary,
-                              fontSize: FontSize.small,
+                              fontSize: FontSize.xs,
                               fontWeight: FontWeight.w700,
-                              height: 1.18,
+                              height: 1.15,
                             ),
                           ),
                         ),
@@ -108,15 +108,15 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
+                            horizontal: 12,
+                            vertical: 6,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (isLoading)
                                 SizedBox.square(
-                                  dimension: 16,
+                                  dimension: 14,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     color: colors.onBrand,
@@ -130,16 +130,16 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                                   maxLines: 1,
                                   style: GoogleFonts.andika(
                                     color: colors.onBrand,
-                                    fontSize: FontSize.small,
+                                    fontSize: FontSize.xs,
                                     fontWeight: FontWeight.w800,
                                     height: 1,
                                   ),
                                 ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 4),
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 color: colors.onBrand,
-                                size: 18,
+                                size: 16,
                               ),
                             ],
                           ),
