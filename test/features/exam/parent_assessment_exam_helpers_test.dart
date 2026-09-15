@@ -38,6 +38,42 @@ void main() {
     expect(find.text('Kindergarten math assessment'), findsOneWidget);
   });
 
+  testWidgets('GRADE item title uses its grade and level', (tester) async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: Builder(
+            builder: (context) => Text(
+              homeExamTitle(
+                context,
+                const GeneratedExam(
+                  examType: examTypeGrade,
+                  title: 'Server title',
+                  grade: 3,
+                  level: 7,
+                  questions: <ExamQuestion>[],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Bài kiểm tra Level 3.7'), findsOneWidget);
+    expect(find.text('Server title'), findsNothing);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+
+    expect(find.text('Level test 3.7'), findsOneWidget);
+  });
+
   test(
     'successful empty profile response does not fall back to user id',
     () async {

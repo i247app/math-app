@@ -135,9 +135,19 @@ String homeExamDateLabel(GeneratedExam exam) {
 }
 
 String homeExamTitle(BuildContext context, GeneratedExam exam) {
+  final numericGrade = exam.grade;
+  final level = exam.level;
+  if (exam.examType?.trim().toUpperCase() == examTypeGrade &&
+      numericGrade != null &&
+      level != null) {
+    return context.formatText(AppKeys.gradeLevelExamTitle, {
+      'grade': numericGrade,
+      'level': level,
+    });
+  }
+
   final title = exam.title?.trim();
   if (title != null && title.isNotEmpty) return title;
-  final numericGrade = exam.grade;
   if (numericGrade != null) {
     if (numericGrade == 0) {
       return context.getText(AppKeys.kindergartenMathAssessment);

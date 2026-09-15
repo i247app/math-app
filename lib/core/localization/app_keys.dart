@@ -407,6 +407,7 @@ class AppKeys {
   static const mathAssessment = 'math_assessment';
   static const kindergartenMathAssessment = 'kindergarten_math_assessment';
   static const gradeMathAssessment = 'grade_math_assessment';
+  static const gradeLevelExamTitle = 'grade_level_exam_title';
   static const mathPractice = 'math_practice';
   static const mathReview = 'math_review';
   static const excellent = 'excellent';
