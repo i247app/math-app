@@ -23,6 +23,7 @@ class ExamApi implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) async {
@@ -42,7 +43,7 @@ class ExamApi implements ExamService {
           numQuestions: AssessmentFlowPolicy.generatedQuestionCount,
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),
-          level: 1,
+          level: (level ?? 1).clamp(1, 10),
           userExamId: normalizedExamType == examTypePractice
               ? validUserExamId
               : null,
@@ -136,6 +137,7 @@ class ExamApi implements ExamService {
     required int profileId,
     required DateTime fromDt,
     required DateTime toDt,
+    String examType = examTypeAssessment,
   }) async {
     if (profileId <= 0) {
       throw ExamException(
@@ -152,7 +154,7 @@ class ExamApi implements ExamService {
           profileId: profileId,
           fromDt: fromDt.toUtc(),
           toDt: toDt.toUtc(),
-          examType: examTypeAssessment,
+          examType: examType,
         ),
       ),
     ).then((response) => response.toModel());

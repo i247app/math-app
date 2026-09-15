@@ -320,7 +320,7 @@ void main() {
     );
   });
 
-  testWidgets('second empty banner selects a grade before using API service', (
+  testWidgets('second banner opens the GRADE list before grade selection', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -364,15 +364,24 @@ void main() {
     await tester.ensureVisible(secondBanner);
     await tester.pump();
     await tester.tap(secondBanner);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(examService.statsCalls, 1);
+    expect(examService.requestedExamTypes, const <String>[examTypeGrade]);
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+
+    await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
 
-    expect(examService.statsCalls, 0);
     expect(find.byType(GradeSelectionScreen), findsOneWidget);
     final gradeSelection = tester.widget<GradeSelectionScreen>(
       find.byType(GradeSelectionScreen),
     );
     expect(gradeSelection.examService, same(examService));
     expect(gradeSelection.examShakeService, isNull);
+    expect(gradeSelection.examType, examTypeGrade);
 
     await tester.tap(
       find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
@@ -381,6 +390,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(
+      tester
+          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
+          .examType,
+      examTypeGrade,
+    );
     expect(
       tester
           .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
@@ -593,6 +608,7 @@ class _PendingExamService implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) async => _testExam;
@@ -619,6 +635,7 @@ class _CountingExamService implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) async => _testExam;

@@ -8,6 +8,7 @@ abstract interface class ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   });
@@ -26,6 +27,7 @@ abstract interface class ExamService {
     required int profileId,
     required DateTime fromDt,
     required DateTime toDt,
+    String examType = examTypeAssessment,
   });
 
   Future<List<ExamStats>> getExamStats({

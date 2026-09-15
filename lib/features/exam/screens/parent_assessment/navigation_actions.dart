@@ -8,9 +8,30 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     HapticFeedback.selectionClick();
     _updateState(() {
       _showAssessmentContent = true;
+      _contentExamType = examTypeAssessment;
       _isLoading = true;
       _hasLoaded = false;
       _errorMessage = null;
+    });
+    _resetAssessmentScrollAfterBuild();
+    unawaited(_loadAssessments(page: 1));
+  }
+
+  void _showGradeContentAndLoad() {
+    if (_showAssessmentContent && _contentExamType == examTypeGrade) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    _updateState(() {
+      _showAssessmentContent = true;
+      _contentExamType = examTypeGrade;
+      _isLoading = true;
+      _hasLoaded = false;
+      _errorMessage = null;
+      _entries = const <ParentAssessmentEntry>[];
+      _allEntries = const <ParentAssessmentEntry>[];
+      _activeEntry = null;
+      _pagination = null;
     });
     _resetAssessmentScrollAfterBuild();
     unawaited(_loadAssessments(page: 1));
@@ -21,7 +42,10 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
       return;
     }
     HapticFeedback.selectionClick();
-    _updateState(() => _showAssessmentContent = false);
+    _updateState(() {
+      _showAssessmentContent = false;
+      _contentExamType = examTypeAssessment;
+    });
     _resetAssessmentScrollAfterBuild();
   }
 
@@ -104,7 +128,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         builder: (_) => AiAssessmentScreen(
           examService: widget.examService,
           initialExam: summaryExam,
-          examType: summaryExam.examType ?? examTypeAssessment,
+          examType: summaryExam.examType ?? _contentExamType,
           gradeLabel: AssessmentFlowPolicy.gradeLabel(summaryExam.grade ?? 0),
           profileId: profileId,
           allowQuestionNavigation: false,
@@ -143,6 +167,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         builder: (_) => LearningProgressScreen(
           profileId: profileStableId(widget.activeProfile),
           examService: widget.examService,
+          examType: _contentExamType,
           initialEntries: List<ParentAssessmentEntry>.unmodifiable(_allEntries),
         ),
       ),
@@ -190,7 +215,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           initialGrades: widget.initialGrades,
           gradeService: widget.gradeService,
           examService: widget.examService,
-          examType: examTypeAssessment,
+          examType: examTypeGrade,
           profileId: profileStableId(widget.activeProfile),
           initialGradeId: profileGradeStableId(widget.activeProfile),
           initialGradeLabel: widget.activeProfile?.grade?.label,

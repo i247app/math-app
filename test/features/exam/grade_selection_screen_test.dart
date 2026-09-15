@@ -9,6 +9,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/helpers/default_grade_label.dart';
@@ -29,20 +30,45 @@ class _NoopExamShakeService implements ExamShakeService {
 
 class _FailingExamService implements ExamService {
   final List<String?> requestedGradeLabels = <String?>[];
+  final List<int?> requestedLevels = <int?>[];
+  final List<String> requestedExamTypes = <String>[];
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) {
     requestedGradeLabels.add(gradeLabel);
+    requestedLevels.add(level);
+    requestedExamTypes.add(examType);
     throw const ExamException('Generation failed');
   }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _MemoryGradeProgressStore implements ProfileGradeProgressStore {
+  _MemoryGradeProgressStore(this.progress);
+
+  ProfileGradeProgress progress;
+
+  @override
+  Future<ProfileGradeProgress> read(int profileId) async => progress;
+
+  @override
+  Future<ProfileGradeProgress> saveIfHigher(
+    int profileId,
+    ProfileGradeProgress candidate,
+  ) async {
+    if (candidate.isHigherThan(progress)) {
+      progress = candidate;
+    }
+    return progress;
+  }
 }
 
 void main() {
@@ -149,6 +175,52 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'GRADE generation uses the saved level for the selected profile',
+    (tester) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final examService = _FailingExamService();
+      final progressStore = _MemoryGradeProgressStore(
+        const ProfileGradeProgress(grade: 5, level: 3),
+      );
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: GradeSelectionScreen(
+              initialGrades: const <GradeModel>[
+                GradeModel(id: 5, label: 'Lớp 5', displayOrder: 5),
+              ],
+              gradeService: _UnusedGradeService(),
+              examService: examService,
+              examType: examTypeGrade,
+              profileId: 81,
+              gradeProgressStore: progressStore,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Tiếp tục'));
+      await tester.pumpAndSettle();
+
+      expect(examService.requestedExamTypes, <String>[examTypeGrade]);
+      expect(examService.requestedGradeLabels, <String?>['Lớp 5']);
+      expect(examService.requestedLevels, <int?>[3]);
     },
   );
 

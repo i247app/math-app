@@ -23,6 +23,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   const AssessmentPlacementResultScreen({
     super.key,
     required this.grade,
+    this.level,
     required this.correctAnswers,
     required this.totalQuestions,
     this.examService,
@@ -34,6 +35,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   });
 
   final int grade;
+  final int? level;
   final int correctAnswers;
   final int totalQuestions;
   final ExamService? examService;
@@ -71,6 +73,7 @@ class _AssessmentPlacementResultScreenState
       final generatedExam = await _examService.generateAssessmentExam(
         examType: examType,
         gradeLabel: AssessmentFlowPolicy.gradeLabel(_grade),
+        level: widget.level,
         profileId: widget.profileId,
         userExamId: examType == examTypePractice ? widget.userExamId : null,
       );
@@ -220,6 +223,21 @@ class _AssessmentPlacementResultScreenState
                 ),
                 const SizedBox(height: 6),
                 _PlacementGradeTitle(grade: _grade),
+                if (widget.level case final level?) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    context.formatText(AppKeys.placementResultGradeLevel, {
+                      'level': level,
+                    }),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.andika(
+                      color: colors.brandStrong,
+                      fontSize: FontSize.large,
+                      fontWeight: FontWeight.w800,
+                      height: 1.1,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 18),
                 _CelebrationMascot(size: mascotSize),
                 SizedBox(height: actionSpacing),

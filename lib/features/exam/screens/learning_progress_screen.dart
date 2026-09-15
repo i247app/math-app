@@ -22,11 +22,13 @@ class LearningProgressScreen extends StatefulWidget {
     super.key,
     required this.profileId,
     required this.examService,
+    this.examType = examTypeAssessment,
     this.initialEntries = const <ParentAssessmentEntry>[],
   });
 
   final int? profileId;
   final ExamService examService;
+  final String examType;
   final List<ParentAssessmentEntry> initialEntries;
 
   @override
@@ -132,6 +134,7 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
         profileId: profileId,
         fromDt: fromDt,
         toDt: toDt,
+        examType: widget.examType,
       );
       if (!mounted || requestId != _requestId) return;
       setState(() {

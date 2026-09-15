@@ -1023,6 +1023,7 @@ class _PendingGenerateExamService implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) {

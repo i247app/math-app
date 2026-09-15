@@ -652,6 +652,7 @@ class _RecordingExamService implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) async {
@@ -733,6 +734,7 @@ class _SequentialTransitionExamService implements ExamService {
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,
+    int? level,
     int? profileId,
     int? userExamId,
   }) {

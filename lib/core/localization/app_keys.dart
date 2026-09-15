@@ -828,6 +828,7 @@ class AppKeys {
   static const placementResultLevel = 'placement_result_level';
   static const placementResultKindergarten = 'placement_result_kindergarten';
   static const placementResultGrade = 'placement_result_grade';
+  static const placementResultGradeLevel = 'placement_result_grade_level';
   static const placementResultCorrectSummary =
       'placement_result_correct_summary';
   static const placementResultViewDetails = 'placement_result_view_details';

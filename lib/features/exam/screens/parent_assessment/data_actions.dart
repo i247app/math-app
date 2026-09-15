@@ -29,7 +29,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
       try {
         final stats = await widget.examService.getExamStats(
           profileId: profileId,
-          examType: examTypeAssessment,
+          examType: _contentExamType,
         );
         final activeEntries =
             stats
@@ -147,7 +147,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
         userExamId: stats.userExamId,
         profileId: profileStableId(widget.activeProfile),
         examStatus: stats.status,
-        examType: stats.examType ?? examTypeAssessment,
+        examType: stats.examType ?? _contentExamType,
         grade: stats.grade,
         level: stats.level,
         createDt: submittedAt,

@@ -88,6 +88,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   String? _errorMessage;
   int _loadRequestId = 0;
   bool _showAssessmentContent = false;
+  String _contentExamType = examTypeAssessment;
   bool _isOpeningActiveAssessment = false;
 
   @override
@@ -101,6 +102,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
       _showAssessmentContent = false;
+      _contentExamType = examTypeAssessment;
       _resetAssessmentScrollAfterBuild();
       return;
     }
@@ -124,11 +126,13 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _hasLoaded = false;
       _errorMessage = null;
       _showAssessmentContent = false;
+      _contentExamType = examTypeAssessment;
       _isLoading = false;
       _loadRequestId++;
       _resetAssessmentScrollAfterBuild();
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
       _showAssessmentContent = false;
+      _contentExamType = examTypeAssessment;
       _resetAssessmentScrollAfterBuild();
     }
   }

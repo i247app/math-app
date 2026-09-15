@@ -12,8 +12,11 @@ import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/grade_exception.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/helpers/default_grade_label.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/widgets/grade_selection/grade_background.dart';
 import 'package:numi/features/exam/widgets/grade_selection/grade_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/grade_selection/grade_failure_notice.dart';
@@ -30,6 +33,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.gradeService,
     this.examService,
     this.examShakeService,
+    this.gradeProgressStore,
     this.examType = examTypeAssessment,
     this.profileId,
     this.initialGradeId,
@@ -42,6 +46,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final GradeService? gradeService;
   final ExamService? examService;
   final ExamShakeService? examShakeService;
+  final ProfileGradeProgressStore? gradeProgressStore;
   final String examType;
   final int? profileId;
   final int? initialGradeId;
@@ -54,16 +59,20 @@ class GradeSelectionScreen extends StatefulWidget {
 
 class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   late final GradeService _gradeService;
+  late final ProfileGradeProgressStore _gradeProgressStore;
   bool showGenerationFailed = false;
   bool isLoadingGrades = false;
   String? gradeLoadError;
   List<GradeModel> grades = const <GradeModel>[];
   String? selectedGradeLabel;
+  bool _isOpeningAssessment = false;
 
   @override
   void initState() {
     super.initState();
     _gradeService = widget.gradeService ?? context.read<GradeService>();
+    _gradeProgressStore =
+        widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
     grades = widget.initialGrades;
     selectedGradeLabel = _initialSelectedGradeLabel(grades);
     if (widget.examType == examTypeAssessment) {
@@ -129,37 +138,67 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
   }
 
   Future<void> openAssessment({String? gradeLabel}) async {
+    if (_isOpeningAssessment) {
+      return;
+    }
+    _isOpeningAssessment = true;
     HapticFeedback.mediumImpact();
     if (showGenerationFailed) {
       setState(() => showGenerationFailed = false);
     }
 
-    final result = await Navigator.of(context).push<AiAssessmentResult>(
-      MaterialPageRoute<AiAssessmentResult>(
-        builder: (_) => AiAssessmentScreen(
-          examService: widget.examService,
-          examType: widget.examType,
-          gradeLabel: gradeLabel,
-          profileId: widget.profileId,
-          startAtKindergarten: false,
-          onResultBack: widget.onResultBack,
+    try {
+      final selectedGrade = AssessmentFlowPolicy.gradeFromLabel(gradeLabel);
+      var savedProgress = ProfileGradeProgress.initial;
+      if (widget.examType == examTypeGrade) {
+        try {
+          savedProgress = await _gradeProgressStore.read(widget.profileId ?? 0);
+        } catch (_) {
+          // Local progress is an optimization; a GRADE exam can still start
+          // safely from level 1 if secure storage is temporarily unavailable.
+        }
+      }
+      final selectedLevel = widget.examType == examTypeGrade
+          ? GradeExamFlowPolicy.levelForSelectedGrade(
+              selectedGrade: selectedGrade,
+              savedProgress: savedProgress,
+            )
+          : null;
+      if (!mounted) {
+        return;
+      }
+
+      final result = await Navigator.of(context).push<AiAssessmentResult>(
+        MaterialPageRoute<AiAssessmentResult>(
+          builder: (_) => AiAssessmentScreen(
+            examService: widget.examService,
+            examType: widget.examType,
+            gradeLabel: gradeLabel,
+            level: selectedLevel,
+            profileId: widget.profileId,
+            startAtKindergarten: false,
+            gradeProgressStore: _gradeProgressStore,
+            onResultBack: widget.onResultBack,
+          ),
         ),
-      ),
-    );
+      );
 
-    if (!mounted) {
-      return;
+      if (!mounted) {
+        return;
+      }
+
+      if (result == AiAssessmentResult.generationFailed) {
+        setState(() => showGenerationFailed = true);
+        return;
+      }
+
+      setState(() {
+        showGenerationFailed = false;
+        selectedGradeLabel = _initialSelectedGradeLabel(grades);
+      });
+    } finally {
+      _isOpeningAssessment = false;
     }
-
-    if (result == AiAssessmentResult.generationFailed) {
-      setState(() => showGenerationFailed = true);
-      return;
-    }
-
-    setState(() {
-      showGenerationFailed = false;
-      selectedGradeLabel = _initialSelectedGradeLabel(grades);
-    });
   }
 
   String? _initialSelectedGradeLabel(List<GradeModel> grades) {

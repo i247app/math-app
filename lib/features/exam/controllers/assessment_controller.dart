@@ -4,8 +4,10 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
+import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/helpers/practice_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
@@ -69,6 +71,7 @@ class AssessmentController extends ChangeNotifier {
     GeneratedExam? initialExam,
     this.examType = examTypeAssessment,
     this.gradeLabel,
+    this.level,
     this.profileId,
     this.startAtKindergarten = true,
   }) : _examService = examService,
@@ -83,17 +86,20 @@ class AssessmentController extends ChangeNotifier {
             ),
       ),
     );
+    _currentLevel = (initialExam?.level ?? level ?? 1).clamp(1, 10);
     _restoreInitialAttempt(initialExam);
   }
 
   final ExamService _examService;
   final String examType;
   final String? gradeLabel;
+  final int? level;
   final int? profileId;
   final bool startAtKindergarten;
 
   GeneratedExam? _exam;
   late AssessmentFlowState _flowState;
+  late int _currentLevel;
   int _questionIndex = 0;
   int _questionNumberOffset = 0;
   final Map<int, String> _selectedAnswerLabels = <int, String>{};
@@ -122,10 +128,15 @@ class AssessmentController extends ChangeNotifier {
         examTypePractice;
   }
 
+  bool get _isGrade {
+    return (_exam?.examType ?? examType).trim().toUpperCase() == examTypeGrade;
+  }
+
   ExamService get examService => _examService;
   GeneratedExam? get exam => _exam;
   bool get isAssessment => _isAssessment;
   bool get isPractice => _isPractice;
+  bool get isGrade => _isGrade;
   int get questionIndex => _questionIndex;
   int get questionNumberOffset => _questionNumberOffset;
   int get progressQuestionIndex => _isTransitioningSet ? 1 : _questionIndex + 1;
@@ -135,6 +146,7 @@ class AssessmentController extends ChangeNotifier {
   int get displayedQuestionNumber =>
       progressQuestionNumberOffset + progressQuestionIndex;
   int get currentGrade => _flowState.grade;
+  int get currentLevel => _currentLevel;
   String get currentGradeLabel => AssessmentFlowPolicy.gradeLabel(currentGrade);
   int get setNumber => _flowState.setNumber;
   AssessmentFlowMode get flowMode => _flowState.mode;
@@ -334,6 +346,7 @@ class AssessmentController extends ChangeNotifier {
             fallback: _isAssessment ? 0 : 1,
           );
     _flowState = AssessmentFlowState(grade: initialGrade);
+    _currentLevel = (level ?? 1).clamp(1, 10);
     _exam = null;
     _questionIndex = 0;
     _questionNumberOffset = 0;
@@ -433,6 +446,15 @@ class AssessmentController extends ChangeNotifier {
     return AssessmentFlowAction.submit;
   }
 
+  GradeExamOutcome gradeOutcome(ProfileGradeProgress savedProgress) {
+    return GradeExamFlowPolicy.evaluate(
+      attemptedGrade: currentGrade,
+      attemptedLevel: currentLevel,
+      score: _currentSetScore,
+      savedProgress: savedProgress,
+    );
+  }
+
   Future<AssessmentFlowAction> advanceAssessmentFlow() async {
     if (!_isAssessment ||
         _isTransitioningSet ||
@@ -518,7 +540,7 @@ class AssessmentController extends ChangeNotifier {
   bool goToNextQuestion() {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
     if (_isTransitioningSet ||
-        ((_isAssessment || _isPractice) && !canContinue) ||
+        ((_isAssessment || _isPractice || _isGrade) && !canContinue) ||
         _questionIndex >= questions.length - 1) {
       return false;
     }
@@ -690,6 +712,7 @@ class AssessmentController extends ChangeNotifier {
           ? AssessmentFlowPolicy.gradeLabel(grade)
           : gradeLabel,
       profileId: profileId,
+      level: _currentLevel,
     );
     ExamCache.seedDetail(generatedExam);
     return generatedExam;
@@ -702,6 +725,7 @@ class AssessmentController extends ChangeNotifier {
           ? AssessmentFlowPolicy.gradeLabel(grade)
           : gradeLabel,
       profileId: profileId,
+      level: _currentLevel,
     );
     ExamCache.seedDetail(generatedExam);
     return generatedExam;

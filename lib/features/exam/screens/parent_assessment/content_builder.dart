@@ -25,7 +25,7 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
         _initialFadeIn(
           child: ParentAssessmentEmptyPoster(
             onTap: _showAssessmentContentAndLoad,
-            onSecondaryTap: _openAssessmentWithGradeSelection,
+            onSecondaryTap: _showGradeContentAndLoad,
           ),
         ),
       ];
@@ -41,7 +41,9 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
         child: ParentAssessmentTabBanner(
           isLoading: resumableActiveEntry != null && _isOpeningActiveAssessment,
           onTap: resumableActiveEntry == null
-              ? _openAssessmentDirectly
+              ? (_contentExamType == examTypeGrade
+                    ? _openAssessmentWithGradeSelection
+                    : _openAssessmentDirectly)
               : () => _openActiveAssessment(resumableActiveEntry.exam),
         ),
       ),

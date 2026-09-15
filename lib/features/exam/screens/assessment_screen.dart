@@ -10,6 +10,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
@@ -36,18 +37,21 @@ class AiAssessmentScreen extends StatefulWidget {
     this.initialExam,
     this.examType = examTypeAssessment,
     this.gradeLabel,
+    this.level,
     this.profileId,
     this.startAtKindergarten = true,
     this.onResultBack,
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
     this.isResumedAssessment = false,
+    this.gradeProgressStore,
   });
 
   final ExamService? examService;
   final GeneratedExam? initialExam;
   final String examType;
   final String? gradeLabel;
+  final int? level;
   final int? profileId;
 
   /// Direct placement starts at grade 0; explicit grade-selection can opt out.
@@ -56,6 +60,7 @@ class AiAssessmentScreen extends StatefulWidget {
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
   final bool isResumedAssessment;
+  final ProfileGradeProgressStore? gradeProgressStore;
 
   @override
   State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
@@ -63,6 +68,7 @@ class AiAssessmentScreen extends StatefulWidget {
 
 class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   late final AssessmentController _controller;
+  late final ProfileGradeProgressStore _gradeProgressStore;
   Timer? _practiceFeedbackTimer;
   bool _isCompletingAssessment = false;
   final GuardedExitController<AiAssessmentResult> _exitController =
@@ -76,9 +82,12 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
       initialExam: widget.initialExam,
       examType: widget.examType,
       gradeLabel: widget.gradeLabel,
+      level: widget.level,
       profileId: widget.profileId,
       startAtKindergarten: widget.startAtKindergarten,
     );
+    _gradeProgressStore =
+        widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
     if (widget.initialExam == null) {
       generateExam();
     }
@@ -137,7 +146,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   Future<void> _goToNextQuestion() async {
-    if ((_controller.isAssessment || _controller.isPractice) &&
+    if ((_controller.isAssessment ||
+            _controller.isPractice ||
+            _controller.isGrade) &&
         !_controller.canContinue) {
       HapticFeedback.selectionClick();
       return;
@@ -191,6 +202,19 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   Future<void> submitCurrentExam() async {
     HapticFeedback.mediumImpact();
+    ProfileGradeProgress? savedGradeProgress;
+    if (_controller.isGrade) {
+      try {
+        savedGradeProgress = await _gradeProgressStore.read(
+          widget.profileId ?? _controller.exam?.profileId ?? 0,
+        );
+      } catch (_) {
+        savedGradeProgress = ProfileGradeProgress.initial;
+      }
+    }
+    final gradeOutcome = savedGradeProgress == null
+        ? null
+        : _controller.gradeOutcome(savedGradeProgress);
     final result = await _controller.submitCurrentExam();
     if (!mounted || result.status != AssessmentSubmitStatus.submitted) {
       if (result.status == AssessmentSubmitStatus.unanswered) {
@@ -201,8 +225,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
     final navigator = Navigator.of(context);
     final examService = _controller.examService;
-    final finalGrade = _controller.currentGrade;
-    final gradeLabel = _controller.currentGradeLabel;
+    final finalGrade = gradeOutcome?.progress.grade ?? _controller.currentGrade;
+    final finalLevel = gradeOutcome?.progress.level ?? _controller.currentLevel;
+    final gradeLabel = AssessmentFlowPolicy.gradeLabel(finalGrade);
     final correctAnswers = _controller.totalCorrectAnswerCount;
     final totalQuestions = _controller.totalAnsweredQuestionCount;
     final profileId = widget.profileId;
@@ -214,7 +239,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         submittedExam.userExamId ?? _controller.userExamId;
     final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
     final reviewDetailId = submittedUserExamId ?? submittedExamId;
-    if (_controller.isAssessment) {
+    if (_controller.isAssessment || _controller.isGrade) {
       setState(() => _isCompletingAssessment = true);
       try {
         await completeAssessmentJourney(
@@ -231,6 +256,18 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         return;
       }
       if (!mounted) return;
+      if (_controller.isGrade) {
+        try {
+          await _gradeProgressStore.saveIfHigher(
+            profileId ?? submittedExam.profileId ?? 0,
+            gradeOutcome?.progress ??
+                ProfileGradeProgress(grade: finalGrade, level: finalLevel),
+          );
+        } catch (_) {
+          // The server journey is already complete; the next GRADE result can
+          // safely repair local progress with another monotonic write.
+        }
+      }
     }
 
     if (_controller.isPractice) {
@@ -289,6 +326,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         builder: (resultContext) {
           return AssessmentPlacementResultScreen(
             grade: finalGrade,
+            level: _controller.isGrade ? finalLevel : null,
             correctAnswers: correctAnswers,
             totalQuestions: totalQuestions,
             examService: examService,
@@ -439,7 +477,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
   }
 
   Future<bool> _confirmAttemptExit(BuildContext dialogContext) {
-    if (!_controller.isAssessment) {
+    if (!_controller.isAssessment && !_controller.isGrade) {
       return showAttemptExitDialog(dialogContext);
     }
     return showAssessmentExitDialog(
@@ -591,10 +629,12 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             _controller.questionIndex > 0,
                                         allQuestionsAnswered:
                                             _controller.allQuestionsAnswered &&
-                                            !_controller.isAssessment,
+                                            !_controller.isAssessment &&
+                                            !_controller.isGrade,
                                         canContinue:
                                             (!_controller.isAssessment &&
-                                                !_controller.isPractice) ||
+                                                !_controller.isPractice &&
+                                                !_controller.isGrade) ||
                                             _controller.canContinue,
                                         isSubmitting: isSubmittingExam,
                                         isTransitioning: isTransitioningSet,

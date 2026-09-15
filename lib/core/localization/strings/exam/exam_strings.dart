@@ -56,6 +56,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultLevel: 'Bạn đạt trình độ',
     AppKeys.placementResultKindergarten: 'MẪU GIÁO',
     AppKeys.placementResultGrade: 'LỚP {grade}',
+    AppKeys.placementResultGradeLevel: 'Cấp độ {level}',
     AppKeys.placementResultCorrectSummary:
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
     AppKeys.placementResultViewDetails: 'Xem chi tiết',
@@ -127,6 +128,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultLevel: 'Your level is',
     AppKeys.placementResultKindergarten: 'KINDERGARTEN',
     AppKeys.placementResultGrade: 'GRADE {grade}',
+    AppKeys.placementResultGradeLevel: 'Level {level}',
     AppKeys.placementResultCorrectSummary:
         'You answered {correct}/{total} questions correctly',
     AppKeys.placementResultViewDetails: 'View details',
