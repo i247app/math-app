@@ -15,6 +15,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_empty_poster.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
@@ -321,9 +322,7 @@ void main() {
     );
   });
 
-  testWidgets('second banner loads GRADE stats then opens grade selection', (
-    tester,
-  ) async {
+  testWidgets('second banner opens GRADE roadmap directly', (tester) async {
     final lingo = LingoProvider();
     final examService = _CountingExamService();
     addTearDown(lingo.dispose);
@@ -371,55 +370,56 @@ void main() {
     expect(examService.statsCalls, 1);
     expect(examService.requestedExamTypes, const <String>[examTypeGrade]);
     expect(find.byType(ParentAssessmentTabBanner), findsNothing);
-    expect(find.byType(GradeSelectionScreen), findsOneWidget);
-    final gradeSelection = tester.widget<GradeSelectionScreen>(
-      find.byType(GradeSelectionScreen),
-    );
-    expect(gradeSelection.examService, same(examService));
-    expect(gradeSelection.examShakeService, isNull);
-    expect(gradeSelection.examType, examTypeGrade);
-
-    await tester.tap(
-      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
-    );
-    await tester.tap(find.text('Tiếp tục'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(AiAssessmentScreen), findsOneWidget);
-    expect(
-      tester
-          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
-          .examType,
-      examTypeGrade,
-    );
-    expect(
-      tester
-          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
-          .allowQuestionNavigation,
-      isFalse,
-    );
-    expect(
-      tester
-          .widget<AiAssessmentScreen>(find.byType(AiAssessmentScreen))
-          .showQuestionNavigation,
-      isFalse,
-    );
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(find.text('12 + 8 = ?'), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.close_rounded).first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(AiAssessmentScreen), findsNothing);
     expect(find.byType(GradeSelectionScreen), findsNothing);
-    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
-    expect(examService.statsCalls, 2);
-    expect(examService.requestedExamTypes, const <String>[
-      examTypeGrade,
-      examTypeGrade,
-    ]);
+    expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
+  });
+
+  testWidgets('second banner opens the roadmap when GRADE history exists', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final examService = _GradePopulatedExamService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: ParentAssessmentTab(
+            user: const LoginUser(id: 981246),
+            activeProfile: const StudentProfile(
+              profileId: 981246,
+              role: 'STUDENT',
+            ),
+            isActive: true,
+            activeRefreshTick: 0,
+            initialGrades: const <GradeModel>[],
+            gradeService: _FakeGradeService(),
+            examService: examService,
+            bottomPadding: 0,
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final gradeBanner = find.image(
+      const AssetImage(parentHomeAfterReviewBannerAsset),
+    );
+    await tester.ensureVisible(gradeBanner);
+    await tester.pump();
+    await tester.tap(gradeBanner);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(examService.requestedExamTypes, const <String>[examTypeGrade]);
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+    expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+    expect(find.text('Lớp 2'), findsOneWidget);
   });
 
   testWidgets('active assessment resumes from stats without loading detail', (
@@ -697,6 +697,31 @@ class _PopulatedExamService extends _CountingExamService {
         level: 1,
         lastSubmittedDt: DateTime.utc(2026, 9, 10, 20, 35),
         review: 'Tiến bộ tốt.',
+      ),
+    ];
+  }
+}
+
+class _GradePopulatedExamService extends _CountingExamService {
+  @override
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
+  }) async {
+    statsCalls++;
+    requestedExamTypes.add(examType);
+    return <ExamStats>[
+      ExamStats(
+        correctNumber: 8,
+        scorePercentage: 80,
+        skippedNumber: 0,
+        totalQuestions: 10,
+        examType: examTypeGrade,
+        userExamId: 8300,
+        status: 'COMPLETE',
+        grade: 2,
+        level: 2,
+        lastSubmittedDt: DateTime.utc(2026, 9, 15, 8, 30),
       ),
     ];
   }

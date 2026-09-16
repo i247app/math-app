@@ -3,14 +3,23 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileGradeProgress {
-  const ProfileGradeProgress({required this.grade, required this.level});
+  const ProfileGradeProgress({
+    required this.grade,
+    required this.level,
+    this.highestUnlockedGrade,
+    this.highestUnlockedLevel,
+  });
 
   static const initial = ProfileGradeProgress(grade: 0, level: 0);
 
   final int grade;
   final int level;
+  final int? highestUnlockedGrade;
+  final int? highestUnlockedLevel;
 
   int get sortValue => (grade * 10) + level;
+  int get highestUnlockedSortValue =>
+      ((highestUnlockedGrade ?? grade) * 10) + (highestUnlockedLevel ?? level);
 
   bool isHigherThan(ProfileGradeProgress other) {
     return sortValue > other.sortValue;
@@ -19,6 +28,8 @@ class ProfileGradeProgress {
   Map<String, dynamic> toJson() => <String, dynamic>{
     'grade': grade,
     'level': level,
+    'highest_unlocked_grade': highestUnlockedGrade ?? grade,
+    'highest_unlocked_level': highestUnlockedLevel ?? level,
   };
 
   static ProfileGradeProgress? fromJson(Object? value) {
@@ -33,6 +44,22 @@ class ProfileGradeProgress {
     return ProfileGradeProgress(
       grade: grade.clamp(0, 5),
       level: level.clamp(0, 10),
+      highestUnlockedGrade: (_asInt(value['highest_unlocked_grade']) ?? grade)
+          .clamp(0, 5),
+      highestUnlockedLevel: (_asInt(value['highest_unlocked_level']) ?? level)
+          .clamp(0, 10),
+    );
+  }
+
+  ProfileGradeProgress preserveHighest(ProfileGradeProgress previous) {
+    if (highestUnlockedSortValue >= previous.highestUnlockedSortValue) {
+      return this;
+    }
+    return ProfileGradeProgress(
+      grade: grade,
+      level: level,
+      highestUnlockedGrade: previous.highestUnlockedGrade ?? previous.grade,
+      highestUnlockedLevel: previous.highestUnlockedLevel ?? previous.level,
     );
   }
 }
@@ -73,7 +100,10 @@ class SecureProfileGradeProgressStore implements ProfileGradeProgressStore {
       return;
     }
     final allProgress = await _readAll();
-    allProgress['$profileId'] = progress.toJson();
+    final previous =
+        ProfileGradeProgress.fromJson(allProgress['$profileId']) ??
+        ProfileGradeProgress.initial;
+    allProgress['$profileId'] = progress.preserveHighest(previous).toJson();
     await _storage.write(key: _storageKey, value: jsonEncode(allProgress));
   }
 

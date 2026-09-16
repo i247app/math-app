@@ -35,6 +35,8 @@ class GradeExamFlowPolicy {
       grade: AssessmentFlowPolicy.clampGrade(attemptedGrade),
       level: attemptedLevel.clamp(minimumLevel, maximumLevel),
     );
+    final isHistoricalAttempt =
+        normalizedAttempt.sortValue < savedProgress.sortValue;
     final failedFirstFive = score.areFirstQuestionsWrong(
       AssessmentFlowPolicy.earlyFailQuestionCount,
     );
@@ -44,7 +46,9 @@ class GradeExamFlowPolicy {
     if (firstSixPerfect) {
       final achieved = _advance(normalizedAttempt, 2);
       return GradeExamOutcome(
-        progress: achieved.isHigherThan(savedProgress)
+        progress: isHistoricalAttempt
+            ? savedProgress
+            : achieved.isHigherThan(savedProgress)
             ? achieved
             : savedProgress,
         passed: true,
@@ -64,7 +68,11 @@ class GradeExamFlowPolicy {
     final levelIncrease = score.hasUpgradeAnchorQuestionCorrect ? 1 : 0;
     final achieved = _advance(normalizedAttempt, levelIncrease);
     return GradeExamOutcome(
-      progress: achieved.isHigherThan(savedProgress) ? achieved : savedProgress,
+      progress: isHistoricalAttempt
+          ? savedProgress
+          : achieved.isHigherThan(savedProgress)
+          ? achieved
+          : savedProgress,
       passed: true,
       levelIncrease: levelIncrease,
     );
@@ -100,7 +108,8 @@ class GradeExamFlowPolicy {
     ProfileGradeProgress attempted,
     ProfileGradeProgress savedProgress,
   ) {
-    if (attempted.grade != savedProgress.grade) {
+    if (attempted.grade != savedProgress.grade ||
+        attempted.level < savedProgress.level) {
       return savedProgress;
     }
     return ProfileGradeProgress(

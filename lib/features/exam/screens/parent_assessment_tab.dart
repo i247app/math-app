@@ -20,6 +20,7 @@ import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/learning_progress_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
@@ -90,6 +91,7 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   bool _showAssessmentContent = false;
   String _contentExamType = examTypeAssessment;
   bool _isOpeningActiveAssessment = false;
+  bool _isOpeningGradeRoadmap = false;
 
   @override
   void initState() {

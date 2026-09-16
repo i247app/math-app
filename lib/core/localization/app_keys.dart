@@ -411,6 +411,13 @@ class AppKeys {
       'assessment_list_kindergarten_title';
   static const assessmentListGradeTitle = 'assessment_list_grade_title';
   static const gradeLevelExamTitle = 'grade_level_exam_title';
+  static const gradeRoadmapKindergarten = 'grade_roadmap_kindergarten';
+  static const gradeRoadmapGrade = 'grade_roadmap_grade';
+  static const gradeRoadmapLevel = 'grade_roadmap_level';
+  static const gradeRoadmapCurrent = 'grade_roadmap_current';
+  static const gradeRoadmapCompleted = 'grade_roadmap_completed';
+  static const gradeRoadmapLocked = 'grade_roadmap_locked';
+  static const gradeRoadmapLoadFailed = 'grade_roadmap_load_failed';
   static const mathPractice = 'math_practice';
   static const mathReview = 'math_review';
   static const excellent = 'excellent';

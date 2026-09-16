@@ -40,10 +40,12 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
         padding: const EdgeInsets.only(bottom: 13),
         child: ParentAssessmentTabBanner(
           isLoading: resumableActiveEntry != null && _isOpeningActiveAssessment,
-          onTap: resumableActiveEntry == null
-              ? (_contentExamType == examTypeGrade
+          onTap: _contentExamType == examTypeGrade
+              ? (resumableActiveEntry == null && _allEntries.isEmpty
                     ? _openAssessmentWithGradeSelection
-                    : _openAssessmentDirectly)
+                    : _openGradeRoadmap)
+              : resumableActiveEntry == null
+              ? _openAssessmentDirectly
               : () => _openActiveAssessment(resumableActiveEntry.exam),
         ),
       ),

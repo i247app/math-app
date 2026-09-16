@@ -49,7 +49,21 @@ void main() {
     );
     await store.save(11, const ProfileGradeProgress(grade: 3, level: 6));
 
-    expect((await store.read(11)).grade, 3);
-    expect((await store.read(11)).level, 6);
+    final downgraded = await store.read(11);
+    expect(downgraded.grade, 3);
+    expect(downgraded.level, 6);
+    expect(downgraded.highestUnlockedGrade, 3);
+    expect(downgraded.highestUnlockedLevel, 7);
+  });
+
+  test('reads legacy progress as the highest unlocked checkpoint', () async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{
+      'profile_grade_progress_v1': '{"11":{"grade":2,"level":5}}',
+    });
+
+    final progress = await store.read(11);
+
+    expect(progress.highestUnlockedGrade, 2);
+    expect(progress.highestUnlockedLevel, 5);
   });
 }

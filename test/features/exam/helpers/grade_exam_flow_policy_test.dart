@@ -108,6 +108,35 @@ void main() {
     expect(outcome.progress.level, 1);
   });
 
+  test('historical level failure never lowers current progress', () {
+    const saved = ProfileGradeProgress(grade: 2, level: 6);
+    final outcome = GradeExamFlowPolicy.evaluate(
+      attemptedGrade: 2,
+      attemptedLevel: 3,
+      score: score({0, 1, 6, 7}),
+      savedProgress: saved,
+    );
+
+    expect(outcome.passed, isFalse);
+    expect(outcome.progress.grade, saved.grade);
+    expect(outcome.progress.level, saved.level);
+  });
+
+  test('historical perfect result never replaces current progress', () {
+    const saved = ProfileGradeProgress(grade: 2, level: 4);
+    final outcome = GradeExamFlowPolicy.evaluate(
+      attemptedGrade: 2,
+      attemptedLevel: 3,
+      score: score({0, 1, 2, 3, 4, 5}),
+      savedProgress: saved,
+    );
+
+    expect(outcome.passed, isTrue);
+    expect(outcome.levelIncrease, 2);
+    expect(outcome.progress.grade, saved.grade);
+    expect(outcome.progress.level, saved.level);
+  });
+
   test('pass without anchor keeps the attempted level', () {
     final outcome = GradeExamFlowPolicy.evaluate(
       attemptedGrade: 4,

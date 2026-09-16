@@ -18,23 +18,10 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
   }
 
   void _showGradeContentAndLoad() {
-    if (_showAssessmentContent && _contentExamType == examTypeGrade) {
+    if (_isOpeningGradeRoadmap) {
       return;
     }
-    HapticFeedback.selectionClick();
-    _updateState(() {
-      _showAssessmentContent = true;
-      _contentExamType = examTypeGrade;
-      _isLoading = true;
-      _hasLoaded = false;
-      _errorMessage = null;
-      _entries = const <ParentAssessmentEntry>[];
-      _allEntries = const <ParentAssessmentEntry>[];
-      _activeEntry = null;
-      _pagination = null;
-    });
-    _resetAssessmentScrollAfterBuild();
-    unawaited(_loadAssessments(page: 1, openExamWhenEmpty: true));
+    unawaited(_openGradeRoadmap());
   }
 
   void _showAssessmentLanding() {
@@ -236,6 +223,47 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
+    if (mounted && _showAssessmentContent) {
+      await _loadAssessments(page: 1, openGradeRoadmapWhenAvailable: true);
+    }
+  }
+
+  Future<void> _openGradeRoadmap() async {
+    if (_isOpeningGradeRoadmap) {
+      return;
+    }
+    final profileId = profileStableId(widget.activeProfile);
+    if (profileId == null || profileId <= 0) {
+      return;
+    }
+    _isOpeningGradeRoadmap = true;
+    HapticFeedback.lightImpact();
+    final initialExams =
+        <GeneratedExam>[
+              if (_activeEntry case final active?) active.exam,
+              ..._allEntries.map((entry) => entry.exam),
+            ]
+            .where(
+              (exam) => exam.examType?.trim().toUpperCase() == examTypeGrade,
+            )
+            .toList(growable: false);
+    final initialGrade = initialExams.isEmpty
+        ? 0
+        : (initialExams.first.grade ?? 0);
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => GradeRoadmapScreen(
+            profileId: profileId,
+            examService: widget.examService,
+            initialExams: initialExams,
+            initialGrade: initialGrade,
+          ),
+        ),
+      );
+    } finally {
+      _isOpeningGradeRoadmap = false;
+    }
     if (mounted && _showAssessmentContent) {
       await _loadAssessments(page: 1);
     }
