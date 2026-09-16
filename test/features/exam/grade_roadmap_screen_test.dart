@@ -54,6 +54,56 @@ void main() {
     );
   });
 
+  testWidgets('horizontal swipe changes grade and animated background', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: _FakeExamService(),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(
+                grade: 2,
+                level: 3,
+                highestUnlockedGrade: 2,
+                highestUnlockedLevel: 4,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lớp 2'), findsOneWidget);
+    expect(
+      find.image(
+        const AssetImage('assets/images/grade-roadmap-background-grade-2.png'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.drag(find.byType(GradeRoadmapScreen), const Offset(-180, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lớp 3'), findsOneWidget);
+    expect(
+      find.image(
+        const AssetImage('assets/images/grade-roadmap-background-grade-3.png'),
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('uses completed artwork only for a passed attempt', (
     tester,
   ) async {

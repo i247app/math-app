@@ -36,7 +36,14 @@ class GradeRoadmapScreen extends StatefulWidget {
 }
 
 class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
-  static const _backgroundAsset = 'assets/images/grade-roadmap-background.png';
+  static const _backgroundAssets = <String>[
+    'assets/images/grade-roadmap-background.png',
+    'assets/images/grade-roadmap-background-grade-1.png',
+    'assets/images/grade-roadmap-background-grade-2.png',
+    'assets/images/grade-roadmap-background-grade-3.png',
+    'assets/images/grade-roadmap-background-grade-4.png',
+    'assets/images/grade-roadmap-background-grade-5.png',
+  ];
   static const _mascotAsset = 'assets/images/grade-roadmap-mascot.png';
   static const _maxLevel = 10;
 
@@ -46,8 +53,17 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   late int _selectedGrade;
   bool _isLoading = true;
   bool _isOpeningExam = false;
+  bool _didPrecacheBackgrounds = false;
+  int _gradeTransitionDirection = 1;
+  double _horizontalDragDistance = 0;
   String? _errorMessage;
-  final ScrollController _scrollController = ScrollController();
+  final List<ScrollController> _scrollControllers = List.generate(
+    6,
+    (_) => ScrollController(),
+  );
+
+  ScrollController get _scrollController =>
+      _scrollControllers[_selectedGrade.clamp(0, 5)];
 
   @override
   void initState() {
@@ -60,8 +76,20 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecacheBackgrounds) return;
+    _didPrecacheBackgrounds = true;
+    for (final asset in _backgroundAssets) {
+      unawaited(precacheImage(AssetImage(asset), context));
+    }
+  }
+
+  @override
   void dispose() {
-    _scrollController.dispose();
+    for (final controller in _scrollControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -397,8 +425,31 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     final next = (_selectedGrade + delta).clamp(0, 5);
     if (next == _selectedGrade) return;
     HapticFeedback.selectionClick();
-    setState(() => _selectedGrade = next);
+    setState(() {
+      _gradeTransitionDirection = next > _selectedGrade ? 1 : -1;
+      _selectedGrade = next;
+    });
     _scrollToCurrentLevel();
+  }
+
+  void _handleHorizontalDragStart(DragStartDetails details) {
+    _horizontalDragDistance = 0;
+  }
+
+  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
+    _horizontalDragDistance += details.primaryDelta ?? 0;
+  }
+
+  void _handleHorizontalDragEnd(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    final movement = velocity.abs() >= 320 ? velocity : _horizontalDragDistance;
+    _horizontalDragDistance = 0;
+    if (movement.abs() < 48) return;
+    _changeGrade(movement < 0 ? 1 : -1);
+  }
+
+  void _handleHorizontalDragCancel() {
+    _horizontalDragDistance = 0;
   }
 
   void _scrollToCurrentLevel() {
@@ -422,72 +473,155 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     });
   }
 
+  String get _backgroundAsset => _backgroundAssets[_selectedGrade];
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return Scaffold(
       backgroundColor: colors.pageBackground,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(_backgroundAsset),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Column(
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: _handleHorizontalDragStart,
+        onHorizontalDragUpdate: _handleHorizontalDragUpdate,
+        onHorizontalDragEnd: _handleHorizontalDragEnd,
+        onHorizontalDragCancel: _handleHorizontalDragCancel,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            _GradeRoadmapHeader(
-              title: _gradeTitle(context),
-              onBack: () => Navigator.pop(context),
-            ),
-            _GradeSwitcher(
-              canGoBack: _selectedGrade > 0,
-              canGoForward: _selectedGrade < 5,
-              onBack: () => _changeGrade(-1),
-              onForward: () => _changeGrade(1),
-            ),
-            if (_errorMessage != null)
-              _RoadmapError(message: _errorMessage!, onRetry: _reload),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                child: _isLoading
-                    ? Center(
-                        key: const ValueKey('grade-roadmap-loading'),
-                        child: CircularProgressIndicator(
-                          color: colors.brandStrong,
-                        ),
-                      )
-                    : RefreshIndicator(
-                        key: ValueKey('grade-roadmap-$_selectedGrade'),
-                        color: colors.brandStrong,
-                        onRefresh: _reload,
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(
-                            parent: BouncingScrollPhysics(),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(18, 12, 18, 36),
-                          child: _GradeRoadmapPath(
-                            currentLevel: _currentLevel,
-                            isCurrentGrade:
-                                _selectedGrade == _progress.grade ||
-                                _exams.any(
-                                  (exam) =>
-                                      _isActiveExam(exam) &&
-                                      exam.grade == _selectedGrade,
-                                ),
-                            isOpeningExam: _isOpeningExam,
-                            isCompleted: _isLevelCompleted,
-                            isUnlocked: _isLevelUnlocked,
-                            hasActiveExam: (level) =>
-                                _activeExamFor(_selectedGrade, level) != null,
-                            onLevelTap: _handleLevelTap,
-                            mascotAsset: _mascotAsset,
-                          ),
-                        ),
-                      ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 520),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              layoutBuilder: (currentChild, previousChildren) => Stack(
+                fit: StackFit.expand,
+                children: [...previousChildren, ?currentChild],
               ),
+              transitionBuilder: (child, animation) {
+                final isIncoming =
+                    child.key ==
+                    ValueKey('grade-roadmap-background-$_selectedGrade');
+                final direction = isIncoming
+                    ? _gradeTransitionDirection
+                    : -_gradeTransitionDirection;
+                final curved = CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                );
+                return FadeTransition(
+                  opacity: curved,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: Offset(direction * 0.035, 0),
+                      end: Offset.zero,
+                    ).animate(curved),
+                    child: ScaleTransition(
+                      scale: Tween<double>(
+                        begin: 1.015,
+                        end: 1,
+                      ).animate(curved),
+                      child: child,
+                    ),
+                  ),
+                );
+              },
+              child: SizedBox.expand(
+                key: ValueKey('grade-roadmap-background-$_selectedGrade'),
+                child: Image.asset(
+                  _backgroundAsset,
+                  fit: BoxFit.cover,
+                  gaplessPlayback: true,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                _GradeRoadmapHeader(
+                  title: _gradeTitle(context),
+                  transitionDirection: _gradeTransitionDirection,
+                  onBack: () => Navigator.pop(context),
+                ),
+                _GradeSwitcher(
+                  canGoBack: _selectedGrade > 0,
+                  canGoForward: _selectedGrade < 5,
+                  onBack: () => _changeGrade(-1),
+                  onForward: () => _changeGrade(1),
+                ),
+                if (_errorMessage != null)
+                  _RoadmapError(message: _errorMessage!, onRetry: _reload),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 360),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final isIncoming =
+                          child.key ==
+                          ValueKey('grade-roadmap-$_selectedGrade');
+                      final direction = isIncoming
+                          ? _gradeTransitionDirection
+                          : -_gradeTransitionDirection;
+                      final curved = CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      );
+                      return FadeTransition(
+                        opacity: curved,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: Offset(direction * 0.09, 0),
+                            end: Offset.zero,
+                          ).animate(curved),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _isLoading
+                        ? Center(
+                            key: const ValueKey('grade-roadmap-loading'),
+                            child: CircularProgressIndicator(
+                              color: colors.brandStrong,
+                            ),
+                          )
+                        : RefreshIndicator(
+                            key: ValueKey('grade-roadmap-$_selectedGrade'),
+                            color: colors.brandStrong,
+                            onRefresh: _reload,
+                            child: SingleChildScrollView(
+                              controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics(),
+                              ),
+                              padding: const EdgeInsets.fromLTRB(
+                                18,
+                                12,
+                                18,
+                                36,
+                              ),
+                              child: _GradeRoadmapPath(
+                                currentLevel: _currentLevel,
+                                isCurrentGrade:
+                                    _selectedGrade == _progress.grade ||
+                                    _exams.any(
+                                      (exam) =>
+                                          _isActiveExam(exam) &&
+                                          exam.grade == _selectedGrade,
+                                    ),
+                                isOpeningExam: _isOpeningExam,
+                                isCompleted: _isLevelCompleted,
+                                isUnlocked: _isLevelUnlocked,
+                                hasActiveExam: (level) =>
+                                    _activeExamFor(_selectedGrade, level) !=
+                                    null,
+                                onLevelTap: _handleLevelTap,
+                                mascotAsset: _mascotAsset,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -497,9 +631,14 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
 }
 
 class _GradeRoadmapHeader extends StatelessWidget {
-  const _GradeRoadmapHeader({required this.title, required this.onBack});
+  const _GradeRoadmapHeader({
+    required this.title,
+    required this.transitionDirection,
+    required this.onBack,
+  });
 
   final String title;
+  final int transitionDirection;
   final VoidCallback onBack;
 
   @override
@@ -511,31 +650,13 @@ class _GradeRoadmapHeader extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          const Positioned.fill(
-            child: PhysicalShape(
-              clipper: _HeaderCurveClipper(),
-              clipBehavior: Clip.antiAlias,
-              color: Color(0xFF16AEB5),
-              elevation: 3,
-              shadowColor: Color(0x26007176),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF31CBD0), Color(0xFF13ADB5)],
-                  ),
-                ),
-              ),
-            ),
-          ),
           Positioned(
             left: 18,
             top: topInset + 7,
             child: Material(
-              color: const Color(0xFF6BD7DB),
-              elevation: 4,
-              shadowColor: const Color(0x3800686D),
+              color: const Color(0x4DFFFFFF),
+              elevation: 2,
+              shadowColor: const Color(0x28000000),
               shape: const CircleBorder(),
               child: InkWell(
                 onTap: onBack,
@@ -563,24 +684,40 @@ class _GradeRoadmapHeader extends StatelessWidget {
                   const _HeaderRays(mirrored: true),
                   const SizedBox(width: 9),
                   Flexible(
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        height: 1,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.2,
-                        shadows: [
-                          Shadow(
-                            color: Color(0x1F005B60),
-                            offset: Offset(0, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 320),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: Offset(transitionDirection * 0.12, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      ),
+                      child: Text(
+                        title,
+                        key: ValueKey(title),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          height: 1,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.2,
+                          shadows: [
+                            Shadow(
+                              color: Color(0x26000000),
+                              offset: Offset(0, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -637,37 +774,6 @@ class _HeaderRay extends StatelessWidget {
       ),
     );
   }
-}
-
-class _HeaderCurveClipper extends CustomClipper<Path> {
-  const _HeaderCurveClipper();
-
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height - 28)
-      ..cubicTo(
-        size.width * 0.82,
-        size.height - 20,
-        size.width * 0.66,
-        size.height - 10,
-        size.width / 2,
-        size.height - 9,
-      )
-      ..cubicTo(
-        size.width * 0.34,
-        size.height - 10,
-        size.width * 0.18,
-        size.height - 20,
-        0,
-        size.height - 28,
-      )
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant _HeaderCurveClipper oldClipper) => false;
 }
 
 class _GradeSwitcher extends StatelessWidget {
