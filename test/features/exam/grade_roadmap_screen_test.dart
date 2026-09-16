@@ -7,6 +7,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 
 void main() {
@@ -149,6 +150,102 @@ void main() {
     expect(assessment.examType, examTypeGrade);
     expect(assessment.level, 1);
   });
+
+  testWidgets('a completed historical level opens review instead of generate', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: _FakeExamService(),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 3),
+            ),
+            initialExams: const <GeneratedExam>[
+              GeneratedExam(
+                userExamId: 600,
+                examStatus: 'COMPLETE',
+                examType: examTypeGrade,
+                grade: 2,
+                level: 1,
+                grading: ExamGrading(scorePercentage: 70),
+                questions: <ExamQuestion>[],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final completedLevel = find.byKey(const ValueKey('grade-roadmap-level-1'));
+    await tester.ensureVisible(completedLevel);
+    await tester.pumpAndSettle();
+    await tester.tap(completedLevel);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ExamReviewScreen), findsOneWidget);
+    expect(find.byType(AiAssessmentScreen), findsNothing);
+  });
+
+  testWidgets('a skipped jump level opens the jump source review', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: _FakeExamService(),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 3),
+            ),
+            initialExams: const <GeneratedExam>[
+              GeneratedExam(
+                userExamId: 600,
+                examStatus: 'COMPLETE',
+                examType: examTypeGrade,
+                grade: 2,
+                level: 1,
+                grading: ExamGrading(scorePercentage: 100),
+                questions: <ExamQuestion>[],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final skippedLevel = find.byKey(const ValueKey('grade-roadmap-level-2'));
+    await tester.ensureVisible(skippedLevel);
+    await tester.pumpAndSettle();
+    await tester.tap(skippedLevel);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ExamReviewScreen), findsOneWidget);
+    final review = tester.widget<ExamReviewScreen>(
+      find.byType(ExamReviewScreen),
+    );
+    expect(review.userExamId, 600);
+    expect(find.byType(AiAssessmentScreen), findsNothing);
+  });
 }
 
 class _FakeProgressStore implements ProfileGradeProgressStore {
@@ -184,6 +281,36 @@ class _FakeExamService implements ExamService {
     examType: examTypeGrade,
     grade: 2,
     level: 1,
+    questions: <ExamQuestion>[
+      ExamQuestion(
+        questionName: '1 + 1 = ?',
+        questionNumber: 1,
+        rightAnswer: 'A',
+        answers: <ExamAnswer>[
+          ExamAnswer(label: 'A', content: '2'),
+          ExamAnswer(label: 'B', content: '3'),
+        ],
+      ),
+    ],
+  );
+
+  @override
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+    String examType = examTypeAssessment,
+  }) async => const GeneratedExam(
+    userExamId: 600,
+    examStatus: 'COMPLETE',
+    examType: examTypeGrade,
+    grade: 2,
+    level: 1,
+    grading: ExamGrading(
+      correctNumber: 1,
+      totalQuestions: 1,
+      scorePercentage: 100,
+    ),
     questions: <ExamQuestion>[
       ExamQuestion(
         questionName: '1 + 1 = ?',

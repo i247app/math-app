@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -12,6 +13,7 @@ import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 
 class GradeRoadmapScreen extends StatefulWidget {
   const GradeRoadmapScreen({
@@ -235,6 +237,38 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     return latest;
   }
 
+  GeneratedExam? _reviewExamForLevel(int grade, int level) {
+    final exactExam = _completedExamFor(grade, level);
+    if (exactExam != null) {
+      return exactExam;
+    }
+
+    final targetValue = (grade * _maxLevel) + level;
+    if (targetValue >= _progress.sortValue) {
+      return null;
+    }
+
+    GeneratedExam? jumpSource;
+    for (final exam in _exams) {
+      final examGrade = exam.grade;
+      final examLevel = exam.level;
+      if (_isActiveExam(exam) || examGrade == null || examLevel == null) {
+        continue;
+      }
+      final examValue = (examGrade * _maxLevel) + examLevel;
+      final isImmediatelyBeforeSkippedLevel = examValue == targetValue - 1;
+      final isPassingAttempt = (exam.grading?.scorePercentage ?? 0) >= 50;
+      if (!isImmediatelyBeforeSkippedLevel || !isPassingAttempt) {
+        continue;
+      }
+      if (jumpSource == null ||
+          _examDate(exam).isAfter(_examDate(jumpSource))) {
+        jumpSource = exam;
+      }
+    }
+    return jumpSource;
+  }
+
   DateTime _examDate(GeneratedExam exam) {
     return DateTime.tryParse(
           exam.modifyDt ?? exam.submittedDt ?? exam.createDt ?? '',
@@ -276,17 +310,47 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
 
   Future<void> _handleLevelTap(int level) async {
     final active = _activeExamFor(_selectedGrade, level);
-    final isCurrent =
-        (_selectedGrade == _progress.grade && level == _currentLevel) ||
-        active != null;
-    if (isCurrent) {
+    if (active != null) {
       await _openAssessment(level: level, activeExam: active);
       return;
     }
-    if (_isLevelUnlocked(level) ||
-        _completedExamFor(_selectedGrade, level) != null) {
-      await _openAssessment(level: level, activeExam: active);
+
+    final reviewExam = _reviewExamForLevel(_selectedGrade, level);
+    if (reviewExam != null) {
+      _openReview(reviewExam);
+      return;
     }
+
+    final isCurrent =
+        _selectedGrade == _progress.grade && level == _currentLevel;
+    if (isCurrent) {
+      await _openAssessment(level: level);
+      return;
+    }
+    if (_isLevelUnlocked(level)) {
+      await _openAssessment(level: level);
+    }
+  }
+
+  void _openReview(GeneratedExam exam) {
+    final userExamId = exam.userExamId;
+    final examId = exam.examId ?? exam.userAiExamId ?? exam.id;
+    if (userExamId == null && examId == null) return;
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => RepositoryProvider<ExamService>.value(
+          value: widget.examService,
+          child: ExamReviewScreen(
+            examId: userExamId == null ? examId : null,
+            userExamId: userExamId,
+            profileId: widget.profileId,
+            examType: examTypeGrade,
+            initialExam: exam,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _openAssessment({
