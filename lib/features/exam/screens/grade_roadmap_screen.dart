@@ -36,9 +36,8 @@ class GradeRoadmapScreen extends StatefulWidget {
 }
 
 class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
+  static const _backgroundAsset = 'assets/images/grade-roadmap-background.png';
   static const _mascotAsset = 'assets/images/grade-roadmap-mascot.png';
-  static const _completeBadgeAsset =
-      'assets/images/grade-roadmap-complete-badge.png';
   static const _maxLevel = 10;
 
   late final ProfileGradeProgressStore _progressStore;
@@ -429,11 +428,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     return Scaffold(
       backgroundColor: colors.pageBackground,
       body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.pageBackgroundTop, colors.pageBackground],
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(_backgroundAsset),
+            fit: BoxFit.cover,
           ),
         ),
         child: Column(
@@ -486,7 +484,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                                 _activeExamFor(_selectedGrade, level) != null,
                             onLevelTap: _handleLevelTap,
                             mascotAsset: _mascotAsset,
-                            completeBadgeAsset: _completeBadgeAsset,
                           ),
                         ),
                       ),
@@ -765,7 +762,6 @@ class _GradeRoadmapPath extends StatelessWidget {
     required this.hasActiveExam,
     required this.onLevelTap,
     required this.mascotAsset,
-    required this.completeBadgeAsset,
   });
 
   static const double _rowHeight = 152;
@@ -779,7 +775,6 @@ class _GradeRoadmapPath extends StatelessWidget {
   final bool Function(int level) hasActiveExam;
   final Future<void> Function(int level) onLevelTap;
   final String mascotAsset;
-  final String completeBadgeAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -860,12 +855,6 @@ class _GradeRoadmapPath extends StatelessWidget {
                         )!,
                 ),
               ),
-            if (completed)
-              Positioned(
-                right: -7,
-                bottom: 7,
-                child: Image.asset(completeBadgeAsset, width: 38, height: 38),
-              ),
             if (current)
               Positioned(
                 left: isOnLeft ? _nodeSize - 3 : -118,
@@ -908,30 +897,36 @@ class _RoadmapLevelNode extends StatelessWidget {
   final bool isLoading;
   final VoidCallback? onTap;
 
-  static const _levelGradients = <List<Color>>[
-    [Color(0xFFFF965B), Color(0xFFFF5932)],
-    [Color(0xFF65E875), Color(0xFF25C84A)],
-    [Color(0xFFD45CF0), Color(0xFFAA2DD7)],
-    [Color(0xFF48D8E0), Color(0xFF0FA7B5)],
-    [Color(0xFFFFD44F), Color(0xFFF2A51B)],
-    [Color(0xFF7794F5), Color(0xFF4C67DD)],
+  static const _levelColors = <Color>[
+    Color(0xFFFF3344),
+    Color(0xFFFF7A20),
+    Color(0xFFFFD91A),
+    Color(0xFF8EEB18),
+    Color(0xFF2DD174),
+    Color(0xFF13C8C2),
+    Color(0xFF18BFE0),
+    Color(0xFF1B79ED),
+    Color(0xFFB33EEB),
+    Color(0xFFF43C9B),
   ];
 
   static Color colorForLevel(int level) {
-    return _levelGradients[(level - 1) % _levelGradients.length].last;
+    return _levelColors[(level - 1) % _levelColors.length];
   }
 
-  static List<Color> gradientForLevel(int level) {
-    return _levelGradients[(level - 1) % _levelGradients.length];
+  String get _assetState {
+    if (completed) return 'completed';
+    if (unlocked) return 'available';
+    return 'locked';
+  }
+
+  String get _assetPath {
+    return 'assets/images/grade-roadmap-buttons/'
+        'level-${level.toString().padLeft(2, '0')}-$_assetState.png';
   }
 
   @override
   Widget build(BuildContext context) {
-    final base = colorForLevel(level);
-    final fill = unlocked
-        ? gradientForLevel(level)
-        : const [Color(0xFF4FD0D4), Color(0xFF14979E)];
-    final foreground = unlocked ? Colors.white : const Color(0xFF087D84);
     final stateLabel = completed
         ? context.getText(AppKeys.gradeRoadmapCompleted)
         : current
@@ -956,146 +951,62 @@ class _RoadmapLevelNode extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Positioned.fill(
-                  top: 5,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFFDDE5E4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: base.withValues(
-                            alpha: current
-                                ? 0.18
-                                : unlocked
-                                ? 0.1
-                                : 0.07,
-                          ),
-                          blurRadius: current ? 11 : 8,
-                          offset: const Offset(0, 5),
-                        ),
-                        const BoxShadow(
-                          color: Color(0x240A4244),
-                          blurRadius: 7,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
+                  child: Image.asset(
+                    _assetPath,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
                   ),
                 ),
-                Positioned.fill(
-                  bottom: 5,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.white, Color(0xFFF5F7F6)],
-                      ),
-                      border: Border.all(color: Colors.white, width: 2.5),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 8,
-                  right: 8,
-                  top: 8,
-                  bottom: 13,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color.lerp(base, Colors.black, 0.13),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 8,
-                  right: 8,
-                  top: 7,
-                  bottom: 16,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: fill,
-                      ),
-                      border: Border.all(
-                        color: Colors.white.withValues(
-                          alpha: unlocked ? 0.3 : 0.2,
-                        ),
-                        width: 1.5,
-                      ),
-                    ),
+                if (unlocked || completed)
+                  Align(
+                    alignment: Alignment.center,
                     child: isLoading
-                        ? Padding(
-                            padding: const EdgeInsets.all(29),
+                        ? const SizedBox.square(
+                            dimension: 30,
                             child: CircularProgressIndicator(
                               strokeWidth: 3,
-                              color: foreground,
+                              color: Colors.white,
                             ),
                           )
-                        : Stack(
-                            fit: StackFit.expand,
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (unlocked)
-                                const CustomPaint(
-                                  painter: _RoadmapNodeGlossPainter(),
+                              Text(
+                                context.getText(AppKeys.gradeRoadmapLevel),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1,
+                                  shadows: [
+                                    Shadow(
+                                      color: Color(0x45000000),
+                                      offset: Offset(0, 1.5),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
                                 ),
-                              Center(
-                                child: !unlocked
-                                    ? Icon(
-                                        Icons.lock_rounded,
-                                        color: foreground,
-                                        size: 30,
-                                      )
-                                    : Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            context.getText(
-                                              AppKeys.gradeRoadmapLevel,
-                                            ),
-                                            style: TextStyle(
-                                              color: foreground,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w900,
-                                              height: 1,
-                                              shadows: const [
-                                                Shadow(
-                                                  color: Color(0x30000000),
-                                                  offset: Offset(0, 1.5),
-                                                  blurRadius: 2,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '$level',
-                                            style: TextStyle(
-                                              color: foreground,
-                                              fontSize: 34,
-                                              fontWeight: FontWeight.w900,
-                                              height: 1,
-                                              shadows: const [
-                                                Shadow(
-                                                  color: Color(0x30000000),
-                                                  offset: Offset(0, 2),
-                                                  blurRadius: 3,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '$level',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1,
+                                  shadows: [
+                                    Shadow(
+                                      color: Color(0x45000000),
+                                      offset: Offset(0, 2),
+                                      blurRadius: 3,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                   ),
-                ),
               ],
             ),
           ),
@@ -1103,41 +1014,6 @@ class _RoadmapLevelNode extends StatelessWidget {
       ),
     );
   }
-}
-
-class _RoadmapNodeGlossPainter extends CustomPainter {
-  const _RoadmapNodeGlossPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final glowPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
-      ..strokeCap = StrokeCap.round;
-    final glowRect = Rect.fromLTWH(
-      size.width * 0.16,
-      size.height * 0.13,
-      size.width * 0.68,
-      size.height * 0.66,
-    );
-    canvas.drawArc(glowRect, 3.55, 0.96, false, glowPaint);
-
-    final softGlowPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0x42FFFFFF), Color(0x00FFFFFF)],
-      ).createShader(Offset.zero & size);
-    canvas.drawCircle(
-      Offset(size.width * 0.33, size.height * 0.27),
-      size.width * 0.22,
-      softGlowPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _RoadmapNodeGlossPainter oldDelegate) => false;
 }
 
 class _RoadmapNodeRays extends StatelessWidget {

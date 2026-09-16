@@ -54,7 +54,7 @@ void main() {
     );
   });
 
-  testWidgets('shows the completion badge only for a passed attempt', (
+  testWidgets('uses completed artwork only for a passed attempt', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -101,7 +101,25 @@ void main() {
 
     expect(
       find.image(
-        const AssetImage('assets/images/grade-roadmap-complete-badge.png'),
+        const AssetImage(
+          'assets/images/grade-roadmap-buttons/level-01-completed.png',
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/images/grade-roadmap-buttons/level-02-completed.png',
+        ),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/images/grade-roadmap-buttons/level-02-available.png',
+        ),
       ),
       findsOneWidget,
     );
