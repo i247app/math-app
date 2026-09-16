@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({super.key, required this.question});
@@ -20,7 +21,7 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final displayQuestion = _normalizeBreakableWhitespace(question);
+    final displayQuestion = normalizeAssessmentText(question);
     final mathQuestion = _mathQuestionParts(displayQuestion);
     final isPictorialQuestion = _containsPictorialSymbols(displayQuestion);
 
@@ -51,14 +52,6 @@ class AssessmentQuestionCard extends StatelessWidget {
             )
           : _questionText(colors, displayQuestion),
     );
-  }
-
-  String _normalizeBreakableWhitespace(String value) {
-    return value
-        .replaceAll('\u00A0', ' ')
-        .replaceAll('\u202F', ' ')
-        .replaceAll('\u2060', '')
-        .replaceAll('\uFEFF', '');
   }
 
   double _minimumHeightFor(
@@ -98,7 +91,7 @@ class AssessmentQuestionCard extends StatelessWidget {
 
   bool _isMathExpression(String value) {
     final expression = value.trim();
-    return RegExp(r'^[0-9\s+×xX*/÷:()=?.,-−]+$').hasMatch(expression) &&
+    return RegExp(r'^[0-9\s+×xX*/÷:()=?.,−-]+$').hasMatch(expression) &&
         RegExp(r'[+×xX*/÷:=−-]').hasMatch(expression) &&
         RegExp(r'\d').hasMatch(expression);
   }
@@ -135,6 +128,7 @@ class AssessmentQuestionCard extends StatelessWidget {
         softWrap: true,
         maxLines: null,
         overflow: TextOverflow.visible,
+        textWidthBasis: TextWidthBasis.parent,
         style: TextStyle(
           color: colors.textPrimary,
           fontSize: _fontSizeFor(displayQuestion),
@@ -230,10 +224,17 @@ class _AssessmentMathExpression extends StatelessWidget {
             spacing: 12,
             runSpacing: 10,
             children: _semanticSegments().map((segment) {
-              return Text(
-                segment,
-                softWrap: false,
-                style: _textStyle(FontSize.displaySmall),
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                child: FittedBox(
+                  alignment: Alignment.center,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    segment,
+                    softWrap: false,
+                    style: _textStyle(FontSize.displaySmall),
+                  ),
+                ),
               );
             }).toList(),
           ),

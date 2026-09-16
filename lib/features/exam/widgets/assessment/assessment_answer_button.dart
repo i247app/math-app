@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({
@@ -23,6 +24,7 @@ class AssessmentAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final displayContent = normalizeAssessmentText(answer.content);
     final feedbackColor = switch (feedbackCorrect) {
       true => colors.success,
       false => colors.error,
@@ -31,7 +33,7 @@ class AssessmentAnswerButton extends StatelessWidget {
     final borderColor =
         feedbackColor ??
         (selected ? colors.brandStrong : Colors.black.withValues(alpha: 0));
-    final isNumeric = isNumericAssessmentContent(answer.content);
+    final isNumeric = isNumericAssessmentContent(displayContent);
     final textColor =
         feedbackColor ??
         (selected && isNumeric ? colors.brandStrong : colors.textPrimary);
@@ -99,16 +101,28 @@ class AssessmentAnswerButton extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            answer.content,
+                            displayContent,
                             maxLines: 1,
                             softWrap: false,
-                            style: _answerTextStyle(textColor, isNumeric),
+                            style: _answerTextStyle(
+                              textColor,
+                              isNumeric,
+                              displayContent,
+                            ),
                           ),
                         )
                       : Text(
-                          answer.content,
+                          displayContent,
                           textAlign: TextAlign.left,
-                          style: _answerTextStyle(textColor, isNumeric),
+                          softWrap: true,
+                          maxLines: null,
+                          overflow: TextOverflow.visible,
+                          textWidthBasis: TextWidthBasis.parent,
+                          style: _answerTextStyle(
+                            textColor,
+                            isNumeric,
+                            displayContent,
+                          ),
                         ),
                 ),
                 if (feedbackCorrect != null) ...[
@@ -137,10 +151,14 @@ class AssessmentAnswerButton extends StatelessWidget {
     );
   }
 
-  TextStyle _answerTextStyle(Color color, bool isNumeric) {
+  TextStyle _answerTextStyle(
+    Color color,
+    bool isNumeric,
+    String displayContent,
+  ) {
     return TextStyle(
       color: color,
-      fontSize: _fontSizeFor(answer.content),
+      fontSize: _fontSizeFor(displayContent),
       fontWeight: isNumeric ? FontWeight.w900 : FontWeight.w500,
       height: 1.2,
       letterSpacing: 0,
