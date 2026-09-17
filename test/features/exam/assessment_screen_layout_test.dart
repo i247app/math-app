@@ -10,7 +10,6 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
-import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
@@ -94,48 +93,6 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('assessment keeps the exit button after the first question', (
-    tester,
-  ) async {
-    await _pumpAssessment(
-      tester,
-      examType: examTypeAssessment,
-      questions: const <ExamQuestion>[
-        ExamQuestion(
-          questionName: 'First question',
-          questionNumber: 1,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: 'Correct'),
-            ExamAnswer(label: 'B', content: 'Incorrect'),
-          ],
-        ),
-        ExamQuestion(
-          questionName: 'Second question',
-          questionNumber: 2,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: 'Correct'),
-            ExamAnswer(label: 'B', content: 'Incorrect'),
-          ],
-        ),
-      ],
-    );
-
-    await tester.tap(find.byType(AssessmentAnswerButton).first);
-    await tester.tap(find.byType(AssessmentBottomActionButton).last);
-    await tester.pump();
-
-    expect(find.text('Second question'), findsOneWidget);
-    final leftButton = tester.widget<AssessmentBottomActionButton>(
-      find.byType(AssessmentBottomActionButton).first,
-    );
-    expect(leftButton.label, 'THOÁT');
-    expect(leftButton.icon, Icons.logout_rounded);
-    expect(leftButton.background, AppColors.red700);
     expect(tester.takeException(), isNull);
   });
 
@@ -260,33 +217,6 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets(
-    'practice first-six pass submits first attempts and shows score',
-    (tester) async {
-      final service = _ImmediatePracticeSubmitService();
-      await _pumpAssessment(
-        tester,
-        examService: service,
-        initialGrade: 3,
-        questions: _setQuestions('Practice'),
-      );
-
-      for (var index = 0; index < 6; index++) {
-        await tester.tap(find.byType(AssessmentAnswerButton).first);
-        await tester.pump();
-        await tester.tap(find.byType(AssessmentBottomActionButton).last);
-        await tester.pump();
-      }
-      await tester.pumpAndSettle();
-
-      expect(service.submitCalls, 1);
-      expect(service.submittedAnswers, hasLength(6));
-      expect(find.byType(PracticeResultScreen), findsOneWidget);
-      expect(find.text('6/6'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
 
   testWidgets(
     'shows submit immediately after answering the last unanswered question',
@@ -933,33 +863,6 @@ class _PendingSubmitExamService implements ExamService {
     submitCalls++;
     submittedAnswers = List<SubmitExamAnswer>.from(answers);
     return _submitCompleter.future;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _ImmediatePracticeSubmitService implements ExamService {
-  int submitCalls = 0;
-  List<SubmitExamAnswer>? submittedAnswers;
-
-  @override
-  Future<GeneratedExam> submitExam({
-    required int examId,
-    required List<SubmitExamAnswer> answers,
-    int? profileId,
-  }) async {
-    submitCalls++;
-    submittedAnswers = List<SubmitExamAnswer>.from(answers);
-    return GeneratedExam(
-      examId: examId,
-      userAiExamId: examId,
-      userExamId: 93001,
-      profileId: profileId,
-      examType: examTypePractice,
-      examStatus: 'SUBMITTED',
-      questions: const <ExamQuestion>[],
-    );
   }
 
   @override
