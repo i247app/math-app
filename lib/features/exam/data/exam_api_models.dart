@@ -387,7 +387,6 @@ class ExamStatsDto {
   final DateTime? lastSubmittedDt;
   final String? review;
   final GeneratedExamDto? inProgressExam;
-  @JsonKey(defaultValue: <GeneratedExamDto>[])
   final List<GeneratedExamDto> inProgressExams;
 
   factory ExamStatsDto.fromJson(Map<String, dynamic> json) =>
