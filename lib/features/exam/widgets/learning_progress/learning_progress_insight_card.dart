@@ -99,6 +99,11 @@ class LearningProgressInsightCard extends StatelessWidget {
     BuildContext context,
     ({int direction, double delta}) trend,
   ) {
+    if (summary != null && summary!.averageDelta == null) {
+      return context.formatText(AppKeys.learningProgressAverageScore, {
+        'score': summary!.averageScore.toStringAsFixed(1),
+      });
+    }
     if (trend.direction > 0) {
       return context.formatText(AppKeys.learningProgressImprovingMessage, {
         'delta': trend.delta.abs().toStringAsFixed(1),
@@ -118,19 +123,27 @@ class LearningProgressInsightCard extends StatelessWidget {
   ) {
     if (summary != null) {
       final delta = summary.averageDelta;
-      if (delta != null) {
-        final normalizedTrend = summary.trend.trim().toUpperCase();
-        final direction = delta > 0.05
-            ? 1
-            : delta < -0.05
-            ? -1
-            : switch (normalizedTrend) {
-                'IMPROVING' || 'UP' => 1,
-                'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
-                _ => 0,
-              };
-        return (direction: direction, delta: delta);
+      if (delta == null) {
+        return (
+          direction: switch (summary.trend.trim().toUpperCase()) {
+            'IMPROVING' || 'UP' => 1,
+            'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
+            _ => 0,
+          },
+          delta: 0,
+        );
       }
+      final normalizedTrend = summary.trend.trim().toUpperCase();
+      final direction = delta > 0.05
+          ? 1
+          : delta < -0.05
+          ? -1
+          : switch (normalizedTrend) {
+              'IMPROVING' || 'UP' => 1,
+              'NEED_TO_TRY' || 'DECLINING' || 'DOWN' => -1,
+              _ => 0,
+            };
+      return (direction: direction, delta: delta);
     }
     if (values.length < 2) {
       return (direction: 0, delta: 0);

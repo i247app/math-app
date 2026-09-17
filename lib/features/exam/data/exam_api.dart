@@ -148,16 +148,20 @@ class ExamApi implements ExamService {
       throw ExamException(AppStrings.current(AppKeys.invalidServerResponse));
     }
 
-    return _runExamRequest(
-      () => _getExamProgressResponse(
-        ExamProgressRequest(
-          profileId: profileId,
-          fromDt: fromDt.toUtc(),
-          toDt: toDt.toUtc(),
-          examType: examType,
-        ),
-      ),
-    ).then((response) => response.toModel());
+    return _runExamRequest(() async {
+      final json = await _postResponse(
+        '/exams/stats',
+        ExamStatsRequest(profileId: profileId, examType: examType).toJson(),
+        (json) => json,
+      );
+      return examStatsToProgress(
+        json,
+        fromDt: fromDt,
+        toDt: toDt,
+        profileId: profileId,
+        examType: examType,
+      );
+    });
   }
 
   Future<ExamListResponseDto> _listExams({
@@ -315,16 +319,6 @@ class ExamApi implements ExamService {
       '/exams/list',
       request.toJson(),
       ExamListResponseDto.fromJson,
-    );
-  }
-
-  Future<ExamProgressResponseDto> _getExamProgressResponse(
-    ExamProgressRequest request,
-  ) {
-    return _postResponse(
-      '/exams/analytics/progress',
-      request.toJson(),
-      ExamProgressResponseDto.fromJson,
     );
   }
 
