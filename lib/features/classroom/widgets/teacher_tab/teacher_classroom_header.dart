@@ -1,15 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomHeader extends StatelessWidget {
-  const _TeacherClassroomHeader({required this.scale});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
-  final double scale;
+class TeacherClassroomHeader extends StatelessWidget {
+  const TeacherClassroomHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     return PageHeader(
-      title: context.getText(AppKeys.studentClassroom),
-      scale: scale,
+      title: context.getText(AppKeys.teacherClassroomTitle),
       actionWidth: 40,
       horizontalPadding: 18,
       verticalPadding: 6,

@@ -1,0 +1,324 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:numi/core/localization/app_strings.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/profile/data/grade_exception.dart';
+import 'package:numi/features/exam/data/exam_shake_service.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/helpers/default_grade_label.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_background.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_bottom_bar.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_failure_notice.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_grid.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_header.dart';
+import 'package:numi/features/exam/widgets/grade_selection/grade_option.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+
+class GradeSelectionScreen extends StatefulWidget {
+  const GradeSelectionScreen({
+    super.key,
+    this.user,
+    this.initialGrades = const <GradeModel>[],
+    this.gradeService,
+    this.examService,
+    this.examShakeService,
+    this.gradeProgressStore,
+    this.examType = examTypeAssessment,
+    this.profileId,
+    this.initialGradeId,
+    this.initialGradeLabel,
+    this.onResultBack,
+    this.selectionOnly = false,
+  });
+
+  final LoginUser? user;
+  final List<GradeModel> initialGrades;
+  final GradeService? gradeService;
+  final ExamService? examService;
+  final ExamShakeService? examShakeService;
+  final ProfileGradeProgressStore? gradeProgressStore;
+  final String examType;
+  final int? profileId;
+  final int? initialGradeId;
+  final String? initialGradeLabel;
+  final VoidCallback? onResultBack;
+  final bool selectionOnly;
+
+  @override
+  State<GradeSelectionScreen> createState() => _GradeSelectionScreenState();
+}
+
+class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
+  late final GradeService _gradeService;
+  late final ProfileGradeProgressStore _gradeProgressStore;
+  bool showGenerationFailed = false;
+  bool isLoadingGrades = false;
+  String? gradeLoadError;
+  List<GradeModel> grades = const <GradeModel>[];
+  String? selectedGradeLabel;
+  bool _isOpeningAssessment = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _gradeService = widget.gradeService ?? context.read<GradeService>();
+    _gradeProgressStore =
+        widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
+    grades = widget.initialGrades;
+    selectedGradeLabel = _initialSelectedGradeLabel(grades);
+    if (widget.examType == examTypeAssessment) {
+      unawaited(
+        (widget.examShakeService ?? context.read<ExamShakeService>()).aiShake(),
+      );
+    }
+    if (grades.isEmpty) {
+      loadGrades();
+    }
+  }
+
+  Future<void> loadGrades() async {
+    final userId = widget.user?.id;
+    if (userId == null || userId <= 0) {
+      setState(() {
+        isLoadingGrades = false;
+        gradeLoadError = AppStrings.current(AppKeys.noAccountForGrades);
+        grades = const <GradeModel>[];
+      });
+      return;
+    }
+
+    setState(() {
+      isLoadingGrades = true;
+      gradeLoadError = null;
+    });
+
+    try {
+      final loadedGrades = await _gradeService.listGrades(userId: userId);
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        grades = loadedGrades;
+        isLoadingGrades = false;
+        if (!loadedGrades.any(
+          (grade) => grade.label?.trim() == selectedGradeLabel,
+        )) {
+          selectedGradeLabel = _initialSelectedGradeLabel(loadedGrades);
+        }
+      });
+    } on GradeException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        gradeLoadError = error.message;
+        isLoadingGrades = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        gradeLoadError = AppStrings.current(AppKeys.gradeLoadFailed);
+        isLoadingGrades = false;
+      });
+    }
+  }
+
+  Future<void> openAssessment({String? gradeLabel}) async {
+    if (_isOpeningAssessment) {
+      return;
+    }
+    _isOpeningAssessment = true;
+    HapticFeedback.mediumImpact();
+    if (showGenerationFailed) {
+      setState(() => showGenerationFailed = false);
+    }
+
+    try {
+      final selectedGrade = AssessmentFlowPolicy.gradeFromLabel(gradeLabel);
+      var savedProgress = ProfileGradeProgress.initial;
+      if (widget.examType == examTypeGrade) {
+        try {
+          savedProgress = await _gradeProgressStore.read(widget.profileId ?? 0);
+        } catch (_) {
+          // Local progress is an optimization; a GRADE exam can still start
+          // safely from level 1 if secure storage is temporarily unavailable.
+        }
+      }
+      final selectedLevel = widget.examType == examTypeGrade
+          ? GradeExamFlowPolicy.levelForSelectedGrade(
+              selectedGrade: selectedGrade,
+              savedProgress: savedProgress,
+            )
+          : null;
+      if (!mounted) {
+        return;
+      }
+
+      final result = await Navigator.of(context).push<AiAssessmentResult>(
+        MaterialPageRoute<AiAssessmentResult>(
+          builder: (_) => AiAssessmentScreen(
+            examService: widget.examService,
+            examType: widget.examType,
+            gradeLabel: gradeLabel,
+            level: selectedLevel,
+            profileId: widget.profileId,
+            startAtKindergarten: false,
+            gradeProgressStore: _gradeProgressStore,
+            allowQuestionNavigation: widget.examType != examTypeGrade,
+            showQuestionNavigation: widget.examType != examTypeGrade,
+            onResultBack: widget.onResultBack,
+          ),
+        ),
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      if (result == null && widget.examType == examTypeGrade) {
+        final onResultBack = widget.onResultBack;
+        if (onResultBack != null) {
+          onResultBack();
+          return;
+        }
+      }
+
+      if (result == AiAssessmentResult.generationFailed) {
+        setState(() => showGenerationFailed = true);
+        return;
+      }
+
+      setState(() {
+        showGenerationFailed = false;
+        selectedGradeLabel = _initialSelectedGradeLabel(grades);
+      });
+    } finally {
+      _isOpeningAssessment = false;
+    }
+  }
+
+  String? _initialSelectedGradeLabel(List<GradeModel> grades) {
+    return defaultGradeLabel(
+      grades,
+      preferredGradeId: widget.initialGradeId,
+      preferredGradeLabel: widget.initialGradeLabel,
+      fallbackToFirst: widget.examType != examTypeAssessment,
+    );
+  }
+
+  void selectGrade(GradeOption option) {
+    HapticFeedback.selectionClick();
+    if (widget.selectionOnly) {
+      Navigator.of(
+        context,
+      ).pop(AssessmentFlowPolicy.gradeFromLabel(option.label));
+      return;
+    }
+    setState(() => selectedGradeLabel = option.label);
+  }
+
+  void continueWithSelectedGrade() {
+    final gradeLabel = selectedGradeLabel?.trim() ?? '';
+    if (gradeLabel.isEmpty && widget.examType != examTypeAssessment) {
+      HapticFeedback.selectionClick();
+      return;
+    }
+
+    openAssessment(gradeLabel: gradeLabel);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: Scaffold(
+        backgroundColor: colors.pageBackground,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: Stack(
+                children: [
+                  const Positioned.fill(child: GradeBackground()),
+                  Positioned.fill(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        38,
+                        88,
+                        38,
+                        widget.selectionOnly ? 40 : 184,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 220),
+                              child: showGenerationFailed
+                                  ? const Padding(
+                                      key: ValueKey('generate-failed-notice'),
+                                      padding: EdgeInsets.only(top: 18),
+                                      child: GradeFailureNotice(),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ),
+                          GradeGrid(
+                            grades: grades,
+                            selectedGradeLabel: selectedGradeLabel,
+                            isLoading: isLoadingGrades,
+                            errorMessage: gradeLoadError,
+                            onSelected: selectGrade,
+                            onRetry: loadGrades,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: GradeHeader(),
+                  ),
+                  if (!widget.selectionOnly)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: GradeBottomBar(
+                        onContinue: continueWithSelectedGrade,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,1120 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/localization/lingo_provider.dart';
+import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/practice_result_screen.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
+
+class _UnusedExamService implements ExamService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+void main() {
+  testWidgets('standard questions fit without vertical scrolling', (
+    tester,
+  ) async {
+    await _pumpAssessment(tester);
+
+    final mainScrollable = find.descendant(
+      of: find.byKey(const ValueKey('question-content')),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable &&
+            widget.axisDirection == AxisDirection.down &&
+            widget.physics is BouncingScrollPhysics,
+      ),
+    );
+    expect(mainScrollable, findsOneWidget);
+    final scrollable = tester.state<ScrollableState>(mainScrollable);
+    expect(scrollable.position.maxScrollExtent, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('bottom actions stay above Android navigation bar', (
+    tester,
+  ) async {
+    const systemBottomInset = 48.0;
+    await _pumpAssessment(tester, bottomInset: systemBottomInset);
+
+    final bottomBar = find.byType(AssessmentBottomBar);
+    expect(
+      tester.getSize(bottomBar).height,
+      AssessmentBottomBar.contentHeight + systemBottomInset,
+    );
+
+    final actionButtons = find.descendant(
+      of: bottomBar,
+      matching: find.byType(AssessmentBottomActionButton),
+    );
+    expect(actionButtons, findsNWidgets(2));
+    final previousButton = tester.widget<AssessmentBottomActionButton>(
+      actionButtons.first,
+    );
+    expect(previousButton.onTap, isNotNull);
+    expect(previousButton.label, 'THOÁT');
+    expect(previousButton.icon, Icons.logout_rounded);
+    expect(previousButton.background, AppColors.red700);
+    for (final element in actionButtons.evaluate()) {
+      final button = find.byWidget(element.widget);
+      expect(tester.getBottomLeft(button).dy, lessThanOrEqualTo(844 - 48));
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('first question exit button uses the header exit flow', (
+    tester,
+  ) async {
+    await _pumpAssessment(tester, examType: examTypeAssessment);
+
+    final bottomBar = find.byType(AssessmentBottomBar);
+    final exitButton = find
+        .descendant(
+          of: bottomBar,
+          matching: find.byType(AssessmentBottomActionButton),
+        )
+        .first;
+    await tester.tap(exitButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('assessment keeps the exit button after the first question', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      examType: examTypeAssessment,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: 'First question',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: 'Second question',
+          questionNumber: 2,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+      ],
+    );
+
+    await tester.tap(find.byType(AssessmentAnswerButton).first);
+    await tester.tap(find.byType(AssessmentBottomActionButton).last);
+    await tester.pump();
+
+    expect(find.text('Second question'), findsOneWidget);
+    final leftButton = tester.widget<AssessmentBottomActionButton>(
+      find.byType(AssessmentBottomActionButton).first,
+    );
+    expect(leftButton.label, 'THOÁT');
+    expect(leftButton.icon, Icons.logout_rounded);
+    expect(leftButton.background, AppColors.red700);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'assessment requires an answer and keeps the selected answer checked',
+    (tester) async {
+      await _pumpAssessment(tester, examType: examTypeAssessment);
+
+      final continueButton = find.byType(AssessmentBottomActionButton).last;
+      final firstAnswer = find.byType(AssessmentAnswerButton).first;
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNull,
+      );
+
+      await tester.tap(firstAnswer);
+      await tester.pump();
+      expect(
+        tester.widget<AssessmentAnswerButton>(firstAnswer).selected,
+        isTrue,
+      );
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNotNull,
+      );
+
+      await tester.tap(firstAnswer);
+      await tester.pump();
+      expect(
+        tester.widget<AssessmentAnswerButton>(firstAnswer).selected,
+        isTrue,
+      );
+      expect(
+        tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+        isNotNull,
+      );
+    },
+  );
+
+  testWidgets('practice shows retry feedback until the correct answer', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: '2 + 2 = ?',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '4'),
+            ExamAnswer(label: 'B', content: '5'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: '3 + 3 = ?',
+          questionNumber: 2,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '6'),
+            ExamAnswer(label: 'B', content: '7'),
+          ],
+        ),
+      ],
+    );
+
+    final continueButton = find.byType(AssessmentBottomActionButton).last;
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNull,
+    );
+
+    await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
+      findsNothing,
+    );
+    final wrongAnswerAfterFeedback = tester.widget<AssessmentAnswerButton>(
+      find.byType(AssessmentAnswerButton).at(1),
+    );
+    expect(wrongAnswerAfterFeedback.selected, isTrue);
+    expect(wrongAnswerAfterFeedback.feedbackCorrect, isNull);
+
+    await tester.tap(find.byType(AssessmentAnswerButton).first);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-correct')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+
+    await tester.pump(const Duration(milliseconds: 700));
+    final correctAnswerAfterFeedback = tester.widget<AssessmentAnswerButton>(
+      find.byType(AssessmentAnswerButton).first,
+    );
+    expect(correctAnswerAfterFeedback.selected, isTrue);
+    expect(correctAnswerAfterFeedback.feedbackCorrect, isNull);
+
+    await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('assessment-answer-feedback-incorrect')),
+      findsOneWidget,
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'practice first-six pass submits first attempts and shows score',
+    (tester) async {
+      final service = _ImmediatePracticeSubmitService();
+      await _pumpAssessment(
+        tester,
+        examService: service,
+        initialGrade: 3,
+        questions: _setQuestions('Practice'),
+      );
+
+      for (var index = 0; index < 6; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pump();
+      }
+      await tester.pumpAndSettle();
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(6));
+      expect(find.byType(PracticeResultScreen), findsOneWidget);
+      expect(find.text('6/6'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'shows submit immediately after answering the last unanswered question',
+    (tester) async {
+      await _pumpAssessment(
+        tester,
+        questions: const <ExamQuestion>[
+          ExamQuestion(
+            questionName: '12 + 8 = ?',
+            questionNumber: 1,
+            answers: <ExamAnswer>[
+              ExamAnswer(label: 'A', content: '18'),
+              ExamAnswer(label: 'B', content: '19'),
+              ExamAnswer(label: 'C', content: '20'),
+              ExamAnswer(label: 'D', content: '21'),
+            ],
+          ),
+          ExamQuestion(
+            questionName: '20 + 10 = ?',
+            questionNumber: 2,
+            answers: <ExamAnswer>[
+              ExamAnswer(label: 'A', content: '28'),
+              ExamAnswer(label: 'B', content: '29'),
+              ExamAnswer(label: 'C', content: '30'),
+              ExamAnswer(label: 'D', content: '31'),
+            ],
+          ),
+        ],
+      );
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AssessmentProgressSection),
+          matching: find.text('2'),
+        ),
+      );
+      await tester.pump();
+      await tester.tap(find.text('30'));
+      await tester.pump();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AssessmentProgressSection),
+          matching: find.text('1'),
+        ),
+      );
+      await tester.pump();
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+      await tester.tap(find.text('20'));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('keeps question navigation scroll offset after switching', (
+    tester,
+  ) async {
+    final questions = List<ExamQuestion>.generate(
+      10,
+      (index) => ExamQuestion(
+        questionName: '${index + 1} + 1 = ?',
+        questionNumber: index + 1,
+        answers: const <ExamAnswer>[
+          ExamAnswer(label: 'A', content: '1'),
+          ExamAnswer(label: 'B', content: '2'),
+          ExamAnswer(label: 'C', content: '3'),
+          ExamAnswer(label: 'D', content: '4'),
+        ],
+      ),
+    );
+    await _pumpAssessment(tester, questions: questions);
+
+    final navigation = find.byKey(
+      const PageStorageKey<String>('assessment-question-navigation'),
+    );
+    await tester.drag(navigation, const Offset(-220, 0));
+    await tester.pumpAndSettle();
+
+    ScrollableState navigationState() => tester.state<ScrollableState>(
+      find.descendant(
+        of: navigation,
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Scrollable &&
+              widget.axisDirection == AxisDirection.right,
+        ),
+      ),
+    );
+
+    final offsetBeforeSwitch = navigationState().position.pixels;
+    expect(offsetBeforeSwitch, greaterThan(0));
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AssessmentProgressSection),
+        matching: find.text('7'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(navigationState().position.pixels, closeTo(offsetBeforeSwitch, 0.5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('can disable switching questions from the progress circles', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      allowQuestionNavigation: false,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: 'First question',
+          questionNumber: 1,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '1'),
+            ExamAnswer(label: 'B', content: '2'),
+          ],
+        ),
+        ExamQuestion(
+          questionName: 'Second question',
+          questionNumber: 2,
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '3'),
+            ExamAnswer(label: 'B', content: '4'),
+          ],
+        ),
+      ],
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AssessmentProgressSection),
+        matching: find.text('2'),
+      ),
+      warnIfMissed: false,
+    );
+    await tester.pump();
+
+    expect(find.text('First question'), findsOneWidget);
+    expect(find.text('Second question'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('assessment exit dialog close keeps the attempt open', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
+    expect(find.text('Hủy bài làm'), findsOneWidget);
+    expect(find.text('Thoát'), findsOneWidget);
+    final cancelButtonRect = tester.getRect(
+      find.byKey(const ValueKey('assessment-cancel-attempt')),
+    );
+    final leaveButtonRect = tester.getRect(
+      find.byKey(const ValueKey('assessment-leave-active')),
+    );
+    expect(cancelButtonRect.top, leaveButtonRect.top);
+    expect(cancelButtonRect.bottom, leaveButtonRect.bottom);
+    expect(cancelButtonRect.height, 42);
+    final cancelTextRect = tester.getRect(find.text('Hủy bài làm'));
+    final leaveTextRect = tester.getRect(find.text('Thoát'));
+    expect(cancelTextRect.left, greaterThan(cancelButtonRect.left));
+    expect(cancelTextRect.right, lessThan(cancelButtonRect.right));
+    expect(leaveTextRect.left, greaterThan(leaveButtonRect.left));
+    expect(leaveTextRect.right, lessThan(leaveButtonRect.right));
+
+    await tester.tap(
+      find.byKey(const ValueKey('assessment-exit-dialog-close')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.statusUpdates, isEmpty);
+    expect(find.text('12 + 8 = ?'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canceling an assessment updates its status to CANCEL', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, <String>['status:CANCEL:7001']);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, <(int, String)>[
+      (7001, assessmentCanceledStatus),
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaving a new assessment does not call an API', (tester) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaving a resumed active assessment does not call an API', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+      isResumedAssessment: true,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-leave-active')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canceling a resumed assessment only updates CANCEL', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+      isResumedAssessment: true,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, <String>['status:CANCEL:7001']);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, <(int, String)>[
+      (7001, assessmentCanceledStatus),
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('canceling without a user exam id does not submit', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService();
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+      initialUserExamId: null,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(service.events, isEmpty);
+    expect(service.submittedAnswers, isNull);
+    expect(service.statusUpdates, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'grade 5 assessment submits after confirming the sixth correct answer',
+    (tester) async {
+      final service = _PendingSubmitExamService();
+      final questions = List<ExamQuestion>.generate(
+        10,
+        (index) => ExamQuestion(
+          questionName: 'Question ${index + 1}',
+          questionNumber: index + 1,
+          rightAnswer: 'A',
+          answers: const <ExamAnswer>[
+            ExamAnswer(label: 'A', content: 'Correct'),
+            ExamAnswer(label: 'B', content: 'Incorrect'),
+          ],
+        ),
+      );
+      await _pumpAssessment(
+        tester,
+        questions: questions,
+        examService: service,
+        initialGrade: 5,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < assessmentCorrectAnswerTarget - 1) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 0);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.submitCalls, 1);
+      expect(
+        service.submittedAnswers,
+        hasLength(assessmentCorrectAnswerTarget),
+      );
+      expect(
+        service.submittedAnswers!.map((answer) => answer.questionNumber),
+        orderedEquals(<int>[1, 2, 3, 4, 5, 6]),
+      );
+      expect(find.byKey(const ValueKey('submit-loader')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'assessment keeps Continue on the last question and submits when pressed',
+    (tester) async {
+      final service = _PendingSubmitExamService();
+      const correctIndexes = <int>{0, 1, 3, 4, 6};
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Final set'),
+        examService: service,
+        initialGrade: 2,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 10; index++) {
+        await tester.tap(
+          find
+              .byType(AssessmentAnswerButton)
+              .at(correctIndexes.contains(index) ? 0 : 1),
+        );
+        await tester.pump();
+        if (index < 9) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 0);
+      expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(10));
+      expect(find.byKey(const ValueKey('submit-loader')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'completed assessment review loads the entire journey by user exam id',
+    (tester) async {
+      final service = _CompletedJourneyReviewExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Completed set'),
+        examService: service,
+        initialGrade: 5,
+        examType: examTypeAssessment,
+        profileId: 21,
+      );
+
+      for (var index = 0; index < assessmentCorrectAnswerTarget; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < assessmentCorrectAnswerTarget - 1) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pumpAndSettle();
+
+      expect(service.completedUserExamId, 91001);
+      expect(service.completedProfileId, 21);
+      expect(service.completedStatus, 'COMPLETE');
+      expect(service.events, <String>['submit', 'status:COMPLETE']);
+      expect(find.text('Luyện Phép trừ có nhớ và Toán đố'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('placement-view-details')));
+      await tester.pumpAndSettle();
+
+      expect(service.requestedDetailId, 91001);
+      expect(service.requestedUserExamId, 91001);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'five consecutive wrong answers fail after confirming question five',
+    (tester) async {
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Early fail'),
+        examService: service,
+        initialGrade: 2,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 5; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+        await tester.pump();
+        if (index < 4) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.submitCalls, 0);
+      expect(service.generateCalls, 0);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(5));
+      expect(service.generateCalls, 1);
+      expect(service.requestedGradeLabels, <String?>['Lớp 1']);
+      expect(
+        find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsOneWidget,
+      );
+
+      service.completeNextSet(grade: 1, setName: 'Recovery');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recovery - Question 1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'shows question seven skeleton while generating the resolved next set',
+    (tester) async {
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Set 1'),
+        examService: service,
+        examType: examTypeAssessment,
+      );
+
+      for (var index = 0; index < 5; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pump();
+        if (index < 4) {
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pump();
+        }
+      }
+
+      expect(service.generateCalls, 0);
+      expect(service.requestedGradeLabels, isEmpty);
+      expect(find.text('Set 1 - Question 5'), findsOneWidget);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+      expect(find.text('Set 1 - Question 6'), findsOneWidget);
+
+      await tester.tap(find.byType(AssessmentAnswerButton).first);
+      await tester.pump();
+
+      expect(find.text('Set 1 - Question 6'), findsOneWidget);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+
+      expect(service.generateCalls, 1);
+      expect(service.requestedGradeLabels, <String?>['Lớp 2']);
+      expect(service.submitCalls, 1);
+      expect(service.submittedAnswers, hasLength(6));
+      expect(
+        find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsOneWidget,
+      );
+      expect(find.text('Set 1 - Question 6'), findsNothing);
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+      final loadingQuestionLabel = tester.widget<Text>(
+        find.byKey(const ValueKey('assessment-question-label')),
+      );
+      expect(loadingQuestionLabel.data, contains('7'));
+
+      service.completeNextSet();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Set 2 - Question 1'), findsOneWidget);
+      final questionLabel = tester.widget<Text>(
+        find.byKey(const ValueKey('assessment-question-label')),
+      );
+      expect(questionLabel.data, contains('7'));
+      expect(find.byKey(const ValueKey('question-loader')), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+}
+
+List<ExamQuestion> _setQuestions(String setName) {
+  return List<ExamQuestion>.generate(
+    10,
+    (index) => ExamQuestion(
+      questionName: '$setName - Question ${index + 1}',
+      questionNumber: index + 1,
+      rightAnswer: 'A',
+      answers: const <ExamAnswer>[
+        ExamAnswer(label: 'A', content: 'Correct'),
+        ExamAnswer(label: 'B', content: 'Incorrect'),
+      ],
+    ),
+  );
+}
+
+Future<void> _pumpAssessment(
+  WidgetTester tester, {
+  double bottomInset = 0,
+  List<ExamQuestion>? questions,
+  bool allowQuestionNavigation = true,
+  ExamService? examService,
+  int initialGrade = 0,
+  String examType = examTypePractice,
+  int? initialUserExamId = 7001,
+  bool isResumedAssessment = false,
+  int? profileId,
+}) async {
+  tester.view.physicalSize = const Size(430, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  final lingo = LingoProvider();
+  addTearDown(lingo.dispose);
+
+  await tester.pumpWidget(
+    LingoScope(
+      lingo: lingo,
+      child: MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: MediaQuery(
+          data: MediaQueryData(
+            size: const Size(430, 844),
+            padding: EdgeInsets.only(bottom: bottomInset),
+            viewPadding: EdgeInsets.only(bottom: bottomInset),
+          ),
+          child: AiAssessmentScreen(
+            examService: examService ?? _UnusedExamService(),
+            examType: examType,
+            profileId: profileId,
+            isResumedAssessment: isResumedAssessment,
+            allowQuestionNavigation: allowQuestionNavigation,
+            initialExam: GeneratedExam(
+              id: 1,
+              examId: 1,
+              aiExamId: 7,
+              userExamId: initialUserExamId,
+              examType: examType,
+              grade: initialGrade,
+              questions:
+                  questions ??
+                  const <ExamQuestion>[
+                    ExamQuestion(
+                      questionName: '12 + 8 = ?',
+                      questionNumber: 1,
+                      answers: <ExamAnswer>[
+                        ExamAnswer(label: 'A', content: '18'),
+                        ExamAnswer(label: 'B', content: '19'),
+                        ExamAnswer(label: 'C', content: '20'),
+                        ExamAnswer(label: 'D', content: '21'),
+                      ],
+                    ),
+                  ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  await tester.pump();
+}
+
+class _PendingSubmitExamService implements ExamService {
+  final Completer<GeneratedExam> _submitCompleter = Completer<GeneratedExam>();
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return _submitCompleter.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ImmediatePracticeSubmitService implements ExamService {
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      userAiExamId: examId,
+      userExamId: 93001,
+      profileId: profileId,
+      examType: examTypePractice,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _ExitStatusExamService implements ExamService {
+  final List<(int, String)> statusUpdates = <(int, String)>[];
+  final List<String> events = <String>[];
+  List<SubmitExamAnswer>? submittedAnswers;
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    events.add('submit:$examId');
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return const GeneratedExam(
+      examId: 1,
+      userExamId: 9001,
+      examType: examTypeAssessment,
+      questions: <ExamQuestion>[],
+    );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    events.add('status:$status:$userExamId');
+    statusUpdates.add((userExamId, status));
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _CompletedJourneyReviewExamService implements ExamService {
+  int? requestedDetailId;
+  int? requestedUserExamId;
+  int? completedUserExamId;
+  int? completedProfileId;
+  String? completedStatus;
+  final List<String> events = <String>[];
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    events.add('submit');
+    return GeneratedExam(
+      examId: examId,
+      userAiExamId: examId,
+      userExamId: 91001,
+      profileId: profileId,
+      examType: examTypeAssessment,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
+  }
+
+  @override
+  Future<void> updateUserExamStatus({
+    required int userExamId,
+    required String status,
+    int? profileId,
+  }) async {
+    events.add('status:$status');
+    completedUserExamId = userExamId;
+    completedProfileId = profileId;
+    completedStatus = status;
+  }
+
+  @override
+  Future<GeneratedExam> getExamDetail(
+    int detailId, {
+    int? profileId,
+    int? userExamId,
+    String examType = examTypeAssessment,
+  }) async {
+    requestedDetailId = detailId;
+    requestedUserExamId = userExamId;
+    return GeneratedExam(
+      userExamId: userExamId,
+      grade: 5,
+      practiceWeakTopics: const <ExamPracticeTopic>[
+        ExamPracticeTopic(topic: 'Phép trừ có nhớ', answered: 3, wrong: 2),
+        ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+      ],
+      grading: const ExamGrading(correctNumber: 6, totalQuestions: 6),
+      answers: List<SubmitExamAnswer>.generate(
+        6,
+        (index) => SubmitExamAnswer(questionNumber: index + 1, label: 'A'),
+      ),
+      questions: _setQuestions('Journey').take(6).toList(growable: false),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _PendingGenerateExamService implements ExamService {
+  final Completer<GeneratedExam> _nextSetCompleter = Completer<GeneratedExam>();
+  int generateCalls = 0;
+  int submitCalls = 0;
+  List<SubmitExamAnswer>? submittedAnswers;
+  final List<String?> requestedGradeLabels = <String?>[];
+
+  void completeNextSet({int grade = 2, String setName = 'Set 2'}) {
+    _nextSetCompleter.complete(
+      GeneratedExam(
+        examId: 2,
+        examType: examTypeAssessment,
+        grade: grade,
+        questions: _setQuestions(setName),
+      ),
+    );
+  }
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? level,
+    int? profileId,
+    int? userExamId,
+  }) {
+    generateCalls++;
+    requestedGradeLabels.add(gradeLabel);
+    return _nextSetCompleter.future;
+  }
+
+  @override
+  Future<GeneratedExam> submitExam({
+    required int examId,
+    required List<SubmitExamAnswer> answers,
+    int? profileId,
+  }) async {
+    submitCalls++;
+    submittedAnswers = List<SubmitExamAnswer>.from(answers);
+    return GeneratedExam(
+      examId: examId,
+      examType: examTypeAssessment,
+      examStatus: 'SUBMITTED',
+      questions: const <ExamQuestion>[],
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}

@@ -10,12 +10,13 @@ import 'strings/home/student_home_strings.dart';
 import 'strings/home/teacher_home_strings.dart';
 import 'strings/classroom/student_classroom_strings.dart';
 import 'strings/classroom/teacher_classroom_strings.dart';
-import 'strings/homework/student_homework_strings.dart';
-import 'strings/homework/teacher_homework_strings.dart';
+import 'strings/classroom_exercise/student_classroom_exercise_strings.dart';
+import 'strings/classroom_exercise/teacher_classroom_exercise_strings.dart';
+import 'strings/notification_strings.dart';
 import 'strings/profile/profile_strings.dart';
 import 'strings/settings/settings_strings.dart';
 import 'strings/study/study_strings.dart';
-import 'strings/quiz/quiz_strings.dart';
+import 'strings/exam/exam_strings.dart';
 
 class AppStrings {
   static final Map<String, Map<String, String>> _localizedValues = {
@@ -31,12 +32,13 @@ class AppStrings {
       ...teacherHomeStrings['vi']!,
       ...studentClassroomStrings['vi']!,
       ...teacherClassroomStrings['vi']!,
-      ...studentHomeworkStrings['vi']!,
-      ...teacherHomeworkStrings['vi']!,
+      ...studentClassroomExerciseStrings['vi']!,
+      ...teacherClassroomExerciseStrings['vi']!,
+      ...notificationStrings['vi']!,
       ...profileStrings['vi']!,
       ...settingsStrings['vi']!,
       ...studyStrings['vi']!,
-      ...quizStrings['vi']!,
+      ...examStrings['vi']!,
     },
     'en': {
       ...authStrings['en']!,
@@ -50,12 +52,13 @@ class AppStrings {
       ...teacherHomeStrings['en']!,
       ...studentClassroomStrings['en']!,
       ...teacherClassroomStrings['en']!,
-      ...studentHomeworkStrings['en']!,
-      ...teacherHomeworkStrings['en']!,
+      ...studentClassroomExerciseStrings['en']!,
+      ...teacherClassroomExerciseStrings['en']!,
+      ...notificationStrings['en']!,
       ...profileStrings['en']!,
       ...settingsStrings['en']!,
       ...studyStrings['en']!,
-      ...quizStrings['en']!,
+      ...examStrings['en']!,
     },
   };
 

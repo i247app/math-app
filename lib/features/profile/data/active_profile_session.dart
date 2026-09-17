@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
 
 class ActiveProfileSession {
   const ActiveProfileSession({
@@ -73,7 +73,7 @@ class ActiveProfileSession {
   }
 
   static int? profileStableId(StudentProfile? profile) {
-    return profile?.profileId ?? profile?.id;
+    return profile?.stableId;
   }
 
   static String? _storageKey(int userId) {

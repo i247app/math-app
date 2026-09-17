@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 
@@ -15,9 +15,9 @@ class StudentClassTeacherAvatarInitial extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initial,
-        style: GoogleFonts.andika(
+        style: const TextStyle(
           color: AppColors.magenta,
-          fontSize: 22,
+          fontSize: FontSize.xxl,
           fontWeight: FontWeight.w700,
           height: 1,
         ),

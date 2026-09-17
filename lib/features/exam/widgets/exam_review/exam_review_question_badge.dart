@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class ExamReviewQuestionBadge extends StatelessWidget {
+  const ExamReviewQuestionBadge({
+    super.key,
+    required this.number,
+    required this.color,
+    required this.textColor,
+  });
+
+  final int number;
+  final Color color;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        context.formatText(AppKeys.questionNumber, {'number': number}),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: textColor,
+          fontSize: FontSize.xxs,
+          fontWeight: FontWeight.w900,
+          height: 1,
+          letterSpacing: 0,
+        ),
+      ),
+    );
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class StudentJoinSchoolOptionTile extends StatelessWidget {
   const StudentJoinSchoolOptionTile({
@@ -32,7 +33,7 @@ class StudentJoinSchoolOptionTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: selected ? AppColors.teal520 : AppColors.textInkDark,
-                    fontSize: 15,
+                    fontSize: FontSize.compact,
                     fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                   ),
                 ),

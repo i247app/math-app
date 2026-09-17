@@ -6,7 +6,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/home/widgets/home_visual_constants.dart';
+import 'package:numi/shared/constants/app_visual_constants.dart';
 
 class HomeMissingStudentDialog extends StatelessWidget {
   const HomeMissingStudentDialog({super.key});
@@ -23,7 +23,7 @@ class HomeMissingStudentDialog extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
           child: Container(
             width: 303,
-            padding: const EdgeInsets.fromLTRB(25, 32, 25, 24),
+            padding: const EdgeInsets.fromLTRB(25, 28, 25, 22),
             decoration: BoxDecoration(
               color: colors.elevatedSurface.withValues(alpha: 0.94),
               borderRadius: BorderRadius.circular(32),
@@ -36,109 +36,100 @@ class HomeMissingStudentDialog extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 192,
-                      height: 192,
-                      decoration: BoxDecoration(
-                        color: colors.brandStrong.withValues(alpha: 0.10),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: colors.brandStrong.withValues(alpha: 0.16),
-                            blurRadius: 30,
-                            spreadRadius: 12,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    parentNoStudentMascotAsset,
+                    width: 220,
+                    height: 194,
+                    fit: BoxFit.contain,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      context.getText(AppKeys.parentNoStudentTitle),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: FontSize.xxxl,
+                        fontWeight: FontWeight.w900,
+                        height: 1.2,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      context.getText(AppKeys.parentNoStudentMessage),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: colors.textSecondary,
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colors.accent,
+                          foregroundColor: colors.onAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        ],
-                      ),
-                    ),
-                    Image.asset(
-                      parentNoStudentMascotAsset,
-                      width: 220,
-                      height: 202,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  context.getText(AppKeys.parentNoStudentTitle),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.xxxl,
-                    fontWeight: FontWeight.w900,
-                    height: 1.2,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.getText(AppKeys.parentNoStudentMessage),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w400,
-                    height: 1.5,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      context.getText(AppKeys.parentCreateStudentNow),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
-                        height: 1,
-                        letterSpacing: 0,
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          context.getText(AppKeys.parentCreateStudentNow),
+                          style: TextStyle(
+                            color: colors.onAccent,
+                            fontSize: FontSize.large,
+                            fontWeight: FontWeight.w400,
+                            height: 1,
+                            letterSpacing: 0,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    style: TextButton.styleFrom(
-                      foregroundColor: colors.brandStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      context.getText(AppKeys.parentCreateStudentLater),
-                      style: TextStyle(
-                        color: colors.brandStrong,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w400,
-                        height: 1,
-                        letterSpacing: 0,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: TextButton.styleFrom(
+                          foregroundColor: colors.brandStrong,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          context.getText(AppKeys.parentCreateStudentLater),
+                          style: TextStyle(
+                            color: colors.brandStrong,
+                            fontSize: FontSize.large,
+                            fontWeight: FontWeight.w400,
+                            height: 1,
+                            letterSpacing: 0,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

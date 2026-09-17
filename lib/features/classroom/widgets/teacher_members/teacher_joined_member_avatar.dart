@@ -1,34 +1,33 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherJoinedMemberAvatar extends StatelessWidget {
-  const _TeacherJoinedMemberAvatar({required this.member, required this.scale});
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_classroom_member_avatar.dart';
+
+class TeacherJoinedMemberAvatar extends StatelessWidget {
+  const TeacherJoinedMemberAvatar({super.key, required this.member});
 
   final ClassroomStudent member;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 56 * scale,
-      height: 56 * scale,
+      width: 56,
+      height: 56,
       child: Stack(
         children: [
           Positioned.fill(
-            child: _TeacherClassroomMemberAvatar(
-              member: member,
-              size: 56 * scale,
-            ),
+            child: TeacherClassroomMemberAvatar(member: member, size: 56),
           ),
           Positioned(
             right: 0,
             bottom: 0,
             child: Container(
-              width: 16 * scale,
-              height: 16 * scale,
+              width: 16,
+              height: 16,
               decoration: BoxDecoration(
                 color: const Color(0xFF22C55E),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2 * scale),
+                border: Border.all(color: Colors.white, width: 2),
               ),
             ),
           ),

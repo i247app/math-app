@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/auth/widgets/shared/auth_action_button.dart';
+import 'package:numi/features/auth/widgets/auth_action_button.dart';
 
 class PasscodeActionButton extends StatelessWidget {
   const PasscodeActionButton({
@@ -16,6 +16,11 @@ class PasscodeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthActionButton(label: label, onPressed: onPressed, isBusy: isBusy);
+    return AuthActionButton(
+      label: label,
+      onPressed: onPressed,
+      layout: AuthActionButtonLayout.compact,
+      isBusy: isBusy,
+    );
   }
 }

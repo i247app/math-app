@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class LanguagePill extends StatelessWidget {
-  const LanguagePill({
-    super.key,
-    required this.currentLanguage,
-    required this.scale,
-  });
+  const LanguagePill({super.key, required this.currentLanguage});
 
   final AppLanguage currentLanguage;
-  final double scale;
 
   static String _flagFor(AppLanguage lang) {
     return switch (lang) {
@@ -23,30 +20,29 @@ class LanguagePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 10 * scale,
-        vertical: 7 * scale,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20 * scale),
-        border: Border.all(color: const Color(0xFF006762), width: 1.5 * scale),
+        color: colors.elevatedSurface,
+        borderRadius: BorderRadius.circular(AppRadius.r20),
+        border: Border.all(color: colors.brandStrong, width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 5,
         children: [
           Text(
             _flagFor(currentLanguage),
-            style: TextStyle(fontSize: FontSize.small * scale),
+            style: const TextStyle(fontSize: FontSize.small),
           ),
-          SizedBox(width: 5 * scale),
           Text(
             currentLanguage.displayName,
             style: GoogleFonts.andika(
-              fontSize: FontSize.caption * scale,
+              fontSize: FontSize.caption,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF006762),
+              color: colors.brandStrong,
               letterSpacing: 0,
             ),
           ),

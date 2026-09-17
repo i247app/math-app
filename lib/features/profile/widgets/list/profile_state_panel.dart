@@ -11,7 +11,6 @@ class ProfileStatePanel extends StatelessWidget {
     required this.title,
     required this.message,
     required this.buttonLabel,
-    required this.scale,
     required this.onTap,
   });
 
@@ -19,17 +18,16 @@ class ProfileStatePanel extends StatelessWidget {
   final String title;
   final String message;
   final String? buttonLabel;
-  final double scale;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(minHeight: 360 * scale),
-      padding: EdgeInsets.all(28 * scale),
+      constraints: const BoxConstraints(minHeight: 360),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.74),
-        borderRadius: BorderRadius.circular(24 * scale),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: const Color(0xFFA2B1A3).withValues(alpha: 0.12),
         ),
@@ -37,57 +35,62 @@ class ProfileStatePanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: AppColors.tealIcon, size: 54 * scale),
-          SizedBox(height: 18 * scale),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: Icon(icon, color: AppColors.tealIcon, size: 54),
+          ),
           Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
               color: AppColors.textPrimary,
-              fontSize: FontSize.xxxl * scale,
+              fontSize: FontSize.xxxl,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
             ),
           ),
-          SizedBox(height: 8 * scale),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.andika(
-              color: AppColors.textSubtle,
-              fontSize: FontSize.small * scale,
-              fontWeight: FontWeight.w700,
-              height: 1.35,
-              letterSpacing: 0,
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.andika(
+                color: AppColors.textSubtle,
+                fontSize: FontSize.small,
+                fontWeight: FontWeight.w700,
+                height: 1.35,
+                letterSpacing: 0,
+              ),
             ),
           ),
-          if (buttonLabel != null && onTap != null) ...[
-            SizedBox(height: 20 * scale),
-            Material(
-              color: AppColors.tealIcon,
-              borderRadius: BorderRadius.circular(999),
-              child: InkWell(
-                onTap: onTap,
+          if (buttonLabel != null && onTap != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Material(
+                color: AppColors.tealIcon,
                 borderRadius: BorderRadius.circular(999),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 22 * scale,
-                    vertical: 12 * scale,
-                  ),
-                  child: Text(
-                    buttonLabel!,
-                    style: GoogleFonts.andika(
-                      color: Colors.white,
-                      fontSize: FontSize.small * scale,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      letterSpacing: 0,
+                child: InkWell(
+                  onTap: onTap,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 12,
+                    ),
+                    child: Text(
+                      buttonLabel!,
+                      style: GoogleFonts.andika(
+                        color: Colors.white,
+                        fontSize: FontSize.small,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ],
         ],
       ),
     );

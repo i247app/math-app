@@ -1,15 +1,23 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-class _TeacherJoinRequestRow extends StatelessWidget {
-  const _TeacherJoinRequestRow({
-    required this.scale,
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_classroom_member_avatar.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_text_block.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_request_action_icon.dart';
+
+class TeacherJoinRequestRow extends StatelessWidget {
+  const TeacherJoinRequestRow({
+    super.key,
     required this.request,
     required this.isProcessing,
     required this.onApprove,
     required this.onReject,
   });
-
-  final double scale;
   final ClassroomStudent request;
   final bool isProcessing;
   final VoidCallback onApprove;
@@ -17,49 +25,54 @@ class _TeacherJoinRequestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = _classroomMemberName(context, request);
+    final name = classroomMemberName(context, request);
     return Row(
       children: [
-        _TeacherClassroomMemberAvatar(member: request, size: 40 * scale),
-        SizedBox(width: 12 * scale),
+        TeacherClassroomMemberAvatar(member: request, size: 40),
         Expanded(
-          child: _TeacherMemberTextBlock(
-            name: name,
-            status: context.getText(AppKeys.teacherPendingApproval),
-            nameFontSize: 16 * scale,
-            statusFontSize: 12 * scale,
-            nameColor: const Color(0xFF1E3A5F),
-            statusColor: AppColors.textCoolMuted,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 12, right: 10),
+            child: TeacherMemberTextBlock(
+              name: name,
+              status: context.getText(AppKeys.teacherPendingApproval),
+              nameFontSize: FontSize.normal,
+              statusFontSize: FontSize.xxs,
+              nameColor: const Color(0xFF1E3A5F),
+              statusColor: AppColors.textCoolMuted,
+            ),
           ),
         ),
-        SizedBox(width: 10 * scale),
         if (isProcessing)
-          SizedBox(
-            width: 53 * scale,
+          const SizedBox(
+            width: 53,
             child: Center(
               child: SizedBox(
-                width: 18 * scale,
-                height: 18 * scale,
-                child: const CircularProgressIndicator(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
                   color: AppColors.teal520,
                   strokeWidth: 2,
                 ),
               ),
             ),
           )
-        else ...[
-          _TeacherRequestActionIcon(
-            asset: 'assets/images/teacher_member_accept.png',
-            size: 25 * scale,
-            onTap: request.profileId == null ? null : onApprove,
+        else
+          Row(
+            spacing: 5,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TeacherRequestActionIcon(
+                asset: 'assets/icons/teacher-member-accept.png',
+                size: 25,
+                onTap: request.profileId == null ? null : onApprove,
+              ),
+              TeacherRequestActionIcon(
+                asset: 'assets/icons/teacher-member-reject.png',
+                size: 23,
+                onTap: request.profileId == null ? null : onReject,
+              ),
+            ],
           ),
-          SizedBox(width: 5 * scale),
-          _TeacherRequestActionIcon(
-            asset: 'assets/images/teacher_member_reject.png',
-            size: 23 * scale,
-            onTap: request.profileId == null ? null : onReject,
-          ),
-        ],
       ],
     );
   }

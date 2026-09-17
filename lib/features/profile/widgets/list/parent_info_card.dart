@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/profile/widgets/list/managed_profile_role_pill.dart';
 import 'package:numi/features/profile/widgets/list/parent_profile_avatar.dart';
@@ -20,7 +20,7 @@ class ParentInfoCard extends StatelessWidget {
     required this.profile,
     required this.user,
     required this.isActive,
-    required this.scale,
+    this.isSwitching = false,
     required this.onSelect,
     required this.onEdit,
   });
@@ -28,7 +28,7 @@ class ParentInfoCard extends StatelessWidget {
   final StudentProfile profile;
   final LoginUser? user;
   final bool isActive;
-  final double scale;
+  final bool isSwitching;
   final VoidCallback onSelect;
   final VoidCallback onEdit;
 
@@ -38,92 +38,88 @@ class ParentInfoCard extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onSelect,
+      onTap: isSwitching ? null : onSelect,
       child: Container(
-        padding: EdgeInsets.all(16 * scale),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16 * scale),
-          border: Border.all(
-            color: const Color(0xFF008080),
-            width: 1.3 * scale,
-          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF008080), width: 1.3),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 16,
           children: [
-            ParentProfileAvatar(profile: profile, scale: scale),
-            SizedBox(width: 16 * scale),
+            ParentProfileAvatar(profile: profile),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 8,
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4,
                           children: [
                             Text(
                               _displayParentName(context, profile, user),
                               softWrap: true,
                               style: GoogleFonts.andika(
                                 color: AppColors.textPrimary,
-                                fontSize: FontSize.large * scale,
+                                fontSize: FontSize.large,
                                 fontWeight: FontWeight.w900,
                                 height: 1.1,
                               ),
                             ),
-                            SizedBox(height: 4 * scale),
-                            ManagedProfileRolePill(
+                            const ManagedProfileRolePill(
                               role: ProfileRole.parent,
-                              scale: scale,
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: 8 * scale),
                       ProfileActionButton(
                         backgroundColor: const Color(0xFFE6F5F5),
-                        width: 34 * scale,
-                        height: 34 * scale,
-                        borderRadius: BorderRadius.circular(10 * scale),
+                        width: 34,
+                        height: 34,
+                        borderRadius: BorderRadius.circular(10),
                         onTap: onEdit,
                         child: SvgPicture.asset(
-                          'assets/images/parent_profile_manage_edit.svg',
-                          width: 19 * scale,
-                          height: 19 * scale,
+                          'assets/icons/parent-profile-manage-edit.svg',
+                          width: 19,
+                          height: 19,
                         ),
-
                       ),
-                      SizedBox(width: 8 * scale),
-                      ProfileRadio(isActive: isActive, scale: scale),
+                      ProfileRadio(isActive: isActive, isLoading: isSwitching),
                     ],
                   ),
-                  SizedBox(height: 10 * scale),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/parent_profile_manage_mail.svg',
-                        width: 16 * scale,
-                        height: 16 * scale,
-                      ),
-                      SizedBox(width: 8 * scale),
-                      Expanded(
-                        child: Text(
-                          '${context.getText(AppKeys.email)}: $email',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
-                            color: const Color(0xFF6B7280),
-                            fontSize: FontSize.caption * scale,
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/parent-profile-manage-mail.svg',
+                          width: 16,
+                          height: 16,
+                        ),
+                        Expanded(
+                          child: Text(
+                            '${context.getText(AppKeys.email)}: $email',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.andika(
+                              color: const Color(0xFF6B7280),
+                              fontSize: FontSize.caption,
+                              fontWeight: FontWeight.w700,
+                              height: 1.1,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -11,21 +11,18 @@ class AddProfileTextField extends StatelessWidget {
     required this.label,
     required this.controller,
     required this.hintText,
-    required this.scale,
     this.keyboardType,
   });
 
   final String label;
   final TextEditingController controller;
   final String hintText;
-  final double scale;
   final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
     return AddProfileFieldShell(
       label: label,
-      scale: scale,
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -33,7 +30,7 @@ class AddProfileTextField extends StatelessWidget {
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         style: GoogleFonts.andika(
           color: AppColors.textPrimary,
-          fontSize: FontSize.normal * scale,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w800,
           height: 1,
           letterSpacing: 0,
@@ -43,7 +40,7 @@ class AddProfileTextField extends StatelessWidget {
           filled: false,
           hintStyle: GoogleFonts.andika(
             color: const Color(0xFFA8B1B2),
-            fontSize: FontSize.small * scale,
+            fontSize: FontSize.small,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
           ),

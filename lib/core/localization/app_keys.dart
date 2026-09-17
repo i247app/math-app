@@ -14,6 +14,17 @@ class AppKeys {
   static const back = 'back';
   static const skipUpper = 'skip_upper';
   static const continueUpper = 'continue_upper';
+  static const attemptExitTitle = 'attempt_exit_title';
+  static const attemptExitMessage = 'attempt_exit_message';
+  static const assessmentExitTitle = 'assessment_exit_title';
+  static const assessmentExitMessage = 'assessment_exit_message';
+  static const assessmentCancelAttempt = 'assessment_cancel_attempt';
+  static const assessmentLeaveAttempt = 'assessment_leave_attempt';
+  static const assessmentStatusUpdateFailed = 'assessment_status_update_failed';
+  static const exitUpper = 'exit_upper';
+  static const unsavedChangesExitTitle = 'unsaved_changes_exit_title';
+  static const unsavedChangesExitMessage = 'unsaved_changes_exit_message';
+  static const discardChangesUpper = 'discard_changes_upper';
   static const language = 'language';
   static const languageTitle = 'language_title';
   static const languageMenuSubtitle = 'language_menu_subtitle';
@@ -32,12 +43,14 @@ class AppKeys {
   static const phoneLoginSubtitle = 'phone_login_subtitle';
   static const phoneNumberUpper = 'phone_number_upper';
   static const phoneHint = 'phone_hint';
+  static const loginNameHint = 'login_name_hint';
   static const chooseCountry = 'choose_country';
   static const continueLabel = 'continue';
   static const creatingAccount = 'creating_account';
   static const checking = 'checking';
   static const phoneRequired = 'phone_required';
   static const invalidPhone = 'invalid_phone';
+  static const invalidEmail = 'invalid_email';
   static const phoneTooShort = 'phone_too_short';
   static const restoringSession = 'restoring_session';
   static const newAccountPrompt = 'new_account_prompt';
@@ -46,6 +59,12 @@ class AppKeys {
   static const loginWithPin = 'login_with_pin';
   static const authSwitchToSignupPrompt = 'auth_switch_to_signup_prompt';
   static const authSwitchToLoginPrompt = 'auth_switch_to_login_prompt';
+  static const trustedDeviceTitle = 'trusted_device_title';
+  static const trustedDeviceSubtitle = 'trusted_device_subtitle';
+  static const trustedDeviceSend = 'trusted_device_send';
+  static const trustedDeviceSending = 'trusted_device_sending';
+  static const trustedDeviceEmpty = 'trusted_device_empty';
+  static const trustedDeviceLoadFailed = 'trusted_device_load_failed';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
   static const otpSentMessage = 'otp_sent_message';
@@ -84,7 +103,7 @@ class AppKeys {
 
   static const navHome = 'nav_home';
   static const navClassroom = 'nav_classroom';
-  static const navHomework = 'nav_homework';
+  static const navClassroomExercise = 'nav_homework';
   static const navStudy = 'nav_study';
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
@@ -96,6 +115,20 @@ class AppKeys {
   static const navHistory = 'nav_history';
   static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';
+
+  static const notificationTitle = 'notification_title';
+  static const notificationToday = 'notification_today';
+  static const notificationEarlier = 'notification_earlier';
+  static const notificationEmptyTitle = 'notification_empty_title';
+  static const notificationEmptyMessage = 'notification_empty_message';
+  static const notificationLoadFailed = 'notification_load_failed';
+  static const notificationFallbackTitle = 'notification_fallback_title';
+  static const notificationFallbackMessage = 'notification_fallback_message';
+  static const notificationJustNow = 'notification_just_now';
+  static const notificationMinutesAgo = 'notification_minutes_ago';
+  static const notificationHoursAgo = 'notification_hours_ago';
+  static const notificationYesterday = 'notification_yesterday';
+  static const notificationDaysAgo = 'notification_days_ago';
 
   static const student = 'student';
   static const assessment = 'assessment';
@@ -110,13 +143,52 @@ class AppKeys {
   static const parentLearningStreak = 'parent_learning_streak';
   static const parentAssessmentTitle = 'parent_assessment_title';
   static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
+  static const parentAssessmentActiveBadge = 'parent_assessment_active_badge';
+  static const parentAssessmentActiveTitle = 'parent_assessment_active_title';
+  static const parentAssessmentActiveSubtitle =
+      'parent_assessment_active_subtitle';
+  static const parentAssessmentContinue = 'parent_assessment_continue';
+  static const parentAssessmentResumeTitle = 'parent_assessment_resume_title';
+  static const parentAssessmentResumeMessage =
+      'parent_assessment_resume_message';
+  static const parentAssessmentCancelActive = 'parent_assessment_cancel_active';
   static const parentLearningProgress = 'parent_learning_progress';
+  static const learningProgressTitle = 'learning_progress_title';
+  static const learningProgressAllAssessments =
+      'learning_progress_all_assessments';
+  static const learningProgressFilterTime = 'learning_progress_filter_time';
+  static const learningProgressFilter = 'learning_progress_filter';
+  static const learningProgressTestLegend = 'learning_progress_test_legend';
+  static const learningProgressTestLabel = 'learning_progress_test_label';
+  static const learningProgressScoreTitle = 'learning_progress_score_title';
+  static const learningProgressAssessmentCount =
+      'learning_progress_assessment_count';
+  static const learningProgressAverageScore = 'learning_progress_average_score';
+  static const learningProgressFromDate = 'learning_progress_from_date';
+  static const learningProgressToDate = 'learning_progress_to_date';
+  static const learningProgressApplyFilter = 'learning_progress_apply_filter';
+  static const learningProgressClearFilter = 'learning_progress_clear_filter';
+  static const learningProgressImprovingTitle =
+      'learning_progress_improving_title';
+  static const learningProgressImprovingMessage =
+      'learning_progress_improving_message';
+  static const learningProgressDecliningTitle =
+      'learning_progress_declining_title';
+  static const learningProgressDecliningMessage =
+      'learning_progress_declining_message';
+  static const learningProgressStableTitle = 'learning_progress_stable_title';
+  static const learningProgressStableMessage =
+      'learning_progress_stable_message';
+  static const learningProgressNoData = 'learning_progress_no_data';
+  static const learningProgressLoadFailed = 'learning_progress_load_failed';
+  static const learningProgressShare = 'learning_progress_share';
+  static const learningProgressShared = 'learning_progress_shared';
   static const parentRoadmapTitle = 'parent_roadmap_title';
   static const parentRoadmapSubtitle = 'parent_roadmap_subtitle';
   static const parentJoinRoomTitle = 'parent_join_room_title';
   static const parentJoinRoomSubtitle = 'parent_join_room_subtitle';
   static const parentRoomTitle = 'parent_room_title';
-  static const parentQuizLoadFailed = 'parent_quiz_load_failed';
+  static const parentExamLoadFailed = 'parent_exam_load_failed';
   static const parentTryAgain = 'parent_try_again';
   static const parentNoClassroom = 'parent_no_classroom';
   static const parentNoTeacher = 'parent_no_teacher';
@@ -135,7 +207,7 @@ class AppKeys {
   static const parentWeekdayFri = 'parent_weekday_fri';
   static const parentWeekdaySat = 'parent_weekday_sat';
   static const yourAchievement = 'your_achievement';
-  static const studentHomework = 'student_homework';
+  static const studentClassroomExercise = 'student_homework';
   static const studentClassroom = 'student_classroom';
   static const homeMessageTeacherOne = 'home_message_teacher_one';
   static const homeMessageTeacherTwo = 'home_message_teacher_two';
@@ -147,12 +219,30 @@ class AppKeys {
   static const homeMessageStudentTwo = 'home_message_student_two';
   static const homeMessageBodyOne = 'home_message_body_one';
   static const homeMessageBodyTwo = 'home_message_body_two';
-  static const studentNoHomeworkTitle = 'student_no_homework_title';
-  static const studentNoHomeworkMessage = 'student_no_homework_message';
+  static const parentMessagesGroupPreview = 'parent_messages_group_preview';
+  static const parentMessagesTeacherThree = 'parent_messages_teacher_three';
+  static const parentMessagesTeacherFour = 'parent_messages_teacher_four';
+  static const parentMessagesTeacherFive = 'parent_messages_teacher_five';
+  static const parentMessagesTeacherSix = 'parent_messages_teacher_six';
+  static const parentMessagesTeacherSeven = 'parent_messages_teacher_seven';
+  static const parentMessagesContactsTitle = 'parent_messages_contacts_title';
+  static const parentMessagesOnlineLabel = 'parent_messages_online_label';
+  static const parentMessagesOfflineLabel = 'parent_messages_offline_label';
+  static const parentMessagesActiveNow = 'parent_messages_active_now';
+  static const parentMessagesOfflineHours = 'parent_messages_offline_hours';
+  static const parentMessagesOfflineDays = 'parent_messages_offline_days';
+  static const parentMessagesBodyThree = 'parent_messages_body_three';
+  static const parentMessagesBodyFour = 'parent_messages_body_four';
+  static const parentMessagesTimeThree = 'parent_messages_time_three';
+  static const parentMessagesTimeFour = 'parent_messages_time_four';
+  static const studentNoClassroomExerciseTitle = 'student_no_homework_title';
+  static const studentNoClassroomExerciseMessage =
+      'student_no_homework_message';
   static const studentNoClassroomsTitle = 'student_no_classrooms_title';
   static const studentNoClassroomsMessage = 'student_no_classrooms_message';
   static const studentJoinNewClassroom = 'student_join_new_classroom';
   static const studentJoinAnotherClassroom = 'student_join_another_classroom';
+  static const studentJoinClassroom = 'student_join_classroom';
   static const studentJoinClassroomSoon = 'student_join_classroom_soon';
   static const studentClassroomLoadFailed = 'student_classroom_load_failed';
   static const studentMissingProfileId = 'student_missing_profile_id';
@@ -219,8 +309,8 @@ class AppKeys {
       'student_class_assignments_subtitle';
   static const studentClassAssignmentsCountFormat =
       'student_class_assignments_count_format';
-  static const studentClassQuizzes = 'student_class_quizzes';
-  static const studentClassQuizzesSubtitle = 'student_class_quizzes_subtitle';
+  static const studentClassExams = 'student_class_exams';
+  static const studentClassExamsSubtitle = 'student_class_exams_subtitle';
   static const studentClassMaterials = 'student_class_materials';
   static const studentClassMaterialsSubtitle =
       'student_class_materials_subtitle';
@@ -232,26 +322,36 @@ class AppKeys {
   static const studentClassReview15Minutes = 'student_class_review_15_minutes';
   static const studentClassDeadlineSample = 'student_class_deadline_sample';
   static const studentClassComingSoon = 'student_class_coming_soon';
-  static const studentHomeworkSearchHint = 'student_homework_search_hint';
-  static const studentHomeworkNotSubmitted = 'student_homework_not_submitted';
-  static const studentHomeworkSubmitted = 'student_homework_submitted';
-  static const studentHomeworkOverdue = 'student_homework_overdue';
-  static const studentHomeworkAssignedAt = 'student_homework_assigned_at';
-  static const studentHomeworkReviewTitle = 'student_homework_review_title';
-  static const studentHomeworkQuestionCount = 'student_homework_question_count';
-  static const studentHomeworkDueDate = 'student_homework_due_date';
-  static const studentHomeworkDueFormat = 'student_homework_due_format';
-  static const studentHomeworkLoadFailed = 'student_homework_load_failed';
-  static const studentHomeworkNoQuestions = 'student_homework_no_questions';
-  static const studentHomeworkQuestionMissingAnswers =
+  static const studentClassroomExerciseSearchHint =
+      'student_homework_search_hint';
+  static const studentClassroomExerciseNotSubmitted =
+      'student_homework_not_submitted';
+  static const studentClassroomExerciseSubmitted = 'student_homework_submitted';
+  static const studentClassroomExerciseOverdue = 'student_homework_overdue';
+  static const studentClassroomExerciseAssignedAt =
+      'student_homework_assigned_at';
+  static const studentClassroomExerciseReviewTitle =
+      'student_homework_review_title';
+  static const studentClassroomExerciseQuestionCount =
+      'student_homework_question_count';
+  static const studentClassroomExerciseDueDate = 'student_homework_due_date';
+  static const studentClassroomExerciseDueFormat =
+      'student_homework_due_format';
+  static const studentClassroomExerciseLoadFailed =
+      'student_homework_load_failed';
+  static const studentClassroomExerciseNoQuestions =
+      'student_homework_no_questions';
+  static const studentClassroomExerciseQuestionMissingAnswers =
       'student_homework_question_missing_answers';
-  static const studentHomeworkSubmitSuccess = 'student_homework_submit_success';
-  static const studentHomeworkSubmitFailed = 'student_homework_submit_failed';
-  static const studentHomeworkMissingExercise =
+  static const studentClassroomExerciseSubmitSuccess =
+      'student_homework_submit_success';
+  static const studentClassroomExerciseSubmitFailed =
+      'student_homework_submit_failed';
+  static const studentClassroomExerciseMissingExercise =
       'student_homework_missing_exercise';
-  static const studentHomeworkAlreadySubmitted =
+  static const studentClassroomExerciseAlreadySubmitted =
       'student_homework_already_submitted';
-  static const studentHomeworkNotOpen = 'student_homework_not_open';
+  static const studentClassroomExerciseNotOpen = 'student_homework_not_open';
   static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
   static const viewAllUpper = 'view_all_upper';
@@ -304,18 +404,31 @@ class AppKeys {
   static const historyLoadErrorTitle = 'history_load_error_title';
   static const noHistoryTitle = 'no_history_title';
   static const noHistoryMessage = 'no_history_message';
-  static const missingQuizId = 'missing_quiz_id';
+  static const missingExamId = 'missing_exam_id';
   static const incomplete = 'incomplete';
   static const mathAssessment = 'math_assessment';
+  static const kindergartenMathAssessment = 'kindergarten_math_assessment';
+  static const gradeMathAssessment = 'grade_math_assessment';
+  static const assessmentListKindergartenTitle =
+      'assessment_list_kindergarten_title';
+  static const assessmentListGradeTitle = 'assessment_list_grade_title';
+  static const gradeLevelExamTitle = 'grade_level_exam_title';
+  static const gradeRoadmapKindergarten = 'grade_roadmap_kindergarten';
+  static const gradeRoadmapGrade = 'grade_roadmap_grade';
+  static const gradeRoadmapLevel = 'grade_roadmap_level';
+  static const gradeRoadmapCurrent = 'grade_roadmap_current';
+  static const gradeRoadmapCompleted = 'grade_roadmap_completed';
+  static const gradeRoadmapLocked = 'grade_roadmap_locked';
+  static const gradeRoadmapLoadFailed = 'grade_roadmap_load_failed';
   static const mathPractice = 'math_practice';
   static const mathReview = 'math_review';
   static const excellent = 'excellent';
   static const good = 'good';
   static const niceTry = 'nice_try';
   static const failed = 'failed';
-  static const quizDetailLoadFailed = 'quiz_detail_load_failed';
-  static const quizDetailTitle = 'quiz_detail_title';
-  static const emptyQuizQuestions = 'empty_quiz_questions';
+  static const examDetailLoadFailed = 'exam_detail_load_failed';
+  static const examDetailTitle = 'exam_detail_title';
+  static const emptyExamQuestions = 'empty_exam_questions';
   static const totalQuestions = 'total_questions';
   static const correct = 'correct';
   static const incorrect = 'incorrect';
@@ -331,7 +444,7 @@ class AppKeys {
   static const hideAnswerUpper = 'hide_answer_upper';
   static const noAnswer = 'no_answer';
   static const answer = 'answer';
-  static const quizDetailErrorTitle = 'quiz_detail_error_title';
+  static const examDetailErrorTitle = 'exam_detail_error_title';
 
   static const settingsTitle = 'settings_title';
   static const accountTitle = 'account_title';
@@ -381,6 +494,7 @@ class AppKeys {
   static const passcodeRemoved = 'passcode_removed';
   static const missingAccount = 'missing_account';
   static const accountNameRequired = 'account_name_required';
+  static const accountNotUpdated = 'account_not_updated';
   static const accountUpdated = 'account_updated';
   static const accountUpdateFailed = 'account_update_failed';
   static const imagePickFailed = 'image_pick_failed';
@@ -428,6 +542,7 @@ class AppKeys {
   static const teacherFallback = 'teacher_fallback';
   static const teacherMissingProfileId = 'teacher_missing_profile_id';
   static const teacherClassOpenFailed = 'teacher_class_open_failed';
+  static const teacherClassroomTitle = 'teacher_classroom_title';
   static const teacherWelcomeBack = 'teacher_welcome_back';
   static const teacherHeroTitle = 'teacher_hero_title';
   static const teacherHeroSubtitle = 'teacher_hero_subtitle';
@@ -435,6 +550,8 @@ class AppKeys {
   static const teacherRecentlyAssigned = 'teacher_recently_assigned';
   static const teacherCreateNewClass = 'teacher_create_new_class';
   static const teacherCompleteProfile = 'teacher_complete_profile';
+  static const teacherCompleteProfileDescription =
+      'teacher_complete_profile_description';
   static const teacherClassFallback = 'teacher_class_fallback';
   static const teacherStudentCount = 'teacher_student_count';
   static const teacherEnterClass = 'teacher_enter_class';
@@ -488,6 +605,7 @@ class AppKeys {
   static const teacherStudyAllClasses = 'teacher_study_all_classes';
   static const teacherStudyLoadFailed = 'teacher_study_load_failed';
   static const teacherStudyNoResults = 'teacher_study_no_results';
+  static const teacherStudyShowMore = 'teacher_study_show_more';
   static const teacherStudyDueDate = 'teacher_study_due_date';
   static const teacherStudyMonth = 'teacher_study_month';
   static const teacherAssignments = 'teacher_assignments';
@@ -552,6 +670,10 @@ class AppKeys {
   static const teacherAssignmentVolumeTwo = 'teacher_assignment_volume_two';
   static const teacherAssignmentTitleHint = 'teacher_assignment_title_hint';
   static const teacherAssessmentTitleHint = 'teacher_assessment_title_hint';
+  static const teacherAssignmentTitleRequired =
+      'teacher_assignment_title_required';
+  static const teacherAssessmentTitleRequired =
+      'teacher_assessment_title_required';
   static const teacherAssignmentProgramLabel =
       'teacher_assignment_program_label';
   static const teacherAssignmentProgramValue =
@@ -606,7 +728,7 @@ class AppKeys {
   static const noAccountForGrades = 'no_account_for_grades';
   static const gradeLoadFailed = 'grade_load_failed';
   static const gradeQuestionTitle = 'grade_question_title';
-  static const generateTestFailed = 'generate_test_failed';
+  static const assessmentGenerationFailed = 'assessment_generation_failed';
   static const noGrades = 'no_grades';
   static const gamesGradeTitle = 'games_grade_title';
   static const gamesGradeSubtitle = 'games_grade_subtitle';
@@ -645,40 +767,37 @@ class AppKeys {
   static const gamesFarmTime = 'games_farm_time';
   static const gamesFarmCorrectCount = 'games_farm_correct_count';
   static const gamesFarmWrongCount = 'games_farm_wrong_count';
-  static const gamesSquadronTitle = 'games_squadron_title';
-  static const gamesSquadronLevelOne = 'games_squadron_level_1';
-  static const gamesSquadronLevelTwo = 'games_squadron_level_2';
-  static const gamesSquadronLevelThree = 'games_squadron_level_3';
-  static const gamesSquadronLevelFour = 'games_squadron_level_4';
-  static const gamesSquadronLevelFive = 'games_squadron_level_5';
-  static const gamesSquadronLevelSix = 'games_squadron_level_6';
-  static const gamesSquadronLevelSeven = 'games_squadron_level_7';
-  static const gamesSquadronBossLevel = 'games_squadron_boss_level';
-  static const gamesSquadronBossEnergy = 'games_squadron_boss_energy';
-  static const gamesSquadronMission = 'games_squadron_mission';
-  static const gamesSquadronComplete = 'games_squadron_complete';
-  static const gamesSquadronBossDefeated = 'games_squadron_boss_defeated';
-  static const gamesSquadronTryAgain = 'games_squadron_try_again';
-  static const gamesSquadronLevelComplete = 'games_squadron_level_complete';
-  static const gamesSquadronNeedAccuracy = 'games_squadron_need_accuracy';
-  static const gamesSquadronExitTitle = 'games_squadron_exit_title';
-  static const gamesSquadronExitMessage = 'games_squadron_exit_message';
-  static const gamesSquadronKeepPlaying = 'games_squadron_keep_playing';
-  static const gamesSquadronFlightHint = 'games_squadron_flight_hint';
-  static const gamesSquadronChooseAmmoFirst =
-      'games_squadron_choose_ammo_first';
-  static const gamesSquadronFire = 'games_squadron_fire';
-  static const gamesSquadronSelectTarget = 'games_squadron_select_target';
-  static const gamesSquadronCurrentAmmo = 'games_squadron_current_ammo';
-  static const gamesSquadronTargetLocked = 'games_squadron_target_locked';
-  static const gamesSquadronTapMeteor = 'games_squadron_tap_meteor';
-  static const gamesSquadronNextAmmo = 'games_squadron_next_ammo';
-  static const gamesSquadronLaserWarning = 'games_squadron_laser_warning';
-  static const gamesSquadronAimShip = 'games_squadron_aim_ship';
-  static const gamesSquadronReloading = 'games_squadron_reloading';
+  static const gamesExitTitle = 'games_exit_title';
+  static const gamesExitMessage = 'games_exit_message';
+  static const gamesKeepPlaying = 'games_keep_playing';
+  static const gamesRescueTitle = 'games_rescue_title';
+  static const gamesRescueLevelOne = 'games_rescue_level_1';
+  static const gamesRescueUrgent = 'games_rescue_urgent';
+  static const gamesRescueIntroMessage = 'games_rescue_intro_message';
+  static const gamesRescueStart = 'games_rescue_start';
+  static const gamesRescueCheckpoint = 'games_rescue_checkpoint';
+  static const gamesRescueChoosePath = 'games_rescue_choose_path';
+  static const gamesRescueGateHint = 'games_rescue_gate_hint';
+  static const gamesRescueTeamChallenge = 'games_rescue_team_challenge';
+  static const gamesRescueBridgeTitle = 'games_rescue_bridge_title';
+  static const gamesRescueBridgeHint = 'games_rescue_bridge_hint';
+  static const gamesRescueHoldLever = 'games_rescue_hold_lever';
+  static const gamesRescueCrossBridge = 'games_rescue_cross_bridge';
+  static const gamesRescueOpenBridge = 'games_rescue_open_bridge';
+  static const gamesRescueNeedExactTeam = 'games_rescue_need_exact_team';
+  static const gamesRescueFinalChallenge = 'games_rescue_final_challenge';
+  static const gamesRescueBossTitle = 'games_rescue_boss_title';
+  static const gamesRescueBossHint = 'games_rescue_boss_hint';
+  static const gamesRescueBossName = 'games_rescue_boss_name';
+  static const gamesRescueNumiReady = 'games_rescue_numi_ready';
+  static const gamesRescueCompleteTitle = 'games_rescue_complete_title';
+  static const gamesRescueCompleteMessage = 'games_rescue_complete_message';
+  static const gamesRescueSkillUnlocked = 'games_rescue_skill_unlocked';
+  static const gamesRescueBringHome = 'games_rescue_bring_home';
+  static const gamesRescueBackToMap = 'games_rescue_back_to_map';
   static const createQuestionFailed = 'create_question_failed';
-  static const missingQuizToSubmit = 'missing_quiz_to_submit';
-  static const submitQuizFailed = 'submit_quiz_failed';
+  static const missingExamToSubmit = 'missing_exam_to_submit';
+  static const submitExamFailed = 'submit_exam_failed';
   static const unansweredSubmitTitle = 'unanswered_submit_title';
   static const unansweredSubmitMessage = 'unanswered_submit_message';
   static const stayUpper = 'stay_upper';
@@ -686,25 +805,54 @@ class AppKeys {
   static const submittingForYou = 'submitting_for_you';
   static const generatingAssessment = 'generating_assessment';
   static const aiChallenge = 'ai_challenge';
+  static const assessmentHeaderTitle = 'assessment_header_title';
   static const questionProgress = 'question_progress';
   static const previousQuestionUpper = 'previous_question_upper';
   static const submittingUpper = 'submitting_upper';
-  static const testAgainCreateMissingQuiz = 'test_again_create_missing_quiz';
+  static const testAgainCreateMissingExam = 'test_again_create_missing_exam';
   static const testAgainCreateFailed = 'test_again_create_failed';
   static const testAgainDialogTitle = 'test_again_dialog_title';
   static const excellentResultTitle = 'excellent_result_title';
   static const goodResultTitle = 'good_result_title';
   static const completedResultTitle = 'completed_result_title';
   static const incompleteResultTitle = 'incomplete_result_title';
-  static const noCompletedHomeworkTitle = 'no_completed_homework_title';
-  static const noCompletedHomeworkMessage = 'no_completed_homework_message';
-  static const homeworkExpiredCannotSubmit = 'homework_expired_cannot_submit';
-  static const homeworkDueSoon = 'homework_due_soon';
-  static const homeworkFailed = 'homework_failed';
+  static const noCompletedClassroomExerciseTitle =
+      'no_completed_homework_title';
+  static const noCompletedClassroomExerciseMessage =
+      'no_completed_homework_message';
+  static const classroomExerciseExpiredCannotSubmit =
+      'homework_expired_cannot_submit';
+  static const classroomExerciseDueSoon = 'homework_due_soon';
+  static const classroomExerciseFailed = 'homework_failed';
   static const parentRoomAssignmentsTitle = 'parent_room_assignments_title';
+  static const parentRoomUtilitiesTitle = 'parent_room_utilities_title';
+  static const parentRoomUtilityMessages = 'parent_room_utility_messages';
+  static const parentRoomUtilityClassroomExercise =
+      'parent_room_utility_homework';
+  static const parentRoomUtilityTests = 'parent_room_utility_tests';
+  static const parentRoomUtilityDocuments = 'parent_room_utility_documents';
+  static const parentRoomUtilityProgress = 'parent_room_utility_progress';
+  static const parentRoomUtilityMembers = 'parent_room_utility_members';
   static const excellentResultMessage = 'excellent_result_message';
-  static const generatingNewQuiz = 'generating_new_quiz';
+  static const generatingNewExam = 'generating_new_exam';
   static const assessmentResultTitle = 'assessment_result_title';
+  static const placementResultCongratulations =
+      'placement_result_congratulations';
+  static const placementResultLevel = 'placement_result_level';
+  static const placementResultKindergarten = 'placement_result_kindergarten';
+  static const placementResultGrade = 'placement_result_grade';
+  static const placementResultGradeLevel = 'placement_result_grade_level';
+  static const placementResultCorrectSummary =
+      'placement_result_correct_summary';
+  static const placementResultViewDetails = 'placement_result_view_details';
+  static const placementResultPracticeAgain = 'placement_result_practice_again';
+  static const placementResultPractice = 'placement_result_practice';
+  static const placementResultWeakTopics = 'placement_result_weak_topics';
+  static const examReviewPracticeBannerTitle =
+      'exam_review_practice_banner_title';
+  static const examReviewTopicConjunction = 'exam_review_topic_conjunction';
+  static const examReviewPracticeBannerAction =
+      'exam_review_practice_banner_action';
   static const scoreUpper = 'score_upper';
   static const numiAiReview = 'numi_ai_review';
   static const defaultAiReview = 'default_ai_review';
@@ -713,6 +861,8 @@ class AppKeys {
   static const practiceUpper = 'practice_upper';
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
   static const loginPhoneNotRegistered = 'login_phone_not_registered';
+  static const authLoginNameCheckFailed = 'auth_login_name_check_failed';
+  static const loginNameNotRegistered = 'login_name_not_registered';
   static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';
@@ -722,10 +872,10 @@ class AppKeys {
   static const verifyOtpFailed = 'verify_otp_failed';
   static const childNameRequired = 'child_name_required';
   static const signupFailed = 'signup_failed';
-  static const quizHasNoQuestions = 'quiz_has_no_questions';
+  static const examHasNoQuestions = 'exam_has_no_questions';
   static const missingUserOrProfileForHistory =
       'missing_user_or_profile_for_history';
-  static const missingQuizIdShort = 'missing_quiz_id_short';
+  static const missingExamIdShort = 'missing_exam_id_short';
   static const apiBaseUrlMissing = 'api_base_url_missing';
   static const invalidServerResponse = 'invalid_server_response';
   static const apiConnectTimeout = 'api_connect_timeout';
@@ -734,6 +884,7 @@ class AppKeys {
   static const apiBadCertificate = 'api_bad_certificate';
   static const apiRequestCanceled = 'api_request_canceled';
   static const apiConnectionFailed = 'api_connection_failed';
+  static const checkInternetConnection = 'check_internet_connection';
   static const welcomeTaglineMath = 'welcome_tagline_math';
   static const welcomeTaglineStudyAssessment =
       'welcome_tagline_study_assessment';
@@ -745,9 +896,11 @@ class AppKeys {
   static const welcomeParentTeacherSubtitle = 'welcome_parent_teacher_subtitle';
   static const welcomeGamesTitle = 'welcome_games_title';
   static const welcomeGamesSubtitle = 'welcome_games_subtitle';
-  static const studentHomeworkReviewLabel = 'student_homework_review_label';
-  static const studentHomeworkPurposeQuiz = 'student_homework_purpose_quiz';
-  static const studentHomeworkPurposeHomework =
+  static const studentClassroomExerciseReviewLabel =
+      'student_homework_review_label';
+  static const studentClassroomExercisePurposeExam =
+      'student_homework_purpose_exam';
+  static const studentClassroomExercisePurposeHomework =
       'student_homework_purpose_homework';
   static const teacherAssignmentDefaultChapter =
       'teacher_assignment_default_chapter';

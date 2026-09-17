@@ -1,33 +1,28 @@
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/core/network/school_models.dart';
-
-class SchoolException implements Exception {
-  const SchoolException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class SchoolService {
-  Future<List<SchoolModel>> listSchools();
-}
+import 'package:numi/features/profile/data/school_service.dart';
+import 'package:numi/features/profile/data/school_api_models.dart';
+import 'package:numi/features/profile/data/profile_conversion.dart';
+import 'package:numi/features/profile/data/school_exception.dart';
+import 'package:numi/features/profile/models/school.dart';
 
 class SchoolApi implements SchoolService {
-  SchoolApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  SchoolApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
 
   @override
   Future<List<SchoolModel>> listSchools() async {
-    final response = await _networkApi.listSchools(
-      const SchoolListRequest(takeAll: true),
+    final json = await _networkClient.postJson(
+      '/schools/list',
+      const SchoolListRequest(takeAll: true).toJson(),
     );
+    NetworkClient.throwForApiStatus(json);
+    final response = SchoolListResponse.fromJson(json);
 
     if (response.mstatus != 200) {
       throw SchoolException(
@@ -39,6 +34,6 @@ class SchoolApi implements SchoolService {
       );
     }
 
-    return response.schools;
+    return response.schools.map((school) => school.toModel()).toList();
   }
 }

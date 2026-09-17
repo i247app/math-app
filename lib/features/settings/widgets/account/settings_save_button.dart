@@ -1,62 +1,78 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class SettingsSaveButton extends StatelessWidget {
   const SettingsSaveButton({
     super.key,
-    required this.scale,
     required this.onTap,
     this.enabled = true,
+    this.isLoading = false,
   });
 
-  final double scale;
   final VoidCallback onTap;
   final bool enabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = enabled
-        ? AppColors.tealIcon
-        : const Color(0xFFBFC9CA);
-    final foregroundColor = enabled ? Colors.white : const Color(0xFFF4F6F6);
+    final colors = context.themeColors;
+    final usesActiveStyle = enabled || isLoading;
+    final backgroundColor = usesActiveStyle
+        ? colors.brandStrong
+        : colors.disabledBackground;
+    final foregroundColor = usesActiveStyle
+        ? colors.onBrand
+        : colors.disabledForeground;
 
     return Material(
       color: backgroundColor,
-      elevation: enabled ? 9 : 0,
-      shadowColor: Colors.black.withValues(alpha: enabled ? 0.30 : 0),
-      borderRadius: BorderRadius.circular(999),
+      elevation: usesActiveStyle ? 9 : 0,
+      shadowColor: colors.shadow.withValues(alpha: usesActiveStyle ? 0.30 : 0),
+      borderRadius: BorderRadius.circular(AppRadius.full),
       child: InkWell(
-        onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(999),
+        onTap: enabled && !isLoading ? onTap : null,
+        borderRadius: BorderRadius.circular(AppRadius.full),
         child: SizedBox(
-          width: 142 * scale,
-          height: 60 * scale,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                context.getText(AppKeys.save),
-                style: GoogleFonts.andika(
-                  color: foregroundColor,
-                  fontSize: FontSize.large * scale,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  letterSpacing: 0,
+          width: 142,
+          height: 60,
+          child: isLoading
+              ? Center(
+                  child: SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(
+                      color: foregroundColor,
+                      strokeWidth: 2.8,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: AppSpacing.s10,
+                  children: [
+                    Text(
+                      context.getText(AppKeys.save),
+                      style: GoogleFonts.andika(
+                        color: foregroundColor,
+                        fontSize: FontSize.large,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: foregroundColor,
+                      size: 24,
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(width: 10 * scale),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: foregroundColor,
-                size: 24 * scale,
-              ),
-            ],
-          ),
         ),
       ),
     );

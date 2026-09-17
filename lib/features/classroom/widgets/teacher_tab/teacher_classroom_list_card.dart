@@ -1,13 +1,19 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-class _TeacherClassroomListCard extends StatelessWidget {
-  const _TeacherClassroomListCard({
-    required this.scale,
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_badge.dart';
+import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_helpers.dart';
+
+class TeacherClassroomListCard extends StatelessWidget {
+  const TeacherClassroomListCard({
+    super.key,
     required this.classroom,
     required this.onTap,
   });
-
-  final double scale;
   final ClassroomModel classroom;
   final VoidCallback onTap;
 
@@ -17,8 +23,8 @@ class _TeacherClassroomListCard extends StatelessWidget {
         classroom.name ?? context.getText(AppKeys.teacherClassFallback);
     final code = classroom.classroomCode ?? classroom.id?.toString() ?? '--';
     final memberCount = classroom.displayStudentCount;
-    final classNumber = _teacherClassroomNumber(classroom);
-    final numberPalette = _teacherClassroomNumberPalette(classroom);
+    final classNumber = teacherClassroomNumber(classroom);
+    final numberPalette = teacherClassroomNumberPalette(classroom);
     final colors = context.themeColors;
 
     return GestureDetector(
@@ -26,57 +32,54 @@ class _TeacherClassroomListCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: colors.elevatedSurface,
-          borderRadius: BorderRadius.circular(24 * scale),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
               color: colors.shadow,
-              blurRadius: 18 * scale,
-              offset: Offset(0, 5 * scale),
+              blurRadius: 18,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 18 * scale,
-          vertical: 18 * scale,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         child: Column(
+          spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              spacing: 16,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _TeacherClassroomNumberBadge(
-                  scale: scale,
+                TeacherClassroomNumberBadge(
                   number: classNumber,
                   palette: numberPalette,
                 ),
-                SizedBox(width: 16 * scale),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 4 * scale),
+                    padding: const EdgeInsets.only(top: 4),
                     child: Column(
+                      spacing: 16,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
+                          style: TextStyle(
                             color: colors.textPrimary,
-                            fontSize: 21 * scale,
+                            fontSize: FontSize.xl,
                             fontWeight: FontWeight.w800,
                             height: 1.05,
                           ),
                         ),
-                        SizedBox(height: 16 * scale),
                         Text(
                           'ID: $code',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.andika(
+                          style: TextStyle(
                             color: colors.textSecondary,
-                            fontSize: 18 * scale,
+                            fontSize: FontSize.large,
                             fontWeight: FontWeight.w600,
                             height: 1.1,
                           ),
@@ -87,15 +90,14 @@ class _TeacherClassroomListCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16 * scale),
             Row(
+              spacing: 7,
               children: [
                 Icon(
                   Icons.person_outline_rounded,
                   color: colors.textSecondary,
-                  size: 17 * scale,
+                  size: 17,
                 ),
-                SizedBox(width: 7 * scale),
                 Flexible(
                   child: Text(
                     context.formatText(AppKeys.teacherStudentCount, {
@@ -103,9 +105,9 @@ class _TeacherClassroomListCard extends StatelessWidget {
                     }),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.andika(
+                    style: TextStyle(
                       color: colors.textSecondary,
-                      fontSize: 18 * scale,
+                      fontSize: FontSize.large,
                       fontWeight: FontWeight.w800,
                       height: 1.1,
                     ),

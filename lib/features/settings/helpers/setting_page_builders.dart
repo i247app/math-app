@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/settings/application/setting_tab.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/settings/screens/setting_tab.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
 
 Widget buildPushedSettingPage({

@@ -9,11 +9,13 @@ const authStrings = <String, Map<String, String>>{
         'Nhập số điện thoại để\nđăng ký hoặc đăng nhập !',
     AppKeys.phoneNumberUpper: 'SỐ ĐIỆN THOẠI',
     AppKeys.phoneHint: 'Nhập số điện thoại',
+    AppKeys.loginNameHint: 'Số điện thoại hoặc email',
     AppKeys.chooseCountry: 'Chọn quốc gia',
     AppKeys.creatingAccount: 'Đang tạo tài khoản...',
     AppKeys.checking: 'Đang kiểm tra...',
     AppKeys.phoneRequired: 'Vui lòng nhập số điện thoại.',
     AppKeys.invalidPhone: 'Số điện thoại chưa hợp lệ.',
+    AppKeys.invalidEmail: 'Email chưa hợp lệ.',
     AppKeys.phoneTooShort: 'Số điện thoại chưa đủ ký tự.',
     AppKeys.restoringSession: 'Đang kiểm tra phiên đăng nhập...',
     AppKeys.newAccountPrompt: 'Đây là tài khoản MỚI. Tiếp tục đăng ký?',
@@ -22,6 +24,15 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.loginWithPin: 'Đăng nhập với PIN',
     AppKeys.authSwitchToSignupPrompt: 'Chưa có tài khoản?',
     AppKeys.authSwitchToLoginPrompt: 'Đã có tài khoản?',
+    AppKeys.trustedDeviceTitle: 'Xác minh thiết bị mới',
+    AppKeys.trustedDeviceSubtitle:
+        'Chọn một thiết bị tin cậy để phê duyệt lần đăng nhập này.',
+    AppKeys.trustedDeviceSend: 'Gửi mã',
+    AppKeys.trustedDeviceSending: 'Đang gửi...',
+    AppKeys.trustedDeviceEmpty:
+        'Không tìm thấy thiết bị đã xác minh cho tài khoản này.',
+    AppKeys.trustedDeviceLoadFailed:
+        'Không thể tải danh sách thiết bị. Vui lòng thử lại.',
     AppKeys.otpWithin30Seconds: 'Bạn sẽ nhận được mã trong vòng 30 giây',
     AppKeys.otpTitle: 'MÃ XÁC NHẬN',
     AppKeys.otpSentMessage: 'Mã OTP vừa gửi: {code}',
@@ -34,7 +45,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabel: 'Tên',
     AppKeys.signupNameInvalid: 'Tên chỉ được gồm chữ, số và khoảng trắng.',
     AppKeys.signupUsernameExists: 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
-    AppKeys.signupEmailLabel: 'Email',
+    AppKeys.signupEmailLabel: 'Email (không bắt buộc)',
     AppKeys.signupRoleLabel: 'Bạn là',
     AppKeys.signupRoleStudent: 'Học Sinh',
     AppKeys.signupRoleParent: 'Phụ huynh',
@@ -56,14 +67,17 @@ const authStrings = <String, Map<String, String>>{
         'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
     AppKeys.phoneNumber: 'Số Điện Thoại',
     AppKeys.authPhoneCheckFailed: 'Không thể kiểm tra số điện thoại.',
+    AppKeys.authLoginNameCheckFailed: 'Không thể kiểm tra tài khoản.',
     AppKeys.loginPhoneNotRegistered:
         'Số điện thoại này chưa có tài khoản. Vui lòng đăng ký.',
+    AppKeys.loginNameNotRegistered:
+        'Số điện thoại hoặc email này chưa có tài khoản. Vui lòng đăng ký.',
     AppKeys.signupPhoneAlreadyRegistered:
         'Số điện thoại này đã có tài khoản. Vui lòng đăng nhập.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
     AppKeys.pinLoginFailed:
-        'Không thể đăng nhập bằng PIN. Vui lòng đăng nhập bằng số điện thoại.',
+        'Không thể đăng nhập bằng PIN. Vui lòng đăng nhập lại.',
     AppKeys.invalidOtp: 'Mã OTP không đúng. Vui lòng thử lại.',
     AppKeys.missingOtpUser: 'Response OTP thiếu thông tin user.',
     AppKeys.verifyOtpFailed: 'Không thể xác thực OTP. Vui lòng thử lại.',
@@ -78,11 +92,13 @@ const authStrings = <String, Map<String, String>>{
         'Enter your phone number to\nsign up or log in!',
     AppKeys.phoneNumberUpper: 'PHONE NUMBER',
     AppKeys.phoneHint: 'Enter phone number',
+    AppKeys.loginNameHint: 'Phone number or email',
     AppKeys.chooseCountry: 'Choose country',
     AppKeys.creatingAccount: 'Creating account...',
     AppKeys.checking: 'Checking...',
     AppKeys.phoneRequired: 'Please enter a phone number.',
     AppKeys.invalidPhone: 'The phone number is invalid.',
+    AppKeys.invalidEmail: 'The email address is invalid.',
     AppKeys.phoneTooShort: 'The phone number is too short.',
     AppKeys.restoringSession: 'Checking login session...',
     AppKeys.newAccountPrompt: 'This is a NEW account. Continue to sign up?',
@@ -91,6 +107,15 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.loginWithPin: 'Login with PIN',
     AppKeys.authSwitchToSignupPrompt: "Don't have an account?",
     AppKeys.authSwitchToLoginPrompt: 'Already have an account?',
+    AppKeys.trustedDeviceTitle: 'Verify your new device',
+    AppKeys.trustedDeviceSubtitle:
+        'Choose a trusted device to approve this login.',
+    AppKeys.trustedDeviceSend: 'Send code',
+    AppKeys.trustedDeviceSending: 'Sending...',
+    AppKeys.trustedDeviceEmpty:
+        'No verified devices were found for this account.',
+    AppKeys.trustedDeviceLoadFailed:
+        'Could not load trusted devices. Please try again.',
     AppKeys.otpWithin30Seconds: 'You will receive a code within 30 seconds',
     AppKeys.otpTitle: 'VERIFICATION CODE',
     AppKeys.otpSentMessage: 'OTP code sent: {code}',
@@ -105,7 +130,7 @@ const authStrings = <String, Map<String, String>>{
         'First name can only include letters, numbers, and spaces.',
     AppKeys.signupUsernameExists:
         'This name already exists. Please choose another name.',
-    AppKeys.signupEmailLabel: 'Email',
+    AppKeys.signupEmailLabel: 'Email (optional)',
     AppKeys.signupRoleLabel: 'You are',
     AppKeys.signupRoleStudent: 'Student',
     AppKeys.signupRoleParent: 'Parent',
@@ -127,14 +152,16 @@ const authStrings = <String, Map<String, String>>{
         "Enter an email to follow your child's assessment results\nand learning journey",
     AppKeys.phoneNumber: 'Phone Number',
     AppKeys.authPhoneCheckFailed: 'Could not check this phone number.',
+    AppKeys.authLoginNameCheckFailed: 'Could not check this account.',
     AppKeys.loginPhoneNotRegistered:
         'This phone number does not have an account. Please sign up.',
+    AppKeys.loginNameNotRegistered:
+        'This phone number or email does not have an account. Please sign up.',
     AppKeys.signupPhoneAlreadyRegistered:
         'This phone number already has an account. Please log in.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
-    AppKeys.pinLoginFailed:
-        'Could not log in with PIN. Please log in with your phone number.',
+    AppKeys.pinLoginFailed: 'Could not log in with PIN. Please log in again.',
     AppKeys.invalidOtp: 'The OTP is incorrect. Please try again.',
     AppKeys.missingOtpUser: 'OTP response is missing user information.',
     AppKeys.verifyOtpFailed: 'Could not verify OTP. Please try again.',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/core/theme/app_theme_colors.dart';
+
 /// A simple loading indicator card — a [CircularProgressIndicator] centred
 /// inside a rounded white card.
 ///
@@ -12,7 +14,7 @@ class CircularLoadingCard extends StatelessWidget {
     this.height = 132,
     this.scale = 1.0,
     this.borderRadius,
-    this.backgroundColor = const Color(0xC2FFFFFF),
+    this.backgroundColor,
     this.strokeWidth = 3,
   });
 
@@ -20,24 +22,29 @@ class CircularLoadingCard extends StatelessWidget {
   final double height;
   final double scale;
   final double? borderRadius;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final double strokeWidth;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = borderRadius ?? 28 * scale;
     return Container(
       width: width,
       height: height * scale,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color:
+            backgroundColor ?? colors.elevatedSurface.withValues(alpha: 0.76),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: SizedBox(
         width: 26 * scale,
         height: 26 * scale,
-        child: CircularProgressIndicator(strokeWidth: strokeWidth),
+        child: CircularProgressIndicator(
+          color: colors.brandStrong,
+          strokeWidth: strokeWidth,
+        ),
       ),
     );
   }

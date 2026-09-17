@@ -1,7 +1,11 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassroomMemberAvatar extends StatelessWidget {
-  const _TeacherClassroomMemberAvatar({
+import 'package:numi/features/classroom/models/classroom.dart';
+import 'package:numi/shared/widgets/profile_avatar_image.dart';
+
+class TeacherClassroomMemberAvatar extends StatelessWidget {
+  const TeacherClassroomMemberAvatar({
+    super.key,
     required this.member,
     required this.size,
   });

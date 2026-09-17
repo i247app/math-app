@@ -1,4 +1,4 @@
-part of '../../presentation/practice_chapter_screen.dart';
+part of '../../screens/practice_chapter_screen.dart';
 
 class _ChapterHeaderCurvePainter extends CustomPainter {
   const _ChapterHeaderCurvePainter({required this.scale});

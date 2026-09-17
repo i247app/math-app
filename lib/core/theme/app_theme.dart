@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
+import 'app_radius.dart';
 import 'app_theme_colors.dart';
+import 'app_typography.dart';
 
 abstract final class AppTheme {
   const AppTheme._();
 
   static ThemeData light() {
-    final textTheme = GoogleFonts.andikaTextTheme();
+    final textTheme = AppTypography.light();
     final colorScheme =
         ColorScheme.fromSeed(
           seedColor: AppColors.teal,
@@ -86,15 +87,15 @@ abstract final class AppTheme {
           letterSpacing: 0,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.borderNeutral),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.borderNeutral),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.tealIcon, width: 1.5),
         ),
       ),
@@ -102,11 +103,7 @@ abstract final class AppTheme {
   }
 
   static ThemeData dark() {
-    final textTheme = GoogleFonts.andikaTextTheme(ThemeData.dark().textTheme)
-        .apply(
-          bodyColor: AppColors.darkOnSurface,
-          displayColor: AppColors.darkOnSurface,
-        );
+    final textTheme = AppTypography.dark();
     const colorScheme = ColorScheme.dark(
       primary: AppColors.darkPrimaryTeal,
       onPrimary: AppColors.darkOnPrimary,
@@ -183,15 +180,15 @@ abstract final class AppTheme {
           letterSpacing: 0,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.darkOutline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(color: AppColors.darkOutline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.r18),
           borderSide: const BorderSide(
             color: AppColors.darkPrimaryTeal,
             width: 1.5,

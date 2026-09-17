@@ -1,0 +1,133 @@
+import 'package:flutter/material.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+class AssessmentProgressSection extends StatelessWidget {
+  const AssessmentProgressSection({
+    super.key,
+    required this.currentQuestion,
+    required this.totalQuestions,
+    required this.answeredQuestionIndexes,
+    required this.onQuestionSelected,
+    this.questionNumberOffset = 0,
+    this.showQuestionNavigation = true,
+  });
+  final int currentQuestion;
+  final int totalQuestions;
+  final Set<int> answeredQuestionIndexes;
+  final ValueChanged<int>? onQuestionSelected;
+  final int questionNumberOffset;
+  final bool showQuestionNavigation;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          showQuestionNavigation
+              ? context.formatText(AppKeys.questionProgress, {
+                  'current': questionNumberOffset + currentQuestion,
+                  'total': questionNumberOffset + totalQuestions,
+                })
+              : context.formatText(AppKeys.questionNumber, {
+                  'number': questionNumberOffset + currentQuestion,
+                }),
+          key: const ValueKey('assessment-question-label'),
+          style: TextStyle(
+            color: colors.brandStrong,
+            fontSize: FontSize.normal,
+            fontWeight: FontWeight.w800,
+            height: 1.2,
+            letterSpacing: 0,
+          ),
+        ),
+        if (showQuestionNavigation) ...[
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 66,
+            child: ListView.separated(
+              key: const PageStorageKey<String>(
+                'assessment-question-navigation',
+              ),
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: totalQuestions,
+              separatorBuilder: (_, index) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final answered = answeredQuestionIndexes.contains(index);
+                final isCurrent = index == currentQuestion - 1;
+                final canSelectQuestion = onQuestionSelected != null;
+                final displayedQuestionNumber =
+                    questionNumberOffset + index + 1;
+                return Semantics(
+                  button: canSelectQuestion,
+                  selected: isCurrent,
+                  label: '$displayedQuestionNumber',
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: canSelectQuestion
+                        ? () => onQuestionSelected!(index)
+                        : null,
+                    child: SizedBox(
+                      width: 42,
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeOutCubic,
+                            width: 42,
+                            height: 42,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: answered
+                                  ? colors.brandStrong
+                                  : colors.elevatedSurface,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colors.brandStrong,
+                                width: 2,
+                              ),
+                            ),
+                            child: Text(
+                              '$displayedQuestionNumber',
+                              style: TextStyle(
+                                color: answered
+                                    ? colors.onBrand
+                                    : colors.brandStrong,
+                                fontSize: FontSize.large,
+                                fontWeight: FontWeight.w700,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 160),
+                            child: isCurrent
+                                ? Icon(
+                                    Icons.arrow_downward_rounded,
+                                    key: ValueKey('current-question-$index'),
+                                    color: colors.brandStrong,
+                                    size: 22,
+                                    weight: 700,
+                                  )
+                                : const SizedBox(height: 22),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}

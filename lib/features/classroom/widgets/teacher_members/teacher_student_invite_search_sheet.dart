@@ -1,17 +1,34 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'dart:async';
 
-class _TeacherStudentInviteSearchSheet extends StatefulWidget {
-  const _TeacherStudentInviteSearchSheet({required this.profileService});
+import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
+
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/profile/data/profile_service.dart';
+import 'package:numi/features/profile/data/profile_exception.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_member_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_send_invite_button.dart';
+import 'package:numi/features/classroom/widgets/teacher_members/teacher_student_search_result_list.dart';
+import 'package:numi/shared/widgets/app_search_field.dart';
+
+class TeacherStudentInviteSearchSheet extends StatefulWidget {
+  const TeacherStudentInviteSearchSheet({
+    super.key,
+    required this.profileService,
+  });
 
   final ProfileService profileService;
 
   @override
-  State<_TeacherStudentInviteSearchSheet> createState() =>
+  State<TeacherStudentInviteSearchSheet> createState() =>
       _TeacherStudentInviteSearchSheetState();
 }
 
 class _TeacherStudentInviteSearchSheetState
-    extends State<_TeacherStudentInviteSearchSheet> {
+    extends State<TeacherStudentInviteSearchSheet> {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedProfileIds = <int>{};
   final Map<int, StudentProfile> _selectedProfilesById =
@@ -69,7 +86,7 @@ class _TeacherStudentInviteSearchSheetState
         return;
       }
       setState(() {
-        _results = profiles.where(_isStudentProfile).toList();
+        _results = profiles.where(isStudentProfile).toList();
       });
     } on ProfileException catch (error) {
       if (!mounted || requestId != _requestSerial) {
@@ -87,7 +104,7 @@ class _TeacherStudentInviteSearchSheetState
   }
 
   void _toggleProfile(StudentProfile profile) {
-    final id = ActiveProfileSession.profileStableId(profile);
+    final id = profileStableId(profile);
     if (id == null) {
       return;
     }
@@ -133,84 +150,77 @@ class _TeacherStudentInviteSearchSheetState
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                context.getText(AppKeys.teacherSearchStudentTitle),
-                style: GoogleFonts.andika(
-                  color: colors.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  height: 1.25,
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  context.getText(AppKeys.teacherSearchStudentTitle),
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: FontSize.xl,
+                    fontWeight: FontWeight.w700,
+                    height: 1.25,
+                  ),
                 ),
               ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _searchController,
-                autofocus: true,
-                textInputAction: TextInputAction.search,
-                onChanged: _onSearchChanged,
-                onSubmitted: _searchProfiles,
-                decoration: InputDecoration(
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: AppSearchField(
+                  controller: _searchController,
                   hintText: context.getText(AppKeys.teacherSearchStudentHint),
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _onSearchChanged('');
-                          },
-                          icon: const Icon(Icons.close_rounded),
-                        ),
-                  filled: true,
-                  fillColor: colors.inputSurface,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
+                  appearance: AppSearchFieldAppearance.outlined,
+                  autofocus: true,
+                  onChanged: _onSearchChanged,
+                  onSubmitted: _searchProfiles,
+                  hapticFeedbackOnClear: false,
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: colors.textSecondary,
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colors.brandStrong),
+                  clearIconColor: colors.textSecondary,
+                  clearIconSize: 24,
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
+                  hintStyle: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colors.inputHint),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  context.formatText(AppKeys.teacherSelectedStudents, {
+                    'count': selectedCount,
+                  }),
+                  style: TextStyle(
+                    color: colors.textSecondary,
+                    fontSize: FontSize.xs,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                context.formatText(AppKeys.teacherSelectedStudents, {
-                  'count': selectedCount,
-                }),
-                style: GoogleFonts.andika(
-                  color: colors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
               Expanded(
-                child: _TeacherStudentSearchResultList(
-                  scrollController: scrollController,
-                  profiles: _results,
-                  selectedProfileIds: _selectedProfileIds,
-                  isSearching: _isSearching,
-                  error: _error,
-                  query: _searchController.text.trim(),
-                  onToggle: _toggleProfile,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: TeacherStudentSearchResultList(
+                    scrollController: scrollController,
+                    profiles: _results,
+                    selectedProfileIds: _selectedProfileIds,
+                    isSearching: _isSearching,
+                    error: _error,
+                    query: _searchController.text.trim(),
+                    onToggle: _toggleProfile,
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              _TeacherSendInviteButton(
-                enabled: selectedCount > 0,
-                onTap: selectedCount == 0
-                    ? null
-                    : () => Navigator.of(context).pop(_selectedProfiles),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: TeacherSendInviteButton(
+                  enabled: selectedCount > 0,
+                  onTap: selectedCount == 0
+                      ? null
+                      : () => Navigator.of(context).pop(_selectedProfiles),
+                ),
               ),
             ],
           ),

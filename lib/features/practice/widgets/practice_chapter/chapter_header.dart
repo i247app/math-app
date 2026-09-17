@@ -1,4 +1,4 @@
-part of '../../presentation/practice_chapter_screen.dart';
+part of '../../screens/practice_chapter_screen.dart';
 
 class _ChapterHeader extends StatelessWidget {
   const _ChapterHeader({required this.chapter, required this.scale});

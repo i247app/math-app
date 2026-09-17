@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:numi/core/network/profile_models.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
 
 class SettingScreenArgs {
   const SettingScreenArgs({
@@ -13,7 +13,7 @@ class SettingScreenArgs {
     required this.onActivateProfile,
     required this.onRefreshProfiles,
     required this.onProfileSaved,
-    required this.scale,
+    this.scale = 1,
   });
 
   final LoginUser? user;

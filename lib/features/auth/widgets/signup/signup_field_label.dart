@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 class SignupFieldLabel extends StatelessWidget {
   const SignupFieldLabel({
@@ -19,9 +19,9 @@ class SignupFieldLabel extends StatelessWidget {
 
     return RichText(
       text: TextSpan(
-        style: GoogleFonts.andika(
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: colors.textPrimary,
-          fontSize: 16,
+          fontSize: FontSize.normal,
           fontWeight: FontWeight.w700,
           letterSpacing: 0,
         ),

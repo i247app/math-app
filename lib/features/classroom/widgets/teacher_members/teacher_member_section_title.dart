@@ -1,9 +1,8 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-class _TeacherMemberSectionTitle extends StatelessWidget {
-  const _TeacherMemberSectionTitle({required this.scale, required this.title});
-
-  final double scale;
+class TeacherMemberSectionTitle extends StatelessWidget {
+  const TeacherMemberSectionTitle({super.key, required this.title});
   final String title;
 
   @override
@@ -12,9 +11,9 @@ class _TeacherMemberSectionTitle extends StatelessWidget {
       title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: GoogleFonts.andika(
-        color: const Color(0xFF1E3A5F),
-        fontSize: 18 * scale,
+      style: const TextStyle(
+        color: Color(0xFF1E3A5F),
+        fontSize: FontSize.large,
         fontWeight: FontWeight.w700,
         height: 1.55,
       ),

@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_exercise_models.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
 
 String? studentClassNonEmpty(String? value) {
   final trimmed = value?.trim();
@@ -40,7 +40,7 @@ String studentClassTeacherInitial(String name) {
   return trimmed.characters.first.toUpperCase();
 }
 
-List<ClassroomExercise> upcomingStudentHomeworkExercises(
+List<ClassroomExercise> upcomingStudentClassroomExerciseExercises(
   List<ClassroomExercise> exercises,
 ) {
   final now = DateTime.now();
@@ -67,7 +67,7 @@ List<ClassroomExercise> upcomingStudentHomeworkExercises(
   });
 }
 
-String studentClassHomeworkTitle(ClassroomExercise exercise) {
+String studentClassClassroomExerciseTitle(ClassroomExercise exercise) {
   final title = exercise.title?.trim();
   if (title != null && title.isNotEmpty) {
     return title;
@@ -76,7 +76,7 @@ String studentClassHomeworkTitle(ClassroomExercise exercise) {
   return id == null ? '' : 'ID: $id';
 }
 
-String studentClassHomeworkDueDate(
+String studentClassClassroomExerciseDueDate(
   BuildContext context,
   ClassroomExercise exercise,
 ) {
@@ -84,10 +84,12 @@ String studentClassHomeworkDueDate(
   if (date == null) {
     return '';
   }
-  return context.formatText(AppKeys.studentHomeworkDueFormat, {'date': date});
+  return context.formatText(AppKeys.studentClassroomExerciseDueFormat, {
+    'date': date,
+  });
 }
 
-bool studentClassHomeworkIsSubmitted(ClassroomExercise exercise) {
+bool studentClassClassroomExerciseIsSubmitted(ClassroomExercise exercise) {
   return exercise.submissionStatus?.trim().toUpperCase() == 'SUBMITTED';
 }
 

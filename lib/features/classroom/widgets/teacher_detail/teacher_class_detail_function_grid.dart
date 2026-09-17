@@ -1,13 +1,15 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherClassDetailFunctionGrid extends StatelessWidget {
-  const _TeacherClassDetailFunctionGrid({
-    required this.scale,
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/classroom/widgets/teacher_detail/teacher_class_detail_function_tile.dart';
+
+class TeacherClassDetailFunctionGrid extends StatelessWidget {
+  const TeacherClassDetailFunctionGrid({
+    super.key,
     required this.onOpenAssignments,
     required this.onOpenAssessments,
   });
-
-  final double scale;
   final VoidCallback onOpenAssignments;
   final VoidCallback onOpenAssessments;
 
@@ -15,27 +17,25 @@ class _TeacherClassDetailFunctionGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
-      crossAxisSpacing: 10 * scale,
-      mainAxisSpacing: 10 * scale,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
       childAspectRatio: 148 / 90,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
-        _TeacherClassDetailFunctionTile(
-          scale: scale,
-          iconAsset: 'assets/images/classroom_homework.png',
+        TeacherClassDetailFunctionTile(
+          iconAsset: 'assets/icons/classroom-homework.png',
           label: context.getText(AppKeys.teacherAssignments),
           onTap: onOpenAssignments,
         ),
-        _TeacherClassDetailFunctionTile(
-          scale: scale,
-          iconAsset: 'assets/images/teacher_class_assignment.png',
+        TeacherClassDetailFunctionTile(
+          iconAsset: 'assets/icons/teacher-class-assignment.png',
           label: context.getText(AppKeys.teacherAssessments),
           onTap: onOpenAssessments,
         ),
-        _TeacherClassDetailFunctionTile(scale: scale),
-        _TeacherClassDetailFunctionTile(scale: scale),
+        const TeacherClassDetailFunctionTile(),
+        const TeacherClassDetailFunctionTile(),
       ],
     );
   }

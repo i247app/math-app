@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
@@ -30,7 +30,7 @@ class PhoneRegionMenu extends StatelessWidget {
             value: item,
             child: Text(
               '${item.flag}  ${item.label} ${item.code}',
-              style: GoogleFonts.andika(),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           );
         }).toList();
@@ -38,13 +38,13 @@ class PhoneRegionMenu extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(region.flag, style: const TextStyle(fontSize: 22)),
+          Text(region.flag, style: const TextStyle(fontSize: FontSize.xxl)),
           const SizedBox(width: 8),
           Text(
             region.code,
-            style: GoogleFonts.andika(
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: colors.textPrimary,
-              fontSize: 18,
+              fontSize: FontSize.large,
               fontWeight: FontWeight.w600,
             ),
           ),

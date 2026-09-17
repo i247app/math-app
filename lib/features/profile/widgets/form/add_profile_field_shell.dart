@@ -9,21 +9,18 @@ class AddProfileFieldShell extends StatelessWidget {
     super.key,
     required this.label,
     required this.child,
-    required this.scale,
   });
 
   final String label;
   final Widget child;
-  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return AppFormFieldLayout(
       label: label,
-      scale: scale,
       labelStyle: GoogleFonts.andika(
         color: const Color(0xFF604950),
-        fontSize: FontSize.small * scale,
+        fontSize: FontSize.small,
         fontWeight: FontWeight.w900,
         height: 1,
         letterSpacing: 0,

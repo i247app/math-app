@@ -1,7 +1,9 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherSendingInviteOverlay extends StatelessWidget {
-  const _TeacherSendingInviteOverlay();
+import 'package:numi/core/theme/app_colors.dart';
+
+class TeacherSendingInviteOverlay extends StatelessWidget {
+  const TeacherSendingInviteOverlay({super.key});
 
   @override
   Widget build(BuildContext context) {

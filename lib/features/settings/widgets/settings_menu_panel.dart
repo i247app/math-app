@@ -1,4 +1,3 @@
-import 'package:numi/features/settings/application/settings_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_theme_scope.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/features/settings/models/settings_constants.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 import 'package:numi/features/settings/widgets/menu/settings_avatar.dart';
 import 'package:numi/features/settings/widgets/menu/settings_language_card.dart';
 import 'package:numi/features/settings/widgets/menu/settings_theme_switch_card.dart';
@@ -22,7 +23,6 @@ class SettingsMenuPanel extends StatelessWidget {
     required this.fallbackAvatarUrl,
     required this.fallbackAvatarPath,
     required this.username,
-    required this.scale,
     required this.currentLanguage,
     required this.hasPasscode,
     required this.isLoadingPasscode,
@@ -39,7 +39,6 @@ class SettingsMenuPanel extends StatelessWidget {
   final String? fallbackAvatarUrl;
   final String? fallbackAvatarPath;
   final String username;
-  final double scale;
   final AppLanguage currentLanguage;
   final bool hasPasscode;
   final bool isLoadingPasscode;
@@ -56,102 +55,113 @@ class SettingsMenuPanel extends StatelessWidget {
     final colors = context.themeColors;
     final themeController = AppThemeScope.of(context);
 
-    return Column(
-      children: [
-        SizedBox(height: 4 * scale),
-        SettingsAvatar(
-          activeProfile: activeProfile,
-          fallbackAvatarUrl: fallbackAvatarUrl,
-          fallbackAvatarPath: fallbackAvatarPath,
-          scale: scale,
-          onSwitchTap: onProfileTap,
-        ),
-        SizedBox(height: 14 * scale),
-        Text(
-          _displayName(),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
-            color: colors.textPrimary,
-            fontSize: FontSize.xxxl * scale,
-            fontWeight: FontWeight.w700,
-            height: 1.05,
-            letterSpacing: 0,
-          ),
-        ),
-        SizedBox(height: 32 * scale),
-        _animatedAction(
-          child: SettingsActionCard(
-            icon: Icons.account_circle_outlined,
-            iconColor: const Color(0xFFC21873),
-            iconBackground: const Color(0xFFFFF0F7),
-            title: context.getText(AppKeys.accountMenuTitle),
-            subtitle: context.getText(AppKeys.accountMenuSubtitle),
-            scale: scale,
-            onTap: onAccountTap,
-          ),
-        ),
-        SizedBox(height: 12 * scale),
-        _animatedAction(
-          child: SettingsActionCard(
-            icon: Icons.person_outline_rounded,
-            iconColor: const Color(0xFF008A52),
-            iconBackground: const Color(0xFFD6FFE3),
-            title: context.getText(AppKeys.profileMenuTitle),
-            subtitle: context.getText(AppKeys.profileMenuSubtitle),
-            scale: scale,
-            onTap: onProfileTap,
-          ),
-        ),
-        SizedBox(height: 12 * scale),
-        _animatedAction(
-          child: SettingsActionCard(
-            icon: Icons.lock_outline_rounded,
-            iconColor: const Color(0xFF327F84),
-            iconBackground: const Color(0xFFE5F7F8),
-            title: context.getText(AppKeys.passcodeMenuTitle),
-            subtitle: context.getText(
-              hasPasscode
-                  ? AppKeys.passcodeMenuSubtitleManage
-                  : AppKeys.passcodeMenuSubtitleSet,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.s4),
+            child: Column(
+              children: [
+                SettingsAvatar(
+                  activeProfile: activeProfile,
+                  fallbackAvatarUrl: fallbackAvatarUrl,
+                  fallbackAvatarPath: fallbackAvatarPath,
+                  onSwitchTap: onProfileTap,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 14),
+                  child: Text(
+                    _displayName(context),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.andika(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w700,
+                      height: 1.05,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.s32),
+                  child: Column(
+                    spacing: AppSpacing.s12,
+                    children: [
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.account_circle_outlined,
+                          iconColor: const Color(0xFFC21873),
+                          iconBackground: const Color(0xFFFFF0F7),
+                          title: context.getText(AppKeys.accountMenuTitle),
+                          subtitle: context.getText(
+                            AppKeys.accountMenuSubtitle,
+                          ),
+                          onTap: onAccountTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.person_outline_rounded,
+                          iconColor: const Color(0xFF008A52),
+                          iconBackground: const Color(0xFFD6FFE3),
+                          title: context.getText(AppKeys.profileMenuTitle),
+                          subtitle: context.getText(
+                            AppKeys.profileMenuSubtitle,
+                          ),
+                          onTap: onProfileTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.lock_outline_rounded,
+                          iconColor: const Color(0xFF327F84),
+                          iconBackground: const Color(0xFFE5F7F8),
+                          title: context.getText(AppKeys.passcodeMenuTitle),
+                          subtitle: context.getText(
+                            hasPasscode
+                                ? AppKeys.passcodeMenuSubtitleManage
+                                : AppKeys.passcodeMenuSubtitleSet,
+                          ),
+                          onTap: onPasscodeTap,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsLanguageCard(
+                          currentLanguage: currentLanguage,
+                          onLanguageChanged: onLanguageChanged,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsThemeSwitchCard(
+                          controller: themeController,
+                        ),
+                      ),
+                      _animatedAction(
+                        child: SettingsActionCard(
+                          icon: Icons.logout_rounded,
+                          iconColor: colors.accentStrong,
+                          iconBackground: const Color(0xFFFFEAEA),
+                          title: context.getText(AppKeys.logout),
+                          subtitle: context.getText(AppKeys.logoutSubtitle),
+                          isDestructive: true,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            onLogoutTap();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            scale: scale,
-            onTap: onPasscodeTap,
           ),
         ),
-        SizedBox(height: 12 * scale),
-        _animatedAction(
-          child: SettingsLanguageCard(
-            currentLanguage: currentLanguage,
-            scale: scale,
-            onLanguageChanged: onLanguageChanged,
-          ),
-        ),
-        SizedBox(height: 12 * scale),
-        _animatedAction(
-          child: SettingsThemeSwitchCard(
-            controller: themeController,
-            scale: scale,
-          ),
-        ),
-        SizedBox(height: 12 * scale),
-        _animatedAction(
-          child: SettingsActionCard(
-            icon: Icons.logout_rounded,
-            iconColor: colors.accentStrong,
-            iconBackground: const Color(0xFFFFEAEA),
-            title: context.getText(AppKeys.logout),
-            subtitle: context.getText(AppKeys.logoutSubtitle),
-            isDestructive: true,
-            scale: scale,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              onLogoutTap();
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -179,11 +189,14 @@ class SettingsMenuPanel extends StatelessWidget {
     );
   }
 
-  String _displayName() {
+  String _displayName(BuildContext context) {
     final name = activeProfile?.name?.trim();
     if (name != null && name.isNotEmpty) {
       return name;
     }
-    return username;
+    final accountName = username.trim();
+    return accountName.isEmpty
+        ? context.getText(AppKeys.accountNotUpdated)
+        : accountName;
   }
 }

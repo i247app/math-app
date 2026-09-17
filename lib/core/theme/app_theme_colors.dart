@@ -25,10 +25,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.onSuccess,
     required this.successSurface,
     required this.warning,
-    required this.onWarning,
     required this.warningSurface,
     required this.info,
-    required this.onInfo,
     required this.infoSurface,
     required this.border,
     required this.borderStrong,
@@ -39,8 +37,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.shadow,
     required this.scrim,
     required this.skeleton,
-    required this.authBackSurface,
-    required this.authBackBorder,
     required this.otpBorder,
     required this.passcodeBorder,
     required this.passcodeShadow,
@@ -68,10 +64,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color onSuccess;
   final Color successSurface;
   final Color warning;
-  final Color onWarning;
   final Color warningSurface;
   final Color info;
-  final Color onInfo;
   final Color infoSurface;
   final Color border;
   final Color borderStrong;
@@ -82,8 +76,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color shadow;
   final Color scrim;
   final Color skeleton;
-  final Color authBackSurface;
-  final Color authBackBorder;
   final Color otpBorder;
   final Color passcodeBorder;
   final Color passcodeShadow;
@@ -111,10 +103,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     onSuccess: Colors.white,
     successSurface: Color(0xFFE7F5ED),
     warning: AppColors.scoreYellow,
-    onWarning: AppColors.textPrimary,
     warningSurface: Color(0xFFFFF4D8),
     info: AppColors.assessmentProgress,
-    onInfo: Colors.white,
     infoSurface: Color(0xFFE6F4FA),
     border: AppColors.borderNeutral,
     borderStrong: Color(0xFFB5BFC2),
@@ -125,8 +115,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     shadow: Color(0x14000000),
     scrim: Color(0x66001741),
     skeleton: Color(0xFFE8EEF0),
-    authBackSurface: Color(0xCCFFFFFF),
-    authBackBorder: Color(0x1AA2B1A3),
     otpBorder: Color(0xFFF47B55),
     passcodeBorder: Color(0xFF6E7474),
     passcodeShadow: Color(0xFFDCBFC8),
@@ -155,10 +143,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     onSuccess: AppColors.darkBackground,
     successSurface: Color(0xFF1E4435),
     warning: Color(0xFFFFD37A),
-    onWarning: AppColors.darkBackground,
     warningSurface: Color(0xFF4B3B1D),
     info: Color(0xFF78C7FF),
-    onInfo: AppColors.darkBackground,
     infoSurface: Color(0xFF1E3C50),
     border: AppColors.darkOutline,
     borderStrong: Color(0xFF547070),
@@ -169,8 +155,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     shadow: Color(0x52000000),
     scrim: Color(0xB8000000),
     skeleton: Color(0xFF2B4141),
-    authBackSurface: Color(0xE6243333),
-    authBackBorder: Color(0x80355151),
     otpBorder: AppColors.darkActionOrange,
     passcodeBorder: Color(0xFF6A8581),
     passcodeShadow: Color(0xFF0C1515),
@@ -200,10 +184,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? onSuccess,
     Color? successSurface,
     Color? warning,
-    Color? onWarning,
     Color? warningSurface,
     Color? info,
-    Color? onInfo,
     Color? infoSurface,
     Color? border,
     Color? borderStrong,
@@ -214,8 +196,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? shadow,
     Color? scrim,
     Color? skeleton,
-    Color? authBackSurface,
-    Color? authBackBorder,
     Color? otpBorder,
     Color? passcodeBorder,
     Color? passcodeShadow,
@@ -243,10 +223,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       onSuccess: onSuccess ?? this.onSuccess,
       successSurface: successSurface ?? this.successSurface,
       warning: warning ?? this.warning,
-      onWarning: onWarning ?? this.onWarning,
       warningSurface: warningSurface ?? this.warningSurface,
       info: info ?? this.info,
-      onInfo: onInfo ?? this.onInfo,
       infoSurface: infoSurface ?? this.infoSurface,
       border: border ?? this.border,
       borderStrong: borderStrong ?? this.borderStrong,
@@ -257,8 +235,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       shadow: shadow ?? this.shadow,
       scrim: scrim ?? this.scrim,
       skeleton: skeleton ?? this.skeleton,
-      authBackSurface: authBackSurface ?? this.authBackSurface,
-      authBackBorder: authBackBorder ?? this.authBackBorder,
       otpBorder: otpBorder ?? this.otpBorder,
       passcodeBorder: passcodeBorder ?? this.passcodeBorder,
       passcodeShadow: passcodeShadow ?? this.passcodeShadow,
@@ -298,10 +274,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
       successSurface: Color.lerp(successSurface, other.successSurface, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
-      onWarning: Color.lerp(onWarning, other.onWarning, t)!,
       warningSurface: Color.lerp(warningSurface, other.warningSurface, t)!,
       info: Color.lerp(info, other.info, t)!,
-      onInfo: Color.lerp(onInfo, other.onInfo, t)!,
       infoSurface: Color.lerp(infoSurface, other.infoSurface, t)!,
       border: Color.lerp(border, other.border, t)!,
       borderStrong: Color.lerp(borderStrong, other.borderStrong, t)!,
@@ -320,8 +294,6 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       shadow: Color.lerp(shadow, other.shadow, t)!,
       scrim: Color.lerp(scrim, other.scrim, t)!,
       skeleton: Color.lerp(skeleton, other.skeleton, t)!,
-      authBackSurface: Color.lerp(authBackSurface, other.authBackSurface, t)!,
-      authBackBorder: Color.lerp(authBackBorder, other.authBackBorder, t)!,
       otpBorder: Color.lerp(otpBorder, other.otpBorder, t)!,
       passcodeBorder: Color.lerp(passcodeBorder, other.passcodeBorder, t)!,
       passcodeShadow: Color.lerp(passcodeShadow, other.passcodeShadow, t)!,

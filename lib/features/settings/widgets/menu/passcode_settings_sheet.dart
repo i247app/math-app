@@ -1,21 +1,21 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/settings/widgets/menu/settings_action_card.dart';
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
+import 'package:numi/shared/widgets/settings_action_card.dart';
 
 enum PasscodeSettingsAction { change, remove }
 
 class PasscodeSettingsSheet extends StatelessWidget {
   const PasscodeSettingsSheet({
     super.key,
-    required this.scale,
     required this.onChange,
     required this.onRemove,
   });
 
-  final double scale;
   final VoidCallback onChange;
   final VoidCallback onRemove;
 
@@ -24,21 +24,22 @@ class PasscodeSettingsSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        margin: EdgeInsets.all(16 * scale),
-        padding: EdgeInsets.all(18 * scale),
+        margin: const EdgeInsets.all(AppSpacing.s16),
+        padding: const EdgeInsets.all(AppSpacing.s18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24 * scale),
+          borderRadius: BorderRadius.circular(AppRadius.r24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 18 * scale,
-              offset: Offset(0, 8 * scale),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          spacing: AppSpacing.s12,
           children: [
             SettingsActionCard(
               icon: Icons.edit_outlined,
@@ -46,10 +47,8 @@ class PasscodeSettingsSheet extends StatelessWidget {
               iconBackground: const Color(0xFFE5F7F8),
               title: context.getText(AppKeys.passcodeChange),
               subtitle: context.getText(AppKeys.passcodeMenuSubtitleManage),
-              scale: scale,
               onTap: onChange,
             ),
-            SizedBox(height: 12 * scale),
             SettingsActionCard(
               icon: Icons.lock_open_rounded,
               iconColor: AppColors.orange500,
@@ -57,7 +56,6 @@ class PasscodeSettingsSheet extends StatelessWidget {
               title: context.getText(AppKeys.passcodeRemove),
               subtitle: context.getText(AppKeys.passcodeRemove),
               isDestructive: true,
-              scale: scale,
               onTap: onRemove,
             ),
           ],

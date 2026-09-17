@@ -1,29 +1,21 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/network/network_client.dart';
-import 'package:numi/core/network/grade_models.dart';
-
-class GradeException implements Exception {
-  const GradeException(this.message, {this.status});
-
-  final String message;
-  final int? status;
-
-  @override
-  String toString() => message;
-}
-
-abstract class GradeService {
-  Future<List<GradeModel>> listGrades({required int userId});
-}
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/profile/data/grade_api_models.dart';
+import 'package:numi/features/profile/data/profile_conversion.dart';
+import 'package:numi/features/profile/data/grade_exception.dart';
+import 'package:numi/features/profile/models/grade.dart';
 
 class GradeApi implements GradeService {
-  GradeApi({String? baseUrl, NetworkApi? networkApi})
-    : _networkApi =
-          networkApi ??
-          (baseUrl == null ? NetworkApi.shared : NetworkApi(baseUrl: baseUrl));
+  GradeApi({String? baseUrl, NetworkClient? networkClient})
+    : _networkClient =
+          networkClient ??
+          (baseUrl == null
+              ? NetworkClient.shared
+              : NetworkClient(baseUrl: baseUrl));
 
-  final NetworkApi _networkApi;
+  final NetworkClient _networkClient;
 
   @override
   Future<List<GradeModel>> listGrades({required int userId}) async {
@@ -33,11 +25,16 @@ class GradeApi implements GradeService {
 
     final GradeListResponse response;
     try {
-      response = await _networkApi.listGrades(GradeListRequest(userId: userId));
+      final json = await _networkClient.postJson(
+        '/grades/list',
+        GradeListRequest(userId: userId).toJson(),
+      );
+      NetworkClient.throwForApiStatus(json);
+      response = GradeListResponse.fromJson(json);
     } on NetworkException catch (error) {
       throw GradeException(error.message, status: error.status);
     }
 
-    return response.grades;
+    return response.grades.map((grade) => grade.toModel()).toList();
   }
 }

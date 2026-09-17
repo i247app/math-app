@@ -20,7 +20,42 @@ class PhoneInputFormatter extends TextInputFormatter {
 
     return TextEditingValue(
       text: text,
-      selection: TextSelection.collapsed(offset: text.length),
+      selection: _formattedSelection(newValue.selection, newValue.text, text),
+    );
+  }
+
+  TextSelection _formattedSelection(
+    TextSelection selection,
+    String value,
+    String formattedValue,
+  ) {
+    int offsetFor(int offset) {
+      final prefix = value.substring(0, offset.clamp(0, value.length));
+      final digitsBeforeCursor = prefix.replaceAll(RegExp(r'\D'), '').length;
+      var formattedOffset = 0;
+      var digitCount = 0;
+      while (formattedOffset < formattedValue.length &&
+          digitCount < digitsBeforeCursor) {
+        if (RegExp(r'\d').hasMatch(formattedValue[formattedOffset])) {
+          digitCount++;
+        }
+        formattedOffset++;
+      }
+
+      // Keep a cursor placed after an existing separator after that separator.
+      if (prefix.isNotEmpty &&
+          RegExp(r'\D').hasMatch(prefix[prefix.length - 1])) {
+        while (formattedOffset < formattedValue.length &&
+            RegExp(r'\D').hasMatch(formattedValue[formattedOffset])) {
+          formattedOffset++;
+        }
+      }
+      return formattedOffset;
+    }
+
+    return selection.copyWith(
+      baseOffset: offsetFor(selection.baseOffset),
+      extentOffset: offsetFor(selection.extentOffset),
     );
   }
 

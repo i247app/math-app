@@ -1,8 +1,20 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherCreateClassForm extends StatelessWidget {
-  const _TeacherCreateClassForm({
-    required this.scale,
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/profile/models/program.dart';
+import 'package:numi/features/profile/models/school.dart';
+import 'package:numi/shared/helpers/teacher_profile_option_helpers.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_class_avatar_picker.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_dropdown_field.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_multi_select_field.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_primary_button.dart';
+import 'package:numi/features/classroom/widgets/teacher_shared/teacher_text_field.dart';
+
+class TeacherCreateClassForm extends StatelessWidget {
+  const TeacherCreateClassForm({
+    super.key,
     required this.avatarPath,
     required this.grades,
     required this.programs,
@@ -19,8 +31,6 @@ class _TeacherCreateClassForm extends StatelessWidget {
     required this.onSchoolChanged,
     required this.onSubmit,
   });
-
-  final double scale;
   final String? avatarPath;
   final List<GradeModel> grades;
   final List<ProgramModel> programs;
@@ -42,76 +52,65 @@ class _TeacherCreateClassForm extends StatelessWidget {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: EdgeInsets.fromLTRB(
-        28 * scale,
-        24 * scale,
-        28 * scale,
-        24 * scale,
-      ),
+      padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
       child: Column(
+        spacing: 14,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _TeacherClassAvatarPicker(
-            scale: scale,
-            avatarPath: avatarPath,
-            onTap: onPickAvatar,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: TeacherClassAvatarPicker(
+              avatarPath: avatarPath,
+              onTap: onPickAvatar,
+            ),
           ),
-          SizedBox(height: 20 * scale),
-          _TeacherDropdownField<GradeModel>(
+          TeacherDropdownField<GradeModel>(
             label: context.getText(AppKeys.teacherGradeLevel),
             value: selectedGrade,
             items: grades,
             displayText: gradeLabel,
             onChanged: onGradeChanged,
-            scale: scale,
           ),
-          SizedBox(height: 14 * scale),
-          _TeacherTextField(
+          TeacherTextField(
             label: context.getText(AppKeys.teacherClassName),
             hintText: context.getText(AppKeys.teacherClassNameHint),
             controller: nameController,
-            scale: scale,
           ),
-          SizedBox(height: 14 * scale),
-          _TeacherMultiSelectField<ProgramModel>(
+          TeacherMultiSelectField<ProgramModel>(
             label: context.getText(AppKeys.learningProgram),
             values: selectedPrograms,
             items: programs,
             displayText: programLabel,
-            itemId: _programStableId,
+            itemId: programStableId,
             emptyText: context.getText(AppKeys.chooseProgram),
             onChanged: onProgramsChanged,
-            scale: scale,
           ),
-          SizedBox(height: 14 * scale),
-          _TeacherDropdownField<SchoolModel>(
+          TeacherDropdownField<SchoolModel>(
             label: context.getText(AppKeys.school),
             value: selectedSchool,
             items: schools,
             displayText: schoolLabel,
             onChanged: onSchoolChanged,
-            scale: scale,
             outlined: true,
           ),
-          SizedBox(height: 14 * scale),
-          _TeacherTextField(
+          TeacherTextField(
             label: context.getText(AppKeys.teacherClassDescription),
             hintText: context.getText(AppKeys.teacherClassDescriptionHint),
             controller: descriptionController,
-            scale: scale,
             maxLines: 4,
           ),
-          SizedBox(height: 28 * scale),
-          Center(
-            child: _TeacherPrimaryButton(
-              label: isSubmitting
-                  ? context.getText(AppKeys.teacherCreating)
-                  : context.getText(AppKeys.teacherCreate),
-              icon: Icons.arrow_forward_rounded,
-              width: 230 * scale,
-              height: 56 * scale,
-              scale: scale,
-              onPressed: isSubmitting ? null : onSubmit,
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: Center(
+              child: TeacherPrimaryButton(
+                label: isSubmitting
+                    ? context.getText(AppKeys.teacherCreating)
+                    : context.getText(AppKeys.teacherCreate),
+                icon: Icons.arrow_forward_rounded,
+                width: 230,
+                height: 56,
+                onPressed: isSubmitting ? null : onSubmit,
+              ),
             ),
           ),
         ],

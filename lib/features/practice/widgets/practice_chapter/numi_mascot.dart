@@ -1,4 +1,4 @@
-part of '../../presentation/practice_chapter_screen.dart';
+part of '../../screens/practice_chapter_screen.dart';
 
 class _NumiMascot extends StatelessWidget {
   const _NumiMascot({required this.animation, required this.scale});
@@ -38,7 +38,7 @@ class _NumiMascot extends StatelessWidget {
               ),
             ),
             Image.asset(
-              'assets/images/welcome_numi_character.png',
+              'assets/images/welcome-numi-character.png',
               fit: BoxFit.contain,
             ),
           ],

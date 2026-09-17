@@ -1,4 +1,4 @@
-part of '../../presentation/practice_chapter_screen.dart';
+part of '../../screens/practice_chapter_screen.dart';
 
 List<Offset> _nodePoints(double width, double height, int count) {
   const top = 90.0;

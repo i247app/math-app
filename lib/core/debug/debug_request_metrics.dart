@@ -5,12 +5,11 @@ import 'package:flutter/foundation.dart';
 /// [DebugRequestMetricsInterceptor] is registered only in debug builds; this
 /// class remains independently usable in tests to characterize its accounting.
 class DebugRequestMetrics {
-  DebugRequestMetrics({void Function(String message)? log})
-    : _log = log ?? debugPrint;
+  DebugRequestMetrics({void Function(String message)? log}) : _log = log;
 
   static final DebugRequestMetrics instance = DebugRequestMetrics();
 
-  final void Function(String message) _log;
+  final void Function(String message)? _log;
   int _started = 0;
   int _succeeded = 0;
   int _failed = 0;
@@ -23,7 +22,7 @@ class DebugRequestMetrics {
 
   int recordStarted({required String method, required String path}) {
     final requestNumber = ++_started;
-    _log('[Request #$requestNumber] $method $path started');
+    _log?.call('request #$requestNumber $method $path started');
     return requestNumber;
   }
 
@@ -43,8 +42,8 @@ class DebugRequestMetrics {
 
     final outcome = failed ? 'failed' : 'completed';
     final status = statusCode == null ? '' : ' status=$statusCode';
-    _log(
-      '[Request #$requestNumber] $method $path $outcome$status '
+    _log?.call(
+      'request #$requestNumber $method $path $outcome$status '
       'in ${elapsed.inMilliseconds}ms '
       '(started=$_started, succeeded=$_succeeded, failed=$_failed)',
     );

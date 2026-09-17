@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/classroom_models.dart';
+import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_message_button.dart';
@@ -74,38 +74,39 @@ class StudentClassTeacherProfileCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.getText(AppKeys.studentClassTeacherRole),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: colors.textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                          letterSpacing: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.getText(AppKeys.studentClassTeacherRole),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: FontSize.xxxs,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5,
+                            letterSpacing: 1,
+                          ),
                         ),
-                      ),
-                      Text(
-                        teacherName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: colors.textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
+                        Text(
+                          teacherName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: FontSize.large,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
                 StudentClassMessageButton(
                   onTap: () => showStudentClassComingSoon(context),
                 ),

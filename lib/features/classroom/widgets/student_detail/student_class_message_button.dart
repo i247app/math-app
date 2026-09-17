@@ -19,7 +19,7 @@ class StudentClassMessageButton extends StatelessWidget {
           height: 44,
           child: Center(
             child: SvgPicture.asset(
-              'assets/images/student_class_message.svg',
+              'assets/icons/student-class-message.svg',
               width: 20,
               height: 20,
             ),

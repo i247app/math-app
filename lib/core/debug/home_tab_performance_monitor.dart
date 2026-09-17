@@ -3,11 +3,13 @@ import 'dart:ui' show FramePhase, FrameTiming;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import 'app_logger.dart';
+
 /// Associates the first rendered frame after a Home tab selection with that
 /// selection. This is intentionally diagnostic-only and does not affect UI.
 class HomeTabPerformanceMonitor {
   HomeTabPerformanceMonitor({void Function(String message)? log})
-    : _log = log ?? debugPrint;
+    : _log = log ?? ((message) => AppLogger.debug('PERF', message));
 
   final void Function(String message) _log;
   _PendingTabSwitch? _pendingTabSwitch;
@@ -68,7 +70,7 @@ class HomeTabPerformanceMonitor {
         : targetFrame.timestampInMicroseconds(FramePhase.rasterFinish) -
               selectionFrameTimestampMicros;
     _log(
-      '[Home tab] ${pendingTabSwitch.role} '
+      'home tab ${pendingTabSwitch.role} '
       '${pendingTabSwitch.fromTab} → ${pendingTabSwitch.toTab}: '
       'next build=${targetFrame.buildDuration.inMilliseconds}ms, '
       'raster=${targetFrame.rasterDuration.inMilliseconds}ms, '

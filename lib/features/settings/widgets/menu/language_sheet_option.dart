@@ -1,7 +1,9 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_radius.dart';
+import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class LanguageSheetOption extends StatelessWidget {
@@ -10,19 +12,17 @@ class LanguageSheetOption extends StatelessWidget {
     required this.flag,
     required this.label,
     required this.selected,
-    required this.scale,
     required this.onTap,
   });
 
   final String flag;
   final String label;
   final bool selected;
-  final double scale;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(18 * scale);
+    final radius = BorderRadius.circular(AppRadius.r18);
 
     return Material(
       color: selected ? const Color(0xFFFFF2F8) : const Color(0xFFF7FBFB),
@@ -31,9 +31,9 @@ class LanguageSheetOption extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16 * scale,
-            vertical: 14 * scale,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s16,
+            vertical: 14,
           ),
           decoration: BoxDecoration(
             borderRadius: radius,
@@ -41,13 +41,18 @@ class LanguageSheetOption extends StatelessWidget {
               color: selected
                   ? const Color(0xFFC1277D)
                   : const Color(0xFFDCE6E3),
-              width: selected ? 2 * scale : 1.2 * scale,
+              width: selected ? 2 : 1.2,
             ),
           ),
           child: Row(
             children: [
-              Text(flag, style: TextStyle(fontSize: FontSize.xxxl * scale)),
-              SizedBox(width: 12 * scale),
+              Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.s12),
+                child: Text(
+                  flag,
+                  style: const TextStyle(fontSize: FontSize.xxxl),
+                ),
+              ),
               Expanded(
                 child: Text(
                   label,
@@ -55,7 +60,7 @@ class LanguageSheetOption extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.andika(
                     color: AppColors.textPrimary,
-                    fontSize: FontSize.normal * scale,
+                    fontSize: FontSize.normal,
                     fontWeight: FontWeight.w800,
                     height: 1,
                     letterSpacing: 0,
@@ -63,21 +68,18 @@ class LanguageSheetOption extends StatelessWidget {
                 ),
               ),
               Container(
-                width: 30 * scale,
-                height: 30 * scale,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: selected ? const Color(0xFFC1277D) : Colors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFFC1277D),
-                    width: 2 * scale,
-                  ),
+                  border: Border.all(color: const Color(0xFFC1277D), width: 2),
                 ),
                 child: selected
-                    ? Icon(
+                    ? const Icon(
                         Icons.check_rounded,
                         color: Colors.white,
-                        size: 20 * scale,
+                        size: 20,
                       )
                     : null,
               ),

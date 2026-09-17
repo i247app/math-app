@@ -1,7 +1,16 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-class _TeacherSendInviteButton extends StatelessWidget {
-  const _TeacherSendInviteButton({required this.enabled, required this.onTap});
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
+
+class TeacherSendInviteButton extends StatelessWidget {
+  const TeacherSendInviteButton({
+    super.key,
+    required this.enabled,
+    required this.onTap,
+  });
 
   final bool enabled;
   final VoidCallback? onTap;
@@ -23,7 +32,10 @@ class _TeacherSendInviteButton extends StatelessWidget {
         ),
         child: Text(
           context.getText(AppKeys.teacherSendInviteRequest),
-          style: GoogleFonts.andika(fontSize: 16, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: FontSize.normal,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );

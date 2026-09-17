@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../debug/app_logger.dart';
 import '../debug/debug_request_metrics.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
@@ -80,20 +81,36 @@ class DebugRequestMetricsInterceptor extends Interceptor {
 class NetworkLogInterceptor extends Interceptor {
   const NetworkLogInterceptor();
 
-  // Temporary diagnostic switch. Set this back to false after verifying the
-  // JWT copied into request metadata.
-  static const _showSensitiveValuesInDebugLogs = true;
+  static const _requestIdKey = 'networkLogRequestId';
+  static const _startedAtKey = 'networkLogStartedAt';
+  static int _lastRequestId = 0;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _log('*** Request ***');
-    _log('uri: ${options.uri}');
-    _log('method: ${options.method}');
-    if (options.headers.isNotEmpty) {
-      _log('headers: ${_formatHeaders(options.headers)}');
+    if (!AppLogger.isDiagnosticBuild) {
+      handler.next(options);
+      return;
     }
-    _log('data:');
-    _log(_formatData(options.data));
+
+    final requestId = ++_lastRequestId;
+    options.extra[_requestIdKey] = requestId;
+    options.extra[_startedAtKey] = DateTime.now();
+    AppLogger.info(
+      'API',
+      '[REQUEST] #$requestId ${options.method} ${options.uri}',
+    );
+    if (options.headers.isNotEmpty) {
+      AppLogger.payload(
+        'API',
+        '#$requestId request headers',
+        _formatHeaders(options.headers),
+      );
+    }
+    AppLogger.payload(
+      'API',
+      '#$requestId request body',
+      _formatData(options.data),
+    );
     handler.next(options);
   }
 
@@ -102,66 +119,69 @@ class NetworkLogInterceptor extends Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    _log('*** Response ***');
-    _log('uri: ${response.requestOptions.uri}');
-    _log('statusCode: ${response.statusCode}');
-    _log('Response Text:');
-    _log(_formatData(response.data));
+    final options = response.requestOptions;
+    final requestId = _requestId(options);
+    AppLogger.info(
+      'API',
+      '[RESPONSE] #$requestId ${options.method} ${options.uri} '
+          'status=${response.statusCode}${_elapsed(options)}',
+    );
+    AppLogger.payload(
+      'API',
+      '#$requestId response body',
+      _formatData(response.data),
+    );
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _log('*** DioException ***');
-    _log('uri: ${err.requestOptions.uri}');
-    _log('type: ${err.type}');
-    _log('message: ${err.message}');
+    final options = err.requestOptions;
+    final requestId = _requestId(options);
+    AppLogger.error(
+      'API',
+      '[RESPONSE] #$requestId ${options.method} ${options.uri} '
+          'type=${err.type}${_elapsed(options)}',
+      error: err.message,
+      stackTrace: err.stackTrace,
+    );
     final response = err.response;
     if (response != null) {
-      _log('statusCode: ${response.statusCode}');
-      _log('Response Text:');
-      _log(_formatData(response.data));
+      AppLogger.payload(
+        'API',
+        '#$requestId error response status=${response.statusCode}',
+        _formatData(response.data),
+      );
     }
     handler.next(err);
   }
 
-  static String _formatHeaders(Map<String, dynamic> headers) {
-    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
-      return _jsonOrString(headers);
-    }
-
+  static Object _formatHeaders(Map<String, dynamic> headers) {
     final redacted = <String, dynamic>{};
     for (final entry in headers.entries) {
       final key = entry.key;
-      final lowerKey = key.toLowerCase();
-      redacted[key] = lowerKey == 'authorization' || lowerKey == 'x-auth-token'
-          ? '<redacted>'
-          : entry.value;
+      redacted[key] = _shouldRedactValue(key) ? '<redacted>' : entry.value;
     }
-    return _jsonOrString(redacted);
+    return redacted;
   }
 
-  static String _formatData(Object? data) {
+  static Object? _formatData(Object? data) {
     if (data == null) {
-      return 'null';
+      return null;
     }
 
     if (data is FormData) {
       return _formatFormData(data);
     }
 
-    if (kDebugMode && _showSensitiveValuesInDebugLogs) {
-      return _jsonOrString(data);
-    }
-
-    return _jsonOrString(_redactSensitiveData(data));
+    return _redactSensitiveData(data);
   }
 
   static Object? _redactSensitiveData(Object? value) {
     if (value is Map) {
       return <String, Object?>{
         for (final entry in value.entries)
-          entry.key.toString(): _isSensitiveKey(entry.key.toString())
+          entry.key.toString(): _shouldRedactValue(entry.key.toString())
               ? '<redacted>'
               : _redactSensitiveData(entry.value),
       };
@@ -181,12 +201,21 @@ class NetworkLogInterceptor extends Interceptor {
       'access_token' ||
       'accesstoken' ||
       'refresh_token' ||
-      'refreshtoken' => true,
+      'refreshtoken' ||
+      'device_push_token' ||
+      'fcm_token' ||
+      'push_token' => true,
       _ => false,
     };
   }
 
-  static String _formatFormData(FormData formData) {
+  // Expose sensitive values only when diagnosing requests in debug builds.
+  // Profile and release builds always keep them redacted.
+  static bool _shouldRedactValue(String key) {
+    return !kDebugMode && _isSensitiveKey(key);
+  }
+
+  static Object _formatFormData(FormData formData) {
     final fields = <String, Object?>{};
     for (final field in formData.fields) {
       final existing = fields[field.key];
@@ -209,18 +238,21 @@ class NetworkLogInterceptor extends Interceptor {
       };
     }).toList();
 
-    return _jsonOrString(<String, Object?>{'fields': fields, 'files': files});
+    return <String, Object?>{'fields': fields, 'files': files};
   }
 
-  static String _jsonOrString(Object? value) {
-    try {
-      return jsonEncode(value);
-    } catch (_) {
-      return value.toString();
+  static int _requestId(RequestOptions options) {
+    final requestId = options.extra[_requestIdKey];
+    return requestId is int ? requestId : 0;
+  }
+
+  static String _elapsed(RequestOptions options) {
+    final startedAt = options.extra[_startedAtKey];
+    if (startedAt is! DateTime) {
+      return '';
     }
+    return ' ${DateTime.now().difference(startedAt).inMilliseconds}ms';
   }
-
-  static void _log(String message) => debugPrint(message);
 }
 
 class MetadataInterceptor extends QueuedInterceptor {

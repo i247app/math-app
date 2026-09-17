@@ -4,10 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/auth/data/auth_models.dart';
-import 'package:numi/features/profile/data/active_profile_session.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/widgets/list/parent_child_profile_card.dart';
 import 'package:numi/features/profile/widgets/list/parent_info_card.dart';
 import 'package:numi/features/profile/widgets/list/profile_add_button.dart';
@@ -19,8 +18,8 @@ class ParentProfileManagePanel extends StatelessWidget {
     required this.parentProfile,
     required this.children,
     required this.activeProfileId,
+    required this.switchingProfileId,
     required this.user,
-    required this.scale,
     required this.onAdd,
     required this.onSelect,
     required this.onEdit,
@@ -31,8 +30,8 @@ class ParentProfileManagePanel extends StatelessWidget {
   final StudentProfile parentProfile;
   final List<StudentProfile> children;
   final int? activeProfileId;
+  final int? switchingProfileId;
   final LoginUser? user;
-  final double scale;
   final VoidCallback onAdd;
   final ValueChanged<StudentProfile> onSelect;
   final ValueChanged<StudentProfile> onEdit;
@@ -45,28 +44,28 @@ class ParentProfileManagePanel extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
       children: [
         Text(
           context.getText(AppKeys.parentInfoTitle),
           style: GoogleFonts.andika(
             color: AppColors.textPrimary,
-            fontSize: FontSize.large * scale,
+            fontSize: FontSize.large,
             fontWeight: FontWeight.w900,
             height: 1,
           ),
         ),
-        SizedBox(height: 12 * scale),
-        ParentInfoCard(
-          profile: parentProfile,
-          user: user,
-          isActive:
-              ActiveProfileSession.profileStableId(parentProfile) ==
-              activeProfileId,
-          scale: scale,
-          onSelect: () => onSelect(parentProfile),
-          onEdit: () => onEdit(parentProfile),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ParentInfoCard(
+            profile: parentProfile,
+            user: user,
+            isActive: profileStableId(parentProfile) == activeProfileId,
+            isSwitching: profileStableId(parentProfile) == switchingProfileId,
+            onSelect: () => onSelect(parentProfile),
+            onEdit: () => onEdit(parentProfile),
+          ),
         ),
-        SizedBox(height: 24 * scale),
         Row(
           children: [
             Expanded(
@@ -77,16 +76,15 @@ class ParentProfileManagePanel extends StatelessWidget {
                 ),
                 style: GoogleFonts.andika(
                   color: AppColors.textPrimary,
-                  fontSize: FontSize.large * scale,
+                  fontSize: FontSize.large,
                   fontWeight: FontWeight.w900,
                   height: 1,
                 ),
               ),
             ),
-            if (canAddProfile) ProfileAddButton(scale: scale, onTap: onAdd),
+            if (canAddProfile) ProfileAddButton(onTap: onAdd),
           ],
         ),
-        SizedBox(height: 12 * scale),
         if (sortedChildren.isEmpty)
           ProfileStatePanel(
             icon: Icons.groups_2_outlined,
@@ -95,24 +93,24 @@ class ParentProfileManagePanel extends StatelessWidget {
             buttonLabel: canAddProfile
                 ? context.getText(AppKeys.addProfile)
                 : null,
-            scale: scale,
             onTap: canAddProfile ? onAdd : null,
           )
         else
-          for (var index = 0; index < sortedChildren.length; index++) ...[
-            ParentChildProfileCard(
-              profile: sortedChildren[index],
-              isActive:
-                  ActiveProfileSession.profileStableId(sortedChildren[index]) ==
-                  activeProfileId,
-              scale: scale,
-              onSelect: () => onSelect(sortedChildren[index]),
-              onEdit: () => onEdit(sortedChildren[index]),
-              onDelete: () => onDelete(sortedChildren[index]),
-            ),
-            if (index != sortedChildren.length - 1)
-              SizedBox(height: 16 * scale),
-          ],
+          Column(
+            spacing: 16,
+            children: sortedChildren
+                .map(
+                  (profile) => ParentChildProfileCard(
+                    profile: profile,
+                    isActive: profileStableId(profile) == activeProfileId,
+                    isSwitching: profileStableId(profile) == switchingProfileId,
+                    onSelect: () => onSelect(profile),
+                    onEdit: () => onEdit(profile),
+                    onDelete: () => onDelete(profile),
+                  ),
+                )
+                .toList(growable: false),
+          ),
       ],
     );
   }
@@ -123,8 +121,7 @@ class ParentProfileManagePanel extends StatelessWidget {
     }
 
     final activeIndex = children.indexWhere(
-      (profile) =>
-          ActiveProfileSession.profileStableId(profile) == activeProfileId,
+      (profile) => profileStableId(profile) == activeProfileId,
     );
     if (activeIndex <= 0) {
       return children;

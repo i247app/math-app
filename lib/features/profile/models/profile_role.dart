@@ -1,4 +1,4 @@
-import 'package:numi/core/network/profile_models.dart';
+import 'package:numi/features/profile/models/profile.dart';
 
 enum ProfileRole {
   student,

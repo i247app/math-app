@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/auth/widgets/passcode/passcode_digit_box.dart';
+import 'package:numi/features/auth/widgets/auth_digit_box.dart';
 
 class PasscodeInputRow extends StatelessWidget {
   const PasscodeInputRow({
@@ -28,7 +28,7 @@ class PasscodeInputRow extends StatelessWidget {
           child: SizedBox(
             width: 64,
             height: 70,
-            child: PasscodeDigitBox(
+            child: AuthDigitBox.passcode(
               controller: controllers[index],
               focusNode: focusNodes[index],
               // PasscodeScreen requests focus after the first frame so the

@@ -4,13 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'app/numi_app.dart';
-import 'app/startup_bootstrap.dart';
-import 'core/debug/app_debug_bloc_observer.dart';
-import 'core/network/api_metadata.dart';
-import 'core/notifications/notification_service.dart';
+import 'package:numi/app/numi_app.dart';
+import 'package:numi/app/composition/app_services.dart';
+import 'package:numi/app/startup_bootstrap.dart';
+import 'package:numi/core/debug/app_logger.dart';
+import 'package:numi/core/debug/app_debug_bloc_observer.dart';
+import 'package:numi/core/network/api_metadata.dart';
+import 'package:numi/core/notifications/notification_service.dart';
 
-export 'app/numi_app.dart';
+export 'package:numi/app/numi_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,11 +21,13 @@ Future<void> main() async {
   }
   _forwardPushTokenToApiMetadata();
   unawaited(NotificationService().initialize());
-  final startup = await const StartupBootstrap().run();
+  final services = AppServices();
+  final startup = await StartupBootstrap(services: services).run();
   runApp(
     NumiApp(
       lingoProvider: startup.lingoProvider,
       themeController: startup.themeController,
+      services: startup.services,
       authService: startup.authService,
       initialSession: startup.initialSession,
       restoreSessionOnStart: false,
@@ -41,7 +45,7 @@ void _forwardPushTokenToApiMetadata() {
   NotificationService.tokens.listen(
     (token) => unawaited(_applyPushToken(metadataProvider, token)),
     onError: (Object error) =>
-        debugPrint('[Notification] forward push token failed: $error'),
+        AppLogger.error('NOTIFY', 'forward push token failed', error: error),
   );
   final latestToken = NotificationService.latestToken;
   if (latestToken != null) {
@@ -56,6 +60,6 @@ Future<void> _applyPushToken(
   try {
     await metadataProvider.updateDevicePushToken(token);
   } catch (error) {
-    debugPrint('[Notification] forward push token failed: $error');
+    AppLogger.error('NOTIFY', 'forward push token failed', error: error);
   }
 }

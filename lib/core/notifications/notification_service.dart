@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../debug/app_logger.dart';
+
 @pragma('vm:entry-point')
 Future<void> numiFirebaseMessagingBackgroundHandler(
   RemoteMessage message,
@@ -24,10 +26,8 @@ Future<void> numiFirebaseMessagingBackgroundHandler(
 
 @pragma('vm:entry-point')
 void numiLocalNotificationTapBackground(NotificationResponse response) {
-  debugPrint(
-    '[Notification] local background tap id=${response.id} '
-    'payload=${response.payload}',
-  );
+  AppLogger.info('NOTIFY', 'local background tap id=${response.id}');
+  AppLogger.payload('NOTIFY', 'local background tap payload', response.payload);
 }
 
 class NotificationService {
@@ -45,6 +45,8 @@ class NotificationService {
         description: 'Notifications shown while NUMI is open.',
         importance: Importance.high,
       );
+  static const int _apnsTokenLoadAttempts = 40;
+  static const Duration _apnsTokenRetryDelay = Duration(milliseconds: 250);
 
   static bool _initialized = false;
   static String? _latestToken;
@@ -77,20 +79,75 @@ class NotificationService {
         await Firebase.initializeApp();
       }
 
-      final token = await FirebaseMessaging.instance.getToken();
+      final messaging = FirebaseMessaging.instance;
+      final token = await resolveMessagingToken(
+        requiresApnsToken: _requiresApnsToken,
+        getApnsToken: messaging.getAPNSToken,
+        getFcmToken: messaging.getToken,
+      );
       if (token == null || token.isEmpty) {
-        debugPrint('[Notification] FCM token is not available yet.');
+        AppLogger.warning('NOTIFY', 'FCM token is not available yet');
         return null;
       }
 
       _emitToken(token);
-      debugPrint('[Notification] FCM token: $token');
+      AppLogger.info('NOTIFY', 'FCM token loaded');
       return token;
     } catch (error, stackTrace) {
       _logNotificationError('token load', error, stackTrace);
       return null;
     }
   }
+
+  /// Waits for APNs registration before asking Firebase for an FCM token.
+  ///
+  /// Recent Firebase Messaging SDKs require the APNs token to be available
+  /// before Apple-platform FCM API calls. The wait is bounded so notification
+  /// startup cannot hang indefinitely when APNs registration is unavailable.
+  @visibleForTesting
+  static Future<String?> resolveMessagingToken({
+    required bool requiresApnsToken,
+    required Future<String?> Function() getApnsToken,
+    required Future<String?> Function() getFcmToken,
+    int apnsTokenLoadAttempts = _apnsTokenLoadAttempts,
+    Duration apnsTokenRetryDelay = _apnsTokenRetryDelay,
+    Future<void> Function(Duration)? delay,
+  }) async {
+    if (requiresApnsToken) {
+      var apnsTokenAvailable = false;
+      for (var attempt = 0; attempt < apnsTokenLoadAttempts; attempt++) {
+        final apnsToken = (await getApnsToken())?.trim();
+        if (apnsToken != null && apnsToken.isNotEmpty) {
+          apnsTokenAvailable = true;
+          break;
+        }
+
+        final hasAnotherAttempt = attempt + 1 < apnsTokenLoadAttempts;
+        if (hasAnotherAttempt) {
+          if (delay != null) {
+            await delay(apnsTokenRetryDelay);
+          } else {
+            await Future<void>.delayed(apnsTokenRetryDelay);
+          }
+        }
+      }
+
+      if (!apnsTokenAvailable) {
+        AppLogger.warning(
+          'NOTIFY',
+          'APNs token is not available yet; deferring FCM token load',
+        );
+        return null;
+      }
+    }
+
+    return getFcmToken();
+  }
+
+  static bool get _requiresApnsToken =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
 
   static void _emitToken(String token) {
     _latestToken = token;
@@ -123,9 +180,9 @@ class NotificationService {
     await _requestPermission();
     await _initializeLocalNotifications();
     await _requestLocalNotificationPermission();
-    await _disableFirebaseForegroundPresentation();
-    await _loadInitialToken();
+    await _configureFirebaseForegroundPresentation();
     _listenForTokenRefresh();
+    await _loadInitialToken();
     _listenForForegroundMessages();
     _listenForOpenedMessages();
     await _handleInitialMessage();
@@ -220,22 +277,23 @@ class NotificationService {
         provisional: false,
         sound: true,
       );
-      debugPrint(
-        '[Notification] permission: ${settings.authorizationStatus.name}',
+      AppLogger.info(
+        'NOTIFY',
+        'permission=${settings.authorizationStatus.name}',
       );
     } catch (error, stackTrace) {
       _logNotificationError('permission request', error, stackTrace);
     }
   }
 
-  /// Avoids duplicate foreground banners on Apple platforms. Foreground FCM
-  /// messages are surfaced through flutter_local_notifications instead.
-  Future<void> _disableFirebaseForegroundPresentation() async {
+  /// Lets Apple platforms present FCM notification payloads while the app is
+  /// in the foreground. Data-only messages still use the local fallback below.
+  Future<void> _configureFirebaseForegroundPresentation() async {
     try {
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: false,
-        badge: false,
-        sound: false,
+        alert: true,
+        badge: true,
+        sound: true,
       );
     } catch (error, stackTrace) {
       _logNotificationError('foreground presentation', error, stackTrace);
@@ -250,7 +308,7 @@ class NotificationService {
     _firebaseMessaging.onTokenRefresh.listen(
       (token) {
         _emitToken(token);
-        debugPrint('[Notification] FCM token refreshed: $token');
+        AppLogger.info('NOTIFY', 'FCM token refreshed');
       },
       onError: (Object error, StackTrace stackTrace) {
         _logNotificationError('token refresh', error, stackTrace);
@@ -263,10 +321,12 @@ class NotificationService {
       (message) {
         _messageController.add(message);
         logRemoteMessage(message, source: 'foreground');
-        // Foreground remote notifications are displayed through local
-        // notifications on mobile so Android and iOS use the same path.
+        // Apple displays notification payloads through the native presentation
+        // options above. Keep the local fallback for Android and for iOS
+        // data-only messages that contain title/body fields.
         if (defaultTargetPlatform == TargetPlatform.android ||
-            defaultTargetPlatform == TargetPlatform.iOS) {
+            (defaultTargetPlatform == TargetPlatform.iOS &&
+                message.notification == null)) {
           unawaited(_showForegroundNotification(message));
         }
       },
@@ -324,9 +384,8 @@ class NotificationService {
 
   static void _handleLocalNotificationResponse(NotificationResponse response) {
     _localResponseController.add(response);
-    debugPrint(
-      '[Notification] local tap id=${response.id} payload=${response.payload}',
-    );
+    AppLogger.info('NOTIFY', 'local tap id=${response.id}');
+    AppLogger.payload('NOTIFY', 'local tap payload', response.payload);
   }
 
   void _listenForOpenedMessages() {
@@ -359,18 +418,20 @@ class NotificationService {
     RemoteMessage message, {
     required String source,
   }) {
-    final notification = message.notification;
-    debugPrint(
-      '[Notification] $source message id=${message.messageId} '
-      'title=${notification?.title} body=${notification?.body} '
-      'data=${message.data}',
-    );
+    AppLogger.info('NOTIFY', '$source message id=${message.messageId}');
+    AppLogger.payload('NOTIFY', '$source message payload', <String, Object?>{
+      'title': message.notification?.title,
+      'body': message.notification?.body,
+      'data': message.data,
+    });
   }
 }
 
 void _logNotificationError(String action, Object error, StackTrace stackTrace) {
-  debugPrint('[Notification] $action failed: $error');
-  if (kDebugMode) {
-    debugPrintStack(stackTrace: stackTrace);
-  }
+  AppLogger.error(
+    'NOTIFY',
+    '$action failed',
+    error: error,
+    stackTrace: stackTrace,
+  );
 }

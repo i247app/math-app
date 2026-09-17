@@ -9,16 +9,16 @@ class PlainAccountTextField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.enabled,
-    required this.scale,
     this.keyboardType,
     this.textStyle,
+    this.hintText,
   });
 
   final TextEditingController controller;
   final bool enabled;
-  final double scale;
   final TextInputType? keyboardType;
   final TextStyle? textStyle;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class PlainAccountTextField extends StatelessWidget {
         textStyle ??
         GoogleFonts.andika(
           color: AppColors.textPrimary,
-          fontSize: FontSize.large * scale,
+          fontSize: FontSize.large,
           fontWeight: FontWeight.w700,
           height: 1,
           letterSpacing: 0,
@@ -41,7 +41,12 @@ class PlainAccountTextField extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onTapOutside: (_) => FocusScope.of(context).unfocus(),
       style: style,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: style.copyWith(
+          color: style.color?.withValues(alpha: 0.45),
+          fontWeight: FontWeight.w500,
+        ),
         filled: false,
         isCollapsed: true,
         border: InputBorder.none,

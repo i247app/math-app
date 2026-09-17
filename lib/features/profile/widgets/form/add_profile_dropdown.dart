@@ -18,7 +18,6 @@ class AddProfileDropdown<T> extends StatelessWidget {
     required this.items,
     required this.itemLabel,
     required this.onChanged,
-    required this.scale,
     this.allowEmpty = false,
     this.emptyLabel,
   });
@@ -29,7 +28,6 @@ class AddProfileDropdown<T> extends StatelessWidget {
   final List<T> items;
   final String Function(T item) itemLabel;
   final ValueChanged<T?> onChanged;
-  final double scale;
   final bool allowEmpty;
   final String? emptyLabel;
 
@@ -42,7 +40,6 @@ class AddProfileDropdown<T> extends StatelessWidget {
 
     return AddProfileFieldShell(
       label: label,
-      scale: scale,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -50,7 +47,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
             dismissProfileFormKeyboard();
             _openBottomSheet(context, selectedValue);
           },
-          borderRadius: BorderRadius.circular(14 * scale),
+          borderRadius: BorderRadius.circular(14),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -66,7 +63,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                     color: selectedLabel == null
                         ? const Color(0xFFA8B1B2)
                         : AppColors.textPrimary,
-                    fontSize: FontSize.normal * scale,
+                    fontSize: FontSize.normal,
                     fontWeight: selectedLabel == null
                         ? FontWeight.w800
                         : FontWeight.w900,
@@ -74,10 +71,10 @@ class AddProfileDropdown<T> extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: AppColors.tealIcon,
-                size: 24 * scale,
+                size: 24,
               ),
             ],
           ),
@@ -94,22 +91,15 @@ class AddProfileDropdown<T> extends StatelessWidget {
       builder: (context) {
         final bottomInset = MediaQuery.paddingOf(context).bottom;
         return Container(
-          padding: EdgeInsets.fromLTRB(
-            20 * scale,
-            10 * scale,
-            20 * scale,
-            bottomInset + 18 * scale,
-          ),
+          padding: EdgeInsets.fromLTRB(20, 10, 20, bottomInset + 18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(28 * scale),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.10),
-                blurRadius: 24 * scale,
-                offset: Offset(0, -8 * scale),
+                blurRadius: 24,
+                offset: const Offset(0, -8),
               ),
             ],
           ),
@@ -121,9 +111,9 @@ class AddProfileDropdown<T> extends StatelessWidget {
               children: [
                 Center(
                   child: Container(
-                    width: 46 * scale,
-                    height: 5 * scale,
-                    margin: EdgeInsets.only(bottom: 14 * scale),
+                    width: 46,
+                    height: 5,
+                    margin: const EdgeInsets.only(bottom: 14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE2E9EC),
                       borderRadius: BorderRadius.circular(999),
@@ -134,67 +124,69 @@ class AddProfileDropdown<T> extends StatelessWidget {
                   label,
                   style: GoogleFonts.andika(
                     color: AppColors.tealIcon,
-                    fontSize: FontSize.xxxl * scale,
+                    fontSize: FontSize.xxxl,
                     fontWeight: FontWeight.w900,
                     height: 1.15,
                   ),
                 ),
-                SizedBox(height: 10 * scale),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 360 * scale),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: items.length + (allowEmpty ? 1 : 0),
-                    separatorBuilder: (_, _) =>
-                        const Divider(height: 1, color: Color(0xFFEFF4F5)),
-                    itemBuilder: (context, index) {
-                      final isEmptyOption = allowEmpty && index == 0;
-                      final item = isEmptyOption
-                          ? null
-                          : items[index - (allowEmpty ? 1 : 0)];
-                      final optionLabel = isEmptyOption
-                          ? emptyLabel ??
-                                context.getText(AppKeys.profileIdTypeNone)
-                          : itemLabel(item as T);
-                      final isSelected = isEmptyOption
-                          ? selectedValue == null
-                          : identical(item, selectedValue) ||
-                                item == selectedValue;
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 360),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: items.length + (allowEmpty ? 1 : 0),
+                      separatorBuilder: (_, _) =>
+                          const Divider(height: 1, color: Color(0xFFEFF4F5)),
+                      itemBuilder: (context, index) {
+                        final isEmptyOption = allowEmpty && index == 0;
+                        final item = isEmptyOption
+                            ? null
+                            : items[index - (allowEmpty ? 1 : 0)];
+                        final optionLabel = isEmptyOption
+                            ? emptyLabel ??
+                                  context.getText(AppKeys.profileIdTypeNone)
+                            : itemLabel(item as T);
+                        final isSelected = isEmptyOption
+                            ? selectedValue == null
+                            : identical(item, selectedValue) ||
+                                  item == selectedValue;
 
-                      return Material(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            optionLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.andika(
-                              color: AppColors.textPrimary,
-                              fontSize: FontSize.normal * scale,
-                              fontWeight: isSelected
-                                  ? FontWeight.w900
-                                  : FontWeight.w700,
-                              letterSpacing: 0,
+                        return Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              optionLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.andika(
+                                color: AppColors.textPrimary,
+                                fontSize: FontSize.normal,
+                                fontWeight: isSelected
+                                    ? FontWeight.w900
+                                    : FontWeight.w700,
+                                letterSpacing: 0,
+                              ),
                             ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: AppColors.tealIcon,
+                                    size: 22,
+                                  )
+                                : null,
+                            onTap: () {
+                              dismissProfileFormKeyboard();
+                              Navigator.of(
+                                context,
+                              ).pop(AddProfileSelectResult<T>(item));
+                            },
                           ),
-                          trailing: isSelected
-                              ? Icon(
-                                  Icons.check_circle_rounded,
-                                  color: AppColors.tealIcon,
-                                  size: 22 * scale,
-                                )
-                              : null,
-                          onTap: () {
-                            dismissProfileFormKeyboard();
-                            Navigator.of(
-                              context,
-                            ).pop(AddProfileSelectResult<T>(item));
-                          },
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],

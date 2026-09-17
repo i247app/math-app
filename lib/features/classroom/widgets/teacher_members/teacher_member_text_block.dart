@@ -1,7 +1,8 @@
-part of 'package:numi/features/classroom/presentation/screens/teacher_classroom_screens.dart';
+import 'package:flutter/material.dart';
 
-class _TeacherMemberTextBlock extends StatelessWidget {
-  const _TeacherMemberTextBlock({
+class TeacherMemberTextBlock extends StatelessWidget {
+  const TeacherMemberTextBlock({
+    super.key,
     required this.name,
     required this.status,
     required this.nameFontSize,
@@ -29,7 +30,7 @@ class _TeacherMemberTextBlock extends StatelessWidget {
           name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
+          style: TextStyle(
             color: nameColor,
             fontSize: nameFontSize,
             fontWeight: FontWeight.w700,
@@ -41,7 +42,7 @@ class _TeacherMemberTextBlock extends StatelessWidget {
           status,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.andika(
+          style: TextStyle(
             color: statusColor,
             fontSize: statusFontSize,
             fontWeight: FontWeight.w500,

@@ -1,7 +1,7 @@
-import 'package:numi/core/network/grade_models.dart';
-import 'package:numi/core/network/program_models.dart';
-import 'package:numi/core/network/school_models.dart';
-import 'package:numi/core/network/semester_models.dart';
+import 'package:numi/features/profile/models/grade.dart';
+import 'package:numi/features/profile/models/program.dart';
+import 'package:numi/features/profile/models/school.dart';
+import 'package:numi/features/profile/models/semester.dart';
 
 const profileOptionsCacheTtl = Duration(minutes: 10);
 
