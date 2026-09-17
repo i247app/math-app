@@ -66,7 +66,7 @@ void main() {
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
     expect(find.text('Xem chi tiết'), findsOneWidget);
-    expect(find.text('Luyện tập lại'), findsOneWidget);
+    expect(find.text('Luyện tập'), findsOneWidget);
     expect(find.byKey(const ValueKey('placement-mascot')), findsOneWidget);
     final mascotImage = tester.widget<Image>(
       find.byKey(const ValueKey('placement-mascot-character')),
@@ -129,7 +129,7 @@ void main() {
 
     expect(find.text('LỚP 3'), findsOneWidget);
     expect(find.text('Xem chi tiết'), findsOneWidget);
-    expect(find.text('Luyện tập lại'), findsOneWidget);
+    expect(find.text('Luyện tập'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -161,6 +161,48 @@ void main() {
     await tester.pump();
 
     expect(didOpenDetails, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('shows the same normalized weak topics used by practice', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: const AssessmentPlacementResultScreen(
+            grade: 2,
+            correctAnswers: 6,
+            totalQuestions: 10,
+            examService: _UnusedExamService(),
+            practiceWeakTopics: <ExamPracticeTopic>[
+              ExamPracticeTopic(
+                topic: ' Phép trừ có nhớ ',
+                answered: 3,
+                wrong: 2,
+              ),
+              ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+              ExamPracticeTopic(
+                topic: 'Phép trừ có nhớ',
+                answered: 1,
+                wrong: 1,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('placement-weak-topics')), findsOneWidget);
+    expect(find.text('Luyện Phép trừ có nhớ và Toán đố'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -299,7 +341,7 @@ void main() {
     final practiceButtonRect = tester.getRect(
       find.byKey(const ValueKey('placement-practice-again')),
     );
-    final practiceTextRect = tester.getRect(find.text('Practice again'));
+    final practiceTextRect = tester.getRect(find.text('Practice'));
     expect(practiceTextRect.left, greaterThan(practiceButtonRect.left + 32));
     expect(practiceTextRect.right, lessThan(practiceButtonRect.right - 8));
     expect(

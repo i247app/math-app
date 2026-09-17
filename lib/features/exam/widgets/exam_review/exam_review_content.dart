@@ -5,6 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_practice_banner.dart';
@@ -59,13 +60,8 @@ class ExamReviewContent extends StatelessWidget {
         ? 0
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
-    final weakTopics = exam.practiceWeakTopics
-        .map((topic) => topic.topic.trim())
-        .where((topic) => topic.isNotEmpty)
-        .toSet()
-        .toList(growable: false);
-    final weakTopicText = _formatTopicList(
-      weakTopics,
+    final weakTopicText = formatExamPracticeTopics(
+      exam.practiceWeakTopics,
       conjunction: context.getText(AppKeys.examReviewTopicConjunction),
     );
 
@@ -138,24 +134,4 @@ class ExamReviewContent extends StatelessWidget {
       ),
     );
   }
-}
-
-String _formatTopicList(List<String> topics, {required String conjunction}) {
-  if (topics.isEmpty) {
-    return '';
-  }
-  if (topics.length == 1) {
-    return topics.single;
-  }
-
-  final normalizedConjunction = conjunction.trim();
-  final finalSeparator = normalizedConjunction.isEmpty
-      ? ', '
-      : ' $normalizedConjunction ';
-  if (topics.length == 2) {
-    return '${topics.first}$finalSeparator${topics.last}';
-  }
-
-  return '${topics.take(topics.length - 1).join(', ')}'
-      '$finalSeparator${topics.last}';
 }

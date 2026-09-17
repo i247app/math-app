@@ -13,6 +13,7 @@ import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
@@ -29,6 +30,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.examService,
     this.profileId,
     this.userExamId,
+    this.practiceWeakTopics = const <ExamPracticeTopic>[],
     this.onTestAgainGenerated,
     this.onViewDetails,
     this.onBack,
@@ -41,6 +43,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final ExamService? examService;
   final int? profileId;
   final int? userExamId;
+  final List<ExamPracticeTopic> practiceWeakTopics;
   final ValueChanged<GeneratedExam>? onTestAgainGenerated;
   final VoidCallback? onViewDetails;
   final VoidCallback? onBack;
@@ -168,6 +171,10 @@ class _AssessmentPlacementResultScreenState
       AppKeys.placementResultCorrectSummary,
       {'correct': _correctAnswers, 'total': _totalQuestions},
     );
+    final weakTopics = formatExamPracticeTopics(
+      widget.practiceWeakTopics,
+      conjunction: context.getText(AppKeys.examReviewTopicConjunction),
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -241,6 +248,13 @@ class _AssessmentPlacementResultScreenState
                 const SizedBox(height: 18),
                 _CelebrationMascot(size: mascotSize),
                 SizedBox(height: actionSpacing),
+                if (weakTopics.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 31),
+                    child: _PlacementWeakTopicsBanner(topics: weakTopics),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 34),
                   child: Row(
@@ -262,7 +276,7 @@ class _AssessmentPlacementResultScreenState
                         child: _PlacementActionButton(
                           key: const ValueKey('placement-practice-again'),
                           label: context.getText(
-                            AppKeys.placementResultPracticeAgain,
+                            AppKeys.placementResultPractice,
                           ),
                           icon: Icons.sync_rounded,
                           color: AppColors.teal500,
@@ -278,6 +292,38 @@ class _AssessmentPlacementResultScreenState
           ),
         );
       },
+    );
+  }
+}
+
+class _PlacementWeakTopicsBanner extends StatelessWidget {
+  const _PlacementWeakTopicsBanner({required this.topics});
+
+  final String topics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('placement-weak-topics'),
+      constraints: const BoxConstraints(minHeight: 36),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFE2D6),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        context.formatText(AppKeys.placementResultWeakTopics, {
+          'topics': topics,
+        }),
+        textAlign: TextAlign.center,
+        style: GoogleFonts.andika(
+          color: AppColors.coral600,
+          fontSize: FontSize.small,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
+        ),
+      ),
     );
   }
 }

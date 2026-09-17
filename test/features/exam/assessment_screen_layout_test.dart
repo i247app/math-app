@@ -712,6 +712,7 @@ void main() {
       expect(service.completedProfileId, 21);
       expect(service.completedStatus, 'COMPLETE');
       expect(service.events, <String>['submit', 'status:COMPLETE']);
+      expect(find.text('Luyện Phép trừ có nhớ và Toán đố'), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('placement-view-details')));
       await tester.pumpAndSettle();
@@ -1050,6 +1051,10 @@ class _CompletedJourneyReviewExamService implements ExamService {
     return GeneratedExam(
       userExamId: userExamId,
       grade: 5,
+      practiceWeakTopics: const <ExamPracticeTopic>[
+        ExamPracticeTopic(topic: 'Phép trừ có nhớ', answered: 3, wrong: 2),
+        ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+      ],
       grading: const ExamGrading(correctNumber: 6, totalQuestions: 6),
       answers: List<SubmitExamAnswer>.generate(
         6,

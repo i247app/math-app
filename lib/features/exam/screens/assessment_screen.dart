@@ -256,6 +256,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         submittedExam.userExamId ?? _controller.userExamId;
     final submittedExamId = submittedExam.examId ?? submittedExam.userAiExamId;
     final reviewDetailId = submittedUserExamId ?? submittedExamId;
+    var practiceWeakTopics = submittedExam.practiceWeakTopics;
     if (_controller.isAssessment || _controller.isGrade) {
       setState(() => _isCompletingAssessment = true);
       try {
@@ -271,6 +272,22 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         setState(() => _isCompletingAssessment = false);
         _showAssessmentCompletionError(error);
         return;
+      }
+      if (!mounted) return;
+      if (submittedUserExamId != null && submittedUserExamId > 0) {
+        try {
+          final journeyDetail = await examService.getExamDetail(
+            submittedUserExamId,
+            profileId: profileId ?? submittedExam.profileId,
+            userExamId: submittedUserExamId,
+            examType: widget.examType,
+          );
+          if (journeyDetail.practiceWeakTopics.isNotEmpty) {
+            practiceWeakTopics = journeyDetail.practiceWeakTopics;
+          }
+        } catch (_) {
+          // The result remains usable with topics returned by submission.
+        }
       }
       if (!mounted) return;
       if (_controller.isGrade) {
@@ -350,6 +367,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             examService: examService,
             profileId: profileId,
             userExamId: submittedUserExamId,
+            practiceWeakTopics: practiceWeakTopics,
             onViewDetails: reviewDetailId == null
                 ? null
                 : () {
