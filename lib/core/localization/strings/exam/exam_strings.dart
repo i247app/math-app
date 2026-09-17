@@ -71,7 +71,7 @@ const examStrings = <String, Map<String, String>>{
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
     AppKeys.placementResultViewDetails: 'Xem chi tiết',
     AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
-    AppKeys.examReviewPracticeBannerTitle: 'Bé cần luyện thêm',
+    AppKeys.examReviewPracticeBannerTitle: 'Luyện thêm',
     AppKeys.examReviewTopicConjunction: 'và',
     AppKeys.examReviewPracticeBannerAction: 'Luyện tập ngay',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
