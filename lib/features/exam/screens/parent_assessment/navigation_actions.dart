@@ -256,6 +256,9 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
           builder: (_) => GradeRoadmapScreen(
             profileId: profileId,
             examService: widget.examService,
+            user: widget.user,
+            initialGrades: widget.initialGrades,
+            gradeService: widget.gradeService,
             initialExams: initialExams,
             initialGrade: initialGrade,
           ),

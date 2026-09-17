@@ -9,6 +9,9 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
+import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/profile/models/grade.dart';
 
 void main() {
   testWidgets('shows ten levels and places the mascot at the current level', (
@@ -41,7 +44,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Lớp 2'), findsOneWidget);
+    expect(find.text('LỚP 2'), findsOneWidget);
     for (var level = 1; level <= 10; level++) {
       expect(
         find.byKey(ValueKey('grade-roadmap-level-$level')),
@@ -52,9 +55,20 @@ void main() {
       find.image(const AssetImage('assets/images/grade-roadmap-mascot.png')),
       findsOneWidget,
     );
+
+    final levelColors = <Color>{};
+    for (var level = 1; level <= 10; level++) {
+      final button = tester.widget<DecoratedBox>(
+        find.byKey(ValueKey('grade-roadmap-level-$level-button')),
+      );
+      final decoration = button.decoration as BoxDecoration;
+      final gradient = decoration.gradient! as LinearGradient;
+      levelColors.add(gradient.colors.last);
+    }
+    expect(levelColors, hasLength(10));
   });
 
-  testWidgets('horizontal swipe changes grade and animated background', (
+  testWidgets('grade pill opens grade selection and swipes stay disabled', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -70,6 +84,12 @@ void main() {
           home: GradeRoadmapScreen(
             profileId: 11,
             examService: _FakeExamService(),
+            initialGrades: const <GradeModel>[
+              GradeModel(id: 1, label: 'Lớp 1'),
+              GradeModel(id: 2, label: 'Lớp 2'),
+              GradeModel(id: 3, label: 'Lớp 3'),
+            ],
+            gradeService: _UnusedGradeService(),
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(
                 grade: 2,
@@ -84,27 +104,42 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Lớp 2'), findsOneWidget);
+    expect(find.text('LỚP 2'), findsOneWidget);
     expect(
       find.image(
         const AssetImage('assets/images/grade-roadmap-background-grade-2.png'),
       ),
-      findsOneWidget,
+      findsNothing,
     );
 
     await tester.drag(find.byType(GradeRoadmapScreen), const Offset(-180, 0));
     await tester.pumpAndSettle();
 
-    expect(find.text('Lớp 3'), findsOneWidget);
-    expect(
-      find.image(
-        const AssetImage('assets/images/grade-roadmap-background-grade-3.png'),
-      ),
-      findsOneWidget,
+    expect(find.text('LỚP 2'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GradeSelectionScreen), findsOneWidget);
+    final gradeSelection = tester.widget<GradeSelectionScreen>(
+      find.byType(GradeSelectionScreen),
     );
+    expect(gradeSelection.examType, examTypeGrade);
+    expect(gradeSelection.profileId, 11);
+    expect(gradeSelection.initialGradeLabel, 'Lớp 2');
+    expect(gradeSelection.selectionOnly, isTrue);
+
+    await tester.tap(
+      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GradeSelectionScreen), findsNothing);
+    expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+    expect(find.text('LỚP 3'), findsOneWidget);
   });
 
-  testWidgets('uses completed artwork only for a passed attempt', (
+  testWidgets('shows completed badge only for a passed attempt', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -150,27 +185,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.image(
-        const AssetImage(
-          'assets/images/grade-roadmap-buttons/level-01-completed.png',
-        ),
-      ),
+      find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
       findsOneWidget,
     );
     expect(
-      find.image(
-        const AssetImage(
-          'assets/images/grade-roadmap-buttons/level-02-completed.png',
-        ),
-      ),
+      find.byKey(const ValueKey('grade-roadmap-level-2-completed')),
       findsNothing,
     );
     expect(
-      find.image(
-        const AssetImage(
-          'assets/images/grade-roadmap-buttons/level-02-available.png',
-        ),
-      ),
+      find.byKey(const ValueKey('grade-roadmap-level-2-button')),
       findsOneWidget,
     );
   });
@@ -314,6 +337,13 @@ void main() {
     expect(review.userExamId, 600);
     expect(find.byType(AiAssessmentScreen), findsNothing);
   });
+}
+
+class _UnusedGradeService implements GradeService {
+  @override
+  Future<List<GradeModel>> listGrades({required int userId}) {
+    throw StateError('The initial grade list should be used by this test.');
+  }
 }
 
 class _FakeProgressStore implements ProfileGradeProgressStore {

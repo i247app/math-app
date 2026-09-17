@@ -39,6 +39,7 @@ class GradeSelectionScreen extends StatefulWidget {
     this.initialGradeId,
     this.initialGradeLabel,
     this.onResultBack,
+    this.selectionOnly = false,
   });
 
   final LoginUser? user;
@@ -52,6 +53,7 @@ class GradeSelectionScreen extends StatefulWidget {
   final int? initialGradeId;
   final String? initialGradeLabel;
   final VoidCallback? onResultBack;
+  final bool selectionOnly;
 
   @override
   State<GradeSelectionScreen> createState() => _GradeSelectionScreenState();
@@ -222,6 +224,12 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
 
   void selectGrade(GradeOption option) {
     HapticFeedback.selectionClick();
+    if (widget.selectionOnly) {
+      Navigator.of(
+        context,
+      ).pop(AssessmentFlowPolicy.gradeFromLabel(option.label));
+      return;
+    }
     setState(() => selectedGradeLabel = option.label);
   }
 
@@ -256,7 +264,12 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                   Positioned.fill(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(38, 88, 38, 184),
+                      padding: EdgeInsets.fromLTRB(
+                        38,
+                        88,
+                        38,
+                        widget.selectionOnly ? 40 : 184,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -291,14 +304,15 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
                     top: 0,
                     child: GradeHeader(),
                   ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: GradeBottomBar(
-                      onContinue: continueWithSelectedGrade,
+                  if (!widget.selectionOnly)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: GradeBottomBar(
+                        onContinue: continueWithSelectedGrade,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
