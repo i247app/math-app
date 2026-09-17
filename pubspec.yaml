@@ -42,12 +42,5 @@ flutter:
   assets:
     - assets/avatars/
     - assets/images/
-    - assets/images/grade-roadmap-background.png
-    - assets/images/grade-roadmap-background-grade-1.png
-    - assets/images/grade-roadmap-background-grade-2.png
-    - assets/images/grade-roadmap-background-grade-3.png
-    - assets/images/grade-roadmap-background-grade-4.png
-    - assets/images/grade-roadmap-background-grade-5.png
-    - assets/images/grade-roadmap-buttons/
     - assets/icons/
     - assets/sounds/effects/

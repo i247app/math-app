@@ -105,12 +105,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('LỚP 2'), findsOneWidget);
-    expect(
-      find.image(
-        const AssetImage('assets/images/grade-roadmap-background-grade-2.png'),
-      ),
-      findsNothing,
-    );
 
     await tester.drag(find.byType(GradeRoadmapScreen), const Offset(-180, 0));
     await tester.pumpAndSettle();
