@@ -179,7 +179,7 @@ class _AssessmentPlacementResultScreenState
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewportHeight = constraints.maxHeight;
-        final topSpacing = (viewportHeight * 0.075).clamp(36.0, 62.0);
+        final topSpacing = (viewportHeight * 0.05).clamp(28.0, 42.0);
         final mascotSize = (viewportHeight * 0.40).clamp(250.0, 330.0);
         final actionSpacing = (viewportHeight * 0.06).clamp(28.0, 50.0);
 
@@ -228,7 +228,7 @@ class _AssessmentPlacementResultScreenState
                     height: 1.25,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 22),
                 _PlacementGradeTitle(grade: _grade),
                 if (widget.level case final level?) ...[
                   const SizedBox(height: 8),

@@ -158,6 +158,8 @@ class AppKeys {
       'learning_progress_all_assessments';
   static const learningProgressFilterTime = 'learning_progress_filter_time';
   static const learningProgressFilter = 'learning_progress_filter';
+  static const learningProgressTestLegend = 'learning_progress_test_legend';
+  static const learningProgressTestLabel = 'learning_progress_test_label';
   static const learningProgressScoreTitle = 'learning_progress_score_title';
   static const learningProgressAssessmentCount =
       'learning_progress_assessment_count';

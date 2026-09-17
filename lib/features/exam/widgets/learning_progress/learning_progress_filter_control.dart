@@ -29,15 +29,15 @@ class LearningProgressFilterControl extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: Container(
-          height: 58,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             borderRadius: radius,
             border: Border.all(color: colors.border),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 9,
+            spacing: 8,
             children: [
               Icon(icon, color: color, size: 22),
               Flexible(

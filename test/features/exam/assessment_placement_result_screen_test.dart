@@ -61,12 +61,17 @@ void main() {
     expect(find.byType(AssessmentResultScreen), findsNothing);
     expect(find.byType(PageHeader), findsOneWidget);
     expect(find.text('Kết Quả'), findsOneWidget);
-    expect(find.text('Bạn đạt trình độ'), findsOneWidget);
+    expect(find.text('Trình độ'), findsOneWidget);
     expect(find.text('MẪU GIÁO'), findsOneWidget);
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
     expect(find.text('Xem chi tiết'), findsOneWidget);
     expect(find.text('Luyện tập'), findsOneWidget);
+    final levelRect = tester.getRect(find.text('Trình độ'));
+    final gradeRect = tester.getRect(
+      find.byKey(const ValueKey('placement-grade')),
+    );
+    expect(gradeRect.top - levelRect.bottom, greaterThanOrEqualTo(16));
     expect(find.byKey(const ValueKey('placement-mascot')), findsOneWidget);
     final mascotImage = tester.widget<Image>(
       find.byKey(const ValueKey('placement-mascot-character')),

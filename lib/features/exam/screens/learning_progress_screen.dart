@@ -11,9 +11,9 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/parent_assessment_entry.dart';
 import 'package:numi/features/exam/widgets/learning_progress/learning_progress_chart_card.dart';
+import 'package:numi/features/exam/widgets/learning_progress/learning_progress_insight_card.dart';
 import 'package:numi/features/exam/widgets/learning_progress/learning_progress_date_filter_dialog.dart';
 import 'package:numi/features/exam/widgets/learning_progress/learning_progress_filter_control.dart';
-import 'package:numi/features/exam/widgets/learning_progress/learning_progress_insight_card.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_retry_panel.dart';
 
@@ -219,7 +219,9 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
-      backgroundColor: colors.pageBackground,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? colors.pageBackground
+          : const Color(0xFFF2FAF9),
       body: Column(
         children: [
           PageHeader(
@@ -290,7 +292,6 @@ class _LearningProgressScreenState extends State<LearningProgressScreen> {
                             LearningProgressChartCard(
                               points: points,
                               entryCount: _progress?.summary?.count,
-                              onFilter: _showDateFilter,
                             ),
                             if (points.isNotEmpty)
                               LearningProgressInsightCard(

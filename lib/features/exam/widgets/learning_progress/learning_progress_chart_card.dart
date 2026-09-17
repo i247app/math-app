@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -12,12 +11,10 @@ class LearningProgressChartCard extends StatelessWidget {
   const LearningProgressChartCard({
     super.key,
     required this.points,
-    required this.onFilter,
     this.entryCount,
   });
 
   final List<ExamProgressPoint> points;
-  final VoidCallback onFilter;
   final int? entryCount;
 
   @override
@@ -25,7 +22,7 @@ class LearningProgressChartCard extends StatelessWidget {
     final colors = context.themeColors;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 18, 12, 14),
+      padding: const EdgeInsets.fromLTRB(10, 16, 10, 18),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(22),
@@ -42,10 +39,7 @@ class LearningProgressChartCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 10,
         children: [
-          _ChartCardHeader(
-            entryCount: entryCount ?? points.length,
-            onFilter: onFilter,
-          ),
+          _ChartCardHeader(entryCount: entryCount ?? points.length),
           if (points.isEmpty)
             ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 280),
@@ -73,71 +67,61 @@ class LearningProgressChartCard extends StatelessWidget {
 }
 
 class _ChartCardHeader extends StatelessWidget {
-  const _ChartCardHeader({required this.entryCount, required this.onFilter});
+  const _ChartCardHeader({required this.entryCount});
 
   final int entryCount;
-  final VoidCallback onFilter;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 8,
-            children: [
-              Row(
-                spacing: 7,
-                children: [
-                  Flexible(
-                    child: Text(
-                      context.getText(AppKeys.learningProgressScoreTitle),
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: FontSize.large,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
-                      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 6,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    context.getText(AppKeys.learningProgressScoreTitle),
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: FontSize.compact,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: colors.textMuted,
-                    size: 18,
-                  ),
-                ],
-              ),
-              Text(
-                context.formatText(AppKeys.learningProgressAssessmentCount, {
-                  'count': entryCount,
-                }),
-                style: const TextStyle(
-                  color: AppColors.textTeal,
-                  fontSize: FontSize.small,
-                  fontWeight: FontWeight.w700,
                 ),
-              ),
-            ],
-          ),
-        ),
-        TextButton.icon(
-          onPressed: onFilter,
-          icon: const Icon(Icons.tune_rounded, size: 20),
-          label: Text(context.getText(AppKeys.learningProgressFilter)),
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.textTeal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            textStyle: const TextStyle(
-              fontSize: FontSize.small,
-              fontWeight: FontWeight.w800,
+                Text(
+                  context.formatText(AppKeys.learningProgressAssessmentCount, {
+                    'count': entryCount,
+                  }),
+                  style: TextStyle(
+                    color: colors.textSecondary,
+                    fontSize: FontSize.small,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 8),
+          Icon(Icons.bar_chart_rounded, color: colors.brandStrong, size: 22),
+          const SizedBox(width: 4),
+          Text(
+            context.getText(AppKeys.learningProgressTestLegend),
+            style: TextStyle(
+              color: colors.brandStrong,
+              fontSize: FontSize.xxs,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
