@@ -17,6 +17,7 @@ class OtpScreen extends StatefulWidget {
     required this.isVerifyingOtp,
     required this.resendSeconds,
     required this.resendResetId,
+    required this.showResendCountdown,
     this.autoFocusCode = false,
     this.otpError,
     this.otpErrorId = 0,
@@ -28,6 +29,7 @@ class OtpScreen extends StatefulWidget {
   final bool isVerifyingOtp;
   final int resendSeconds;
   final int resendResetId;
+  final bool showResendCountdown;
   final bool autoFocusCode;
   final String? otpError;
   final int otpErrorId;
@@ -235,6 +237,7 @@ class _OtpScreenState extends State<OtpScreen>
                     onResend: handleResend,
                     isVerifyingOtp: widget.isVerifyingOtp,
                     resendCountdown: resendCountdown,
+                    showResendCountdown: widget.showResendCountdown,
                     errorText: otpError,
                   ),
                 ),

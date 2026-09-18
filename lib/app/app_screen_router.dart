@@ -251,6 +251,8 @@ class AppScreenRouter extends StatelessWidget {
                           state.isVerifyingOtp || state.isSendingOtp,
                       resendSeconds: state.otpExpiresIn ?? 0,
                       resendResetId: state.otpPreviewId,
+                      showResendCountdown:
+                          state.selectedTrustedDeviceId == null,
                       autoFocusCode: state.otpFlow == OtpFlow.signup,
                       otpError: state.otpError,
                       otpErrorId: state.otpErrorId,

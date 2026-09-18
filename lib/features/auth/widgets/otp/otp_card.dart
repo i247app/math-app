@@ -18,6 +18,7 @@ class OtpCard extends StatelessWidget {
     required this.onResend,
     required this.isVerifyingOtp,
     required this.resendCountdown,
+    required this.showResendCountdown,
     this.errorText,
   });
 
@@ -29,6 +30,7 @@ class OtpCard extends StatelessWidget {
   final VoidCallback onResend;
   final bool isVerifyingOtp;
   final int resendCountdown;
+  final bool showResendCountdown;
   final String? errorText;
 
   @override
@@ -117,7 +119,7 @@ class OtpCard extends StatelessWidget {
         const SizedBox(height: 14),
         SizedBox(
           height: 24,
-          child: resendCountdown > 0
+          child: showResendCountdown && resendCountdown > 0
               ? _OtpCountdownText(
                   text: context.formatText(AppKeys.resendOtpAfter, {
                     'seconds': resendCountdown,

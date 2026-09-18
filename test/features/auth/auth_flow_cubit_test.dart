@@ -194,6 +194,7 @@ void main() {
     expect(authService.sentOtpUserId, 7);
     expect(authService.sentOtpTargetDeviceId, 4);
     expect(cubit.state.screen, AuthScreen.otp);
+    expect(cubit.state.selectedTrustedDeviceId, 4);
     await cubit.close();
   });
 
