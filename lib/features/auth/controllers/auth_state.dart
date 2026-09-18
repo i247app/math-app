@@ -49,9 +49,6 @@ class AuthFlowState {
     this.isSigningUp = false,
     this.otpExpiresAt,
     this.otpExpiresIn,
-    this.devOtpCode,
-    this.devOtpPurpose,
-    this.showDevOtpPreview = false,
     this.otpPreviewId = 0,
     this.otpError,
     this.otpErrorId = 0,
@@ -82,9 +79,6 @@ class AuthFlowState {
   final bool isSigningUp;
   final String? otpExpiresAt;
   final int? otpExpiresIn;
-  final String? devOtpCode;
-  final String? devOtpPurpose;
-  final bool showDevOtpPreview;
   final int otpPreviewId;
   final String? otpError;
   final int otpErrorId;
@@ -115,9 +109,6 @@ class AuthFlowState {
     bool? isSigningUp,
     String? otpExpiresAt,
     int? otpExpiresIn,
-    String? devOtpCode,
-    String? devOtpPurpose,
-    bool? showDevOtpPreview,
     int? otpPreviewId,
     String? otpError,
     int? otpErrorId,
@@ -127,7 +118,6 @@ class AuthFlowState {
     AuthenticationResult? authenticationResult,
     int? authenticationResultId,
     bool clearAuthError = false,
-    bool clearDevOtp = false,
     bool clearOtpError = false,
     bool clearOtpExpiry = false,
     bool clearLoginName = false,
@@ -181,11 +171,6 @@ class AuthFlowState {
       isSigningUp: isSigningUp ?? this.isSigningUp,
       otpExpiresAt: clearOtpExpiry ? null : otpExpiresAt ?? this.otpExpiresAt,
       otpExpiresIn: clearOtpExpiry ? null : otpExpiresIn ?? this.otpExpiresIn,
-      devOtpCode: clearDevOtp ? null : devOtpCode ?? this.devOtpCode,
-      devOtpPurpose: clearDevOtp ? null : devOtpPurpose ?? this.devOtpPurpose,
-      showDevOtpPreview: clearDevOtp
-          ? false
-          : showDevOtpPreview ?? this.showDevOtpPreview,
       otpPreviewId: otpPreviewId ?? this.otpPreviewId,
       otpError: clearOtpError ? null : otpError ?? this.otpError,
       otpErrorId: otpErrorId ?? this.otpErrorId,

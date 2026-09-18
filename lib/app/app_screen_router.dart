@@ -252,9 +252,6 @@ class AppScreenRouter extends StatelessWidget {
                       resendSeconds: state.otpExpiresIn ?? 0,
                       resendResetId: state.otpPreviewId,
                       autoFocusCode: state.otpFlow == OtpFlow.signup,
-                      devOtpCode: state.showDevOtpPreview
-                          ? state.devOtpCode
-                          : null,
                       otpError: state.otpError,
                       otpErrorId: state.otpErrorId,
                     ),

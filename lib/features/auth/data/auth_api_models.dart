@@ -100,7 +100,6 @@ class AuthResponse {
     this.requiredOtp,
     this.accessToken,
     this.expiresAt,
-    this.otpCode,
     this.user,
     this.profile,
   });
@@ -117,8 +116,6 @@ class AuthResponse {
   final String? accessToken;
   @JsonKey(name: 'expires_at')
   final String? expiresAt;
-  @JsonKey(name: 'otp_code')
-  final String? otpCode;
   final AuthUser? user;
   final AuthProfile? profile;
 
@@ -133,7 +130,6 @@ class SendOtpResponse {
   const SendOtpResponse({
     required this.mstatus,
     this.expiresAt,
-    this.otpCode,
     this.otpType,
     this.status,
     this.mmessage,
@@ -142,7 +138,6 @@ class SendOtpResponse {
 
   final int mstatus;
   final String? expiresAt;
-  final String? otpCode;
   final String? otpType;
   final String? status;
   final String? mmessage;

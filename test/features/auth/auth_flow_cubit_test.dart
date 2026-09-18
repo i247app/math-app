@@ -13,14 +13,12 @@ class _FakeAuthService implements AuthService {
     this.verifyOtpIsValid = false,
     this.isTrusted,
     this.trustedDevices = const <AuthTrustedDevice>[],
-    this.sentOtpCode,
   });
 
   final bool accountExists;
   final bool verifyOtpIsValid;
   final bool? isTrusted;
   final List<AuthTrustedDevice> trustedDevices;
-  final String? sentOtpCode;
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
@@ -67,11 +65,7 @@ class _FakeAuthService implements AuthService {
     sentOtpKind = kind;
     sentOtpUserId = userId;
     sentOtpTargetDeviceId = targetDeviceId;
-    return SendOtpResult(
-      expiresIn: 30,
-      otpCode: sentOtpCode,
-      purpose: kind.previewPurpose,
-    );
+    return const SendOtpResult(expiresIn: 30);
   }
 
   @override
@@ -179,7 +173,6 @@ void main() {
           platform: 'android',
         ),
       ],
-      sentOtpCode: '1234',
     );
     final cubit = _buildCubit(
       authService: authService,
@@ -201,16 +194,14 @@ void main() {
     expect(authService.sentOtpUserId, 7);
     expect(authService.sentOtpTargetDeviceId, 4);
     expect(cubit.state.screen, AuthScreen.otp);
-    expect(cubit.state.devOtpCode, isNull);
     await cubit.close();
   });
 
   test(
-    'untrusted login without verified devices sends and displays OTP directly',
+    'untrusted login without verified devices sends OTP without exposing it',
     () async {
       final authService = _FakeAuthService(
         isTrusted: false,
-        sentOtpCode: '1234',
         verifyOtpIsValid: true,
       );
       final cubit = _buildCubit(
@@ -226,9 +217,6 @@ void main() {
       expect(authService.sentOtpUserId, isNull);
       expect(authService.sentOtpTargetDeviceId, isNull);
       expect(cubit.state.screen, AuthScreen.otp);
-      expect(cubit.state.devOtpCode, '1234');
-      expect(cubit.state.showDevOtpPreview, isTrue);
-
       await cubit.verifyOtp('1234');
 
       expect(cubit.state.screen, AuthScreen.otp);

@@ -100,7 +100,7 @@ class AuthApi implements AuthService {
       ),
     );
 
-    return response.toModel(kind: kind);
+    return response.toModel();
   }
 
   @override

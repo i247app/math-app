@@ -40,10 +40,8 @@ extension AuthResponseDtoConversion on AuthResponse {
 }
 
 extension SendOtpResponseDtoConversion on SendOtpResponse {
-  SendOtpResult toModel({required AuthOtpKind kind}) {
+  SendOtpResult toModel() {
     return SendOtpResult(
-      otpCode: otpCode,
-      purpose: kind.previewPurpose,
       expiresAt: expiresAt,
       expiresIn: _expiresInFrom(expiresAt) ?? 0,
     );

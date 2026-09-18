@@ -18,7 +18,6 @@ class OtpCard extends StatelessWidget {
     required this.onResend,
     required this.isVerifyingOtp,
     required this.resendCountdown,
-    this.devOtpCode,
     this.errorText,
   });
 
@@ -30,14 +29,12 @@ class OtpCard extends StatelessWidget {
   final VoidCallback onResend;
   final bool isVerifyingOtp;
   final int resendCountdown;
-  final String? devOtpCode;
   final String? errorText;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final hasError = errorText != null;
-    final otpCode = devOtpCode?.trim();
     final isFull = controllers.every(
       (controller) => controller.text.isNotEmpty,
     );
@@ -70,23 +67,6 @@ class OtpCard extends StatelessWidget {
             );
           }),
         ),
-        if (otpCode != null && otpCode.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              context.formatText(AppKeys.otpSentMessage, {'code': otpCode}),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: colors.brandStrong,
-                fontSize: FontSize.small,
-                fontWeight: FontWeight.w700,
-                height: 1.25,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: errorText == null

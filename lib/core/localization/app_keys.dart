@@ -67,7 +67,6 @@ class AppKeys {
   static const trustedDeviceLoadFailed = 'trusted_device_load_failed';
   static const otpWithin30Seconds = 'otp_within_30_seconds';
   static const otpTitle = 'otp_title';
-  static const otpSentMessage = 'otp_sent_message';
   static const otpConfirming = 'otp_confirming';
   static const otpConfirm = 'otp_confirm';
   static const resendOtp = 'resend_otp';

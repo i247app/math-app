@@ -31,7 +31,6 @@ extension AuthFlowSession on AuthFlowCubit {
           screen: AuthScreen.login,
           isCheckingLoginName: false,
           authError: AppStrings.current(AppKeys.pinLoginFailed),
-          clearDevOtp: true,
           clearOtpExpiry: true,
           clearOtpError: true,
         ),

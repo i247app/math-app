@@ -160,22 +160,17 @@ extension AuthFlowOtp on AuthFlowCubit {
     required SendOtpResult otp,
     required OtpFlow flow,
   }) {
-    final exposesOtpPreview = flow == OtpFlow.signup || state.showDevOtpPreview;
     _emitState(
       state.copyWith(
         screen: AuthScreen.otp,
         loginName: loginName,
         otpExpiresAt: otp.expiresAt,
         otpExpiresIn: otp.expiresIn,
-        devOtpCode: exposesOtpPreview ? otp.otpCode : null,
-        devOtpPurpose: exposesOtpPreview ? otp.purpose : null,
-        showDevOtpPreview: exposesOtpPreview,
         otpPreviewId: state.otpPreviewId + 1,
         otpFlow: flow,
         isSendingOtp: false,
         isSigningUp: false,
         clearAuthError: true,
-        clearDevOtp: !exposesOtpPreview || otp.otpCode == null,
         clearOtpExpiry: otp.expiresAt == null,
         clearOtpError: true,
       ),

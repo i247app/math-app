@@ -1,23 +1,15 @@
 enum AuthOtpKind {
-  login(apiType: 'LOGIN_2FA', previewPurpose: 'login'),
-  signup(apiType: 'REGISTER', previewPurpose: 'register');
+  login(apiType: 'LOGIN_2FA'),
+  signup(apiType: 'REGISTER');
 
-  const AuthOtpKind({required this.apiType, required this.previewPurpose});
+  const AuthOtpKind({required this.apiType});
 
   final String apiType;
-  final String previewPurpose;
 }
 
 class SendOtpResult {
-  const SendOtpResult({
-    required this.expiresIn,
-    this.otpCode,
-    this.purpose,
-    this.expiresAt,
-  });
+  const SendOtpResult({required this.expiresIn, this.expiresAt});
 
-  final String? otpCode;
-  final String? purpose;
   final int expiresIn;
   final String? expiresAt;
 }
