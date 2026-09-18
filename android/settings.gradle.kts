@@ -21,6 +21,8 @@ plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "9.1.0" apply false
     id("com.google.gms.google-services") version "4.4.4" apply false
+    // Kept as apply-false for Flutter's Kotlin version validation.
+    // Android compilation uses AGP's built-in Kotlin support.
     id("org.jetbrains.kotlin.android") version "2.4.10" apply false
 }
 
