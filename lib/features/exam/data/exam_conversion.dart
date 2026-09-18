@@ -152,14 +152,15 @@ extension ExamListResponseDtoConversion on ExamListResponseDto {
 
 extension ExamProgressPointDtoConversion on ExamProgressPointDto {
   ExamProgressPoint toModel() => ExamProgressPoint(
-    completedDt: completedDt,
+    completedDt: lastSubmittedDt,
     correctNumber: correctNumber,
-    examId: userAiExamId,
+    examId: userExamId,
     score: score,
     scorePct: scorePct,
     sequence: sequence,
     totalQuestions: totalQuestions,
     examType: examType,
+    status: status,
     grade: grade,
     level: level,
   );
@@ -171,7 +172,7 @@ extension ExamProgressSummaryDtoConversion on ExamProgressSummaryDto {
     averageScore: averageScore,
     averageScorePct: averageScorePct,
     count: count,
-    highestExamId: highestUserAiExamId,
+    highestExamId: highestUserExamId,
     highestScore: highestScore,
     highestScorePct: highestScorePct,
     lowestScore: lowestScore,
@@ -218,71 +219,4 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       inProgressExams: activeExams,
     );
   }
-}
-
-/// Adapts the stats endpoint to the progress chart. Date filtering is local
-/// because the stats request does not accept a date range.
-ExamProgressResponse examStatsToProgress(
-  Map<String, dynamic> json, {
-  required DateTime fromDt,
-  required DateTime toDt,
-  required int profileId,
-  required String examType,
-}) {
-  final response = ExamStatsResponseDto.fromJson(json);
-  final rawStats = (json['stats'] as List<dynamic>?) ?? const [];
-  final entries = <({ExamStatsDto stats, DateTime date})>[];
-  for (var i = 0; i < response.stats.length; i++) {
-    final stats = response.stats[i];
-    final raw = rawStats[i] as Map<String, dynamic>;
-    final date =
-        DateTime.tryParse(raw['ended_dt']?.toString() ?? '') ??
-        stats.lastSubmittedDt ??
-        DateTime.tryParse(raw['create_dt']?.toString() ?? '');
-    if (date == null || date.isBefore(fromDt) || date.isAfter(toDt)) continue;
-    entries.add((stats: stats, date: date));
-  }
-  entries.sort((a, b) {
-    final order = a.date.compareTo(b.date);
-    return order != 0
-        ? order
-        : (a.stats.userExamId ?? 0).compareTo(b.stats.userExamId ?? 0);
-  });
-  final points = <ExamProgressPoint>[
-    for (var i = 0; i < entries.length; i++)
-      ExamProgressPoint(
-        completedDt: entries[i].date,
-        correctNumber: entries[i].stats.correctNumber,
-        examId: entries[i].stats.userExamId ?? 0,
-        score: entries[i].stats.scorePercentage / 10,
-        scorePct: entries[i].stats.scorePercentage,
-        sequence: i + 1,
-        totalQuestions: entries[i].stats.totalQuestions,
-        examType: entries[i].stats.examType,
-        grade: entries[i].stats.grade,
-        level: entries[i].stats.level,
-      ),
-  ];
-  final rawSummary = json['summary'];
-  // A global summary is valid only when the filter retains every record.
-  final summary =
-      entries.length == response.stats.length &&
-          rawSummary is Map<String, dynamic>
-      ? ExamProgressSummaryDto.fromJson({
-          ...rawSummary,
-          'highest_user_ai_exam_id': rawSummary['highest_user_exam_id'],
-        }).toModel()
-      : null;
-  return ExamProgressResponse(
-    mstatus: response.mstatus,
-    profileId: profileId,
-    examType: examType,
-    fromDt: fromDt,
-    toDt: toDt,
-    series: points,
-    summary: summary,
-    status: response.status,
-    mmessage: response.mmessage,
-    debug: response.debug,
-  );
 }

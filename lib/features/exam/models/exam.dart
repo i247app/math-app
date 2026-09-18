@@ -63,6 +63,7 @@ class ExamProgressPoint {
     required this.sequence,
     required this.totalQuestions,
     this.examType,
+    this.status,
     this.shortText,
     this.title,
     this.grade,
@@ -77,6 +78,7 @@ class ExamProgressPoint {
   final int sequence;
   final int totalQuestions;
   final String? examType;
+  final String? status;
   final String? shortText;
   final String? title;
   final int? grade;

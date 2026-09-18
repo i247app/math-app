@@ -17,24 +17,26 @@ void main() {
       'exam_type': 'ASSESSMENT',
       'series': <Map<String, dynamic>>[
         <String, dynamic>{
-          'completed_dt': '2026-08-14T10:05:32.716344Z',
+          'last_submitted_dt': '2026-08-14T10:05:32.716344Z',
           'correct_number': 2,
           'exam_type': 'ASSESSMENT',
           'grade': 1,
           'level': 1,
-          'user_ai_exam_id': 107,
+          'status': 'COMPLETE',
+          'user_exam_id': 107,
           'score': 4,
           'score_pct': 40,
           'sequence': 1,
           'total_questions': 5,
         },
         <String, dynamic>{
-          'completed_dt': '2026-08-14T10:07:16.946980Z',
+          'last_submitted_dt': '2026-08-14T10:07:16.946980Z',
           'correct_number': 2,
           'exam_type': 'ASSESSMENT',
           'grade': 1,
           'level': 2,
-          'user_ai_exam_id': 108,
+          'status': 'COMPLETE',
+          'user_exam_id': 108,
           'score': 4,
           'score_pct': 40,
           'sequence': 2,
@@ -47,7 +49,7 @@ void main() {
         'average_score': 4,
         'average_score_pct': 40,
         'count': 2,
-        'highest_user_ai_exam_id': 108,
+        'highest_user_exam_id': 108,
         'highest_score': 4,
         'highest_score_pct': 40,
         'lowest_score': 4,
@@ -62,61 +64,7 @@ void main() {
     expect(response.summary?.count, 2);
   });
 
-  test('stats progress sorts all records and filters dates inclusively', () {
-    final rows = List.generate(
-      12,
-      (i) => <String, dynamic>{
-        'user_exam_id': i + 1,
-        'ended_dt': DateTime.utc(2026, 9, 12 - i).toIso8601String(),
-        'correct_number': 2,
-        'score_percentage': 40,
-        'skipped_number': 0,
-        'total_questions': 5,
-        'grade': i % 6,
-        'status': i == 0 ? 'CANCEL' : 'COMPLETE',
-      },
-    );
-    final json = <String, dynamic>{
-      'mstatus': 200,
-      'stats': rows,
-      'summary': {
-        'average_delta': null,
-        'average_score': 4,
-        'average_score_pct': 40,
-        'count': 12,
-        'highest_score': 4,
-        'highest_score_pct': 40,
-        'lowest_score': 4,
-        'highest_user_exam_id': 1,
-        'trend': 'NEED_TO_TRY',
-      },
-    };
-    final all = examStatsToProgress(
-      json,
-      fromDt: DateTime.utc(2026, 9),
-      toDt: DateTime.utc(2026, 10),
-      profileId: 2,
-      examType: 'ASSESSMENT',
-    );
-    expect(all.series, hasLength(12));
-    expect(all.series.first.examId, 12);
-    expect(all.series.last.examId, 1);
-    expect(all.series.last.sequence, 12);
-    expect(all.summary?.highestExamId, 1);
-    expect(all.summary?.averageDelta, isNull);
-    final filtered = examStatsToProgress(
-      json,
-      fromDt: DateTime.utc(2026, 9, 3),
-      toDt: DateTime.utc(2026, 9, 4),
-      profileId: 2,
-      examType: 'ASSESSMENT',
-    );
-    expect(filtered.series, hasLength(2));
-    expect(filtered.series.first.sequence, 1);
-    expect(filtered.summary, isNull);
-  });
-
-  test('exam progress uses stats and parses the new summary', () async {
+  test('exam progress posts journey dates and parses the summary', () async {
     String? requestPath;
     Map<String, dynamic>? requestBody;
     final dio = Dio();
@@ -138,22 +86,22 @@ void main() {
               requestOptions: options,
               statusCode: 200,
               data: <String, dynamic>{
-                'from_dt': '2026-01-03T04:48:58.607719Z',
+                'from_dt': '2026-01-03 04:48:58.607719',
                 'limit': 10,
                 'mstatus': 200,
                 'profile_id': 21,
-                'stats': <Map<String, dynamic>>[
+                'series': <Map<String, dynamic>>[
                   <String, dynamic>{
-                    'ended_dt': '2026-07-28T06:15:28.136337Z',
+                    'last_submitted_dt': '2026-07-28T06:15:28.136337Z',
                     'correct_number': 4,
                     'exam_type': 'ASSESSMENT',
                     'grade': 1,
                     'level': 1,
                     'user_exam_id': 62,
                     'score': 8,
-                    'score_percentage': 80,
-                    'skipped_number': 0,
+                    'score_pct': 80,
                     'sequence': 1,
+                    'status': 'COMPLETE',
                     'total_questions': 5,
                   },
                 ],
@@ -169,7 +117,7 @@ void main() {
                   'lowest_score': 2,
                   'trend': 'NEED_TO_TRY',
                 },
-                'to_dt': '2026-08-03T04:48:58.607719Z',
+                'to_dt': '2026-08-03 04:48:58.607719',
                 'tz': '+07:00',
               },
             ),
@@ -185,15 +133,19 @@ void main() {
       toDt: DateTime.parse('2026-08-03T04:48:58.607719Z'),
     );
 
-    expect(requestPath, '/exams/stats');
+    expect(requestPath, '/exams/journey/progress');
     expect(requestBody, contains('metadata'));
     expect(requestBody, containsPair('profile_id', 21));
     expect(requestBody, containsPair('exam_type', 'ASSESSMENT'));
-    expect(requestBody, isNot(contains('from_dt')));
-    expect(requestBody, isNot(contains('to_dt')));
+    expect(requestBody, containsPair('from_dt', '2026-01-03 04:48:58.607719'));
+    expect(requestBody, containsPair('to_dt', '2026-08-03 04:48:58.607719'));
     expect(response.series.single.examId, 62);
     expect(response.series.single.score, 8);
+    expect(response.series.single.scorePct, 80);
+    expect(response.series.single.grade, 1);
+    expect(response.series.single.status, 'COMPLETE');
     expect(response.summary?.averageDelta, -1.8);
+    expect(response.summary?.highestExamId, 62);
     expect(response.summary?.trend, 'NEED_TO_TRY');
   });
 }

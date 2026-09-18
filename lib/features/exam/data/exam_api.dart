@@ -148,20 +148,17 @@ class ExamApi implements ExamService {
       throw ExamException(AppStrings.current(AppKeys.invalidServerResponse));
     }
 
-    return _runExamRequest(() async {
-      final json = await _postResponse(
-        '/exams/stats',
-        ExamStatsRequest(profileId: profileId, examType: examType).toJson(),
-        (json) => json,
-      );
-      return examStatsToProgress(
-        json,
-        fromDt: fromDt,
-        toDt: toDt,
-        profileId: profileId,
-        examType: examType,
-      );
-    });
+    return _runExamRequest(
+      () =>
+          _postResponse('/exams/journey/progress', <String, dynamic>{
+            'profile_id': profileId,
+            'exam_type': examType,
+            'from_dt': _journeyDateTime(fromDt),
+            'to_dt': _journeyDateTime(toDt),
+          }, ExamProgressResponseDto.fromJson).then(
+            (response) => response.toModel(),
+          ),
+    );
   }
 
   Future<ExamListResponseDto> _listExams({
@@ -632,4 +629,15 @@ int _requireProfileId(int? profileId) {
 
 int _gradeFromLabel(String? gradeLabel) {
   return AssessmentFlowPolicy.gradeFromLabel(gradeLabel);
+}
+
+// The journey endpoint accepts wall-clock dates with six fractional digits.
+String _journeyDateTime(DateTime date) {
+  final fraction = date.millisecond * 1000 + date.microsecond;
+  final seconds = date
+      .toIso8601String()
+      .split('.')
+      .first
+      .replaceFirst('T', ' ');
+  return '$seconds.${fraction.toString().padLeft(6, '0')}';
 }

@@ -434,21 +434,22 @@ class ExamProgressResponseDto {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ExamProgressPointDto {
   const ExamProgressPointDto({
-    required this.completedDt,
+    required this.lastSubmittedDt,
     required this.correctNumber,
-    required this.userAiExamId,
+    required this.userExamId,
     required this.score,
     required this.scorePct,
     required this.sequence,
     required this.totalQuestions,
     this.examType,
+    this.status,
     this.grade,
     this.level,
   });
 
-  final DateTime completedDt;
+  final DateTime lastSubmittedDt;
   final int correctNumber;
-  final int userAiExamId;
+  final int userExamId;
   @JsonKey(fromJson: _doubleFromJson)
   final double score;
   @JsonKey(fromJson: _doubleFromJson)
@@ -456,6 +457,7 @@ class ExamProgressPointDto {
   final int sequence;
   final int totalQuestions;
   final String? examType;
+  final String? status;
   final int? grade;
   final int? level;
 
@@ -476,7 +478,7 @@ class ExamProgressSummaryDto {
     required this.highestScorePct,
     required this.lowestScore,
     required this.trend,
-    this.highestUserAiExamId,
+    this.highestUserExamId,
   });
 
   @JsonKey(fromJson: _nullableDoubleFromJson)
@@ -486,7 +488,7 @@ class ExamProgressSummaryDto {
   @JsonKey(fromJson: _doubleFromJson)
   final double averageScorePct;
   final int count;
-  final int? highestUserAiExamId;
+  final int? highestUserExamId;
   @JsonKey(fromJson: _doubleFromJson)
   final double highestScore;
   @JsonKey(fromJson: _doubleFromJson)
