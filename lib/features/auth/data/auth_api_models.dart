@@ -26,7 +26,7 @@ class UpdateUserRequest {
     this.email,
   });
 
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'uid')
   final int userId;
   final String? name;
   final String? phone;
@@ -62,6 +62,7 @@ class SendOtpRequest {
 
   final String otpType;
   final String identifier;
+  @JsonKey(name: 'uid')
   final int? userId;
   final int? targetDeviceId;
 
@@ -195,7 +196,7 @@ class AuthProfile {
   final int? id;
   @JsonKey(fromJson: AuthUser._intFromJson)
   final int? profileId;
-  @JsonKey(fromJson: AuthUser._intFromJson)
+  @JsonKey(name: 'uid', fromJson: AuthUser._intFromJson)
   final int? userId;
   final String? name;
   final String? avatarKey;
@@ -226,7 +227,7 @@ class AuthUser {
 
   @JsonKey(fromJson: _intFromJson)
   final int? id;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'uid', fromJson: _intFromJson)
   final int? userId;
   final String? email;
   final String? name;

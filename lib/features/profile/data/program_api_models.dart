@@ -6,6 +6,7 @@ part 'program_api_models.g.dart';
 class ProgramListRequest {
   const ProgramListRequest({required this.userId});
 
+  @JsonKey(name: 'uid')
   final int userId;
 
   factory ProgramListRequest.fromJson(Map<String, dynamic> json) =>

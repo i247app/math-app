@@ -6,6 +6,7 @@ part 'grade_api_models.g.dart';
 class GradeListRequest {
   const GradeListRequest({required this.userId});
 
+  @JsonKey(name: 'uid')
   final int userId;
 
   factory GradeListRequest.fromJson(Map<String, dynamic> json) =>

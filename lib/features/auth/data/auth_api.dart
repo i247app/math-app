@@ -264,7 +264,7 @@ class AuthApi implements AuthService {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'user_id': request.userId,
+      'uid': request.userId,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.phone?.isNotEmpty == true) 'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,

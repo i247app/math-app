@@ -19,7 +19,7 @@ void main() {
     expect(request.toJson(), <String, dynamic>{
       'otp_type': 'LOGIN_2FA',
       'identifier': '+84905666666',
-      'user_id': 21,
+      'uid': 21,
       'target_device_id': 4,
     });
   });
@@ -34,5 +34,24 @@ void main() {
       'otp_type': 'REGISTER',
       'identifier': 'learner@example.com',
     });
+  });
+
+  test('uses uid for account updates and auth response users', () {
+    const request = UpdateUserRequest(userId: 21);
+    expect(request.toJson(), <String, dynamic>{'uid': 21});
+
+    final response = AuthResponse.fromJson(<String, dynamic>{
+      'mstatus': 200,
+      'user': <String, dynamic>{'uid': 21},
+      'profile': <String, dynamic>{'uid': 21},
+    });
+    expect(response.user?.userId, 21);
+    expect(response.profile?.userId, 21);
+
+    final otpResponse = VerifyOtpResponse.fromJson(<String, dynamic>{
+      'mstatus': 200,
+      'user': <String, dynamic>{'uid': 21},
+    });
+    expect(otpResponse.user?.userId, 21);
   });
 }

@@ -6,6 +6,7 @@ part 'semester_api_models.g.dart';
 class SemesterListRequest {
   const SemesterListRequest({required this.userId});
 
+  @JsonKey(name: 'uid')
   final int userId;
 
   factory SemesterListRequest.fromJson(Map<String, dynamic> json) =>

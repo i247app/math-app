@@ -10,6 +10,7 @@ part 'profile_api_models.g.dart';
 class ProfileListRequest {
   const ProfileListRequest({this.userId, this.search});
 
+  @JsonKey(name: 'uid')
   final int? userId;
   final String? search;
 
@@ -37,6 +38,7 @@ class CreateProfileRequest {
     this.teacherId,
   });
 
+  @JsonKey(name: 'uid')
   final int userId;
   final int schoolId;
   final String name;
@@ -242,7 +244,7 @@ class StudentProfileDto {
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
   final String? profileCode;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'uid', fromJson: _intFromJson)
   final int? userId;
   @JsonKey(fromJson: _intFromJson)
   final int? schoolId;

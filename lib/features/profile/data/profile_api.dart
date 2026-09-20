@@ -197,7 +197,7 @@ class ProfileApi implements ProfileService {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'user_id': request.userId,
+      'uid': request.userId,
       'school_id': request.schoolId,
       'name': request.name,
       if (request.dob?.isNotEmpty == true) 'dob': request.dob,

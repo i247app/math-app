@@ -132,7 +132,7 @@ StudentProfile _studentProfileFromJson(Map<String, dynamic> json) {
     id: _intFromJson(json['id']),
     profileId: _intFromJson(json['profile_id']),
     profileCode: _stringFromJson(json['profile_code']),
-    userId: _intFromJson(json['user_id']),
+    userId: _intFromJson(json['uid']),
     schoolId: _intFromJson(json['school_id']),
     school: _objectFromJson(json['school'], _schoolFromJson),
     name: _stringFromJson(json['name']),

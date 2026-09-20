@@ -6,6 +6,7 @@ part 'device_api_models.g.dart';
 class DeviceListRequest {
   const DeviceListRequest({required this.userId, required this.isVerified});
 
+  @JsonKey(name: 'uid')
   final int userId;
   final bool isVerified;
 
@@ -60,7 +61,7 @@ class DeviceModel {
   final bool? isVerified;
   final String? platform;
   final String? status;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'uid', fromJson: _intFromJson)
   final int? userId;
   final String? createDt;
   final String? modifyDt;

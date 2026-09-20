@@ -183,7 +183,7 @@ void main() {
                       'is_verified': true,
                       'platform': 'UNKNOWN',
                       'status': 'ACTIVE',
-                      'user_id': 21,
+                      'uid': 21,
                     },
                   ],
                   'mstatus': 200,
@@ -201,7 +201,7 @@ void main() {
     final response = await api.listTrustedDevices(userId: 21);
 
     expect(requestPath, '/devices/list');
-    expect(requestBody, <String, dynamic>{'user_id': 21, 'is_verified': true});
+    expect(requestBody, <String, dynamic>{'uid': 21, 'is_verified': true});
     expect(response.single.deviceId, 4);
   });
 
@@ -245,7 +245,7 @@ void main() {
     expect(requestBody, <String, dynamic>{
       'otp_type': 'LOGIN_2FA',
       'identifier': '+84905666666',
-      'user_id': 21,
+      'uid': 21,
       'target_device_id': 4,
     });
   });

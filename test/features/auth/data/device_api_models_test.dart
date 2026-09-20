@@ -6,7 +6,7 @@ void main() {
     const request = DeviceListRequest(userId: 21, isVerified: true);
 
     expect(request.toJson(), <String, dynamic>{
-      'user_id': 21,
+      'uid': 21,
       'is_verified': true,
     });
   });
@@ -23,7 +23,7 @@ void main() {
           'modify_dt': '2026-07-08T16:37:18.116911Z',
           'platform': 'UNKNOWN',
           'status': 'ACTIVE',
-          'user_id': 21,
+          'uid': 21,
         },
       ],
       'mstatus': 200,
