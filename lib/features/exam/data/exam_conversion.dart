@@ -35,7 +35,13 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
       if (normalizedLabel == null || normalizedLabel.isEmpty) {
         return;
       }
-      answersByLabel[normalizedLabel] = content?.trim() ?? '';
+      final normalizedContent = content?.trim();
+      if (normalizedContent == null ||
+          normalizedContent.isEmpty ||
+          answersByLabel[normalizedLabel]?.isNotEmpty == true) {
+        return;
+      }
+      answersByLabel[normalizedLabel] = normalizedContent;
     }
 
     addAnswer(rightAnswerLabel, rightAnswerContent);
