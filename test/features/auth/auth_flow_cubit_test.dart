@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/controllers/auth_cubit.dart';
 import 'package:numi/features/auth/controllers/auth_state.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/models/signup_form_data.dart';
@@ -13,12 +14,14 @@ class _FakeAuthService implements AuthService {
     this.verifyOtpIsValid = false,
     this.isTrusted,
     this.trustedDevices = const <AuthTrustedDevice>[],
+    this.lookupFailure,
   });
 
   final bool accountExists;
   final bool verifyOtpIsValid;
   final bool? isTrusted;
   final List<AuthTrustedDevice> trustedDevices;
+  final Object? lookupFailure;
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
@@ -32,6 +35,9 @@ class _FakeAuthService implements AuthService {
   @override
   Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
     lookedUpLoginName = loginName;
+    if (lookupFailure != null) {
+      throw lookupFailure!;
+    }
     return AuthLoginLookupResult(
       loginName: loginName,
       exists: accountExists,
@@ -279,6 +285,51 @@ void main() {
 
     expect(authService.sentOtpLoginName, isNull);
     expect(cubit.state.screen, AuthScreen.signup);
+    await cubit.close();
+  });
+
+  test(
+    'keeps signup phone lookup failures out of the dialog error state',
+    () async {
+      final authService = _FakeAuthService(
+        accountExists: false,
+        lookupFailure: const AuthException('Service unavailable', status: 503),
+      );
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(
+          screen: AuthScreen.login,
+          authEntryMode: AuthEntryMode.signup,
+        ),
+      );
+
+      await cubit.lookupSignupPhone('+84901234567');
+
+      expect(cubit.state.authError, isNull);
+      expect(cubit.state.loginLookupError, 'Service unavailable');
+      expect(cubit.state.loginLookupErrorStatus, 503);
+      expect(cubit.state.isCheckingLoginName, isFalse);
+      await cubit.close();
+    },
+  );
+
+  test('treats a 4206 signup lookup response as an available phone', () async {
+    final authService = _FakeAuthService(
+      lookupFailure: const AuthException('User not found', status: 4206),
+    );
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AuthScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.lookupSignupPhone('+84901234567');
+
+    expect(cubit.state.authError, isNull);
+    expect(cubit.state.loginNameExists, isFalse);
+    expect(cubit.state.loginLookupErrorStatus, 4206);
     await cubit.close();
   });
 

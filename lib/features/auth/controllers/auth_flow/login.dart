@@ -70,9 +70,12 @@ extension AuthFlowLogin on AuthFlowCubit {
 
       _emitState(
         state.copyWith(
+          loginName: phone,
+          checkedLoginName: phone,
           isCheckingLoginName: false,
-          authError: error.message,
-          clearLoginLookup: true,
+          loginLookupError: error.message,
+          loginLookupErrorStatus: error.status,
+          clearAuthError: true,
         ),
       );
     } catch (_) {
@@ -82,9 +85,13 @@ extension AuthFlowLogin on AuthFlowCubit {
 
       _emitState(
         state.copyWith(
+          loginName: phone,
+          checkedLoginName: phone,
           isCheckingLoginName: false,
-          authError: AppStrings.current(AppKeys.authLoginNameCheckFailed),
-          clearLoginLookup: true,
+          loginLookupError: AppStrings.current(
+            AppKeys.authLoginNameCheckFailed,
+          ),
+          clearAuthError: true,
         ),
       );
     }
