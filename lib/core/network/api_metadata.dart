@@ -214,7 +214,7 @@ Future<String> deviceDisplayName() async {
 
   if (Platform.isIOS) {
     final info = await deviceInfo.iosInfo;
-    return _resolvedDeviceName(info.name, info.modelName);
+    return _resolvedDeviceName(info.modelName, "Unknown device");
   }
 
   return _unknownDeviceName;
