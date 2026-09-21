@@ -117,7 +117,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
         final deviceInfo = await _deviceInfoPlugin.androidInfo;
         return _DeviceMetadata(
           deviceId: deviceInfo.id,
-          deviceName: deviceInfo.name,
+          deviceName: await deviceDisplayName(),
           modelName: deviceInfo.brand,
           platform: 'android',
           systemVersion: deviceInfo.version.sdkInt.toString(),
@@ -128,7 +128,7 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
         final deviceInfo = await _deviceInfoPlugin.iosInfo;
         return _DeviceMetadata(
           deviceId: deviceInfo.identifierForVendor,
-          deviceName: deviceInfo.modelName,
+          deviceName: await deviceDisplayName(),
           modelName: deviceInfo.systemName,
           platform: 'ios',
           systemVersion: deviceInfo.systemVersion,
@@ -202,6 +202,32 @@ class AppApiMetadataProvider implements ApiMetadataProvider {
 
     return '';
   }
+}
+
+Future<String> deviceDisplayName() async {
+  final deviceInfo = DeviceInfoPlugin();
+
+  if (Platform.isAndroid) {
+    final info = await deviceInfo.androidInfo;
+    final assignedName = info.name.trim();
+    if (assignedName.isNotEmpty && assignedName.toLowerCase() != 'unknown') {
+      return assignedName;
+    }
+
+    final parts = <String>[info.manufacturer, info.model]
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty && value.toLowerCase() != 'unknown')
+        .toSet();
+
+    return parts.isEmpty ? 'Android device' : parts.join(' ');
+  }
+
+  if (Platform.isIOS) {
+    final info = await deviceInfo.iosInfo;
+    return info.name.trim().isEmpty ? info.model : info.name;
+  }
+
+  return 'Unknown device';
 }
 
 class AppClientInfo {
