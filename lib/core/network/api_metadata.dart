@@ -209,25 +209,27 @@ Future<String> deviceDisplayName() async {
 
   if (Platform.isAndroid) {
     final info = await deviceInfo.androidInfo;
-    final assignedName = info.name.trim();
-    if (assignedName.isNotEmpty && assignedName.toLowerCase() != 'unknown') {
-      return assignedName;
-    }
-
-    final parts = <String>[info.manufacturer, info.model]
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty && value.toLowerCase() != 'unknown')
-        .toSet();
-
-    return parts.isEmpty ? 'Android device' : parts.join(' ');
+    return _resolvedDeviceName(info.name, info.model);
   }
 
   if (Platform.isIOS) {
     final info = await deviceInfo.iosInfo;
-    return info.name.trim().isEmpty ? info.model : info.name;
+    return _resolvedDeviceName(info.name, info.modelName);
   }
 
-  return 'Unknown device';
+  return _unknownDeviceName;
+}
+
+const _unknownDeviceName = 'Unknown device';
+
+String _resolvedDeviceName(String deviceName, String modelName) {
+  for (final value in <String>[deviceName, modelName]) {
+    final normalized = value.trim();
+    if (normalized.isNotEmpty && normalized.toLowerCase() != 'unknown') {
+      return normalized;
+    }
+  }
+  return _unknownDeviceName;
 }
 
 class AppClientInfo {
