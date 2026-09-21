@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.MediaStore
+import androidx.core.view.WindowCompat
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
@@ -13,6 +15,13 @@ import java.io.FileOutputStream
 
 class MainActivity : FlutterActivity() {
     private var pendingAvatarResult: MethodChannel.Result? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15+ enables this automatically for this app's target SDK.
+        // Explicitly enable it on earlier Android versions for consistent UI.
+        WindowCompat.enableEdgeToEdge(window)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

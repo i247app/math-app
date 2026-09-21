@@ -92,6 +92,7 @@ class AppScreenRouter extends StatelessWidget {
 
             final authError = state.authError;
             if (authError != null &&
+                state.screen != AuthScreen.login &&
                 state.screen != AuthScreen.otp &&
                 !_isInlineSignupUsernameError(state)) {
               context.showErrorDialog(localizedAuthError(context, authError));
@@ -128,7 +129,10 @@ class AppScreenRouter extends StatelessWidget {
                 : delaysValidationError && !loginNameSubmitAttempted
                 ? null
                 : validationErrorKey;
-            final loginNameErrorText = !loginNameHasInput
+            final loginNameErrorText =
+                state.screen == AuthScreen.login && state.authError != null
+                ? localizedAuthError(context, state.authError!)
+                : !loginNameHasInput
                 ? null
                 : loginNameInputErrorKey != null
                 ? context.getText(loginNameInputErrorKey)

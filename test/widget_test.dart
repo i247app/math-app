@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
@@ -10,6 +11,19 @@ import 'package:numi/main.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 
 class _FakeAuthService implements AuthService {
+  @override
+  Future<void> logout() async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FailingLoginLookupAuthService implements AuthService {
+  @override
+  Future<AuthLoginLookupResult> lookupLoginName(String loginName) {
+    throw const AuthException('Service unavailable', status: 503);
+  }
+
   @override
   Future<void> logout() async {}
 
@@ -83,6 +97,28 @@ void main() {
         expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
       },
     );
+
+    testWidgets('shows login failures below the input instead of a dialog', (
+      tester,
+    ) async {
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      await tester.pumpWidget(
+        NumiApp(authService: _FailingLoginLookupAuthService()),
+      );
+
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
+      await tester.ensureVisible(welcomeLogin);
+      await tester.tap(welcomeLogin);
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(EditableText), 'learner@example.com');
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Service unavailable'), findsOneWidget);
+      expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+    });
 
     testWidgets('clears the login input after logout', (tester) async {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
