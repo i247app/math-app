@@ -8,6 +8,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/auth/widgets/auth_digit_box.dart';
 import 'package:numi/core/utils/avatar/avatar_picker_service.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/models/setting_screen_args.dart';
@@ -17,6 +18,7 @@ import 'package:numi/features/settings/widgets/setting_header.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
 import 'package:numi/shared/widgets/exit_confirmation_dialog.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
+import 'package:numi/shared/controllers/numeric_code_input_controller.dart';
 
 class SettingAccountScreen extends StatefulWidget {
   const SettingAccountScreen({super.key, required this.args});
@@ -180,6 +182,28 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
     HapticFeedback.mediumImpact();
     setState(() => _isSaving = true);
     try {
+      final email = settingsEmptyToNull(_emailController.text);
+      if (_isNewEmail(email)) {
+        await _authService.sendOtp(
+          loginName: email!,
+          // The OTP API currently exposes REGISTER and LOGIN_2FA only. The
+          // REGISTER OTP verifies ownership of the new email address.
+          kind: AuthOtpKind.signup,
+        );
+        if (!mounted) {
+          return;
+        }
+
+        final verified = await _showEmailOtpVerification(email);
+        if (!mounted) {
+          return;
+        }
+        if (!verified) {
+          setState(() => _isSaving = false);
+          return;
+        }
+      }
+
       final avatarPath = _draftAvatarPath != _snapshotAvatarPath
           ? _draftAvatarPath
           : null;
@@ -187,7 +211,7 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
         userId: userId,
         name: name,
         phone: settingsNormalizedPhone(_phoneController.text),
-        email: settingsEmptyToNull(_emailController.text),
+        email: email,
         avatarPath: avatarPath,
       );
       if (!mounted) {
@@ -216,6 +240,23 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
       setState(() => _isSaving = false);
       _showError(context.readText(AppKeys.accountUpdateFailed));
     }
+  }
+
+  bool _isNewEmail(String? email) {
+    final currentEmail = _user?.email?.trim();
+    return email != null && email.toLowerCase() != currentEmail?.toLowerCase();
+  }
+
+  Future<bool> _showEmailOtpVerification(String email) async {
+    return await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => _EmailOtpVerificationDialog(
+            email: email,
+            authService: _authService,
+          ),
+        ) ??
+        false;
   }
 
   Future<void> _pickAvatar() async {
@@ -316,6 +357,162 @@ class _SettingAccountScreenState extends State<SettingAccountScreen>
           child: child,
         );
       },
+    );
+  }
+}
+
+class _EmailOtpVerificationDialog extends StatefulWidget {
+  const _EmailOtpVerificationDialog({
+    required this.email,
+    required this.authService,
+  });
+
+  final String email;
+  final AuthService authService;
+
+  @override
+  State<_EmailOtpVerificationDialog> createState() =>
+      _EmailOtpVerificationDialogState();
+}
+
+class _EmailOtpVerificationDialogState
+    extends State<_EmailOtpVerificationDialog> {
+  late final NumericCodeInputController _codeInput = NumericCodeInputController(
+    length: 4,
+  );
+  bool _isVerifying = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _codeInput.dispose();
+    super.dispose();
+  }
+
+  Future<void> _verify() async {
+    if (!_codeInput.isComplete || _isVerifying) {
+      return;
+    }
+    final code = _codeInput.value;
+
+    setState(() {
+      _isVerifying = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.authService.verifyOtp(
+        loginName: widget.email,
+        otpCode: code,
+        kind: AuthOtpKind.signup,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (result.isValid) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() {
+        _isVerifying = false;
+        _error = result.message ?? context.readText(AppKeys.invalidOtp);
+      });
+    } on AuthException catch (error) {
+      if (mounted) {
+        setState(() {
+          _isVerifying = false;
+          _error = error.message;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isVerifying = false;
+          _error = context.readText(AppKeys.verifyOtpFailed);
+        });
+      }
+    }
+  }
+
+  void _updateDigit(int index, String value) {
+    _codeInput.updateDigit(index, value);
+    setState(() => _error = null);
+  }
+
+  void _handleEmptyBackspace(int index) {
+    _codeInput.clearPreviousAndFocus(index);
+    setState(() => _error = null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_isVerifying,
+      child: AlertDialog(
+        title: Text(context.getText(AppKeys.accountEmailVerificationTitle)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              context.formatText(AppKeys.accountEmailVerificationMessage, {
+                'email': widget.email,
+              }),
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              label: context.getText(AppKeys.accountEmailVerificationCodeHint),
+              child: Row(
+                children: List.generate(4, (index) {
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: index == 0 ? 0 : 8),
+                      child: SizedBox(
+                        height: 58,
+                        child: AuthDigitBox.otp(
+                          controller: _codeInput.controllers[index],
+                          focusNode: _codeInput.focusNodes[index],
+                          autofocus: index == 0,
+                          textInputAction: index == 3
+                              ? TextInputAction.done
+                              : TextInputAction.next,
+                          onChanged: (value) => _updateDigit(index, value),
+                          onEmptyBackspace: () => _handleEmptyBackspace(index),
+                          hasError: _error != null,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isVerifying
+                ? null
+                : () => Navigator.of(context).pop(false),
+            child: Text(context.getText(AppKeys.cancel)),
+          ),
+          FilledButton(
+            onPressed: _isVerifying || !_codeInput.isComplete ? null : _verify,
+            child: _isVerifying
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(context.getText(AppKeys.otpConfirm)),
+          ),
+        ],
+      ),
     );
   }
 }

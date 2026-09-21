@@ -496,6 +496,12 @@ class AppKeys {
   static const accountNotUpdated = 'account_not_updated';
   static const accountUpdated = 'account_updated';
   static const accountUpdateFailed = 'account_update_failed';
+  static const accountEmailVerificationTitle =
+      'account_email_verification_title';
+  static const accountEmailVerificationMessage =
+      'account_email_verification_message';
+  static const accountEmailVerificationCodeHint =
+      'account_email_verification_code_hint';
   static const imagePickFailed = 'image_pick_failed';
   static const profileOptionsMissingAccount = 'profile_options_missing_account';
   static const profileOptionsLoadFailed = 'profile_options_load_failed';

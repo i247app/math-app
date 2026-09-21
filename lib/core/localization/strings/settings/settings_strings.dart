@@ -49,6 +49,10 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.accountNotUpdated: 'Chưa cập nhật',
     AppKeys.accountUpdated: 'Đã cập nhật tài khoản.',
     AppKeys.accountUpdateFailed: 'Không thể cập nhật tài khoản.',
+    AppKeys.accountEmailVerificationTitle: 'Xác minh email mới',
+    AppKeys.accountEmailVerificationMessage:
+        'Nhập mã OTP đã gửi tới {email} để lưu thay đổi.',
+    AppKeys.accountEmailVerificationCodeHint: 'Nhập mã OTP gồm 4 chữ số',
     AppKeys.switchingProfile: 'Đang chuyển hồ sơ...',
     AppKeys.switchingLanguage: 'Đang đổi ngôn ngữ...',
   },
@@ -100,6 +104,10 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.accountNotUpdated: 'Not updated',
     AppKeys.accountUpdated: 'Account updated.',
     AppKeys.accountUpdateFailed: 'Could not update account.',
+    AppKeys.accountEmailVerificationTitle: 'Verify new email',
+    AppKeys.accountEmailVerificationMessage:
+        'Enter the OTP sent to {email} to save your changes.',
+    AppKeys.accountEmailVerificationCodeHint: 'Enter the 4-digit OTP',
     AppKeys.switchingProfile: 'Switching profile...',
     AppKeys.switchingLanguage: 'Changing language...',
   },
