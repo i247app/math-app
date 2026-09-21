@@ -14,9 +14,7 @@ import 'package:numi/features/home/data/home_api.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_api.dart';
 import 'package:numi/features/notifications/data/notification_list_service.dart';
-import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/notifications/data/notification_api.dart';
-import 'package:numi/features/notifications/data/api_notification_ping_service.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/profile/data/school_service.dart';
@@ -48,7 +46,6 @@ class AppServices {
     ClassroomExerciseService? classroomExerciseService,
     ExamService? examService,
     NotificationListService? notificationService,
-    NotificationPingService? notificationPingService,
     HomeLayoutService? homeLayoutService,
     ExamShakeService? examShakeService,
     ExamSnapshotStore examSnapshotStore = const CachedExamSnapshotStore(),
@@ -75,9 +72,6 @@ class AppServices {
       examService: examService ?? ExamApi(networkClient: client),
       notificationService:
           notificationService ?? NotificationApi(networkClient: client),
-      notificationPingService:
-          notificationPingService ??
-          ApiNotificationPingService(networkClient: client),
       homeLayoutService:
           homeLayoutService ?? HomeLayoutApi(networkClient: client),
       examShakeService:
@@ -107,7 +101,6 @@ class AppServices {
     required this.classroomExerciseService,
     required this.examService,
     required this.notificationService,
-    required this.notificationPingService,
     required this.homeLayoutService,
     required this.examShakeService,
     required this.examSnapshotStore,
@@ -128,7 +121,6 @@ class AppServices {
   final ClassroomExerciseService classroomExerciseService;
   final ExamService examService;
   final NotificationListService notificationService;
-  final NotificationPingService notificationPingService;
   final HomeLayoutService homeLayoutService;
   final ExamShakeService examShakeService;
   final ExamSnapshotStore examSnapshotStore;

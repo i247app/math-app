@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
-import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
@@ -69,24 +68,12 @@ class _FakeAuthService implements AuthService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeNotificationPingService implements NotificationPingService {
-  int calls = 0;
-
-  @override
-  Future<void> ping() async {
-    calls++;
-  }
-}
-
 AppSessionCubit _buildCubit({
   _FakeAuthService? authService,
   ProfileSessionResolver? profileResolver,
-  _FakeNotificationPingService? notificationPingService,
 }) => AppSessionCubit(
   authService: authService ?? _FakeAuthService(),
   profileResolver: profileResolver ?? _FakeProfileSessionResolver(),
-  notificationPingService:
-      notificationPingService ?? _FakeNotificationPingService(),
 );
 
 void main() {
@@ -175,36 +162,29 @@ void main() {
       },
     );
 
-    test(
-      'owns restore, notification ping, active profile and logout',
-      () async {
-        final authService = _FakeAuthService(
-          restoredUser: const LoginUser(id: 9, role: 'STUDENT'),
-        );
-        final resolver = _FakeProfileSessionResolver();
-        final ping = _FakeNotificationPingService();
-        final cubit = _buildCubit(
-          authService: authService,
-          profileResolver: resolver,
-          notificationPingService: ping,
-        );
+    test('owns restore, active profile and logout', () async {
+      final authService = _FakeAuthService(
+        restoredUser: const LoginUser(id: 9, role: 'STUDENT'),
+      );
+      final resolver = _FakeProfileSessionResolver();
+      final cubit = _buildCubit(
+        authService: authService,
+        profileResolver: resolver,
+      );
 
-        await cubit.restoreSession();
-        expect(cubit.state.user?.id, 9);
-        expect(cubit.state.status, SessionStatus.authenticated);
-        expect(ping.calls, 1);
+      await cubit.restoreSession();
+      expect(cubit.state.user?.id, 9);
+      expect(cubit.state.status, SessionStatus.authenticated);
+      const profile = StudentProfile(profileId: 91, role: 'STUDENT');
+      await cubit.activateProfile(profile);
+      expect(cubit.state.activeProfile?.profileId, 91);
+      expect(resolver.rememberedUserId, 9);
 
-        const profile = StudentProfile(profileId: 91, role: 'STUDENT');
-        await cubit.activateProfile(profile);
-        expect(cubit.state.activeProfile?.profileId, 91);
-        expect(resolver.rememberedUserId, 9);
-
-        await cubit.logout();
-        expect(authService.logoutCalls, 1);
-        expect(cubit.state.status, SessionStatus.unauthenticated);
-        await cubit.close();
-      },
-    );
+      await cubit.logout();
+      expect(authService.logoutCalls, 1);
+      expect(cubit.state.status, SessionStatus.unauthenticated);
+      await cubit.close();
+    });
 
     test('shows Home while a new login resolves profiles', () async {
       final resolver = _ControlledProfileSessionResolver();

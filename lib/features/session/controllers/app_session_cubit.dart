@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/models/profile.dart';
-import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
@@ -16,11 +13,9 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     AuthenticatedSession? initialSession,
     required AuthService authService,
     required ProfileSessionResolver profileResolver,
-    required NotificationPingService notificationPingService,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
        _authService = authService,
        _profileResolver = profileResolver,
-       _notificationPingService = notificationPingService,
        super(
          initialSession == null
              ? const AppSessionState()
@@ -37,7 +32,6 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
   final ProfileSessionResolver _profileResolver;
   final AuthService _authService;
-  final NotificationPingService _notificationPingService;
   int _sessionEpoch;
   int _operationRevision = 0;
   Future<void>? _pendingLogout;
@@ -136,7 +130,6 @@ class AppSessionCubit extends Cubit<AppSessionState> {
         isNewlyRegistered: isNewlyRegistered,
       ),
     );
-    unawaited(_notificationPingService.ping());
   }
 
   void _showAuthenticatedShell(LoginUser user) {

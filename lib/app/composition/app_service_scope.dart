@@ -10,7 +10,6 @@ import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/notifications/data/notification_list_service.dart';
-import 'package:numi/features/notifications/data/notification_ping_service.dart';
 import 'package:numi/features/profile/data/active_profile_session.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
@@ -51,9 +50,6 @@ class AppServiceScope extends StatelessWidget {
         RepositoryProvider<ExamService>.value(value: services.examService),
         RepositoryProvider<NotificationListService>.value(
           value: services.notificationService,
-        ),
-        RepositoryProvider<NotificationPingService>.value(
-          value: services.notificationPingService,
         ),
         RepositoryProvider<HomeLayoutService>.value(
           value: services.homeLayoutService,
