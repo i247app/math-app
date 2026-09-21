@@ -18,7 +18,7 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
           child: HomeBanner(
             data: HomeBannerData(
               image: const AssetImage(homeInitialAssessmentBannerAsset),
-              onTap: openAssessment,
+              onTap: openInitialAssessment,
             ),
           ),
         ),

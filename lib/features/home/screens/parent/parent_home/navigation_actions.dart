@@ -9,6 +9,16 @@ extension ParentHomeNavigationActions on ParentHomeContentState {
     }
   }
 
+  Future<void> openInitialAssessment() async {
+    HapticFeedback.lightImpact();
+    await (widget.onOpenInitialAssessment ?? widget.onOpenAssessment)?.call(
+      context,
+    );
+    if (mounted) {
+      await loadHome();
+    }
+  }
+
   void openParentAssessmentResult(GeneratedExam exam) {
     _openExamReview(exam);
   }

@@ -9,6 +9,7 @@ import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
+import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -16,6 +17,62 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 
 void main() {
+  testWidgets('initial assessment banner opens the direct assessment action', (
+    tester,
+  ) async {
+    const profileId = 81520;
+    final cache = HomeProfileCache.instance;
+    cache.invalidateProfile(profileId);
+    addTearDown(() => cache.invalidateProfile(profileId));
+
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    var directAssessmentOpenCount = 0;
+    var gradeSelectionOpenCount = 0;
+
+    await tester.pumpWidget(
+      RepositoryProvider<HomeLayoutService>.value(
+        value: const _EmptyParentHomeService(),
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: LingoScope(
+            lingo: lingo,
+            child: ParentHomeContent(
+              user: const LoginUser(id: 271),
+              profiles: const <StudentProfile>[],
+              activeProfile: const StudentProfile(
+                profileId: profileId,
+                role: 'PARENT',
+              ),
+              isActive: true,
+              activeRefreshTick: 0,
+              initialGrades: const <GradeModel>[],
+              gradeService: _EmptyGradeService(),
+              examService: _EmptyExamService(),
+              onRefreshProfiles: _doNothing,
+              onActivateProfile: _activateNothing,
+              onProfileSaved: _doNothingSync,
+              onOpenProfileMenu: _doNothingSync,
+              onOpenClassroomTab: _doNothingSync,
+              onOpenPracticeTab: _doNothingSync,
+              onParentAssessmentStateChanged: (_) {},
+              bottomPadding: 0,
+              onOpenAssessment: (_) async => gradeSelectionOpenCount++,
+              onOpenInitialAssessment: (_) async => directAssessmentOpenCount++,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(HomeBanner).first);
+    await tester.pumpAndSettle();
+
+    expect(directAssessmentOpenCount, 1);
+    expect(gradeSelectionOpenCount, 0);
+  });
+
   testWidgets('parent home refreshes assessments in the background on entry', (
     tester,
   ) async {
@@ -129,6 +186,27 @@ class _RecordingExamService implements ExamService {
         ),
       ],
     );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _EmptyExamService implements ExamService {
+  @override
+  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) async {
+    return const <GeneratedExam>[];
+  }
+
+  @override
+  Future<ExamListResponse> listExamPage({
+    int? userId,
+    int? profileId,
+    required int page,
+    required int size,
+    bool takeAll = false,
+  }) async {
+    return const ExamListResponse(mstatus: 200, exams: <GeneratedExam>[]);
   }
 
   @override

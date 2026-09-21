@@ -22,6 +22,7 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/exam/data/exam_snapshot_store.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
@@ -73,6 +74,18 @@ class AppDashboardTabFactory implements DashboardTabFactory {
               profileId: profileStableId(args.activeProfile),
               initialGradeId: profileGradeStableId(args.activeProfile),
               initialGradeLabel: args.activeProfile?.grade?.label,
+            ),
+          ),
+        ),
+        onOpenInitialAssessment: (context) => Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => AiAssessmentScreen(
+              examService: args.examService,
+              examType: examTypeAssessment,
+              gradeLabel: args.activeProfile?.grade?.label,
+              profileId: profileStableId(args.activeProfile),
+              allowQuestionNavigation: false,
+              showQuestionNavigation: false,
             ),
           ),
         ),

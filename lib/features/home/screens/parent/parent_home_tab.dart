@@ -65,6 +65,7 @@ class ParentHomeContent extends StatefulWidget {
     this.useActiveStudentProfileData = false,
     this.examSnapshotStore = const NoopExamSnapshotStore(),
     this.onOpenAssessment,
+    this.onOpenInitialAssessment,
     this.onOpenExamReview,
     this.onCreateStudentProfile,
   });
@@ -91,6 +92,7 @@ class ParentHomeContent extends StatefulWidget {
   final bool useActiveStudentProfileData;
   final ExamSnapshotStore examSnapshotStore;
   final Future<void> Function(BuildContext context)? onOpenAssessment;
+  final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?
   onOpenExamReview;
   final Future<void> Function(BuildContext context)? onCreateStudentProfile;
