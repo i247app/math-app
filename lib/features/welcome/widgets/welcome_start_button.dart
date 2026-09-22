@@ -12,16 +12,20 @@ class WelcomeStartButton extends StatelessWidget {
     super.key,
     required this.onStart,
     this.labelKey = AppKeys.start,
+    this.cornerRadius = 28,
+    this.verticalPadding = 16,
   });
 
   final VoidCallback onStart;
   final String labelKey;
+  final double cornerRadius;
+  final double verticalPadding;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    final radius = BorderRadius.circular(28);
+    final radius = BorderRadius.circular(cornerRadius);
 
     return Material(
       color: colors.accent,
@@ -33,7 +37,7 @@ class WelcomeStartButton extends StatelessWidget {
         },
         borderRadius: radius,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.symmetric(vertical: verticalPadding),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

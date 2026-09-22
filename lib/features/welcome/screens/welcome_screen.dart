@@ -4,11 +4,13 @@ import 'package:numi/features/welcome/widgets/welcome_composition.dart';
 
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback onStart;
+  final VoidCallback onAssessment;
   final VoidCallback onLogin;
 
   const WelcomeScreen({
     super.key,
     required this.onStart,
+    required this.onAssessment,
     required this.onLogin,
   });
 
@@ -16,7 +18,11 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.themeColors.pageBackground,
-      body: WelcomeComposition(onStart: onStart, onLogin: onLogin),
+      body: WelcomeComposition(
+        onStart: onStart,
+        onAssessment: onAssessment,
+        onLogin: onLogin,
+      ),
     );
   }
 }

@@ -16,11 +16,14 @@ import 'package:numi/features/auth/screens/login_screen.dart';
 import 'package:numi/features/auth/screens/otp_screen.dart';
 import 'package:numi/features/auth/screens/passcode_screen.dart';
 import 'package:numi/features/auth/screens/signup_screen.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/session/screens/session_dashboard_screen.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/passcode_cubit.dart';
 import 'package:numi/features/session/controllers/passcode_state.dart';
 import 'package:numi/features/welcome/screens/welcome_details_screen.dart';
+import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 import 'package:numi/features/welcome/screens/welcome_screen.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
 
@@ -146,6 +149,18 @@ class AppScreenRouter extends StatelessWidget {
             final actionLabel = context.getText(
               isSignupEntry ? AppKeys.signup : AppKeys.login,
             );
+            void openGuestAssessment() {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AiAssessmentScreen(
+                    examType: examTypeAssessment,
+                    allowQuestionNavigation: false,
+                    showQuestionNavigation: false,
+                  ),
+                ),
+              );
+            }
+
             final useSafeArea =
                 !coordinatorState.isRestoringSession &&
                 screen != AppScreen.welcome &&
@@ -162,6 +177,20 @@ class AppScreenRouter extends StatelessWidget {
                       onStart: () {
                         cubit.openWelcomeDetails();
                         coordinator.showWelcomeDetails();
+                      },
+                      onAssessment: () {
+                        Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (_) => WelcomeAssessmentIntroScreen(
+                              onAssessment: openGuestAssessment,
+                              onSkip: () {
+                                Navigator.of(context).pop();
+                                cubit.openSignupEntry();
+                                coordinator.showLogin();
+                              },
+                            ),
+                          ),
+                        );
                       },
                       onLogin: () async {
                         if (await passcodeCubit.openRememberedUnlock()) {

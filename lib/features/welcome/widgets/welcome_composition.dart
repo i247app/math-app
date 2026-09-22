@@ -11,6 +11,7 @@ import 'welcome_start_button.dart';
 
 class WelcomeComposition extends StatelessWidget {
   final VoidCallback onStart;
+  final VoidCallback onAssessment;
   final VoidCallback onLogin;
 
   static const _mascotAsset = 'assets/images/numi-mascot-hero.png';
@@ -20,6 +21,7 @@ class WelcomeComposition extends StatelessWidget {
   const WelcomeComposition({
     super.key,
     required this.onStart,
+    required this.onAssessment,
     required this.onLogin,
   });
 
@@ -144,10 +146,15 @@ class WelcomeComposition extends StatelessWidget {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     WelcomeStartButton(onStart: onStart),
-                                    const SizedBox(height: 16),
+                                    const SizedBox(height: 20),
                                     WelcomeLoginButton(
                                       onLogin: onLogin,
                                       labelKey: AppKeys.welcomeLogin,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    WelcomeLoginButton(
+                                      onLogin: onAssessment,
+                                      labelKey: AppKeys.assessmentAction,
                                     ),
                                   ],
                                 ),

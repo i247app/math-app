@@ -42,5 +42,6 @@ flutter:
   assets:
     - assets/avatars/
     - assets/images/
+    - assets/images/assessment_intro/
     - assets/icons/
     - assets/sounds/effects/
