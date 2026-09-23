@@ -3,7 +3,10 @@ import 'package:numi/features/profile/models/program.dart';
 import 'package:numi/features/profile/models/semester.dart';
 
 abstract interface class ProfileService {
-  Future<List<StudentProfile>> listProfiles({required int userId});
+  Future<List<StudentProfile>> listProfiles({
+    required int userId,
+    bool useGuestToken = false,
+  });
 
   Future<List<StudentProfile>> searchProfiles({required String search});
 

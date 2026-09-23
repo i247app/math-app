@@ -21,9 +21,15 @@ class ProfileApi implements ProfileService {
   final NetworkClient _networkClient;
 
   @override
-  Future<List<StudentProfile>> listProfiles({required int userId}) async {
+  Future<List<StudentProfile>> listProfiles({
+    required int userId,
+    bool useGuestToken = false,
+  }) async {
     try {
-      final response = await _listProfiles(ProfileListRequest(userId: userId));
+      final response = await _listProfiles(
+        ProfileListRequest(userId: userId),
+        useGuestToken: useGuestToken,
+      );
       return response.profiles.map((profile) => profile.toModel()).toList();
     } on NetworkException catch (error) {
       throw ProfileException(error.message, status: error.status);
@@ -168,11 +174,15 @@ class ProfileApi implements ProfileService {
     return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 
-  Future<ProfileListResponse> _listProfiles(ProfileListRequest request) {
+  Future<ProfileListResponse> _listProfiles(
+    ProfileListRequest request, {
+    bool useGuestToken = false,
+  }) {
     return _postResponse(
       '/profiles/list',
       request.toJson(),
       ProfileListResponse.fromJson,
+      useGuestToken: useGuestToken,
     );
   }
 
@@ -269,9 +279,14 @@ class ProfileApi implements ProfileService {
   Future<T> _postResponse<T>(
     String path,
     Map<String, dynamic> body,
-    T Function(Map<String, dynamic>) fromJson,
-  ) async {
-    final json = await _networkClient.postJson(path, body);
+    T Function(Map<String, dynamic>) fromJson, {
+    bool useGuestToken = false,
+  }) async {
+    final json = await _networkClient.postJson(
+      path,
+      body,
+      useGuestToken: useGuestToken,
+    );
     NetworkClient.throwForApiStatus(json);
     return fromJson(json);
   }

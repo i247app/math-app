@@ -6,7 +6,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
@@ -52,6 +54,30 @@ class _PendingExamService implements ExamService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _FakeGuestAccountService implements GuestAccountService {
+  int ensureCalls = 0;
+
+  final guest = const GuestAccount(
+    uid: 42,
+    user: <String, dynamic>{'uid': 42, 'profile_id': 421},
+  );
+
+  @override
+  GuestAccount? get current => guest;
+
+  @override
+  Future<int?> readStoredUid() async => guest.uid;
+
+  @override
+  Future<GuestAccount> ensureGuest() async {
+    ensureCalls++;
+    return guest;
+  }
+
+  @override
+  Future<void> clear() async {}
+}
+
 void main() {
   group('authentication entry characterization', () {
     testWidgets('starts on the welcome screen', (tester) async {
@@ -63,20 +89,29 @@ void main() {
     testWidgets('opens guest assessment from the initial welcome screen', (
       tester,
     ) async {
+      final guestAccounts = _FakeGuestAccountService();
       await tester.pumpWidget(
-        NumiApp(services: AppServices(examService: _PendingExamService())),
+        NumiApp(
+          services: AppServices(
+            examService: _PendingExamService(),
+            guestAccountService: guestAccounts,
+          ),
+        ),
       );
 
-      await tester.ensureVisible(find.text('Đánh Giá'));
-      await tester.tap(find.text('Đánh Giá'));
+      expect(guestAccounts.ensureCalls, 0);
+      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
+      await tester.tap(find.text('ĐÁNH GIÁ'));
       await tester.pumpAndSettle();
 
+      expect(guestAccounts.ensureCalls, 1);
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
 
       await tester.tap(
         find.byKey(const ValueKey('welcome-assessment-intro-action')),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(AiAssessmentScreen), findsOneWidget);
     });

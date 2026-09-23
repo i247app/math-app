@@ -8,6 +8,8 @@ import '../debug/debug_request_metrics.dart';
 import 'api_metadata.dart';
 import 'auth_token_store.dart';
 
+const guestTokenRequestKey = 'useGuestToken';
+
 class DebugRequestMetricsInterceptor extends Interceptor {
   DebugRequestMetricsInterceptor({DebugRequestMetrics? metrics})
     : _metrics = metrics ?? DebugRequestMetrics.instance;
@@ -259,11 +261,14 @@ class MetadataInterceptor extends QueuedInterceptor {
   MetadataInterceptor({
     required ApiMetadataProvider metadataProvider,
     required AuthTokenStore authTokenStore,
+    required AuthTokenStore guestTokenStore,
   }) : _metadataProvider = metadataProvider,
-       _authTokenStore = authTokenStore;
+       _authTokenStore = authTokenStore,
+       _guestTokenStore = guestTokenStore;
 
   final ApiMetadataProvider _metadataProvider;
   final AuthTokenStore _authTokenStore;
+  final AuthTokenStore _guestTokenStore;
 
   @override
   void onRequest(
@@ -276,7 +281,11 @@ class MetadataInterceptor extends QueuedInterceptor {
     }
 
     final metadata = await _metadataProvider.buildMetadata();
-    metadata['authorization'] = await _authorizationValue();
+    metadata['authorization'] = await _authorizationValue(
+      options.extra[guestTokenRequestKey] == true
+          ? _guestTokenStore
+          : _authTokenStore,
+    );
     metadata['content_type'] = _contentType(options.data);
     final data = options.data;
     if (data is FormData) {
@@ -292,8 +301,8 @@ class MetadataInterceptor extends QueuedInterceptor {
     handler.next(options);
   }
 
-  Future<String> _authorizationValue() async {
-    final token = (await _authTokenStore.readToken())?.trim();
+  Future<String> _authorizationValue(AuthTokenStore tokenStore) async {
+    final token = (await tokenStore.readToken())?.trim();
     return token == null || token.isEmpty ? '' : 'Bearer $token';
   }
 
@@ -333,19 +342,23 @@ class MetadataInterceptor extends QueuedInterceptor {
 /// authentication request header. Request authentication lives in body
 /// metadata via [MetadataInterceptor].
 class AuthTokenResponseInterceptor extends QueuedInterceptor {
-  AuthTokenResponseInterceptor({required AuthTokenStore authTokenStore})
-    : _authTokenStore = authTokenStore;
+  AuthTokenResponseInterceptor({
+    required AuthTokenStore authTokenStore,
+    required AuthTokenStore guestTokenStore,
+  }) : _authTokenStore = authTokenStore,
+       _guestTokenStore = guestTokenStore;
 
   static const _authTokenHeader = 'X-Auth-Token';
 
   final AuthTokenStore _authTokenStore;
+  final AuthTokenStore _guestTokenStore;
 
   @override
   void onResponse(
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) async {
-    await _storeTokenFromHeaders(response.headers);
+    await _storeTokenFromHeaders(response.headers, response.requestOptions);
     handler.next(response);
   }
 
@@ -353,12 +366,15 @@ class AuthTokenResponseInterceptor extends QueuedInterceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final response = err.response;
     if (response != null) {
-      await _storeTokenFromHeaders(response.headers);
+      await _storeTokenFromHeaders(response.headers, response.requestOptions);
     }
     handler.next(err);
   }
 
-  Future<void> _storeTokenFromHeaders(Headers headers) async {
+  Future<void> _storeTokenFromHeaders(
+    Headers headers,
+    RequestOptions requestOptions,
+  ) async {
     for (final entry in headers.map.entries) {
       if (entry.key.toLowerCase() != _authTokenHeader.toLowerCase()) {
         continue;
@@ -366,7 +382,10 @@ class AuthTokenResponseInterceptor extends QueuedInterceptor {
 
       final token = entry.value.isEmpty ? null : entry.value.first.trim();
       if (token != null && token.isNotEmpty) {
-        await _authTokenStore.writeToken(token);
+        final store = requestOptions.extra[guestTokenRequestKey] == true
+            ? _guestTokenStore
+            : _authTokenStore;
+        await store.writeToken(token);
       }
       return;
     }

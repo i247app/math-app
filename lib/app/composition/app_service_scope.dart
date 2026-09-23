@@ -6,6 +6,7 @@ import 'package:numi/core/data/session_data_cleaner.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_navigator.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
@@ -36,6 +37,9 @@ class AppServiceScope extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthService>.value(value: services.authService),
+        RepositoryProvider<GuestAccountService>.value(
+          value: services.guestAccountService,
+        ),
         RepositoryProvider<ProfileService>.value(
           value: services.profileService,
         ),

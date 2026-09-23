@@ -13,6 +13,7 @@ import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/controllers/auth_cubit.dart';
@@ -182,6 +183,7 @@ class _AppFlowState extends State<AppFlow> {
                 initialSession: widget.initialSession,
                 authService: widget.authService ?? context.read<AuthService>(),
                 profileResolver: context.read(),
+                guestAccountService: context.read<GuestAccountService>(),
               );
               context.read<SessionScopedRepositoryRegistry>().updateSession(
                 isAuthenticated: cubit.state.isAuthenticated,

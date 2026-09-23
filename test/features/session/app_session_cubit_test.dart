@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
+import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/features/session/models/profile_session_resolution.dart';
@@ -68,16 +70,48 @@ class _FakeAuthService implements AuthService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _FakeGuestAccountService implements GuestAccountService {
+  int clearCalls = 0;
+
+  @override
+  GuestAccount? get current => null;
+
+  @override
+  Future<int?> readStoredUid() async => null;
+
+  @override
+  Future<GuestAccount> ensureGuest() =>
+      throw UnimplementedError('Not needed in this test');
+
+  @override
+  Future<void> clear() async {
+    clearCalls++;
+  }
+}
+
 AppSessionCubit _buildCubit({
   _FakeAuthService? authService,
   ProfileSessionResolver? profileResolver,
+  GuestAccountService? guestAccountService,
 }) => AppSessionCubit(
   authService: authService ?? _FakeAuthService(),
   profileResolver: profileResolver ?? _FakeProfileSessionResolver(),
+  guestAccountService: guestAccountService,
 );
 
 void main() {
   group('AppSessionCubit', () {
+    test('clears guest data when a real user signs in', () async {
+      final guestAccounts = _FakeGuestAccountService();
+      final cubit = _buildCubit(guestAccountService: guestAccounts);
+
+      await cubit.establishSession(user: const LoginUser(id: 7));
+
+      expect(guestAccounts.clearCalls, 1);
+      expect(cubit.state.status, SessionStatus.authenticated);
+      await cubit.close();
+    });
+
     test(
       'owns an authenticated session independently from auth flow state',
       () async {

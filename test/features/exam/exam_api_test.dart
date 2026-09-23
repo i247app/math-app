@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/network_client.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
+import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/controllers/assessment_controller.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
@@ -60,6 +62,20 @@ void main() {
     expect(exam.userExamId, 99);
     expect(exam.questions.single.rightAnswer, 'A');
     expect(exam.questions.single.correctAnswer, '4');
+  });
+
+  test('includes guest uid when generating without a profile id', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return _examResponse();
+    }, guestAccountService: _GuestAccountService());
+
+    await api.generateAssessmentExam();
+
+    expect(_body(captured), containsPair('uid', 42));
+    expect(_body(captured), isNot(contains('profile_id')));
+    expect(captured.extra['useGuestToken'], isTrue);
   });
 
   test('generates PRACTICE with its assessment journey id', () async {
@@ -193,6 +209,24 @@ void main() {
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('user_exam_id', 99));
     expect(body, containsPair('status', 'COMPLETE'));
+    expect(captured.extra['useGuestToken'], isNull);
+  });
+
+  test('updates guest user exam status with the guest token', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return const <String, dynamic>{'mstatus': 200, 'status': 'Success'};
+    }, guestAccountService: _GuestAccountService());
+
+    await api.updateUserExamStatus(
+      profileId: 21,
+      userExamId: 99,
+      status: 'COMPLETE',
+    );
+
+    expect(captured.path, '/exams/update-user-exam-status');
+    expect(captured.extra['useGuestToken'], isTrue);
   });
 
   test('loads exam detail and maps selected answers from details', () async {
@@ -673,8 +707,9 @@ void main() {
 }
 
 ExamApi _apiReturning(
-  Map<String, dynamic> Function(RequestOptions options) response,
-) {
+  Map<String, dynamic> Function(RequestOptions options) response, {
+  GuestAccountService? guestAccountService,
+}) {
   final dio = Dio()
     ..interceptors.add(
       InterceptorsWrapper(
@@ -691,7 +726,23 @@ ExamApi _apiReturning(
     );
   return ExamApi(
     networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    guestAccountService: guestAccountService,
   );
+}
+
+class _GuestAccountService implements GuestAccountService {
+  @override
+  GuestAccount? get current =>
+      const GuestAccount(uid: 42, user: <String, dynamic>{'uid': 42});
+
+  @override
+  Future<int?> readStoredUid() async => 42;
+
+  @override
+  Future<GuestAccount> ensureGuest() async => current!;
+
+  @override
+  Future<void> clear() async {}
 }
 
 Map<String, dynamic> _body(RequestOptions options) =>

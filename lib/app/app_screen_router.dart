@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/app/controllers/app_coordinator_cubit.dart';
 import 'package:numi/app/navigation/app_screen.dart';
 import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/auth/controllers/auth_cubit.dart';
@@ -16,6 +19,7 @@ import 'package:numi/features/auth/screens/login_screen.dart';
 import 'package:numi/features/auth/screens/otp_screen.dart';
 import 'package:numi/features/auth/screens/passcode_screen.dart';
 import 'package:numi/features/auth/screens/signup_screen.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/session/screens/session_dashboard_screen.dart';
@@ -149,11 +153,16 @@ class AppScreenRouter extends StatelessWidget {
             final actionLabel = context.getText(
               isSignupEntry ? AppKeys.signup : AppKeys.login,
             );
-            void openGuestAssessment() {
-              Navigator.of(context).push<void>(
+            Future<void> openGuestAssessment(BuildContext introContext) async {
+              final guest = await introContext
+                  .read<GuestAccountService>()
+                  .ensureGuest();
+              if (!introContext.mounted) return;
+              await Navigator.of(introContext).push<void>(
                 MaterialPageRoute<void>(
-                  builder: (_) => const AiAssessmentScreen(
+                  builder: (_) => AiAssessmentScreen(
                     examType: examTypeAssessment,
+                    profileId: guest.profileId,
                     allowQuestionNavigation: false,
                     showQuestionNavigation: false,
                   ),
@@ -179,6 +188,19 @@ class AppScreenRouter extends StatelessWidget {
                         coordinator.showWelcomeDetails();
                       },
                       onAssessment: () {
+                        final guestAccounts = context
+                            .read<GuestAccountService>();
+                        unawaited(
+                          guestAccounts.ensureGuest().then<void>(
+                            (_) {},
+                            onError: (Object error, StackTrace stackTrace) {
+                              AppLogger.warning(
+                                'GUEST',
+                                'Guest setup will retry on assessment: $error',
+                              );
+                            },
+                          ),
+                        );
                         Navigator.of(context).push<void>(
                           MaterialPageRoute<void>(
                             builder: (_) => WelcomeAssessmentIntroScreen(

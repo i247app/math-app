@@ -8,16 +8,22 @@ import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 
 class ExamApi implements ExamService {
-  ExamApi({String? baseUrl, NetworkClient? networkClient})
-    : _networkClient =
-          networkClient ??
-          (baseUrl == null
-              ? NetworkClient.shared
-              : NetworkClient(baseUrl: baseUrl));
+  ExamApi({
+    String? baseUrl,
+    NetworkClient? networkClient,
+    GuestAccountService? guestAccountService,
+  }) : _guestAccountService = guestAccountService,
+       _networkClient =
+           networkClient ??
+           (baseUrl == null
+               ? NetworkClient.shared
+               : NetworkClient(baseUrl: baseUrl));
 
   final NetworkClient _networkClient;
+  final GuestAccountService? _guestAccountService;
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -46,6 +52,7 @@ class ExamApi implements ExamService {
           userExamId: normalizedExamType == examTypePractice
               ? validUserExamId
               : null,
+          guestUid: _guestAccountService?.current?.uid,
         ),
       ),
     );
@@ -103,7 +110,7 @@ class ExamApi implements ExamService {
             'profile_id': _requireProfileId(profileId),
             'user_exam_id': userExamId,
             'status': status,
-          });
+          }, useGuestToken: _guestAccountService?.current != null);
       NetworkClient.throwForApiStatus(json);
     });
   }
@@ -350,6 +357,7 @@ class ExamApi implements ExamService {
       path,
       body,
       receiveTimeout: receiveTimeout,
+      useGuestToken: _guestAccountService?.current != null,
     );
     NetworkClient.throwForApiStatus(json);
     return fromJson(json);

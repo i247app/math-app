@@ -7,6 +7,8 @@ import 'package:numi/features/dashboard/navigation/dashboard_navigator.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/data/auth_api.dart';
+import 'package:numi/features/auth/data/guest_account_api.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom/data/classroom_api.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
@@ -39,6 +41,7 @@ class AppServices {
   factory AppServices({
     NetworkClient? networkClient,
     AuthService? authService,
+    GuestAccountService? guestAccountService,
     ProfileService? profileService,
     GradeService? gradeService,
     SchoolService? schoolService,
@@ -57,10 +60,14 @@ class AppServices {
   }) {
     final client = networkClient ?? NetworkClient.shared;
     final profiles = profileService ?? ProfileApi(networkClient: client);
+    final guests =
+        guestAccountService ??
+        GuestAccountApi(networkClient: client, profileService: profiles);
 
     return AppServices._(
       networkClient: client,
       authService: authService ?? AuthApi(networkClient: client),
+      guestAccountService: guests,
       profileService: profiles,
       gradeService: gradeService ?? GradeApi(networkClient: client),
       schoolService: schoolService ?? SchoolApi(networkClient: client),
@@ -68,7 +75,9 @@ class AppServices {
       classroomExerciseService:
           classroomExerciseService ??
           ClassroomExerciseApi(networkClient: client),
-      examService: examService ?? ExamApi(networkClient: client),
+      examService:
+          examService ??
+          ExamApi(networkClient: client, guestAccountService: guests),
       notificationService:
           notificationService ?? NotificationApi(networkClient: client),
       homeLayoutService:
@@ -92,6 +101,7 @@ class AppServices {
   const AppServices._({
     required this.networkClient,
     required this.authService,
+    required this.guestAccountService,
     required this.profileService,
     required this.gradeService,
     required this.schoolService,
@@ -112,6 +122,7 @@ class AppServices {
 
   final NetworkClient networkClient;
   final AuthService authService;
+  final GuestAccountService guestAccountService;
   final ProfileService profileService;
   final GradeService gradeService;
   final SchoolService schoolService;

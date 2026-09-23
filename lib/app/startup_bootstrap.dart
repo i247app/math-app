@@ -98,6 +98,25 @@ class StartupBootstrap {
         return null;
       }
 
+      final role = user.role?.trim().toUpperCase();
+      int? guestUid;
+      try {
+        guestUid = await services.guestAccountService.readStoredUid();
+      } catch (_) {
+        // Guest storage must not prevent a real account from being restored.
+      }
+      if (role == 'GUEST' || guestUid == user.id) {
+        // Older builds could save a guest's X-Auth-Token as auth_token.
+        await services.networkClient.moveAuthTokenToGuest();
+        return null;
+      }
+
+      try {
+        await services.guestAccountService.clear();
+      } catch (_) {
+        // Preserve the authenticated session if guest cleanup is unavailable.
+      }
+
       await _rememberAuthenticatedAccount(user);
       final profileResolution = await services.profileSessionResolver
           .resolveForUserId(user.id);

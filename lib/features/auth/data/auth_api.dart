@@ -30,7 +30,7 @@ class AuthApi implements AuthService {
 
     try {
       final response = await _postAuth(
-        '/auth/login-resume',
+        '/auth/resume-session',
         const <String, dynamic>{},
       );
       final user = response.user?.toModel();

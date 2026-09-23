@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
@@ -13,9 +15,11 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     AuthenticatedSession? initialSession,
     required AuthService authService,
     required ProfileSessionResolver profileResolver,
+    GuestAccountService? guestAccountService,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
        _authService = authService,
        _profileResolver = profileResolver,
+       _guestAccountService = guestAccountService,
        super(
          initialSession == null
              ? const AppSessionState()
@@ -32,6 +36,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
   final ProfileSessionResolver _profileResolver;
   final AuthService _authService;
+  final GuestAccountService? _guestAccountService;
   int _sessionEpoch;
   int _operationRevision = 0;
   Future<void>? _pendingLogout;
@@ -111,6 +116,18 @@ class AppSessionCubit extends Cubit<AppSessionState> {
       clear();
       return;
     }
+    final guestAccountService = _guestAccountService;
+    if (guestAccountService != null) {
+      try {
+        await guestAccountService.clear();
+      } catch (error) {
+        AppLogger.warning(
+          'GUEST',
+          'Could not clear guest data on login: $error',
+        );
+      }
+    }
+    if (!_isCurrent(revision)) return;
     if (showHomeWhileResolving) {
       _showAuthenticatedShell(user);
     } else if (!state.isAuthenticated) {

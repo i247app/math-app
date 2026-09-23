@@ -25,10 +25,12 @@ class NetworkClient {
     String? baseUrl,
     Dio? dio,
     AuthTokenStore? authTokenStore,
+    AuthTokenStore? guestTokenStore,
     ApiMetadataProvider? metadataProvider,
   }) : _baseUrl = _normalizeBaseUrl(baseUrl ?? ApiConfig.baseUrl),
        _dio = dio ?? Dio(),
        _authTokenStore = authTokenStore ?? CachedAuthTokenStore.instance,
+       _guestTokenStore = guestTokenStore ?? CachedAuthTokenStore.guestInstance,
        _metadataProvider = metadataProvider ?? AppApiMetadataProvider.instance {
     _dio.options
       ..baseUrl = _baseUrl
@@ -41,10 +43,14 @@ class NetworkClient {
       MetadataInterceptor(
         metadataProvider: _metadataProvider,
         authTokenStore: _authTokenStore,
+        guestTokenStore: _guestTokenStore,
       ),
     );
     _dio.interceptors.add(
-      AuthTokenResponseInterceptor(authTokenStore: _authTokenStore),
+      AuthTokenResponseInterceptor(
+        authTokenStore: _authTokenStore,
+        guestTokenStore: _guestTokenStore,
+      ),
     );
     if (kDebugMode) {
       _dio.interceptors.add(DebugRequestMetricsInterceptor());
@@ -55,12 +61,14 @@ class NetworkClient {
   final String _baseUrl;
   final Dio _dio;
   final AuthTokenStore _authTokenStore;
+  final AuthTokenStore _guestTokenStore;
   final ApiMetadataProvider _metadataProvider;
 
   Future<Map<String, dynamic>> postJson(
     String path,
     Map<String, dynamic> body, {
     Duration? receiveTimeout,
+    bool useGuestToken = false,
   }) async {
     if (_baseUrl.trim().isEmpty) {
       throw NetworkException(AppStrings.current(AppKeys.apiBaseUrlMissing));
@@ -71,9 +79,14 @@ class NetworkClient {
       response = await _dio.post<Object?>(
         path,
         data: Map<String, dynamic>.from(body),
-        options: receiveTimeout == null
+        options: receiveTimeout == null && !useGuestToken
             ? null
-            : Options(receiveTimeout: receiveTimeout),
+            : Options(
+                receiveTimeout: receiveTimeout,
+                extra: useGuestToken
+                    ? const <String, dynamic>{guestTokenRequestKey: true}
+                    : null,
+              ),
       );
     } on DioException catch (error) {
       throw NetworkException(
@@ -133,8 +146,21 @@ class NetworkClient {
 
   Future<void> clearAuthToken() => _authTokenStore.clearToken();
 
+  Future<void> clearGuestToken() => _guestTokenStore.clearToken();
+
   Future<void> writeAuthToken(String token) {
     return _authTokenStore.writeToken(token);
+  }
+
+  Future<void> writeGuestToken(String token) {
+    return _guestTokenStore.writeToken(token);
+  }
+
+  Future<void> moveAuthTokenToGuest() async {
+    final token = (await _authTokenStore.readToken())?.trim();
+    if (token == null || token.isEmpty) return;
+    await _guestTokenStore.writeToken(token);
+    await _authTokenStore.clearToken();
   }
 
   Future<bool> hasAuthToken() async {

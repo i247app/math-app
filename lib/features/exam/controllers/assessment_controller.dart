@@ -734,7 +734,7 @@ class AssessmentController extends ChangeNotifier {
       gradeLabel: _isAssessment
           ? AssessmentFlowPolicy.gradeLabel(grade)
           : gradeLabel,
-      profileId: profileId,
+      profileId: profileId ?? _exam?.profileId,
       level: _currentLevel,
     );
     ExamCache.seedDetail(generatedExam);

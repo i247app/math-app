@@ -5,12 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
-class WelcomeAssessmentIntroScreen extends StatelessWidget {
+class WelcomeAssessmentIntroScreen extends StatefulWidget {
   const WelcomeAssessmentIntroScreen({
     super.key,
     required this.onAssessment,
@@ -24,8 +25,41 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
   static const _mascotAsset =
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
 
-  final VoidCallback onAssessment;
+  final Future<void> Function(BuildContext context) onAssessment;
   final VoidCallback onSkip;
+
+  @override
+  State<WelcomeAssessmentIntroScreen> createState() =>
+      _WelcomeAssessmentIntroScreenState();
+}
+
+class _WelcomeAssessmentIntroScreenState
+    extends State<WelcomeAssessmentIntroScreen> {
+  bool _isStarting = false;
+
+  Future<void> _startAssessment() async {
+    if (_isStarting) return;
+    setState(() => _isStarting = true);
+    try {
+      await widget.onAssessment(context);
+    } on NetworkException catch (error) {
+      if (mounted) await context.showErrorDialog(error.message);
+    } on FormatException {
+      if (mounted) {
+        await context.showErrorDialog(
+          context.getText(AppKeys.invalidServerResponse),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        await context.showErrorDialog(
+          context.getText(AppKeys.apiConnectionFailed),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isStarting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +76,7 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              _backgroundAsset,
+              WelcomeAssessmentIntroScreen._backgroundAsset,
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
             ),
@@ -72,7 +106,7 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
                           key: const ValueKey('welcome-assessment-skip'),
                           onPressed: () {
                             HapticFeedback.lightImpact();
-                            onSkip();
+                            widget.onSkip();
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.welcomeTeal,
@@ -96,7 +130,7 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
                         right: 0,
                         child: Center(
                           child: Image.asset(
-                            _logoAsset,
+                            WelcomeAssessmentIntroScreen._logoAsset,
                             width: logoWidth,
                             fit: BoxFit.contain,
                             semanticLabel: 'Numi Toán AI',
@@ -109,7 +143,7 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
                         right: 0,
                         child: Center(
                           child: Image.asset(
-                            _mascotAsset,
+                            WelcomeAssessmentIntroScreen._mascotAsset,
                             width: mascotWidth,
                             fit: BoxFit.contain,
                             semanticLabel: 'Numi assessment mascot',
@@ -123,14 +157,26 @@ class WelcomeAssessmentIntroScreen extends StatelessWidget {
                         child: Center(
                           child: SizedBox(
                             width: math.min(width - 112, 240),
-                            child: WelcomeStartButton(
-                              key: const ValueKey(
-                                'welcome-assessment-intro-action',
+                            child: IgnorePointer(
+                              ignoring: _isStarting,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  WelcomeStartButton(
+                                    key: const ValueKey(
+                                      'welcome-assessment-intro-action',
+                                    ),
+                                    onStart: () => _startAssessment(),
+                                    labelKey: AppKeys.assessmentAction,
+                                    cornerRadius: 16,
+                                    verticalPadding: 14,
+                                  ),
+                                  if (_isStarting)
+                                    const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                ],
                               ),
-                              onStart: onAssessment,
-                              labelKey: AppKeys.assessmentAction,
-                              cornerRadius: 16,
-                              verticalPadding: 14,
                             ),
                           ),
                         ),

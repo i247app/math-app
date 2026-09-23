@@ -11,11 +11,12 @@ abstract class AuthTokenStore {
 class SecureAuthTokenStore implements AuthTokenStore {
   const SecureAuthTokenStore({
     FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
-
-  static const _tokenKey = 'auth_token';
+    String tokenKey = 'auth_token',
+  }) : _storage = storage,
+       _tokenKey = tokenKey;
 
   final FlutterSecureStorage _storage;
+  final String _tokenKey;
 
   @override
   Future<String?> readToken() => _storage.read(key: _tokenKey);
@@ -39,6 +40,9 @@ class CachedAuthTokenStore implements AuthTokenStore {
     : _persistentStore = persistentStore ?? const SecureAuthTokenStore();
 
   static final CachedAuthTokenStore instance = CachedAuthTokenStore();
+  static final CachedAuthTokenStore guestInstance = CachedAuthTokenStore(
+    persistentStore: const SecureAuthTokenStore(tokenKey: 'guest_token'),
+  );
 
   final AuthTokenStore _persistentStore;
   String? _cachedToken;
