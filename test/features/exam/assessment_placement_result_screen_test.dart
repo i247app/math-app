@@ -26,6 +26,7 @@ void main() {
       'assets/images/assessment-result-checklist.png',
       'assets/images/assessment-result-pencil.png',
       'assets/images/grade-ribbon.png',
+      'assets/images/grade-ribbon-en.png',
     ];
 
     for (final asset in assets) {
@@ -339,6 +340,21 @@ void main() {
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
+
+    final englishRibbonImage = tester.widget<Image>(
+      find.descendant(
+        of: find.byKey(const ValueKey('placement-grade-ribbon')),
+        matching: find.byType(Image),
+      ),
+    );
+    expect(
+      englishRibbonImage.image,
+      isA<AssetImage>().having(
+        (image) => image.assetName,
+        'assetName',
+        'assets/images/grade-ribbon-en.png',
+      ),
+    );
 
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
