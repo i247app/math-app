@@ -237,7 +237,17 @@ class AuthApi implements AuthService {
   @override
   Future<void> logout() async {
     _loginUsers.clear();
-    await _networkClient.clearAuthToken();
+    try {
+      final response = await _networkClient.postJson(
+        '/auth/logout',
+        const <String, dynamic>{},
+      );
+      NetworkClient.throwForApiStatus(response);
+    } on NetworkException {
+      // A failed server request must not keep the local session signed in.
+    } finally {
+      await _networkClient.clearAuthToken();
+    }
   }
 
   Future<AuthResponse> _signup(
