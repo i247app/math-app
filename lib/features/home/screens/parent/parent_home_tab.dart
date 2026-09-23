@@ -18,7 +18,6 @@ import 'package:numi/features/home/data/home_layout_exception.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/exam/data/exam_snapshot_store.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
@@ -63,7 +62,6 @@ class ParentHomeContent extends StatefulWidget {
     this.onChildProfileDialogShown,
     this.homeHeader,
     this.useActiveStudentProfileData = false,
-    this.examSnapshotStore = const NoopExamSnapshotStore(),
     this.onOpenAssessment,
     this.onOpenInitialAssessment,
     this.onOpenExamReview,
@@ -90,7 +88,6 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
   final bool useActiveStudentProfileData;
-  final ExamSnapshotStore examSnapshotStore;
   final Future<void> Function(BuildContext context)? onOpenAssessment;
   final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?
@@ -112,6 +109,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       .read<HomeLayoutService>();
   bool isLoading = true;
   bool hasLoadedHome = false;
+  bool isOpeningInitialAssessment = false;
   String? errorMessage;
   HomeLayout? homeLayout;
   List<GeneratedExam> completedAssessments = const <GeneratedExam>[];

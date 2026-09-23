@@ -12,6 +12,78 @@ bool isCompletedAssessment(GeneratedExam exam) {
       (status == 'SUBMITTED' || exam.grading?.scorePercentage != null);
 }
 
+/// Return the resumable exam carried by an active assessment journey.
+GeneratedExam? activeInProgressAssessmentExam(ExamStats stats) {
+  final status = stats.status?.trim().toUpperCase();
+  if (status == 'COMPLETE' || status == 'SUBMITTED' || status == 'CANCEL') {
+    return null;
+  }
+  final outerIsActive = status == 'ACTIVE' || status == 'IN_PROGRESS';
+  final candidates = stats.inProgressExams.where((exam) {
+    final examStatus = exam.examStatus?.trim().toUpperCase();
+    return exam.questions.isNotEmpty &&
+        (outerIsActive ||
+            examStatus == 'ACTIVE' ||
+            examStatus == 'IN_PROGRESS');
+  });
+  GeneratedExam? latest;
+  for (final exam in candidates) {
+    if (latest == null || examDate(exam).isAfter(examDate(latest))) {
+      latest = exam;
+    }
+  }
+  return latest;
+}
+
+GeneratedExam? latestActiveAssessmentExam(Iterable<ExamStats> stats) {
+  GeneratedExam? latest;
+  for (final item in stats) {
+    final exam = activeInProgressAssessmentExam(item);
+    if (exam != null &&
+        (latest == null || examDate(exam).isAfter(examDate(latest)))) {
+      latest = exam;
+    }
+  }
+  return latest;
+}
+
+bool isCompletedAssessmentStats(ExamStats stats) {
+  if (activeInProgressAssessmentExam(stats) != null) return false;
+  final status = stats.status?.trim().toUpperCase();
+  return status == null ||
+      status.isEmpty ||
+      status == 'COMPLETE' ||
+      status == 'SUBMITTED';
+}
+
+GeneratedExam completedAssessmentFromStats(
+  ExamStats stats, {
+  required int profileId,
+  String fallbackExamType = examTypeAssessment,
+}) {
+  final submittedAt = stats.lastSubmittedDt?.toIso8601String();
+  return GeneratedExam(
+    userExamId: stats.userExamId,
+    profileId: profileId,
+    examStatus: stats.status,
+    examType: stats.examType ?? fallbackExamType,
+    grade: stats.grade,
+    level: stats.level,
+    createDt: submittedAt,
+    modifyDt: submittedAt,
+    shortText: stats.review,
+    grading: ExamGrading(
+      aiDetectGrade: stats.grade == null ? null : 'Lớp ${stats.grade}',
+      aiReview: stats.review,
+      correctNumber: stats.correctNumber,
+      scorePercentage: stats.scorePercentage.round(),
+      skippedNumber: stats.skippedNumber,
+      totalQuestions: stats.totalQuestions,
+    ),
+    questions: const <ExamQuestion>[],
+  );
+}
+
 class CompletedParentAssessmentPage {
   const CompletedParentAssessmentPage({
     required this.exams,

@@ -6,23 +6,23 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
     required int profileId,
   }) async {
     try {
-      final userId = widget.useActiveStudentProfileData
-          ? null
-          : widget.user?.id;
-      final result = await loadCompletedParentAssessments(
-        examService: widget.examService,
+      final stats = await widget.examService.getExamStats(
         profileId: profileId,
-        userId: userId,
-        page: 1,
-        size: 5,
-        allowUserFallback: !widget.useActiveStudentProfileData,
-        useUnpaginatedList: true,
+        examType: examTypeAssessment,
       );
       if (!mounted || requestId != _assessmentLoadRequestId) {
         return;
       }
 
-      final assessments = result.allExams;
+      final assessments =
+          stats
+              .where(isCompletedAssessmentStats)
+              .map(
+                (entry) =>
+                    completedAssessmentFromStats(entry, profileId: profileId),
+              )
+              .toList(growable: false)
+            ..sort((a, b) => examDate(b).compareTo(examDate(a)));
       final layout = homeLayout;
       _updateState(() {
         _lastAppliedAssessmentLoadRequestId = requestId;
@@ -31,12 +31,6 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
           childSummaries = _studentSummariesFromLayout(layout, assessments);
         }
       });
-      widget.examSnapshotStore.seedList(
-        exams: assessments,
-        userId: userId,
-        profileId: profileId,
-      );
-
       if (layout != null) {
         HomeProfileCache.instance.putParent(
           ParentHomeSnapshot(

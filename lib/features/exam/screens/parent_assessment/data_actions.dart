@@ -46,7 +46,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
         loadedActiveEntry = activeEntries.isEmpty ? null : activeEntries.first;
         loadedAllEntries =
             stats
-                .where(_isCompletedAssessmentStats)
+                .where(isCompletedAssessmentStats)
                 .map(_assessmentEntryFromStats)
                 .toList(growable: false)
               ..sort((a, b) => examDate(b.exam).compareTo(examDate(a.exam)));
@@ -113,82 +113,20 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
     }
   }
 
-  bool _isCompletedAssessmentStats(ExamStats stats) {
-    if (_activeInProgressExam(stats) != null) {
-      return false;
-    }
-    final status = stats.status?.trim().toUpperCase();
-    if (status == 'CANCEL') {
-      return false;
-    }
-    return status == null ||
-        status.isEmpty ||
-        status == 'COMPLETE' ||
-        status == 'SUBMITTED';
-  }
-
   bool _isActiveAssessmentStats(ExamStats stats) {
-    return _activeInProgressExam(stats) != null;
-  }
-
-  GeneratedExam? _activeInProgressExam(ExamStats stats) {
-    if (_isTerminalExamStatus(stats.status)) {
-      return null;
-    }
-    final outerStatusIsActive = _isActiveExamStatus(stats.status);
-    final candidates = stats.inProgressExams
-        .where(
-          (exam) =>
-              exam.questions.isNotEmpty &&
-              (outerStatusIsActive || _isActiveExamStatus(exam.examStatus)),
-        )
-        .toList(growable: false);
-    if (candidates.isEmpty) {
-      return null;
-    }
-    return candidates.reduce(
-      (latest, exam) =>
-          examDate(exam).isAfter(examDate(latest)) ? exam : latest,
-    );
-  }
-
-  bool _isActiveExamStatus(String? value) {
-    final status = value?.trim().toUpperCase();
-    return status == 'ACTIVE' || status == 'IN_PROGRESS';
-  }
-
-  bool _isTerminalExamStatus(String? value) {
-    final status = value?.trim().toUpperCase();
-    return status == 'COMPLETE' || status == 'SUBMITTED' || status == 'CANCEL';
+    return activeInProgressAssessmentExam(stats) != null;
   }
 
   ParentAssessmentEntry _assessmentEntryFromStats(ExamStats stats) {
-    final inProgressExam = _activeInProgressExam(stats);
+    final inProgressExam = activeInProgressAssessmentExam(stats);
     if (inProgressExam != null) {
       return ParentAssessmentEntry(exam: inProgressExam);
     }
-    final submittedAt = stats.lastSubmittedDt?.toIso8601String();
-    final detectedGrade = stats.grade == null ? null : 'Lớp ${stats.grade}';
     return ParentAssessmentEntry(
-      exam: GeneratedExam(
-        userExamId: stats.userExamId,
-        profileId: profileStableId(widget.activeProfile),
-        examStatus: stats.status,
-        examType: stats.examType ?? _contentExamType,
-        grade: stats.grade,
-        level: stats.level,
-        createDt: submittedAt,
-        modifyDt: submittedAt,
-        shortText: stats.review,
-        grading: ExamGrading(
-          aiDetectGrade: detectedGrade,
-          aiReview: stats.review,
-          correctNumber: stats.correctNumber,
-          scorePercentage: stats.scorePercentage.round(),
-          skippedNumber: stats.skippedNumber,
-          totalQuestions: stats.totalQuestions,
-        ),
-        questions: const <ExamQuestion>[],
+      exam: completedAssessmentFromStats(
+        stats,
+        profileId: profileStableId(widget.activeProfile)!,
+        fallbackExamType: _contentExamType,
       ),
     );
   }

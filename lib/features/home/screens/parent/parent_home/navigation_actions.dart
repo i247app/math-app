@@ -10,12 +10,18 @@ extension ParentHomeNavigationActions on ParentHomeContentState {
   }
 
   Future<void> openInitialAssessment() async {
+    if (isOpeningInitialAssessment) return;
+    isOpeningInitialAssessment = true;
     HapticFeedback.lightImpact();
-    await (widget.onOpenInitialAssessment ?? widget.onOpenAssessment)?.call(
-      context,
-    );
-    if (mounted) {
-      await loadHome();
+    try {
+      await (widget.onOpenInitialAssessment ?? widget.onOpenAssessment)?.call(
+        context,
+      );
+      if (mounted) {
+        await loadHome();
+      }
+    } finally {
+      isOpeningInitialAssessment = false;
     }
   }
 
@@ -28,7 +34,7 @@ extension ParentHomeNavigationActions on ParentHomeContentState {
   }
 
   void _openExamReview(GeneratedExam exam) {
-    final examId = exam.examId ?? exam.id;
+    final examId = exam.userExamId ?? exam.examId ?? exam.id;
     if (examId == null || examId <= 0) {
       return;
     }

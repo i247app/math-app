@@ -20,18 +20,15 @@ import 'package:numi/features/classroom_exercise/helpers/teacher_exercise_helper
 import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/exam/data/exam_snapshot_store.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
+import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
-  const AppDashboardTabFactory({required this.examSnapshotStore});
-
-  final ExamSnapshotStore examSnapshotStore;
+  const AppDashboardTabFactory();
 
   @override
   Widget buildTab({
@@ -63,7 +60,6 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         initialGrades: args.initialGrades,
         gradeService: args.gradeService,
         examService: args.examService,
-        examSnapshotStore: examSnapshotStore,
         onOpenAssessment: (context) => Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (_) => GradeSelectionScreen(
@@ -77,27 +73,29 @@ class AppDashboardTabFactory implements DashboardTabFactory {
             ),
           ),
         ),
-        onOpenInitialAssessment: (context) => Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (_) => AiAssessmentScreen(
-              examService: args.examService,
-              examType: examTypeAssessment,
-              gradeLabel: args.activeProfile?.grade?.label,
-              profileId: profileStableId(args.activeProfile),
-              allowQuestionNavigation: false,
-              showQuestionNavigation: false,
-            ),
-          ),
+        onOpenInitialAssessment: (context) => openInitialAssessmentFromHome(
+          context: context,
+          examService: args.examService,
+          profileId: profileStableId(args.activeProfile),
+          gradeLabel: args.activeProfile?.grade?.label,
         ),
         onOpenExamReview: (context, exam) {
           final examId = exam.examId ?? exam.id;
-          if (examId == null || examId <= 0) {
+          final userExamId = exam.userExamId;
+          final validUserExamId = userExamId != null && userExamId > 0
+              ? userExamId
+              : null;
+          if (validUserExamId == null && (examId == null || examId <= 0)) {
             return Future<void>.value();
           }
           return Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
-              builder: (_) =>
-                  ExamReviewScreen(examId: examId, initialExam: exam),
+              builder: (_) => ExamReviewScreen(
+                examId: validUserExamId == null ? examId : null,
+                userExamId: validUserExamId,
+                examType: exam.examType,
+                initialExam: exam,
+              ),
             ),
           );
         },

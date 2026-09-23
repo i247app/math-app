@@ -58,7 +58,6 @@ class AppServices {
     final client = networkClient ?? NetworkClient.shared;
     final profiles = profileService ?? ProfileApi(networkClient: client);
 
-    final examSnapshots = examSnapshotStore;
     return AppServices._(
       networkClient: client,
       authService: authService ?? AuthApi(networkClient: client),
@@ -78,8 +77,7 @@ class AppServices {
           examShakeService ?? AIShakeService(networkClient: client),
       examSnapshotStore: examSnapshotStore,
       dashboardTabFactory:
-          dashboardTabFactory ??
-          AppDashboardTabFactory(examSnapshotStore: examSnapshots),
+          dashboardTabFactory ?? const AppDashboardTabFactory(),
       dashboardNavigator: dashboardNavigator,
       sessionDataCleaner: sessionDataCleaner,
       activeProfileSession: activeProfileSession,
