@@ -5,7 +5,7 @@ part 'exam_api_models.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class GenerateExamRequest {
   const GenerateExamRequest({
-    required this.profileId,
+    this.profileId,
     required this.numQuestions,
     required this.examType,
     required this.grade,
@@ -13,7 +13,7 @@ class GenerateExamRequest {
     this.userExamId,
   });
 
-  final int profileId;
+  final int? profileId;
   final int numQuestions;
   final String examType;
   final int grade;

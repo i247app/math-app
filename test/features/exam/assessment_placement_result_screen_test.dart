@@ -364,6 +364,127 @@ void main() {
     expect(practiceButtonRect, vietnamesePracticeButtonRect);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('renders grade ribbon and progression chart for assessed grade', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: const AssessmentPlacementResultScreen(
+            grade: 3,
+            correctAnswers: 5,
+            totalQuestions: 5,
+            examService: _UnusedExamService(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('placement-grade-ribbon')), findsOneWidget);
+    expect(find.byKey(const ValueKey('placement-you-are-here')), findsOneWidget);
+    expect(find.text('Bạn đang ở'), findsOneWidget);
+    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
+    expect(find.text('Bài 1'), findsOneWidget);
+    expect(find.text('Bài 5'), findsOneWidget);
+    expect(find.text('M.Giáo'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('loads exam stats from API and applies progression transition on chart', (tester) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    final statsService = _MockStatsExamService()
+      ..mockStats = [
+        ExamStats(
+          correctNumber: 8,
+          scorePercentage: 80.0,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          userExamId: 900,
+          grade: 3,
+          lastSubmittedDt: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 2,
+            correctAnswers: 4,
+            totalQuestions: 5,
+            profileId: 999,
+            userExamId: 901,
+            examService: statsService,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(statsService.requestedProfileId, 999);
+    expect(statsService.requestedExamType, examTypeAssessment);
+    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
+    // Both previous grade (Lớp 3) and current grade (Lớp 2) badges are present in the transition
+    expect(find.text('Lớp 3'), findsWidgets);
+    expect(find.text('Lớp 2'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('animates line drawing jump from previous grade down to final grade', (tester) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: const AssessmentPlacementResultScreen(
+            grade: 2,
+            previousGrade: 3,
+            correctAnswers: 4,
+            totalQuestions: 5,
+            examService: _UnusedExamService(),
+          ),
+        ),
+      ),
+    );
+
+    // Initial frame
+    await tester.pump();
+    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
+
+    // Midway through animation (drawing across points)
+    await tester.pump(const Duration(milliseconds: 700));
+
+    // Finish animation
+    await tester.pumpAndSettle();
+    expect(find.text('Lớp 3'), findsWidgets);
+    expect(find.text('Lớp 2'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _UnusedExamService implements ExamService {
@@ -419,6 +540,25 @@ class _RecordingPracticeService implements ExamService {
   }) async {
     completedUserExamId = userExamId;
     completedStatus = status;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _MockStatsExamService implements ExamService {
+  int? requestedProfileId;
+  String? requestedExamType;
+  List<ExamStats> mockStats = const <ExamStats>[];
+
+  @override
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
+  }) async {
+    requestedProfileId = profileId;
+    requestedExamType = examType;
+    return mockStats;
   }
 
   @override

@@ -27,7 +27,6 @@ class ExamApi implements ExamService {
     int? profileId,
     int? userExamId,
   }) async {
-    final validProfileId = _requireProfileId(profileId);
     final normalizedExamType = examType.trim().toUpperCase();
     final validUserExamId = userExamId != null && userExamId > 0
         ? userExamId
@@ -39,7 +38,7 @@ class ExamApi implements ExamService {
     response = await _runExamRequest(
       () => _generateExam(
         GenerateExamRequest(
-          profileId: validProfileId,
+          profileId: profileId,
           numQuestions: AssessmentFlowPolicy.generatedQuestionCount,
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),

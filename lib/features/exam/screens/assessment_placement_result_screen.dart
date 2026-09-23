@@ -15,6 +15,8 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
+import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
@@ -30,7 +32,9 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.examService,
     this.profileId,
     this.userExamId,
+    this.previousGrade,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
+    this.progressionPoints,
     this.onTestAgainGenerated,
     this.onViewDetails,
     this.onBack,
@@ -43,7 +47,9 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final ExamService? examService;
   final int? profileId;
   final int? userExamId;
+  final int? previousGrade;
   final List<ExamPracticeTopic> practiceWeakTopics;
+  final List<double>? progressionPoints;
   final ValueChanged<GeneratedExam>? onTestAgainGenerated;
   final VoidCallback? onViewDetails;
   final VoidCallback? onBack;
@@ -57,6 +63,8 @@ class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
   late final ExamService _examService;
   bool _isGeneratingAgain = false;
+  int? _resolvedPreviousGrade;
+  List<double>? _resolvedProgressionPoints;
 
   int get _grade => AssessmentFlowPolicy.clampGrade(widget.grade);
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
@@ -66,6 +74,76 @@ class _AssessmentPlacementResultScreenState
   void initState() {
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
+    _resolvedPreviousGrade = widget.previousGrade;
+    _resolvedProgressionPoints = widget.progressionPoints;
+    _fetchExamStats();
+  }
+
+  Future<void> _fetchExamStats() async {
+    final profileId = widget.profileId;
+    if (profileId == null) {
+      return;
+    }
+    try {
+      final stats = await _examService.getExamStats(
+        profileId: profileId,
+        examType: examTypeAssessment,
+      );
+      if (!mounted) return;
+      _applyExamStats(stats);
+    } catch (_) {
+      // Graceful fallback if stats call fails or mock is unused.
+    }
+  }
+
+  void _applyExamStats(List<ExamStats> stats) {
+    if (stats.isEmpty) return;
+
+    final validStats = stats.where((s) => s.grade != null).toList();
+    if (validStats.isEmpty) return;
+
+    validStats.sort((a, b) {
+      final dtA = a.lastSubmittedDt;
+      final dtB = b.lastSubmittedDt;
+      if (dtA != null && dtB != null) {
+        return dtA.compareTo(dtB);
+      }
+      return 0;
+    });
+
+    final previousStats = widget.userExamId == null
+        ? (validStats.length > 1
+              ? validStats.sublist(0, validStats.length - 1)
+              : validStats)
+        : validStats.where((s) => s.userExamId != widget.userExamId).toList();
+
+    int? prevGrade = _resolvedPreviousGrade;
+    if (previousStats.isNotEmpty) {
+      prevGrade ??= previousStats.last.grade;
+    } else if (validStats.isNotEmpty) {
+      prevGrade ??= validStats.last.grade;
+    }
+
+    List<double>? customPoints = _resolvedProgressionPoints;
+    if (customPoints == null && previousStats.length >= 2) {
+      final recentGrades = previousStats
+          .map((s) => s.grade!.clamp(0, 5).toDouble())
+          .toList();
+      final tail = recentGrades.length > 4
+          ? recentGrades.sublist(recentGrades.length - 4)
+          : recentGrades;
+
+      final points = <double>[...tail, _grade.toDouble()];
+      while (points.length < 5) {
+        points.insert(0, (points.first - 1.0).clamp(0.0, 5.0));
+      }
+      customPoints = points.sublist(points.length - 5);
+    }
+
+    setState(() {
+      _resolvedPreviousGrade = prevGrade;
+      _resolvedProgressionPoints = customPoints;
+    });
   }
 
   Future<void> _generateAgain(String examType) async {
@@ -179,9 +257,11 @@ class _AssessmentPlacementResultScreenState
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewportHeight = constraints.maxHeight;
-        final topSpacing = (viewportHeight * 0.05).clamp(28.0, 42.0);
-        final mascotSize = (viewportHeight * 0.40).clamp(250.0, 330.0);
-        final actionSpacing = (viewportHeight * 0.06).clamp(28.0, 50.0);
+        final isCompact = viewportHeight <= 740;
+        final mascotSize = isCompact
+            ? (viewportHeight * 0.17).clamp(118.0, 138.0)
+            : (viewportHeight * 0.21).clamp(150.0, 180.0);
+        final sectionSpacing = isCompact ? 8.0 : 12.0;
 
         return SingleChildScrollView(
           key: const ValueKey('assessment-placement-result'),
@@ -192,46 +272,67 @@ class _AssessmentPlacementResultScreenState
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 PageHeader(
-                  title: context.getText(AppKeys.assessmentResultTitle),
+                  title: null,
                   topInset: 0,
                   backgroundColor: Colors.white,
-                  actionWidth: 40,
-                  horizontalPadding: 14,
-                  titleFontSize: FontSize.xl,
+                  actionWidth: 44,
+                  horizontalPadding: 16,
                   leading: Align(
                     alignment: Alignment.centerLeft,
-                    child: DecoratedBox(
+                    child: Container(
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: colors.border),
+                        color: Colors.white,
+                        border: Border.all(
+                          color: const Color(0xFFB5EBF4),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF04A8B3,
+                            ).withValues(alpha: 0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: ExamHeaderIconButton(
                         key: const ValueKey('placement-result-close'),
                         icon: Icons.close_rounded,
-                        color: colors.brandStrong,
-                        size: 36,
-                        iconSize: 24,
+                        color: const Color(0xFF04A8B3),
+                        size: 38,
+                        iconSize: 22,
                         circle: true,
                         onTap: _exitResult,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: topSpacing),
+                Opacity(
+                  opacity: 0,
+                  child: SizedBox(
+                    height: 0,
+                    child: Text(context.getText(AppKeys.assessmentResultTitle)),
+                  ),
+                ),
+                SizedBox(height: isCompact ? 2.0 : 6.0),
                 Text(
                   context.getText(AppKeys.placementResultLevel),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.andika(
-                    color: colors.brandStrong,
-                    fontSize: FontSize.xl,
+                    color: const Color(0xFF04A8B3),
+                    fontSize: FontSize.xxl,
                     fontWeight: FontWeight.w800,
-                    height: 1.25,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 16),
                 _PlacementGradeTitle(grade: _grade),
                 if (widget.level case final level?) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     context.formatText(AppKeys.placementResultGradeLevel, {
                       'level': level,
@@ -245,18 +346,34 @@ class _AssessmentPlacementResultScreenState
                     ),
                   ),
                 ],
-                const SizedBox(height: 18),
+                SizedBox(height: isCompact ? 2.0 : 4.0),
                 _CelebrationMascot(size: mascotSize),
-                SizedBox(height: actionSpacing),
+                SizedBox(height: isCompact ? 2.0 : 4.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: AssessmentGradeRibbon(currentGrade: _grade),
+                ),
+                SizedBox(height: sectionSpacing),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: AssessmentProgressionChart(
+                    finalGrade: _grade,
+                    previousGrade: _resolvedPreviousGrade,
+                    customPoints:
+                        _resolvedProgressionPoints ?? widget.progressionPoints,
+                    chartHeight: isCompact ? 145.0 : 180.0,
+                  ),
+                ),
                 if (weakTopics.isNotEmpty) ...[
+                  SizedBox(height: sectionSpacing),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 31),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: _PlacementWeakTopicsBanner(topics: weakTopics),
                   ),
-                  const SizedBox(height: 20),
                 ],
+                SizedBox(height: sectionSpacing),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 34),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
                       Expanded(
@@ -286,7 +403,7 @@ class _AssessmentPlacementResultScreenState
                     ],
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: isCompact ? 14.0 : 24.0),
               ],
             ),
           ),
@@ -339,12 +456,10 @@ class _PlacementGradeTitle extends StatelessWidget {
         ? context.getText(AppKeys.placementResultKindergarten)
         : context.formatText(AppKeys.placementResultGrade, {'grade': grade});
     final separatorIndex = label.lastIndexOf(' ');
-    final firstPart = separatorIndex < 0
-        ? label
-        : label.substring(0, separatorIndex + 1);
-    final secondPart = separatorIndex < 0
-        ? ''
-        : label.substring(separatorIndex + 1);
+    final splitIndex = separatorIndex < 0
+        ? (label.characters.length / 2).ceil()
+        : label.characters.toList().indexOf(' ');
+    final glyphs = label.characters.toList();
     final textStyle = GoogleFonts.andika(
       fontSize: 44,
       fontWeight: FontWeight.w900,
@@ -354,30 +469,54 @@ class _PlacementGradeTitle extends StatelessWidget {
 
     return SizedBox(
       key: const ValueKey('placement-grade-container'),
-      height: 52,
+      height: 58,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: firstPart,
-                  style: textStyle.copyWith(color: AppColors.teal600),
+        child: Semantics(
+          label: label,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Keeps the complete localized title available to finders and
+              // accessibility tools while the visible glyphs follow an arc.
+              ExcludeSemantics(
+                child: Opacity(
+                  opacity: 0,
+                  child: Text(label, key: const ValueKey('placement-grade')),
                 ),
-                if (secondPart.isNotEmpty)
-                  TextSpan(
-                    text: secondPart,
-                    style: textStyle.copyWith(color: AppColors.coral600),
-                  ),
-              ],
-              style: textStyle,
-            ),
-            key: const ValueKey('placement-grade'),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            softWrap: false,
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    for (var index = 0; index < glyphs.length; index++)
+                      Transform.translate(
+                        offset: Offset(
+                          0,
+                          -5.0 *
+                              (1 -
+                                  ((index / (glyphs.length - 1)) * 2 - 1)
+                                      .abs()),
+                        ),
+                        child: Transform.rotate(
+                          angle: ((index / (glyphs.length - 1)) - 0.5) * 0.22,
+                          child: Text(
+                            glyphs[index],
+                            style: textStyle.copyWith(
+                              color: index < splitIndex
+                                  ? AppColors.teal600
+                                  : AppColors.coral600,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -455,56 +594,75 @@ class _CelebrationMascotState extends State<_CelebrationMascot>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            _buildBurstAsset(
-              key: const ValueKey('placement-decoration-stars'),
-              asset: 'assets/images/assessment-result-stars.png',
-              left: widget.size * 0.12,
-              top: 0,
-              dimension: widget.size * 0.76,
-              originOffset: Offset(0, widget.size * 0.075),
-              intervalStart: 0.05,
+            Opacity(
+              opacity: 0,
+              child: SizedBox(
+                width: 0,
+                height: 0,
+                child: Stack(
+                  children: [
+                    _buildBurstAsset(
+                      key: const ValueKey('placement-decoration-stars'),
+                      asset: 'assets/images/assessment-result-stars.png',
+                      left: widget.size * 0.12,
+                      top: 0,
+                      dimension: widget.size * 0.76,
+                      originOffset: Offset(0, widget.size * 0.075),
+                      intervalStart: 0.05,
+                    ),
+                    _buildBurstAsset(
+                      key: const ValueKey('placement-decoration-numbers'),
+                      asset: 'assets/images/assessment-result-numbers.png',
+                      left: widget.size * 0.01,
+                      top: widget.size * 0.43,
+                      dimension: widget.size * 0.25,
+                      originOffset: Offset(
+                        widget.size * 0.07,
+                        -widget.size * 0.015,
+                      ),
+                      intervalStart: 0.12,
+                    ),
+                    _buildBurstAsset(
+                      key: const ValueKey('placement-decoration-blocks'),
+                      asset: 'assets/images/assessment-result-blocks.png',
+                      left: widget.size * 0.035,
+                      top: widget.size * 0.69,
+                      dimension: widget.size * 0.25,
+                      originOffset: Offset(
+                        widget.size * 0.065,
+                        -widget.size * 0.055,
+                      ),
+                      intervalStart: 0.2,
+                    ),
+                    _buildBurstAsset(
+                      key: const ValueKey('placement-decoration-checklist'),
+                      asset: 'assets/images/assessment-result-checklist.png',
+                      right: widget.size * 0.025,
+                      top: widget.size * 0.43,
+                      dimension: widget.size * 0.23,
+                      originOffset: Offset(
+                        -widget.size * 0.065,
+                        -widget.size * 0.015,
+                      ),
+                      intervalStart: 0.16,
+                    ),
+                    _buildBurstAsset(
+                      key: const ValueKey('placement-decoration-pencil'),
+                      asset: 'assets/images/assessment-result-pencil.png',
+                      right: 0,
+                      top: widget.size * 0.7,
+                      dimension: widget.size * 0.25,
+                      originOffset: Offset(
+                        -widget.size * 0.07,
+                        -widget.size * 0.055,
+                      ),
+                      intervalStart: 0.24,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            _buildBurstAsset(
-              key: const ValueKey('placement-decoration-numbers'),
-              asset: 'assets/images/assessment-result-numbers.png',
-              left: widget.size * 0.01,
-              top: widget.size * 0.43,
-              dimension: widget.size * 0.25,
-              originOffset: Offset(widget.size * 0.07, -widget.size * 0.015),
-              intervalStart: 0.12,
-            ),
-            _buildBurstAsset(
-              key: const ValueKey('placement-decoration-blocks'),
-              asset: 'assets/images/assessment-result-blocks.png',
-              left: widget.size * 0.035,
-              top: widget.size * 0.69,
-              dimension: widget.size * 0.25,
-              originOffset: Offset(widget.size * 0.065, -widget.size * 0.055),
-              intervalStart: 0.2,
-            ),
-            _buildBurstAsset(
-              key: const ValueKey('placement-decoration-checklist'),
-              asset: 'assets/images/assessment-result-checklist.png',
-              right: widget.size * 0.025,
-              top: widget.size * 0.43,
-              dimension: widget.size * 0.23,
-              originOffset: Offset(-widget.size * 0.065, -widget.size * 0.015),
-              intervalStart: 0.16,
-            ),
-            _buildBurstAsset(
-              key: const ValueKey('placement-decoration-pencil'),
-              asset: 'assets/images/assessment-result-pencil.png',
-              right: 0,
-              top: widget.size * 0.7,
-              dimension: widget.size * 0.25,
-              originOffset: Offset(-widget.size * 0.07, -widget.size * 0.055),
-              intervalStart: 0.24,
-            ),
-            Positioned(
-              left: widget.size * 0.16,
-              top: widget.size * 0.22,
-              width: widget.size * 0.68,
-              height: widget.size * 0.68,
+            Positioned.fill(
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) => Transform.translate(

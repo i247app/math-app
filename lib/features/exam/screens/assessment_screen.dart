@@ -367,6 +367,9 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             examService: examService,
             profileId: profileId,
             userExamId: submittedUserExamId,
+            previousGrade: _controller.completedSets.isNotEmpty
+                ? _controller.completedSets.first.grade
+                : (savedGradeProgress?.grade ?? _controller.currentGrade),
             practiceWeakTopics: practiceWeakTopics,
             onViewDetails: reviewDetailId == null
                 ? null
