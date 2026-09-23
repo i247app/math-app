@@ -13,6 +13,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/app/composition/app_services.dart';
@@ -100,12 +101,28 @@ void main() {
       );
 
       expect(guestAccounts.ensureCalls, 0);
+      expect(
+        tester.widget<Text>(find.text('BẮT ĐẦU')).style?.fontSize,
+        FontSize.large,
+      );
       await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
       await tester.tap(find.text('ĐÁNH GIÁ'));
       await tester.pumpAndSettle();
 
       expect(guestAccounts.ensureCalls, 1);
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
+      expect(find.text('TOÁN AI'), findsOneWidget);
+      expect(find.text('Kiểm Tra Năng Lực'), findsOneWidget);
+      expect(find.text('START'), findsOneWidget);
+      expect(tester.widget<Text>(find.text('START')).style?.fontSize, 32);
+      expect(
+        tester.widget<Text>(find.text('TOÁN AI')).style?.fontFamily,
+        'NunitoVariable',
+      );
+      expect(
+        tester.widget<Text>(find.text('Kiểm Tra Năng Lực')).style?.fontFamily,
+        'NunitoVariable',
+      );
 
       await tester.tap(
         find.byKey(const ValueKey('welcome-assessment-intro-action')),
@@ -114,6 +131,29 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    });
+
+    testWidgets('returns from assessment intro to the initial welcome screen', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        NumiApp(
+          services: AppServices(
+            guestAccountService: _FakeGuestAccountService(),
+          ),
+        ),
+      );
+
+      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
+      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.pumpAndSettle();
+      expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('welcome-assessment-back')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
+      expect(find.byType(WelcomeAssessmentIntroScreen), findsNothing);
     });
 
     testWidgets('continues from welcome details to the login screen', (

@@ -9,6 +9,7 @@ import 'package:numi/core/network/network_client.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
+import 'package:numi/shared/widgets/app_back_button.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
 class WelcomeAssessmentIntroScreen extends StatefulWidget {
@@ -20,8 +21,6 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
 
   static const _backgroundAsset =
       'assets/images/assessment_intro/assessment-intro-background.png';
-  static const _logoAsset =
-      'assets/images/assessment_intro/assessment-numi-logo.png';
   static const _mascotAsset =
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
 
@@ -88,10 +87,6 @@ class _WelcomeAssessmentIntroScreenState
                   final height = constraints.maxHeight;
                   final isTablet =
                       MediaQuery.sizeOf(context).shortestSide >= 600;
-                  final logoWidth = math.min(
-                    width * 0.65,
-                    isTablet ? 315.0 : 240.0,
-                  );
                   final mascotWidth = math.min(
                     width * (isTablet ? 0.58 : 0.7),
                     isTablet ? 390.0 : 310.0,
@@ -99,6 +94,15 @@ class _WelcomeAssessmentIntroScreenState
 
                   return Stack(
                     children: [
+                      Positioned(
+                        top: 2,
+                        left: 12,
+                        child: AppBackButton(
+                          key: const ValueKey('welcome-assessment-back'),
+                          onPressed: () => Navigator.of(context).pop(),
+                          color: AppColors.welcomeTeal,
+                        ),
+                      ),
                       Positioned(
                         top: 2,
                         right: 12,
@@ -128,12 +132,38 @@ class _WelcomeAssessmentIntroScreenState
                         top: isTablet ? 80 : 72,
                         left: 0,
                         right: 0,
-                        child: Center(
-                          child: Image.asset(
-                            WelcomeAssessmentIntroScreen._logoAsset,
-                            width: logoWidth,
-                            fit: BoxFit.contain,
-                            semanticLabel: 'Numi Toán AI',
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'TOÁN AI',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'NunitoVariable',
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.brandTeal,
+                                  fontSize: isTablet ? 52 : 42,
+                                  height: 1.1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Kiểm Tra Năng Lực',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'NunitoVariable',
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.brandOrange,
+                                    fontSize: isTablet ? 38 : 32,
+                                    height: 1.1,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -167,7 +197,8 @@ class _WelcomeAssessmentIntroScreenState
                                       'welcome-assessment-intro-action',
                                     ),
                                     onStart: () => _startAssessment(),
-                                    labelKey: AppKeys.assessmentAction,
+                                    labelText: 'START',
+                                    fontSize: 32,
                                     cornerRadius: 16,
                                     verticalPadding: 14,
                                   ),

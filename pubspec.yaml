@@ -39,6 +39,9 @@ flutter:
           weight: 400
         - asset: assets/fonts/Andika-Bold.ttf
           weight: 700
+    - family: NunitoVariable
+      fonts:
+        - asset: assets/fonts/Nunito-wght.ttf
   assets:
     - assets/avatars/
     - assets/images/

@@ -12,12 +12,16 @@ class WelcomeStartButton extends StatelessWidget {
     super.key,
     required this.onStart,
     this.labelKey = AppKeys.start,
+    this.labelText,
+    this.fontSize = FontSize.large,
     this.cornerRadius = 28,
     this.verticalPadding = 16,
   });
 
   final VoidCallback onStart;
   final String labelKey;
+  final String? labelText;
+  final double fontSize;
   final double cornerRadius;
   final double verticalPadding;
 
@@ -42,10 +46,10 @@ class WelcomeStartButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                context.getText(labelKey),
+                labelText ?? context.getText(labelKey),
                 style: GoogleFonts.nunito(
                   color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize: FontSize.large,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w900,
                   height: 1.2,
                 ),
