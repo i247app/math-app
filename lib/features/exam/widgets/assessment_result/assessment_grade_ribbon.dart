@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/core/theme/app_colors.dart';
 
 class AssessmentGradeRibbon extends StatelessWidget {
   const AssessmentGradeRibbon({super.key, required this.currentGrade});
@@ -44,20 +44,22 @@ class AssessmentGradeRibbon extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Tooltip "Bạn đang ở" with down arrow pointing to currentGrade
+            // The inverted-house tip stays centered over the active grade.
             SizedBox(
               height: 30,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Positioned(
-                    left: (targetCenterX - 56).clamp(0.0, totalWidth - 112),
-                    width: 112,
-                    child: Center(
-                      child: _YouAreHereBadge(
-                        text: context.getText(
-                          AppKeys.placementResultYouAreHere,
-                        ),
+                    left: (targetCenterX - 14).clamp(0.0, totalWidth - 28),
+                    width: 28,
+                    height: 30,
+                    child: Semantics(
+                      label: context.getText(AppKeys.placementResultYouAreHere),
+                      child: const ClipPath(
+                        key: ValueKey('placement-current-grade-marker'),
+                        clipper: _InvertedHouseClipper(),
+                        child: ColoredBox(color: AppColors.red),
                       ),
                     ),
                   ),
@@ -86,72 +88,23 @@ class AssessmentGradeRibbon extends StatelessWidget {
   }
 }
 
-class _YouAreHereBadge extends StatelessWidget {
-  const _YouAreHereBadge({required this.text});
-
-  final String text;
+class _InvertedHouseClipper extends CustomClipper<Path> {
+  const _InvertedHouseClipper();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      key: const ValueKey('placement-you-are-here'),
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-          decoration: BoxDecoration(
-            color: const Color(0xFF38B6FF),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF38B6FF).withValues(alpha: 0.35),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Text(
-            text,
-            maxLines: 1,
-            style: GoogleFonts.andika(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              height: 1.2,
-            ),
-          ),
-        ),
-        // Downward pointing arrow triangle
-        const CustomPaint(
-          size: Size(10, 6),
-          painter: _TrianglePointerPainter(color: Color(0xFF38B6FF)),
-        ),
-      ],
-    );
-  }
-}
-
-class _TrianglePointerPainter extends CustomPainter {
-  const _TrianglePointerPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(3, 0)
+      ..lineTo(size.width - 3, 0)
+      ..quadraticBezierTo(size.width, 0, size.width, 3)
+      ..lineTo(size.width, size.height * 0.53)
       ..lineTo(size.width / 2, size.height)
+      ..lineTo(0, size.height * 0.53)
+      ..lineTo(0, 3)
+      ..quadraticBezierTo(0, 0, 3, 0)
       ..close();
-
-    canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _TrianglePointerPainter oldDelegate) =>
-      oldDelegate.color != color;
+  bool shouldReclip(covariant _InvertedHouseClipper oldClipper) => false;
 }

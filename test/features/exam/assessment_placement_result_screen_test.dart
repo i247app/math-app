@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -419,10 +420,26 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('placement-you-are-here')),
+      find.byKey(const ValueKey('placement-current-grade-marker')),
       findsOneWidget,
     );
-    expect(find.text('Bạn đang ở'), findsOneWidget);
+    expect(find.text('Bạn đang ở'), findsNothing);
+    final marker = find.byKey(const ValueKey('placement-current-grade-marker'));
+    expect(
+      tester
+          .widget<ColoredBox>(
+            find.descendant(of: marker, matching: find.byType(ColoredBox)),
+          )
+          .color,
+      AppColors.red,
+    );
+    final ribbonRect = tester.getRect(
+      find.byKey(const ValueKey('placement-grade-ribbon')),
+    );
+    expect(
+      tester.getCenter(marker).dx,
+      closeTo(ribbonRect.left + ribbonRect.width * 0.557, 1),
+    );
     expect(
       find.byKey(const ValueKey('placement-progression-chart')),
       findsOneWidget,
@@ -448,12 +465,14 @@ void main() {
   });
 
   testWidgets(
-    'waits for stats, then shows four previous assessments and the new one',
+    'waits for journey progress, then shows four previous assessments and the new one',
     (tester) async {
       final lingo = LingoProvider();
       addTearDown(lingo.dispose);
-      final pendingStats = Completer<List<ExamStats>>();
-      final statsService = _DelayedStatsExamService(pendingStats.future);
+      final pendingProgress = Completer<ExamProgressResponse>();
+      final progressService = _DelayedProgressExamService(
+        pendingProgress.future,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -468,14 +487,22 @@ void main() {
               totalQuestions: 5,
               profileId: 999,
               userExamId: 106,
-              examService: statsService,
+              examService: progressService,
             ),
           ),
         ),
       );
 
       expect(
-        find.byKey(const ValueKey('assessment-placement-stats-loading')),
+        find.byKey(const ValueKey('assessment-placement-progress-loading')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('assessment-placement-ribbon-skeleton')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('assessment-placement-chart-skeleton')),
         findsOneWidget,
       );
       expect(
@@ -487,23 +514,27 @@ void main() {
         findsNothing,
       );
 
-      pendingStats.complete([
-        for (var index = 0; index < 6; index++)
-          ExamStats(
-            correctNumber: 5,
-            scorePercentage: 100,
-            skippedNumber: 0,
-            totalQuestions: 5,
-            userExamId: 101 + index,
-            grade: index,
-            lastSubmittedDt: DateTime.utc(2026, 1, index + 1),
-            status: 'COMPLETE',
-          ),
-      ]);
+      pendingProgress.complete(
+        _progressResponse([
+          for (var index = 0; index < 6; index++)
+            _progressPoint(
+              examId: 101 + index,
+              grade: index,
+              sequence: index + 1,
+            ),
+        ]),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      final fade = tester.widget<Opacity>(
+        find.byKey(const ValueKey('assessment-placement-history-content')),
+      );
+      expect(fade.opacity, greaterThan(0));
+      expect(fade.opacity, lessThan(1));
       await tester.pumpAndSettle();
 
       expect(
-        find.byKey(const ValueKey('assessment-placement-stats-loading')),
+        find.byKey(const ValueKey('assessment-placement-progress-loading')),
         findsNothing,
       );
       final chart = tester.widget<AssessmentProgressionChart>(
@@ -512,6 +543,7 @@ void main() {
       expect(chart.previousGrades, [1, 2, 3, 4]);
       expect(chart.finalGrade, 5);
       expect(chart.firstTestNumber, 2);
+      expect(chart.testNumbers, [2, 3, 4, 5, 6]);
       expect(find.text('Bài 2'), findsOneWidget);
       expect(find.text('Bài 6'), findsOneWidget);
       expect(find.text('Bài 1'), findsNothing);
@@ -524,23 +556,15 @@ void main() {
   );
 
   testWidgets(
-    'loads exam stats from API and applies progression transition on chart',
+    'loads journey progress from API and applies progression transition on chart',
     (tester) async {
       final lingo = LingoProvider();
       addTearDown(lingo.dispose);
 
-      final statsService = _MockStatsExamService()
-        ..mockStats = [
-          ExamStats(
-            correctNumber: 8,
-            scorePercentage: 80.0,
-            skippedNumber: 0,
-            totalQuestions: 10,
-            userExamId: 900,
-            grade: 3,
-            lastSubmittedDt: DateTime.now().subtract(const Duration(days: 1)),
-          ),
-        ];
+      final progressService = _MockProgressExamService()
+        ..mockProgress = _progressResponse([
+          _progressPoint(examId: 900, grade: 3, sequence: 4),
+        ]);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -555,15 +579,22 @@ void main() {
               totalQuestions: 5,
               profileId: 999,
               userExamId: 901,
-              examService: statsService,
+              examService: progressService,
             ),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      expect(statsService.requestedProfileId, 999);
-      expect(statsService.requestedExamType, examTypeAssessment);
+      expect(progressService.requestedProfileId, 999);
+      expect(progressService.requestedExamType, examTypeAssessment);
+      expect(progressService.requestedToDt, isNotNull);
+      expect(
+        progressService.requestedToDt!.difference(
+          progressService.requestedFromDt!,
+        ),
+        const Duration(days: 7),
+      );
       expect(
         find.byKey(const ValueKey('placement-progression-chart')),
         findsOneWidget,
@@ -571,9 +602,56 @@ void main() {
       // Both previous grade (Lớp 3) and current grade (Lớp 2) badges are present in the transition
       expect(find.text('Lớp 3'), findsWidgets);
       expect(find.text('Lớp 2'), findsWidgets);
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byType(AssessmentProgressionChart),
+      );
+      expect(chart.testNumbers, [4, 5]);
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('orders chart points by API sequence up to the current exam', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final progressService = _MockProgressExamService()
+      ..mockProgress = _progressResponse([
+        _progressPoint(examId: 201, grade: 2, sequence: 4),
+        _progressPoint(examId: 198, grade: 0, sequence: 1),
+        _progressPoint(examId: 202, grade: 3, sequence: 5),
+        _progressPoint(examId: 199, grade: 1, sequence: 2),
+      ]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 2,
+            correctAnswers: 5,
+            totalQuestions: 5,
+            profileId: 999,
+            userExamId: 201,
+            examService: progressService,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<AssessmentProgressionChart>(
+      find.byType(AssessmentProgressionChart),
+    );
+    expect(chart.previousGrades, [0, 1]);
+    expect(chart.finalGrade, 2);
+    expect(chart.testNumbers, [1, 2, 4]);
+    expect(find.text('Bài 5'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'animates line drawing jump from previous grade down to final grade',
@@ -641,8 +719,148 @@ void main() {
       ),
     );
 
-    expect(find.text('Kinder.'), findsOneWidget);
+    expect(find.text('Grade 0'), findsOneWidget);
     expect(find.text('Grade 1'), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('English grade-zero chart shows Grade 0 on axis and badge', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await lingo.setLanguage(AppLanguage.en);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(
+            body: Center(
+              child: AssessmentProgressionChart(finalGrade: 0, animate: false),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Grade 0'), findsNWidgets(2));
+    expect(find.text('Kinder.'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('single assessment aligns its label and badge with the y axis', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(
+            body: Center(
+              child: AssessmentProgressionChart(finalGrade: 5, animate: false),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final plotLeft = tester
+        .getTopLeft(find.byKey(const ValueKey('placement-progression-plot')))
+        .dx;
+    final badgeLeft = tester
+        .getTopLeft(
+          find.byKey(const ValueKey('placement-progression-final-badge')),
+        )
+        .dx;
+    final labelCenter = tester.getCenter(find.text('Bài 1')).dx;
+
+    expect(badgeLeft, inInclusiveRange(plotLeft, plotLeft + 16));
+    expect(labelCenter, closeTo(plotLeft, 1));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('test labels are centered under their chart points', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(
+            body: Center(
+              child: AssessmentProgressionChart(
+                finalGrade: 5,
+                previousGrades: <int>[0, 2],
+                testNumbers: <int>[2, 4, 7],
+                animate: false,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final plot = tester.getRect(
+      find.byKey(const ValueKey('placement-progression-plot')),
+    );
+    expect(tester.getCenter(find.text('Bài 2')).dx, closeTo(plot.left, 1));
+    expect(
+      tester.getCenter(find.text('Bài 4')).dx,
+      closeTo(plot.left + (plot.width - 28) / 2, 1),
+    );
+    expect(
+      tester.getCenter(find.text('Bài 7')).dx,
+      closeTo(plot.right - 28, 1),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('last test label stays inside a narrow chart', (tester) async {
+    tester.view.physicalSize = const Size(264, 190);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(
+            body: Center(
+              child: AssessmentProgressionChart(
+                finalGrade: 1,
+                previousGrades: <int>[0],
+                testNumbers: <int>[1, 2],
+                chartHeight: 120,
+                animate: false,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final chart = tester.getRect(
+      find.byKey(const ValueKey('placement-progression-chart')),
+    );
+    final plot = tester.getRect(
+      find.byKey(const ValueKey('placement-progression-plot')),
+    );
+    final lastLabel = tester.getRect(find.text('Test 2'));
+    expect(tester.getCenter(find.text('Test 1')).dx, closeTo(plot.left, 1));
+    expect(lastLabel.center.dx, closeTo(plot.right - 28, 1));
+    expect(lastLabel.right, lessThan(chart.right));
     expect(tester.takeException(), isNull);
   });
 }
@@ -706,36 +924,64 @@ class _RecordingPracticeService implements ExamService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _MockStatsExamService implements ExamService {
+class _MockProgressExamService implements ExamService {
   int? requestedProfileId;
   String? requestedExamType;
-  List<ExamStats> mockStats = const <ExamStats>[];
+  DateTime? requestedFromDt;
+  DateTime? requestedToDt;
+  ExamProgressResponse? mockProgress;
 
   @override
-  Future<List<ExamStats>> getExamStats({
+  Future<ExamProgressResponse> getExamProgress({
     required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
     String examType = examTypeAssessment,
   }) async {
     requestedProfileId = profileId;
     requestedExamType = examType;
-    return mockStats;
+    requestedFromDt = fromDt;
+    requestedToDt = toDt;
+    return mockProgress ?? _progressResponse(const <ExamProgressPoint>[]);
   }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _DelayedStatsExamService implements ExamService {
-  const _DelayedStatsExamService(this.stats);
+class _DelayedProgressExamService implements ExamService {
+  const _DelayedProgressExamService(this.progress);
 
-  final Future<List<ExamStats>> stats;
+  final Future<ExamProgressResponse> progress;
 
   @override
-  Future<List<ExamStats>> getExamStats({
+  Future<ExamProgressResponse> getExamProgress({
     required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
     String examType = examTypeAssessment,
-  }) => stats;
+  }) => progress;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
+
+ExamProgressResponse _progressResponse(List<ExamProgressPoint> points) =>
+    ExamProgressResponse(mstatus: 200, series: points);
+
+ExamProgressPoint _progressPoint({
+  required int examId,
+  required int grade,
+  required int sequence,
+  String status = 'COMPLETE',
+}) => ExamProgressPoint(
+  completedDt: DateTime.utc(2026, 1, sequence),
+  correctNumber: 5,
+  examId: examId,
+  score: 10,
+  scorePct: 100,
+  sequence: sequence,
+  totalQuestions: 5,
+  grade: grade,
+  status: status,
+);

@@ -164,7 +164,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultWeakTopics: 'Practice {topics}',
     AppKeys.placementResultYouAreHere: 'You are here',
     AppKeys.placementResultRibbonGrade: 'Grade {grade}',
-    AppKeys.placementResultKindergartenShort: 'Kinder.',
+    AppKeys.placementResultKindergartenShort: 'Grade 0',
     AppKeys.placementResultTest: 'Test {number}',
     AppKeys.examReviewPracticeBannerTitle: 'More practice recommended',
     AppKeys.examReviewTopicConjunction: 'and',

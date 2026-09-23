@@ -4,20 +4,35 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 
+// Keep the final point and its centered test label clear of the right edge.
+const double _plotRightInset = 28.0;
+
+double _pointX(int index, int pointCount, double width) {
+  if (pointCount <= 1) return 0.0;
+  final usableWidth = width > _plotRightInset ? width - _plotRightInset : 0.0;
+  return usableWidth * index / (pointCount - 1);
+}
+
 class AssessmentProgressionChart extends StatefulWidget {
   const AssessmentProgressionChart({
     super.key,
     required this.finalGrade,
     this.previousGrades = const <int>[],
+    this.testNumbers,
     this.firstTestNumber = 1,
+    this.maxVisiblePoints = 5,
     this.chartHeight = 150.0,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
-  });
+  }) : assert(maxVisiblePoints == null || maxVisiblePoints > 0);
 
   final int finalGrade;
   final List<int> previousGrades;
+  final List<int>? testNumbers;
   final int firstTestNumber;
+
+  /// Set to null to plot the full history. Other placements keep five points.
+  final int? maxVisiblePoints;
   final double chartHeight;
   final bool animate;
   final Duration animationDuration;
@@ -71,7 +86,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     final dataChanged =
         oldWidget.finalGrade != widget.finalGrade ||
         !listEquals(oldWidget.previousGrades, widget.previousGrades) ||
-        oldWidget.firstTestNumber != widget.firstTestNumber;
+        !listEquals(oldWidget.testNumbers, widget.testNumbers) ||
+        oldWidget.firstTestNumber != widget.firstTestNumber ||
+        oldWidget.maxVisiblePoints != widget.maxVisiblePoints;
     if (!oldWidget.animate || dataChanged) {
       _controller.forward(from: 0.0);
     }
@@ -85,8 +102,14 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
 
   List<double> _resolvePoints() {
     final target = widget.finalGrade.clamp(0, 5).toDouble();
-    final history = widget.previousGrades.length > 4
-        ? widget.previousGrades.sublist(widget.previousGrades.length - 4)
+    final historyLimit = widget.maxVisiblePoints == null
+        ? null
+        : widget.maxVisiblePoints! - 1;
+    final history =
+        historyLimit != null && widget.previousGrades.length > historyLimit
+        ? widget.previousGrades.sublist(
+            widget.previousGrades.length - historyLimit,
+          )
         : widget.previousGrades;
     return <double>[
       ...history.map((grade) => grade.clamp(0, 5).toDouble()),
@@ -191,6 +214,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                             clipBehavior: Clip.none,
                             children: [
                               CustomPaint(
+                                key: const ValueKey(
+                                  'placement-progression-plot',
+                                ),
                                 size: Size(
                                   constraints.maxWidth,
                                   constraints.maxHeight,
@@ -226,26 +252,41 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
             children: [
               const SizedBox(width: 48),
               Expanded(
-                child: Row(
-                  children: List.generate(pointCount, (index) {
-                    return Expanded(
-                      child: Center(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            context.formatText(AppKeys.placementResultTest, {
-                              'number': widget.firstTestNumber + index,
-                            }),
-                            style: GoogleFonts.andika(
-                              color: const Color(0xFF9CA3AF),
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w600,
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SizedBox(
+                    height: 16,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: List.generate(pointCount, (index) {
+                        final x = _pointX(
+                          index,
+                          pointCount,
+                          constraints.maxWidth,
+                        );
+                        return Positioned(
+                          left: x,
+                          top: 0,
+                          child: FractionalTranslation(
+                            translation: const Offset(-0.5, 0),
+                            child: Text(
+                              context.formatText(AppKeys.placementResultTest, {
+                                'number':
+                                    widget.testNumbers != null &&
+                                        index < widget.testNumbers!.length
+                                    ? widget.testNumbers![index]
+                                    : widget.firstTestNumber + index,
+                              }),
+                              style: GoogleFonts.andika(
+                                color: const Color(0xFF9CA3AF),
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  }),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -273,13 +314,15 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     final scale = Curves.easeOutBack.transform(badgeProgress);
 
     return Positioned(
-      right: 0,
+      left: points.length == 1 ? 8 : null,
+      right: points.length == 1 ? null : _plotRightInset,
       top: (lastY - 26).clamp(0.0, height - 24),
       child: Transform.scale(
         scale: scale,
         child: Opacity(
           opacity: badgeProgress,
           child: Container(
+            key: const ValueKey('placement-progression-final-badge'),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: const Color(0xFFFFA726),
@@ -352,11 +395,11 @@ class _AssessmentChartPainter extends CustomPainter {
 
     if (points.isEmpty) return;
 
-    // 2. Map the four most recent completed assessments and the new result.
+    // 2. Map every supplied chart point across the available plot width.
     final count = points.length;
     final offsets = <Offset>[];
     for (var i = 0; i < count; i++) {
-      final x = count == 1 ? width : width * (i / (count - 1));
+      final x = _pointX(i, count, width);
       final val = points[i].clamp(0.0, 5.0);
       final y = height - (val / 5.0) * height;
       offsets.add(Offset(x, y));

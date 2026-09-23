@@ -21,6 +21,8 @@ import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selec
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
 import 'package:numi/shared/layouts/page_header.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
 class AssessmentPlacementResultScreen extends StatefulWidget {
   const AssessmentPlacementResultScreen({
@@ -63,9 +65,10 @@ class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
   late final ExamService _examService;
   bool _isGeneratingAgain = false;
-  bool _examStatsResolved = false;
+  bool _progressResolved = false;
   int? _resolvedCurrentGrade;
   List<int> _resolvedPreviousGrades = const <int>[];
+  List<int> _resolvedPreviousTestNumbers = const <int>[];
   int _resolvedCurrentTestNumber = 1;
 
   int get _grade =>
@@ -78,88 +81,95 @@ class _AssessmentPlacementResultScreenState
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
     _resolvedCurrentGrade = widget.grade;
-    _examStatsResolved = widget.profileId == null;
-    if (_examStatsResolved && widget.previousGrade != null) {
+    _progressResolved = widget.profileId == null;
+    if (_progressResolved && widget.previousGrade != null) {
       _resolvedPreviousGrades = <int>[widget.previousGrade!];
+      _resolvedPreviousTestNumbers = const <int>[1];
       _resolvedCurrentTestNumber = 2;
     }
-    _fetchExamStats();
+    _fetchExamProgress();
   }
 
-  Future<void> _fetchExamStats() async {
+  Future<void> _fetchExamProgress() async {
     final profileId = widget.profileId;
     if (profileId == null) {
       return;
     }
-    var hasUsableStats = false;
+    var hasUsableProgress = false;
     try {
-      final stats = await _examService.getExamStats(
+      final toDt = DateTime.now();
+      final progress = await _examService.getExamProgress(
         profileId: profileId,
+        fromDt: toDt.subtract(const Duration(days: 7)),
+        toDt: toDt,
         examType: widget.examType,
       );
       if (mounted) {
-        hasUsableStats = _applyExamStats(stats);
+        hasUsableProgress = _applyExamProgress(progress);
       }
     } catch (_) {
-      // Graceful fallback if stats call fails or mock is unused.
+      // Keep the current result visible if progress is unavailable.
     } finally {
       if (mounted) {
         setState(() {
-          if (!hasUsableStats) {
+          if (!hasUsableProgress) {
             _resolvedPreviousGrades = widget.previousGrade == null
                 ? const <int>[]
                 : <int>[widget.previousGrade!];
+            _resolvedPreviousTestNumbers = widget.previousGrade == null
+                ? const <int>[]
+                : const <int>[1];
             _resolvedCurrentTestNumber = _resolvedPreviousGrades.isEmpty
                 ? 1
                 : 2;
           }
-          _examStatsResolved = true;
+          _progressResolved = true;
         });
       }
     }
   }
 
-  bool _applyExamStats(List<ExamStats> stats) {
-    if (stats.isEmpty) return false;
-
-    final validStats = stats.where((s) {
-      final status = s.status?.trim().toUpperCase();
+  bool _applyExamProgress(ExamProgressResponse progress) {
+    final validPoints = progress.series.where((point) {
+      final status = point.status?.trim().toUpperCase();
       final isCompleted =
           status == null || status == 'COMPLETE' || status == 'SUBMITTED';
-      return s.grade != null && isCompleted;
+      return point.grade != null && isCompleted;
     }).toList();
-    if (validStats.isEmpty) return false;
+    if (validPoints.isEmpty) return false;
 
-    validStats.sort((a, b) {
-      final dtA = a.lastSubmittedDt;
-      final dtB = b.lastSubmittedDt;
-      if (dtA != null && dtB != null) {
-        final byDate = dtA.compareTo(dtB);
-        if (byDate != 0) return byDate;
-      }
-      return (a.userExamId ?? 0).compareTo(b.userExamId ?? 0);
+    validPoints.sort((a, b) {
+      final bySequence = a.sequence.compareTo(b.sequence);
+      return bySequence != 0
+          ? bySequence
+          : a.completedDt.compareTo(b.completedDt);
     });
 
     final currentIndex = widget.userExamId == null
-        ? validStats.length - 1
-        : validStats.indexWhere((s) => s.userExamId == widget.userExamId);
+        ? validPoints.length - 1
+        : validPoints.indexWhere((point) => point.examId == widget.userExamId);
     final hasCurrentResult = currentIndex >= 0;
-    final currentStat = hasCurrentResult ? validStats[currentIndex] : null;
+    final currentPoint = hasCurrentResult ? validPoints[currentIndex] : null;
     final currentTestNumber = hasCurrentResult
-        ? currentIndex + 1
-        : validStats.length + 1;
-    final historyEndIndex = hasCurrentResult ? currentIndex : validStats.length;
+        ? currentPoint!.sequence
+        : validPoints.last.sequence + 1;
+    final historyEndIndex = hasCurrentResult
+        ? currentIndex
+        : validPoints.length;
     final historyStartIndex = historyEndIndex > 4 ? historyEndIndex - 4 : 0;
-    final previousStats = validStats.sublist(
+    final previousPoints = validPoints.sublist(
       historyStartIndex,
       historyEndIndex,
     );
 
-    if (currentStat?.grade != null) {
-      _resolvedCurrentGrade = currentStat!.grade!;
+    if (currentPoint?.grade != null) {
+      _resolvedCurrentGrade = currentPoint!.grade!;
     }
-    _resolvedPreviousGrades = previousStats
-        .map((stat) => stat.grade!)
+    _resolvedPreviousGrades = previousPoints
+        .map((point) => point.grade!)
+        .toList(growable: false);
+    _resolvedPreviousTestNumbers = previousPoints
+        .map((point) => point.sequence)
         .toList(growable: false);
     _resolvedCurrentTestNumber = currentTestNumber;
     return true;
@@ -254,16 +264,42 @@ class _AssessmentPlacementResultScreenState
               constraints: const BoxConstraints(maxWidth: 430),
               child: _isGeneratingAgain
                   ? const AssessmentTestAgainLoader()
-                  : !_examStatsResolved
-                  ? const SizedBox.expand(
-                      key: ValueKey('assessment-placement-stats-loading'),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.teal500,
-                        ),
-                      ),
-                    )
+                  : !_progressResolved
+                  ? _buildProgressSkeleton()
                   : _buildResultContent(context),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressSkeleton() {
+    return SizedBox.expand(
+      key: const ValueKey('assessment-placement-progress-loading'),
+      child: LayoutBuilder(
+        builder: (context, constraints) => AppSkeletonLoader(
+          builder: (context, color) => Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppSkeletonBlock(
+                    key: const ValueKey('assessment-placement-ribbon-skeleton'),
+                    height: 72,
+                    radius: 28,
+                    color: color,
+                  ),
+                  const SizedBox(height: 12),
+                  AppSkeletonBlock(
+                    key: const ValueKey('assessment-placement-chart-skeleton'),
+                    height: constraints.maxHeight * 0.38,
+                    radius: 20,
+                    color: color,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -377,20 +413,38 @@ class _AssessmentPlacementResultScreenState
                 SizedBox(height: isCompact ? 2.0 : 4.0),
                 _CelebrationMascot(size: mascotSize),
                 SizedBox(height: isCompact ? 2.0 : 4.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: AssessmentGradeRibbon(currentGrade: _grade),
-                ),
-                SizedBox(height: sectionSpacing),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: AssessmentProgressionChart(
-                    finalGrade: _grade,
-                    previousGrades: _resolvedPreviousGrades,
-                    firstTestNumber:
-                        _resolvedCurrentTestNumber -
-                        _resolvedPreviousGrades.length,
-                    chartHeight: isCompact ? 145.0 : 180.0,
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOut,
+                  builder: (context, opacity, child) => Opacity(
+                    key: const ValueKey('assessment-placement-history-content'),
+                    opacity: opacity,
+                    child: child,
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: AssessmentGradeRibbon(currentGrade: _grade),
+                      ),
+                      SizedBox(height: sectionSpacing),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: AssessmentProgressionChart(
+                          finalGrade: _grade,
+                          previousGrades: _resolvedPreviousGrades,
+                          testNumbers: <int>[
+                            ..._resolvedPreviousTestNumbers,
+                            _resolvedCurrentTestNumber,
+                          ],
+                          firstTestNumber:
+                              _resolvedCurrentTestNumber -
+                              _resolvedPreviousGrades.length,
+                          chartHeight: isCompact ? 145.0 : 180.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 if (weakTopics.isNotEmpty) ...[
