@@ -203,17 +203,6 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                   animationProgress: progress,
                                 ),
                               ),
-                              // Jump origin badge (if transitioning between different grades)
-                              if (points.length >= 2)
-                                _buildPreviousPointBadge(
-                                  constraints: constraints,
-                                  points: points,
-                                  label: _gradeLabel(
-                                    context,
-                                    points[points.length - 2].round(),
-                                  ),
-                                  progress: progress,
-                                ),
                               // Floating badge for final point
                               _buildFinalPointBadge(
                                 constraints: constraints,
@@ -262,61 +251,6 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPreviousPointBadge({
-    required BoxConstraints constraints,
-    required List<double> points,
-    required String label,
-    required double progress,
-  }) {
-    if (points.length < 2) return const SizedBox.shrink();
-    final prevIndex = points.length - 2;
-    final prevVal = points[prevIndex];
-    final height = constraints.maxHeight;
-    final width = constraints.maxWidth;
-
-    final prevX = width * (prevIndex / (points.length - 1));
-    final prevY = height - (prevVal / 5.0) * height;
-
-    final badgeProgress = ((progress - 0.55) / 0.25).clamp(0.0, 1.0);
-    if (badgeProgress <= 0) return const SizedBox.shrink();
-
-    final scale = Curves.easeOutBack.transform(badgeProgress);
-
-    return Positioned(
-      left: (prevX - 22).clamp(0.0, width - 44),
-      top: (prevY - 24).clamp(0.0, height - 20),
-      child: Transform.scale(
-        scale: scale,
-        child: Opacity(
-          opacity: badgeProgress,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFD1D5DB), width: 1.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Text(
-              label,
-              style: GoogleFonts.andika(
-                color: const Color(0xFF4B5563),
-                fontSize: 9.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -616,6 +616,35 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('chart shows only the final grade badge, not a previous badge', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await lingo.setLanguage(AppLanguage.en);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(
+            body: Center(
+              child: AssessmentProgressionChart(
+                finalGrade: 1,
+                previousGrades: <int>[0, 1, 0],
+                animate: false,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Kinder.'), findsOneWidget);
+    expect(find.text('Grade 1'), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _UnusedExamService implements ExamService {
