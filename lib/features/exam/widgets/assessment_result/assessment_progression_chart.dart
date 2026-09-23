@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -7,18 +8,16 @@ class AssessmentProgressionChart extends StatefulWidget {
   const AssessmentProgressionChart({
     super.key,
     required this.finalGrade,
-    this.previousGrade,
-    this.customPoints,
-    this.questionCount = 5,
+    this.previousGrades = const <int>[],
+    this.firstTestNumber = 1,
     this.chartHeight = 150.0,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
   });
 
   final int finalGrade;
-  final int? previousGrade;
-  final List<double>? customPoints;
-  final int questionCount;
+  final List<int> previousGrades;
+  final int firstTestNumber;
   final double chartHeight;
   final bool animate;
   final Duration animationDuration;
@@ -64,14 +63,17 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   @override
   void didUpdateWidget(covariant AssessmentProgressionChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.finalGrade != widget.finalGrade ||
-        oldWidget.previousGrade != widget.previousGrade ||
-        oldWidget.customPoints != widget.customPoints) {
-      if (widget.animate) {
-        _controller.forward(from: 0.0);
-      } else {
-        _controller.value = 1.0;
-      }
+    if (!widget.animate) {
+      _controller.value = 1.0;
+      return;
+    }
+
+    final dataChanged =
+        oldWidget.finalGrade != widget.finalGrade ||
+        !listEquals(oldWidget.previousGrades, widget.previousGrades) ||
+        oldWidget.firstTestNumber != widget.firstTestNumber;
+    if (!oldWidget.animate || dataChanged) {
+      _controller.forward(from: 0.0);
     }
   }
 
@@ -82,45 +84,14 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   }
 
   List<double> _resolvePoints() {
-    if (widget.customPoints != null && widget.customPoints!.isNotEmpty) {
-      return widget.customPoints!;
-    }
-
     final target = widget.finalGrade.clamp(0, 5).toDouble();
-    final prev = widget.previousGrade?.clamp(0, 5).toDouble();
-
-    if (prev != null && prev != target) {
-      // Visual transition showing current/previous grade and the jump to final grade
-      final start = prev > 1 ? 1.0 : 0.0;
-      final step = (prev - start) / 2.0;
-      return [
-        start,
-        (start + step).clamp(0.0, 5.0),
-        prev,
-        prev, // "Bạn đang ở Grade X"
-        target, // Jump to Grade Y
-      ];
-    }
-
-    switch (widget.finalGrade.clamp(0, 5)) {
-      case 0:
-        return const [0.0, 0.0, 0.0, 0.0, 0.0];
-      case 1:
-        return const [0.0, 0.5, 1.0, 1.0, 1.0];
-      case 2:
-        return const [0.0, 0.7, 1.4, 2.0, 2.0];
-      case 3:
-        return const [0.0, 1.0, 2.0, 3.0, 3.0];
-      case 4:
-        return const [0.0, 1.0, 2.2, 3.2, 4.0];
-      case 5:
-        return const [0.0, 1.2, 2.5, 3.8, 5.0];
-      default:
-        return List.generate(
-          widget.questionCount,
-          (i) => (target * (i / (widget.questionCount - 1))).clamp(0.0, 5.0),
-        );
-    }
+    final history = widget.previousGrades.length > 4
+        ? widget.previousGrades.sublist(widget.previousGrades.length - 4)
+        : widget.previousGrades;
+    return <double>[
+      ...history.map((grade) => grade.clamp(0, 5).toDouble()),
+      target,
+    ];
   }
 
   String _gradeLabel(BuildContext context, int grade) {
@@ -233,15 +204,13 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                 ),
                               ),
                               // Jump origin badge (if transitioning between different grades)
-                              if (widget.previousGrade != null &&
-                                  widget.previousGrade != widget.finalGrade &&
-                                  points.length >= 2)
+                              if (points.length >= 2)
                                 _buildPreviousPointBadge(
                                   constraints: constraints,
                                   points: points,
                                   label: _gradeLabel(
                                     context,
-                                    widget.previousGrade!,
+                                    points[points.length - 2].round(),
                                   ),
                                   progress: progress,
                                 ),
@@ -275,8 +244,8 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            context.formatText(AppKeys.placementResultLesson, {
-                              'number': index + 1,
+                            context.formatText(AppKeys.placementResultTest, {
+                              'number': widget.firstTestNumber + index,
                             }),
                             style: GoogleFonts.andika(
                               color: const Color(0xFF9CA3AF),
@@ -449,68 +418,39 @@ class _AssessmentChartPainter extends CustomPainter {
 
     if (points.isEmpty) return;
 
-    // 2. Map data points to canvas coordinates
+    // 2. Map the four most recent completed assessments and the new result.
     final count = points.length;
     final offsets = <Offset>[];
     for (var i = 0; i < count; i++) {
-      final x = count == 1 ? width / 2 : width * (i / (count - 1));
+      final x = count == 1 ? width : width * (i / (count - 1));
       final val = points[i].clamp(0.0, 5.0);
       final y = height - (val / 5.0) * height;
       offsets.add(Offset(x, y));
     }
 
-    // 3. Compute distances along polyline for progressive animation
-    final segmentDistances = <double>[];
-    var totalDistance = 0.0;
-    for (var i = 0; i < offsets.length - 1; i++) {
-      final dist = (offsets[i + 1] - offsets[i]).distance;
-      segmentDistances.add(dist);
-      totalDistance += dist;
-    }
+    final progress = animationProgress.clamp(0.0, 1.0);
+    final lastSegmentIndex = count - 2;
+    final segmentProgress = count > 1 ? progress : 1.0;
+    final segmentStart = count > 1 ? offsets[lastSegmentIndex] : offsets.last;
+    final currentHead = count > 1
+        ? Offset.lerp(segmentStart, offsets.last, segmentProgress)!
+        : offsets.last;
+    final currentVal = count > 1
+        ? points[lastSegmentIndex] +
+              (points.last - points[lastSegmentIndex]) * segmentProgress
+        : points.last;
 
-    final currentDist = totalDistance * animationProgress.clamp(0.0, 1.0);
-    var accumulatedDist = 0.0;
-    var activeSegmentIndex = -1;
-    Offset currentHead = offsets.first;
-    double currentVal = points.first;
-    final drawnOffsets = <Offset>[offsets.first];
-
-    for (var i = 0; i < segmentDistances.length; i++) {
-      final segDist = segmentDistances[i];
-      if (accumulatedDist + segDist <= currentDist) {
-        accumulatedDist += segDist;
-        drawnOffsets.add(offsets[i + 1]);
-        currentHead = offsets[i + 1];
-        currentVal = points[i + 1];
-      } else {
-        activeSegmentIndex = i;
-        final remaining = currentDist - accumulatedDist;
-        final t = segDist > 0 ? (remaining / segDist).clamp(0.0, 1.0) : 1.0;
-        currentHead = Offset.lerp(offsets[i], offsets[i + 1], t)!;
-        currentVal = points[i] + (points[i + 1] - points[i]) * t;
-        drawnOffsets.add(currentHead);
-        break;
+    // Keep every historical segment visible; only the final segment animates.
+    if (count > 1) {
+      final areaPath = Path()..moveTo(offsets.first.dx, offsets.first.dy);
+      for (var i = 1; i < count - 1; i++) {
+        areaPath.lineTo(offsets[i].dx, offsets[i].dy);
       }
-    }
-
-    if (animationProgress >= 1.0) {
-      currentHead = offsets.last;
-      currentVal = points.last;
-      drawnOffsets.clear();
-      drawnOffsets.addAll(offsets);
-      activeSegmentIndex = -1;
-    }
-
-    // 4. Draw multi-color gradient area fill under the drawn line
-    if (drawnOffsets.length >= 2) {
-      final areaPath = Path()
-        ..moveTo(drawnOffsets.first.dx, drawnOffsets.first.dy);
-      for (var i = 1; i < drawnOffsets.length; i++) {
-        areaPath.lineTo(drawnOffsets[i].dx, drawnOffsets[i].dy);
-      }
-      areaPath.lineTo(currentHead.dx, height);
-      areaPath.lineTo(drawnOffsets.first.dx, height);
-      areaPath.close();
+      areaPath
+        ..lineTo(currentHead.dx, currentHead.dy)
+        ..lineTo(currentHead.dx, height)
+        ..lineTo(offsets.first.dx, height)
+        ..close();
 
       final areaShader = const LinearGradient(
         begin: Alignment.centerLeft,
@@ -532,23 +472,15 @@ class _AssessmentChartPainter extends CustomPainter {
       canvas.drawPath(areaPath, areaPaint);
     }
 
-    // 5. Draw connecting line segments with smooth color transitions
-    final numSegments = offsets.length - 1;
-    for (var i = 0; i < numSegments; i++) {
-      if (activeSegmentIndex >= 0 && i > activeSegmentIndex) {
-        break;
-      }
+    // 3. Draw historical segments followed by the animated new segment.
+    for (var i = 0; i < count - 1; i++) {
+      final isNewSegment = i == lastSegmentIndex;
+      if (isNewSegment && segmentProgress <= 0) continue;
 
-      final isCurrentActive = i == activeSegmentIndex;
       final startPt = offsets[i];
-      final endPt = isCurrentActive ? currentHead : offsets[i + 1];
-
-      final val1 = points[i];
-      final val2 = isCurrentActive ? currentVal : points[i + 1];
-
-      final color1 = _colorForValue(val1);
-      final color2 = _colorForValue(val2);
-
+      final endPt = isNewSegment ? currentHead : offsets[i + 1];
+      final color1 = _colorForValue(points[i]);
+      final color2 = _colorForValue(isNewSegment ? currentVal : points[i + 1]);
       final linePaint = Paint()
         ..strokeWidth = 3.2
         ..strokeCap = StrokeCap.round
@@ -563,65 +495,32 @@ class _AssessmentChartPainter extends CustomPainter {
           colors: [color1, color2],
         ).createShader(Rect.fromPoints(startPt, endPt));
       }
-
       canvas.drawLine(startPt, endPt, linePaint);
     }
 
-    // 6. Draw point dots
-    for (var i = 0; i < offsets.length; i++) {
-      final p = offsets[i];
-      final isLast = i == offsets.length - 1;
-      final pointColor = _colorForValue(points[i]);
-
-      // Only draw dot if pen has reached it
-      final hasReached = offsets[i].dx <= currentHead.dx + 0.5;
-      if (!hasReached && animationProgress < 1.0) {
-        continue;
-      }
-
-      if (isLast) {
-        if (animationProgress >= 0.9) {
-          final haloProgress = ((animationProgress - 0.9) / 0.1).clamp(
-            0.0,
-            1.0,
-          );
-          final haloRadius = 10.0 * Curves.easeOutBack.transform(haloProgress);
-
-          // Glowing halo
-          final haloPaint = Paint()
-            ..color = pointColor.withValues(alpha: 0.25)
-            ..style = PaintingStyle.fill;
-          canvas.drawCircle(p, haloRadius, haloPaint);
-
-          // Outer dot
-          final outerDotPaint = Paint()
-            ..color = pointColor
-            ..style = PaintingStyle.fill;
-          canvas.drawCircle(p, 5.5, outerDotPaint);
-
-          // Inner white dot
-          final innerDotPaint = Paint()
-            ..color = Colors.white
-            ..style = PaintingStyle.fill;
-          canvas.drawCircle(p, 2.5, innerDotPaint);
-        }
-      } else {
-        // Regular point dot with white ring
-        final fillPaint = Paint()
-          ..color = pointColor
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(p, 4.5, fillPaint);
-
-        final ringPaint = Paint()
-          ..color = Colors.white
-          ..strokeWidth = 1.5
-          ..style = PaintingStyle.stroke;
-        canvas.drawCircle(p, 4.5, ringPaint);
-      }
+    // Draw all completed assessment points; reveal the new point at the end.
+    for (var i = 0; i < count - 1; i++) {
+      _drawHistoricalPoint(canvas, offsets[i], _colorForValue(points[i]));
+    }
+    if (count == 1 || progress >= 1.0) {
+      final pointColor = _colorForValue(points.last);
+      final haloRadius = count == 1
+          ? 10.0
+          : 10.0 *
+                Curves.easeOutBack.transform(
+                  ((progress - 0.9) / 0.1).clamp(0.0, 1.0),
+                );
+      canvas.drawCircle(
+        offsets.last,
+        haloRadius,
+        Paint()..color = pointColor.withValues(alpha: 0.25),
+      );
+      canvas.drawCircle(offsets.last, 5.5, Paint()..color = pointColor);
+      canvas.drawCircle(offsets.last, 2.5, Paint()..color = Colors.white);
     }
 
-    // 7. Moving Glowing Pen Tip during animation
-    if (animationProgress > 0.02 && animationProgress < 0.99) {
+    // Moving pen is restricted to the final segment between the latest tests.
+    if (count > 1 && progress > 0.02 && progress < 0.99) {
       final penColor = _colorForValue(currentVal);
 
       // Outer glow pulse
@@ -650,6 +549,18 @@ class _AssessmentChartPainter extends CustomPainter {
     if (val <= 2.8) return const Color(0xFF43A047); // Green
     if (val <= 3.8) return const Color(0xFFFFB300); // Yellow/Amber
     return const Color(0xFFFFA726); // Orange
+  }
+
+  void _drawHistoricalPoint(Canvas canvas, Offset point, Color color) {
+    canvas.drawCircle(point, 4.5, Paint()..color = color);
+    canvas.drawCircle(
+      point,
+      4.5,
+      Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke,
+    );
   }
 
   @override

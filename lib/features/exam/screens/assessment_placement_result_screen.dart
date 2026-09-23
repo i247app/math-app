@@ -29,12 +29,12 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.level,
     required this.correctAnswers,
     required this.totalQuestions,
+    this.examType = examTypeAssessment,
     this.examService,
     this.profileId,
     this.userExamId,
     this.previousGrade,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
-    this.progressionPoints,
     this.onTestAgainGenerated,
     this.onViewDetails,
     this.onBack,
@@ -44,12 +44,12 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final int? level;
   final int correctAnswers;
   final int totalQuestions;
+  final String examType;
   final ExamService? examService;
   final int? profileId;
   final int? userExamId;
   final int? previousGrade;
   final List<ExamPracticeTopic> practiceWeakTopics;
-  final List<double>? progressionPoints;
   final ValueChanged<GeneratedExam>? onTestAgainGenerated;
   final VoidCallback? onViewDetails;
   final VoidCallback? onBack;
@@ -63,10 +63,13 @@ class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
   late final ExamService _examService;
   bool _isGeneratingAgain = false;
-  int? _resolvedPreviousGrade;
-  List<double>? _resolvedProgressionPoints;
+  bool _examStatsResolved = false;
+  int? _resolvedCurrentGrade;
+  List<int> _resolvedPreviousGrades = const <int>[];
+  int _resolvedCurrentTestNumber = 1;
 
-  int get _grade => AssessmentFlowPolicy.clampGrade(widget.grade);
+  int get _grade =>
+      AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
   int get _correctAnswers => widget.correctAnswers.clamp(0, _totalQuestions);
 
@@ -74,8 +77,12 @@ class _AssessmentPlacementResultScreenState
   void initState() {
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
-    _resolvedPreviousGrade = widget.previousGrade;
-    _resolvedProgressionPoints = widget.progressionPoints;
+    _resolvedCurrentGrade = widget.grade;
+    _examStatsResolved = widget.profileId == null;
+    if (_examStatsResolved && widget.previousGrade != null) {
+      _resolvedPreviousGrades = <int>[widget.previousGrade!];
+      _resolvedCurrentTestNumber = 2;
+    }
     _fetchExamStats();
   }
 
@@ -84,66 +91,78 @@ class _AssessmentPlacementResultScreenState
     if (profileId == null) {
       return;
     }
+    var hasUsableStats = false;
     try {
       final stats = await _examService.getExamStats(
         profileId: profileId,
-        examType: examTypeAssessment,
+        examType: widget.examType,
       );
-      if (!mounted) return;
-      _applyExamStats(stats);
+      if (mounted) {
+        hasUsableStats = _applyExamStats(stats);
+      }
     } catch (_) {
       // Graceful fallback if stats call fails or mock is unused.
+    } finally {
+      if (mounted) {
+        setState(() {
+          if (!hasUsableStats) {
+            _resolvedPreviousGrades = widget.previousGrade == null
+                ? const <int>[]
+                : <int>[widget.previousGrade!];
+            _resolvedCurrentTestNumber = _resolvedPreviousGrades.isEmpty
+                ? 1
+                : 2;
+          }
+          _examStatsResolved = true;
+        });
+      }
     }
   }
 
-  void _applyExamStats(List<ExamStats> stats) {
-    if (stats.isEmpty) return;
+  bool _applyExamStats(List<ExamStats> stats) {
+    if (stats.isEmpty) return false;
 
-    final validStats = stats.where((s) => s.grade != null).toList();
-    if (validStats.isEmpty) return;
+    final validStats = stats.where((s) {
+      final status = s.status?.trim().toUpperCase();
+      final isCompleted =
+          status == null || status == 'COMPLETE' || status == 'SUBMITTED';
+      return s.grade != null && isCompleted;
+    }).toList();
+    if (validStats.isEmpty) return false;
 
     validStats.sort((a, b) {
       final dtA = a.lastSubmittedDt;
       final dtB = b.lastSubmittedDt;
       if (dtA != null && dtB != null) {
-        return dtA.compareTo(dtB);
+        final byDate = dtA.compareTo(dtB);
+        if (byDate != 0) return byDate;
       }
-      return 0;
+      return (a.userExamId ?? 0).compareTo(b.userExamId ?? 0);
     });
 
-    final previousStats = widget.userExamId == null
-        ? (validStats.length > 1
-              ? validStats.sublist(0, validStats.length - 1)
-              : validStats)
-        : validStats.where((s) => s.userExamId != widget.userExamId).toList();
+    final currentIndex = widget.userExamId == null
+        ? validStats.length - 1
+        : validStats.indexWhere((s) => s.userExamId == widget.userExamId);
+    final hasCurrentResult = currentIndex >= 0;
+    final currentStat = hasCurrentResult ? validStats[currentIndex] : null;
+    final currentTestNumber = hasCurrentResult
+        ? currentIndex + 1
+        : validStats.length + 1;
+    final historyEndIndex = hasCurrentResult ? currentIndex : validStats.length;
+    final historyStartIndex = historyEndIndex > 4 ? historyEndIndex - 4 : 0;
+    final previousStats = validStats.sublist(
+      historyStartIndex,
+      historyEndIndex,
+    );
 
-    int? prevGrade = _resolvedPreviousGrade;
-    if (previousStats.isNotEmpty) {
-      prevGrade ??= previousStats.last.grade;
-    } else if (validStats.isNotEmpty) {
-      prevGrade ??= validStats.last.grade;
+    if (currentStat?.grade != null) {
+      _resolvedCurrentGrade = currentStat!.grade!;
     }
-
-    List<double>? customPoints = _resolvedProgressionPoints;
-    if (customPoints == null && previousStats.length >= 2) {
-      final recentGrades = previousStats
-          .map((s) => s.grade!.clamp(0, 5).toDouble())
-          .toList();
-      final tail = recentGrades.length > 4
-          ? recentGrades.sublist(recentGrades.length - 4)
-          : recentGrades;
-
-      final points = <double>[...tail, _grade.toDouble()];
-      while (points.length < 5) {
-        points.insert(0, (points.first - 1.0).clamp(0.0, 5.0));
-      }
-      customPoints = points.sublist(points.length - 5);
-    }
-
-    setState(() {
-      _resolvedPreviousGrade = prevGrade;
-      _resolvedProgressionPoints = customPoints;
-    });
+    _resolvedPreviousGrades = previousStats
+        .map((stat) => stat.grade!)
+        .toList(growable: false);
+    _resolvedCurrentTestNumber = currentTestNumber;
+    return true;
   }
 
   Future<void> _generateAgain(String examType) async {
@@ -235,6 +254,15 @@ class _AssessmentPlacementResultScreenState
               constraints: const BoxConstraints(maxWidth: 430),
               child: _isGeneratingAgain
                   ? const AssessmentTestAgainLoader()
+                  : !_examStatsResolved
+                  ? const SizedBox.expand(
+                      key: ValueKey('assessment-placement-stats-loading'),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.teal500,
+                        ),
+                      ),
+                    )
                   : _buildResultContent(context),
             ),
           ),
@@ -358,9 +386,10 @@ class _AssessmentPlacementResultScreenState
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: AssessmentProgressionChart(
                     finalGrade: _grade,
-                    previousGrade: _resolvedPreviousGrade,
-                    customPoints:
-                        _resolvedProgressionPoints ?? widget.progressionPoints,
+                    previousGrades: _resolvedPreviousGrades,
+                    firstTestNumber:
+                        _resolvedCurrentTestNumber -
+                        _resolvedPreviousGrades.length,
                     chartHeight: isCompact ? 145.0 : 180.0,
                   ),
                 ),

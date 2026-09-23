@@ -857,7 +857,7 @@ class AppKeys {
   static const placementResultRibbonGrade = 'placement_result_ribbon_grade';
   static const placementResultKindergartenShort =
       'placement_result_kindergarten_short';
-  static const placementResultLesson = 'placement_result_lesson';
+  static const placementResultTest = 'placement_result_test';
   static const examReviewPracticeBannerTitle =
       'exam_review_practice_banner_title';
   static const examReviewTopicConjunction = 'exam_review_topic_conjunction';

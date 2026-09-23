@@ -364,6 +364,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             level: _controller.isGrade ? finalLevel : null,
             correctAnswers: correctAnswers,
             totalQuestions: totalQuestions,
+            examType: widget.examType,
             examService: examService,
             profileId: profileId,
             userExamId: submittedUserExamId,

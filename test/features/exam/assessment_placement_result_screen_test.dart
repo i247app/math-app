@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +13,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
+import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -22,6 +25,7 @@ void main() {
       'assets/images/assessment-result-blocks.png',
       'assets/images/assessment-result-checklist.png',
       'assets/images/assessment-result-pencil.png',
+      'assets/images/grade-ribbon.png',
     ];
 
     for (final asset in assets) {
@@ -394,97 +398,208 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('placement-grade-ribbon')), findsOneWidget);
-    expect(find.byKey(const ValueKey('placement-you-are-here')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('placement-grade-ribbon')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-you-are-here')),
+      findsOneWidget,
+    );
     expect(find.text('Bạn đang ở'), findsOneWidget);
-    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('placement-progression-chart')),
+      findsOneWidget,
+    );
     expect(find.text('Bài 1'), findsOneWidget);
-    expect(find.text('Bài 5'), findsOneWidget);
+    expect(find.text('Bài 5'), findsNothing);
     expect(find.text('M.Giáo'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('loads exam stats from API and applies progression transition on chart', (tester) async {
-    final lingo = LingoProvider();
-    addTearDown(lingo.dispose);
-
-    final statsService = _MockStatsExamService()
-      ..mockStats = [
-        ExamStats(
-          correctNumber: 8,
-          scorePercentage: 80.0,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          userExamId: 900,
-          grade: 3,
-          lastSubmittedDt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ];
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: LingoScope(
-          lingo: lingo,
-          child: AssessmentPlacementResultScreen(
-            grade: 2,
-            correctAnswers: 4,
-            totalQuestions: 5,
-            profileId: 999,
-            userExamId: 901,
-            examService: statsService,
-          ),
-        ),
+    final ribbonImage = tester.widget<Image>(
+      find.descendant(
+        of: find.byKey(const ValueKey('placement-grade-ribbon')),
+        matching: find.byType(Image),
       ),
     );
-    await tester.pumpAndSettle();
-
-    expect(statsService.requestedProfileId, 999);
-    expect(statsService.requestedExamType, examTypeAssessment);
-    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
-    // Both previous grade (Lớp 3) and current grade (Lớp 2) badges are present in the transition
-    expect(find.text('Lớp 3'), findsWidgets);
-    expect(find.text('Lớp 2'), findsWidgets);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('animates line drawing jump from previous grade down to final grade', (tester) async {
-    final lingo = LingoProvider();
-    addTearDown(lingo.dispose);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: LingoScope(
-          lingo: lingo,
-          child: const AssessmentPlacementResultScreen(
-            grade: 2,
-            previousGrade: 3,
-            correctAnswers: 4,
-            totalQuestions: 5,
-            examService: _UnusedExamService(),
-          ),
-        ),
+    expect(
+      ribbonImage.image,
+      isA<AssetImage>().having(
+        (image) => image.assetName,
+        'assetName',
+        'assets/images/grade-ribbon.png',
       ),
     );
-
-    // Initial frame
-    await tester.pump();
-    expect(find.byKey(const ValueKey('placement-progression-chart')), findsOneWidget);
-
-    // Midway through animation (drawing across points)
-    await tester.pump(const Duration(milliseconds: 700));
-
-    // Finish animation
-    await tester.pumpAndSettle();
-    expect(find.text('Lớp 3'), findsWidgets);
-    expect(find.text('Lớp 2'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'waits for stats, then shows four previous assessments and the new one',
+    (tester) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final pendingStats = Completer<List<ExamStats>>();
+      final statsService = _DelayedStatsExamService(pendingStats.future);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: AssessmentPlacementResultScreen(
+              grade: 5,
+              correctAnswers: 5,
+              totalQuestions: 5,
+              profileId: 999,
+              userExamId: 106,
+              examService: statsService,
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.byKey(const ValueKey('assessment-placement-stats-loading')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('placement-progression-chart')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('placement-grade-ribbon')),
+        findsNothing,
+      );
+
+      pendingStats.complete([
+        for (var index = 0; index < 6; index++)
+          ExamStats(
+            correctNumber: 5,
+            scorePercentage: 100,
+            skippedNumber: 0,
+            totalQuestions: 5,
+            userExamId: 101 + index,
+            grade: index,
+            lastSubmittedDt: DateTime.utc(2026, 1, index + 1),
+            status: 'COMPLETE',
+          ),
+      ]);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('assessment-placement-stats-loading')),
+        findsNothing,
+      );
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byType(AssessmentProgressionChart),
+      );
+      expect(chart.previousGrades, [1, 2, 3, 4]);
+      expect(chart.finalGrade, 5);
+      expect(chart.firstTestNumber, 2);
+      expect(find.text('Bài 2'), findsOneWidget);
+      expect(find.text('Bài 6'), findsOneWidget);
+      expect(find.text('Bài 1'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('placement-grade-ribbon')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'loads exam stats from API and applies progression transition on chart',
+    (tester) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+
+      final statsService = _MockStatsExamService()
+        ..mockStats = [
+          ExamStats(
+            correctNumber: 8,
+            scorePercentage: 80.0,
+            skippedNumber: 0,
+            totalQuestions: 10,
+            userExamId: 900,
+            grade: 3,
+            lastSubmittedDt: DateTime.now().subtract(const Duration(days: 1)),
+          ),
+        ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: AssessmentPlacementResultScreen(
+              grade: 2,
+              correctAnswers: 4,
+              totalQuestions: 5,
+              profileId: 999,
+              userExamId: 901,
+              examService: statsService,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(statsService.requestedProfileId, 999);
+      expect(statsService.requestedExamType, examTypeAssessment);
+      expect(
+        find.byKey(const ValueKey('placement-progression-chart')),
+        findsOneWidget,
+      );
+      // Both previous grade (Lớp 3) and current grade (Lớp 2) badges are present in the transition
+      expect(find.text('Lớp 3'), findsWidgets);
+      expect(find.text('Lớp 2'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'animates line drawing jump from previous grade down to final grade',
+    (tester) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: const AssessmentPlacementResultScreen(
+              grade: 2,
+              previousGrade: 3,
+              correctAnswers: 4,
+              totalQuestions: 5,
+              examService: _UnusedExamService(),
+            ),
+          ),
+        ),
+      );
+
+      // Initial frame
+      await tester.pump();
+      expect(
+        find.byKey(const ValueKey('placement-progression-chart')),
+        findsOneWidget,
+      );
+
+      // Midway through animation (drawing across points)
+      await tester.pump(const Duration(milliseconds: 700));
+
+      // Finish animation
+      await tester.pumpAndSettle();
+      expect(find.text('Lớp 3'), findsWidgets);
+      expect(find.text('Lớp 2'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 class _UnusedExamService implements ExamService {
@@ -560,6 +675,21 @@ class _MockStatsExamService implements ExamService {
     requestedExamType = examType;
     return mockStats;
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _DelayedStatsExamService implements ExamService {
+  const _DelayedStatsExamService(this.stats);
+
+  final Future<List<ExamStats>> stats;
+
+  @override
+  Future<List<ExamStats>> getExamStats({
+    required int profileId,
+    String examType = examTypeAssessment,
+  }) => stats;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
