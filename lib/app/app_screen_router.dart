@@ -184,8 +184,8 @@ class AppScreenRouter extends StatelessWidget {
                     AppScreen.welcome => WelcomeScreen(
                       key: const ValueKey('welcome'),
                       onStart: () {
-                        cubit.openWelcomeDetails();
-                        coordinator.showWelcomeDetails();
+                        cubit.openSignupEntry();
+                        coordinator.showLogin();
                       },
                       onAssessment: () {
                         final guestAccounts = context

@@ -643,21 +643,23 @@ void main() {
       expect(find.text('TOÁN AI'), findsNothing);
     });
 
-    testWidgets('continues from welcome details to the login screen', (
+    testWidgets('continues from welcome directly to the login screen in signup mode', (
       tester,
     ) async {
       await tester.pumpWidget(const NumiApp());
 
-      await tester.ensureVisible(find.text('sign up'));
-      await tester.tap(find.text('sign up'));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('welcome-details')), findsOneWidget);
-
-      await tester.ensureVisible(find.text('TIẾP TỤC'));
-      await tester.tap(find.text('TIẾP TỤC'));
+      final signupButton = find.text('SIGN UP');
+      await tester.ensureVisible(signupButton);
+      await tester.tap(signupButton);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const ValueKey('login')), findsOneWidget);
+      expect(find.byKey(const ValueKey('welcome-details')), findsNothing);
+
+      await tester.tap(find.byType(AppBackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
     });
 
     testWidgets('returns login to the welcome screen that opened it', (
