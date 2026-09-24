@@ -13,6 +13,7 @@ import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/games/screens/games_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
+import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/teacher/teacher_home_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_study_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart';
@@ -29,6 +30,9 @@ import 'package:numi/features/settings/screens/setting_tab.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
+
+  // Đổi thành false để dùng lại Parent Home gốc.
+  static const bool _useNewParentHome = true;
 
   @override
   Widget buildTab({
@@ -51,90 +55,93 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     bool useActiveStudentProfileData = false,
   }) {
     return switch (args.activeTab) {
-      0 => ParentHomeContent(
-        user: args.user,
-        profiles: args.profiles,
-        activeProfile: args.activeProfile,
-        isActive: args.isActive,
-        activeRefreshTick: args.activeRefreshTick,
-        initialGrades: args.initialGrades,
-        gradeService: args.gradeService,
-        examService: args.examService,
-        onOpenAssessment: (context) => Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (_) => GradeSelectionScreen(
-              user: args.user,
-              initialGrades: args.initialGrades,
-              gradeService: args.gradeService,
-              examType: examTypeAssessment,
-              profileId: profileStableId(args.activeProfile),
-              initialGradeId: profileGradeStableId(args.activeProfile),
-              initialGradeLabel: args.activeProfile?.grade?.label,
-            ),
-          ),
-        ),
-        onOpenInitialAssessment: (context) => openInitialAssessmentFromHome(
-          context: context,
+      0 =>
+        (useActiveStudentProfileData || !_useNewParentHome
+            ? ParentHomeContent.new
+            : NewParentHomeContent.new)(
+          user: args.user,
+          profiles: args.profiles,
+          activeProfile: args.activeProfile,
+          isActive: args.isActive,
+          activeRefreshTick: args.activeRefreshTick,
+          initialGrades: args.initialGrades,
+          gradeService: args.gradeService,
           examService: args.examService,
-          profileId: profileStableId(args.activeProfile),
-          gradeLabel: args.activeProfile?.grade?.label,
-        ),
-        onOpenExamReview: (context, exam) {
-          final examId = exam.examId ?? exam.id;
-          final userExamId = exam.userExamId;
-          final validUserExamId = userExamId != null && userExamId > 0
-              ? userExamId
-              : null;
-          if (validUserExamId == null && (examId == null || examId <= 0)) {
-            return Future<void>.value();
-          }
-          return Navigator.of(context).push<void>(
+          onOpenAssessment: (context) => Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
-              builder: (_) => ExamReviewScreen(
-                examId: validUserExamId == null ? examId : null,
-                userExamId: validUserExamId,
-                examType: exam.examType,
-                initialExam: exam,
+              builder: (_) => GradeSelectionScreen(
+                user: args.user,
+                initialGrades: args.initialGrades,
+                gradeService: args.gradeService,
+                examType: examTypeAssessment,
+                profileId: profileStableId(args.activeProfile),
+                initialGradeId: profileGradeStableId(args.activeProfile),
+                initialGradeLabel: args.activeProfile?.grade?.label,
               ),
             ),
-          );
-        },
-        onCreateStudentProfile: (context) => Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (_) => Material(
-              color: context.themeColors.pageBackground,
-              child: SafeArea(
-                child: SettingTab.page(
-                  user: args.user,
-                  profiles: args.profiles,
-                  activeProfile: args.activeProfile,
-                  profileLoadError: null,
-                  onLogout: () {},
-                  onActivateProfile: args.onActivateProfile,
-                  onRefreshProfiles: args.onRefreshProfiles,
-                  onProfileSaved: args.onProfileSaved,
-                  bottomPadding: 0,
-                  initialView: SettingPageView.profile,
-                  isPushedPage: true,
-                  openAddProfileOnStart: true,
+          ),
+          onOpenInitialAssessment: (context) => openInitialAssessmentFromHome(
+            context: context,
+            examService: args.examService,
+            profileId: profileStableId(args.activeProfile),
+            gradeLabel: args.activeProfile?.grade?.label,
+          ),
+          onOpenExamReview: (context, exam) {
+            final examId = exam.examId ?? exam.id;
+            final userExamId = exam.userExamId;
+            final validUserExamId = userExamId != null && userExamId > 0
+                ? userExamId
+                : null;
+            if (validUserExamId == null && (examId == null || examId <= 0)) {
+              return Future<void>.value();
+            }
+            return Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => ExamReviewScreen(
+                  examId: validUserExamId == null ? examId : null,
+                  userExamId: validUserExamId,
+                  examType: exam.examType,
+                  initialExam: exam,
+                ),
+              ),
+            );
+          },
+          onCreateStudentProfile: (context) => Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (_) => Material(
+                color: context.themeColors.pageBackground,
+                child: SafeArea(
+                  child: SettingTab.page(
+                    user: args.user,
+                    profiles: args.profiles,
+                    activeProfile: args.activeProfile,
+                    profileLoadError: null,
+                    onLogout: () {},
+                    onActivateProfile: args.onActivateProfile,
+                    onRefreshProfiles: args.onRefreshProfiles,
+                    onProfileSaved: args.onProfileSaved,
+                    bottomPadding: 0,
+                    initialView: SettingPageView.profile,
+                    isPushedPage: true,
+                    openAddProfileOnStart: true,
+                  ),
                 ),
               ),
             ),
           ),
+          onRefreshProfiles: args.onRefreshProfiles,
+          onActivateProfile: args.onActivateProfile,
+          onProfileSaved: args.onProfileSaved,
+          onOpenProfileMenu: args.onOpenProfileMenu,
+          onOpenClassroomTab: args.onOpenClassroomTab,
+          onOpenPracticeTab: args.onOpenPracticeTab,
+          onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
+          bottomPadding: args.bottomPadding,
+          homeHeader: args.homeHeader,
+          showChildProfileDialogOnStart: args.showChildProfileDialogOnStart,
+          onChildProfileDialogShown: args.onChildProfileDialogShown,
+          useActiveStudentProfileData: useActiveStudentProfileData,
         ),
-        onRefreshProfiles: args.onRefreshProfiles,
-        onActivateProfile: args.onActivateProfile,
-        onProfileSaved: args.onProfileSaved,
-        onOpenProfileMenu: args.onOpenProfileMenu,
-        onOpenClassroomTab: args.onOpenClassroomTab,
-        onOpenPracticeTab: args.onOpenPracticeTab,
-        onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
-        bottomPadding: args.bottomPadding,
-        homeHeader: args.homeHeader,
-        showChildProfileDialogOnStart: args.showChildProfileDialogOnStart,
-        onChildProfileDialogShown: args.onChildProfileDialogShown,
-        useActiveStudentProfileData: useActiveStudentProfileData,
-      ),
       1 => ParentAssessmentTab(
         user: args.user,
         activeProfile: args.activeProfile,
