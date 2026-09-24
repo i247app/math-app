@@ -12,17 +12,26 @@ import 'package:numi/core/debug/app_debug_bloc_observer.dart';
 import 'package:numi/core/network/api_metadata.dart';
 import 'package:numi/core/notifications/notification_service.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 export 'package:numi/app/numi_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+	// 2. Execute storage lifecycle cleanup before doing anything else
+  await initStorageOnLaunch();
+
   if (kDebugMode) {
     Bloc.observer = const AppDebugBlocObserver();
   }
+
   _forwardPushTokenToApiMetadata();
   unawaited(NotificationService().initialize());
   final services = AppServices();
   final startup = await StartupBootstrap(services: services).run();
+
   runApp(
     NumiApp(
       lingoProvider: startup.lingoProvider,
@@ -61,5 +70,26 @@ Future<void> _applyPushToken(
     await metadataProvider.updateDevicePushToken(token);
   } catch (error) {
     AppLogger.error('NOTIFY', 'forward push token failed', error: error);
+  }
+}
+
+Future<void> initStorageOnLaunch() async {
+  final prefs = await SharedPreferences.getInstance();
+  const secureStorage = FlutterSecureStorage();
+
+  final hasRunBefore = prefs.getBool('has_run_before') ?? false;
+
+  if (!hasRunBefore) {
+    // Check if upgrading from an older version without this flag
+    final existingToken = await secureStorage.read(key: 'auth_token');
+
+    if (existingToken != null) {
+      // User is upgrading: preserve session, just mark the flag
+      await prefs.setBool('has_run_before', true);
+    } else {
+      // Fresh install or Reinstall: wipe stale Keychain entries
+      await secureStorage.deleteAll();
+      await prefs.setBool('has_run_before', true);
+    }
   }
 }
