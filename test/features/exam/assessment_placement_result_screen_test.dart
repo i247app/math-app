@@ -28,6 +28,7 @@ void main() {
       'assets/images/assessment-result-pencil.png',
       'assets/images/grade-ribbon.png',
       'assets/images/grade-ribbon-en.png',
+      'assets/images/grade-ribbon-numbers.png',
     ];
 
     for (final asset in assets) {
@@ -168,6 +169,10 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('placement-view-details')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('placement-view-details')));
     await tester.pump();
 
@@ -246,6 +251,10 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('placement-practice-again')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('placement-practice-again')));
     await tester.pump();
 
@@ -353,9 +362,12 @@ void main() {
       isA<AssetImage>().having(
         (image) => image.assetName,
         'assetName',
-        'assets/images/grade-ribbon-en.png',
+        'assets/images/grade-ribbon-numbers.png',
       ),
     );
+    expect(find.text('Grade'), findsOneWidget);
+    expect(find.text('Lớp'), findsNothing);
+    expect(tester.widget<Text>(find.text('Grade')).style?.color, Colors.black);
 
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
@@ -425,6 +437,19 @@ void main() {
     );
     expect(find.text('Bạn đang ở'), findsNothing);
     final marker = find.byKey(const ValueKey('placement-current-grade-marker'));
+    final markerLabel = find.byKey(
+      const ValueKey('placement-current-grade-label'),
+    );
+    expect(find.text('Lớp'), findsOneWidget);
+    expect(tester.widget<Text>(markerLabel).style?.color, Colors.black);
+    expect(
+      tester.getBottomLeft(markerLabel).dy,
+      lessThan(tester.getTopLeft(marker).dy),
+    );
+    expect(
+      tester.getCenter(markerLabel).dx,
+      closeTo(tester.getCenter(marker).dx, 1),
+    );
     expect(
       tester
           .widget<ColoredBox>(
@@ -438,7 +463,7 @@ void main() {
     );
     expect(
       tester.getCenter(marker).dx,
-      closeTo(ribbonRect.left + ribbonRect.width * 0.557, 1),
+      closeTo(ribbonRect.left + ribbonRect.width * 0.562, 1),
     );
     expect(
       find.byKey(const ValueKey('placement-progression-chart')),
@@ -458,7 +483,7 @@ void main() {
       isA<AssetImage>().having(
         (image) => image.assetName,
         'assetName',
-        'assets/images/grade-ribbon.png',
+        'assets/images/grade-ribbon-numbers.png',
       ),
     );
     expect(tester.takeException(), isNull);

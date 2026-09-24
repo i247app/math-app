@@ -11,34 +11,27 @@ class AssessmentGradeRibbon extends StatelessWidget {
 
   final int currentGrade;
 
-  // Text centers in the ribbon images (the overlapping pills are not equal-width).
-  static const List<double> _viGradeCenters = [
-    0.087,
-    0.263,
-    0.408,
-    0.557,
-    0.707,
-    0.858,
-  ];
-  static const List<double> _enGradeCenters = [
-    0.087,
-    0.278,
-    0.413,
-    0.561,
-    0.722,
+  // Numeral centers in the shared ribbon (the overlapping pills are unequal).
+  static const List<double> _gradeCenters = [
+    0.093,
+    0.272,
+    0.414,
+    0.562,
+    0.719,
     0.884,
   ];
 
   @override
   Widget build(BuildContext context) {
-    final activeIndex = currentGrade.clamp(0, _viGradeCenters.length - 1);
-    final isVietnamese = LingoScope.of(context).language == AppLanguage.vi;
+    final activeIndex = currentGrade.clamp(0, _gradeCenters.length - 1);
+    final gradeLabel = LingoScope.of(context).language == AppLanguage.vi
+        ? 'LỚP'
+        : 'GRADE';
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final totalWidth = constraints.maxWidth;
-        final gradeCenters = isVietnamese ? _viGradeCenters : _enGradeCenters;
-        final targetCenterX = totalWidth * gradeCenters[activeIndex];
+        final targetCenterX = totalWidth * _gradeCenters[activeIndex];
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -46,21 +39,42 @@ class AssessmentGradeRibbon extends StatelessWidget {
           children: [
             // The inverted-house tip stays centered over the active grade.
             SizedBox(
-              height: 30,
+              height: 48,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Positioned(
-                    left: (targetCenterX - 14).clamp(0.0, totalWidth - 28),
-                    width: 28,
-                    height: 30,
-                    child: Semantics(
-                      label: context.getText(AppKeys.placementResultYouAreHere),
-                      child: const ClipPath(
-                        key: ValueKey('placement-current-grade-marker'),
-                        clipper: _InvertedHouseClipper(),
-                        child: ColoredBox(color: AppColors.red),
-                      ),
+                    left: (targetCenterX - 26).clamp(0.0, totalWidth - 52),
+                    width: 52,
+                    child: Column(
+                      children: [
+                        Text(
+                          gradeLabel,
+                          key: const ValueKey('placement-current-grade-label'),
+                          style: const TextStyle(
+                            fontFamily: 'NunitoVariable',
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        SizedBox(
+                          width: 28,
+                          height: 30,
+                          child: Semantics(
+                            label: context.getText(
+                              AppKeys.placementResultYouAreHere,
+                            ),
+                            child: const ClipPath(
+                              key: ValueKey('placement-current-grade-marker'),
+                              clipper: _InvertedHouseClipper(),
+                              child: ColoredBox(color: AppColors.red),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -71,9 +85,7 @@ class AssessmentGradeRibbon extends StatelessWidget {
               key: const ValueKey('placement-grade-ribbon'),
               height: 40,
               child: Image.asset(
-                isVietnamese
-                    ? 'assets/images/grade-ribbon.png'
-                    : 'assets/images/grade-ribbon-en.png',
+                'assets/images/grade-ribbon-numbers.png',
                 width: totalWidth,
                 height: 40,
                 fit: BoxFit.cover,
