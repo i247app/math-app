@@ -73,6 +73,8 @@ class _AssessmentPlacementResultScreenState
 
   int get _grade =>
       AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
+  bool get _showsAssessmentChart =>
+      widget.examType.trim().toUpperCase() == examTypeAssessment;
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
   int get _correctAnswers => widget.correctAnswers.clamp(0, _totalQuestions);
 
@@ -81,13 +83,15 @@ class _AssessmentPlacementResultScreenState
     super.initState();
     _examService = widget.examService ?? context.read<ExamService>();
     _resolvedCurrentGrade = widget.grade;
-    _progressResolved = widget.profileId == null;
-    if (_progressResolved && widget.previousGrade != null) {
+    _progressResolved = !_showsAssessmentChart || widget.profileId == null;
+    if (_showsAssessmentChart &&
+        _progressResolved &&
+        widget.previousGrade != null) {
       _resolvedPreviousGrades = <int>[widget.previousGrade!];
       _resolvedPreviousTestNumbers = const <int>[1];
       _resolvedCurrentTestNumber = 2;
     }
-    _fetchExamProgress();
+    if (_showsAssessmentChart) _fetchExamProgress();
   }
 
   Future<void> _fetchExamProgress() async {
@@ -428,22 +432,24 @@ class _AssessmentPlacementResultScreenState
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: AssessmentGradeRibbon(currentGrade: _grade),
                       ),
-                      SizedBox(height: sectionSpacing),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: AssessmentProgressionChart(
-                          finalGrade: _grade,
-                          previousGrades: _resolvedPreviousGrades,
-                          testNumbers: <int>[
-                            ..._resolvedPreviousTestNumbers,
-                            _resolvedCurrentTestNumber,
-                          ],
-                          firstTestNumber:
-                              _resolvedCurrentTestNumber -
-                              _resolvedPreviousGrades.length,
-                          chartHeight: isCompact ? 145.0 : 180.0,
+                      if (_showsAssessmentChart) ...[
+                        SizedBox(height: sectionSpacing),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: AssessmentProgressionChart(
+                            finalGrade: _grade,
+                            previousGrades: _resolvedPreviousGrades,
+                            testNumbers: <int>[
+                              ..._resolvedPreviousTestNumbers,
+                              _resolvedCurrentTestNumber,
+                            ],
+                            firstTestNumber:
+                                _resolvedCurrentTestNumber -
+                                _resolvedPreviousGrades.length,
+                            chartHeight: isCompact ? 145.0 : 180.0,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),

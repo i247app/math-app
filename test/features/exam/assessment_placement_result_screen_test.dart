@@ -464,6 +464,51 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('GRADE result keeps ribbon but does not load or show chart', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final progressService = _MockProgressExamService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 3,
+            correctAnswers: 5,
+            totalQuestions: 5,
+            examType: examTypeGrade,
+            profileId: 999,
+            previousGrade: 2,
+            examService: progressService,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(progressService.requestedProfileId, isNull);
+    expect(
+      find.byKey(const ValueKey('assessment-placement-progress-loading')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-grade-ribbon')),
+      findsOneWidget,
+    );
+    expect(find.byType(AssessmentProgressionChart), findsNothing);
+    expect(
+      find.byKey(const ValueKey('placement-view-details')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'waits for journey progress, then shows four previous assessments and the new one',
     (tester) async {
