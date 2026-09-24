@@ -205,6 +205,9 @@ class _WelcomeAssessmentIntroScreenState
                     isTablet ? 390.0 : 310.0,
                   );
                   final contentWidth = math.min(width - 32, 430.0);
+                  // The ribbon PNG has 72 transparent pixels on each side.
+                  // Expand its layout so the visible colors align with the chart.
+                  final ribbonWidth = contentWidth * 2172 / 2028;
                   const contentLift = 25.0;
                   final contentTop =
                       math.max(
@@ -357,8 +360,16 @@ class _WelcomeAssessmentIntroScreenState
                                   children: [
                                     Transform.translate(
                                       offset: const Offset(0, -24),
-                                      child: AssessmentGradeRibbon(
-                                        currentGrade: _currentGrade,
+                                      child: SizedBox(
+                                        height: 90,
+                                        child: OverflowBox(
+                                          alignment: Alignment.center,
+                                          minWidth: ribbonWidth,
+                                          maxWidth: ribbonWidth,
+                                          child: AssessmentGradeRibbon(
+                                            currentGrade: _currentGrade,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 8),

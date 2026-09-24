@@ -364,6 +364,11 @@ void main() {
       final chartRect = tester.getRect(
         find.byKey(const ValueKey('placement-progression-chart')),
       );
+      final ribbonRect = tester.getRect(
+        find.byKey(const ValueKey('placement-grade-ribbon')),
+      );
+      expect(ribbonRect.center.dx, closeTo(chartRect.center.dx, 1));
+      expect(ribbonRect.width * 2028 / 2172, closeTo(chartRect.width, 1));
       final plotRect = tester.getRect(
         find.byKey(const ValueKey('placement-progression-plot')),
       );
