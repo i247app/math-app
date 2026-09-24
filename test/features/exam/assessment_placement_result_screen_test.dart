@@ -68,7 +68,7 @@ void main() {
     expect(find.byType(AssessmentResultScreen), findsNothing);
     expect(find.byType(PageHeader), findsOneWidget);
     expect(find.text('Kết Quả'), findsOneWidget);
-    expect(find.text('Trình độ'), findsNWidgets(2));
+    expect(find.text('Trình độ'), findsOneWidget);
     expect(find.text('MẪU GIÁO'), findsOneWidget);
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
@@ -677,7 +677,14 @@ void main() {
         find.byKey(const ValueKey('placement-progression-chart')),
         findsOneWidget,
       );
-      expect(find.text('L2'), findsOneWidget);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('placement-progression-current-grade')),
+            )
+            .data,
+        '2',
+      );
       expect(find.text('Bài 5'), findsOneWidget);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
@@ -766,14 +773,19 @@ void main() {
 
       // Finish animation
       await tester.pumpAndSettle();
-      expect(find.text('L2'), findsOneWidget);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('placement-progression-current-grade')),
+            )
+            .data,
+        '2',
+      );
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('chart shows current grade without redundant grade text', (
-    tester,
-  ) async {
+  testWidgets('chart shows grade title above the large number', (tester) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     await lingo.setLanguage(AppLanguage.en);
@@ -795,9 +807,16 @@ void main() {
       ),
     );
 
-    expect(find.text('G1'), findsOneWidget);
+    final currentGrade = find.byKey(
+      const ValueKey('placement-progression-current-grade'),
+    );
+    expect(tester.widget<Text>(currentGrade).data, '1');
     expect(find.text('K'), findsOneWidget);
-    expect(find.text('Grade 1'), findsNothing);
+    expect(find.text('Level'), findsOneWidget);
+    expect(
+      tester.getBottomLeft(find.text('Level')).dy,
+      lessThan(tester.getTopLeft(currentGrade).dy),
+    );
     expect(
       find.byKey(const ValueKey('placement-progression-final-badge')),
       findsNothing,
@@ -821,7 +840,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('English grade-zero chart shows G0 and K axis', (tester) async {
+  testWidgets('English grade-zero chart shows 0 and Level label', (
+    tester,
+  ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     await lingo.setLanguage(AppLanguage.en);
@@ -839,10 +860,21 @@ void main() {
       ),
     );
 
-    expect(find.text('G0'), findsOneWidget);
-    expect(tester.widget<Text>(find.text('G0')).style?.fontSize, 64);
+    final currentGrade = find.byKey(
+      const ValueKey('placement-progression-current-grade'),
+    );
+    final gradeTitle = find.byKey(
+      const ValueKey('placement-progression-grade-title'),
+    );
+    expect(tester.widget<Text>(currentGrade).data, '0');
+    expect(tester.widget<Text>(currentGrade).style?.fontSize, 72);
+    expect(find.text('Level'), findsOneWidget);
+    expect(
+      tester.getCenter(gradeTitle).dx,
+      closeTo(tester.getCenter(currentGrade).dx, 1),
+    );
     expect(find.text('K'), findsOneWidget);
-    expect(find.text('Grade 0'), findsNothing);
+    expect(find.text('Grade'), findsNothing);
     expect(find.text('Kinder.'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -874,7 +906,14 @@ void main() {
     }
 
     await showSubmittedAt(DateTime.now().subtract(const Duration(hours: 2)));
-    expect(find.text('G2'), findsOneWidget);
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('placement-progression-current-grade')),
+          )
+          .data,
+      '2',
+    );
     expect(find.textContaining(RegExp(r' · \d{2}:\d{2}')), findsOneWidget);
 
     await showSubmittedAt(DateTime.now().subtract(const Duration(hours: 26)));
@@ -888,7 +927,14 @@ void main() {
 
     await lingo.setLanguage(AppLanguage.vi);
     await showSubmittedAt(DateTime.now().subtract(const Duration(days: 8)));
-    expect(find.text('L2'), findsOneWidget);
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('placement-progression-current-grade')),
+          )
+          .data,
+      '2',
+    );
     expect(find.text(' · 1 tuần trước'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -910,7 +956,14 @@ void main() {
       ),
     );
 
-    expect(find.text('L5'), findsOneWidget);
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('placement-progression-current-grade')),
+          )
+          .data,
+      '5',
+    );
     expect(find.text('Bài 1'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('placement-progression-plot')),
@@ -950,7 +1003,14 @@ void main() {
     expect(find.text('Bài 2'), findsNothing);
     expect(find.text('Bài 4'), findsNothing);
     expect(find.text('Bài 7'), findsOneWidget);
-    expect(find.text('L5'), findsOneWidget);
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('placement-progression-current-grade')),
+          )
+          .data,
+      '5',
+    );
     expect(tester.takeException(), isNull);
   });
 

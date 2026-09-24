@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/localization/app_language.dart';
-import 'package:numi/core/localization/lingo_scope.dart';
 
 // The first test sits on the Y axis; the last keeps room for its halo.
-const double _plotRightInset = 8;
+const double _plotRightInset = 12;
 
 double _pointX(int index, int count, double width) {
   if (count <= 1) return 0;
@@ -143,14 +141,11 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   Widget build(BuildContext context) {
     final points = _resolvePoints();
     final grade = widget.finalGrade.clamp(0, 5);
-    final levelLabel = context.getText(AppKeys.placementResultLevel);
     final testLabel = context.formatText(AppKeys.placementResultTest, {
       'number': _lastTestNumber(points.length),
     });
     final submittedTimeLabel = _submittedTimeLabel(context);
-    final gradePrefix = LingoScope.of(context).language == AppLanguage.vi
-        ? 'L'
-        : 'G';
+    final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
     return LayoutBuilder(
       builder: (context, constraints) {
         final chartHeight = constraints.hasBoundedHeight
@@ -175,13 +170,16 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                 children: [
                   const _StairsIcon(),
                   const SizedBox(width: 12),
-                  Expanded(
-                    flex: 1,
+                  SizedBox(
+                    width: 79,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.center,
                       child: Text(
-                        levelLabel,
+                        gradeDescription,
+                        key: const ValueKey(
+                          'placement-progression-grade-title',
+                        ),
                         style: GoogleFonts.andika(
                           color: const Color(0xFF1C3A43),
                           fontSize: 22,
@@ -233,18 +231,42 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 96,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '$gradePrefix$grade',
-                        style: GoogleFonts.andika(
-                          color: const Color(0xFF1C3A43),
-                          fontSize: 64,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
-                        ),
+                    width: 115,
+                    child: Padding(
+                      // Keep the number centered under the grade title.
+                      padding: const EdgeInsets.only(left: 36),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 79,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
+                              child: Text(
+                                '$grade',
+                                key: const ValueKey(
+                                  'placement-progression-current-grade',
+                                ),
+                                style: GoogleFonts.andika(
+                                  color: const Color(0xFF1C3A43),
+                                  fontSize: 72,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Reserve the old caption's height so the number
+                          // keeps its vertical position when the caption hides.
+                          SizedBox(
+                            height: math.min(
+                              30.0,
+                              math.max(0.0, chartHeight - 74.0),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

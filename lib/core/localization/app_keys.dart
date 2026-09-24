@@ -855,6 +855,7 @@ class AppKeys {
   static const placementResultWeakTopics = 'placement_result_weak_topics';
   static const placementResultYouAreHere = 'placement_result_you_are_here';
   static const placementResultRibbonGrade = 'placement_result_ribbon_grade';
+  static const placementResultChartGrade = 'placement_result_chart_grade';
   static const placementResultKindergartenShort =
       'placement_result_kindergarten_short';
   static const placementResultTest = 'placement_result_test';

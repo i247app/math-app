@@ -338,8 +338,21 @@ void main() {
       expect(chart.testNumbers, <int>[1, 2]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 2));
       expect(chart.maxVisiblePoints, isNull);
-      expect(find.text('L3'), findsOneWidget);
-      expect(tester.widget<Text>(find.text('L3')).style?.fontSize, 64);
+      final currentGrade = find.byKey(
+        const ValueKey('placement-progression-current-grade'),
+      );
+      expect(tester.widget<Text>(currentGrade).data, '3');
+      expect(tester.widget<Text>(currentGrade).style?.fontSize, 72);
+      expect(find.text('Trình độ'), findsNothing);
+      expect(find.text('Level'), findsOneWidget);
+      expect(
+        tester.getBottomLeft(find.text('Level')).dy,
+        lessThan(tester.getTopLeft(currentGrade).dy),
+      );
+      expect(
+        tester.getCenter(find.text('Level')).dx,
+        closeTo(tester.getCenter(currentGrade).dx, 1),
+      );
       expect(
         tester
             .getRect(
@@ -358,7 +371,7 @@ void main() {
         find.byKey(const ValueKey('placement-progression-tick-3')),
       );
       expect(plotRect.left - gradeTickRect.right, closeTo(12, 0.5));
-      expect(plotRect.width, greaterThan(140));
+      expect(plotRect.width, closeTo(chartRect.width - 200, 1));
       final submittedTimeRect = tester.getRect(
         find.byKey(const ValueKey('placement-progression-submitted-time')),
       );
