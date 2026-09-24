@@ -40,7 +40,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.resendOtp: 'Gửi lại mã',
     AppKeys.resendOtpAfter: 'Gửi lại mã sau {seconds} giây',
     AppKeys.signupNameHint: 'vd: quoc, quyen',
-    AppKeys.signupEmailHint: 'example@numinumi.com',
+    AppKeys.signupEmailHint: 'numisilly@gmail.com',
     AppKeys.signupNameLabel: 'Tên',
     AppKeys.signupNameInvalid: 'Tên chỉ được gồm chữ, số và khoảng trắng.',
     AppKeys.signupUsernameExists: 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
@@ -124,7 +124,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.resendOtp: 'Resend code',
     AppKeys.resendOtpAfter: 'Resend code in {seconds}s',
     AppKeys.signupNameHint: 'ex: quoc, quyen',
-    AppKeys.signupEmailHint: 'example@numinumi.com',
+    AppKeys.signupEmailHint: 'numisilly@gmail.com',
     AppKeys.signupNameLabel: 'First Name',
     AppKeys.signupNameInvalid:
         'First name can only include letters, numbers, and spaces.',

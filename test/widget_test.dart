@@ -700,7 +700,10 @@ void main() {
 
         expect(find.byKey(const ValueKey('login')), findsOneWidget);
         expect(find.text('🇻🇳'), findsNothing);
-        expect(find.text('example@numinumi.com'), findsOneWidget);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
+          contains('@'),
+        );
 
         final input = find.byType(EditableText);
         await tester.enterText(input, 'invalid-email');

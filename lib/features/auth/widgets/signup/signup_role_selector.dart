@@ -17,9 +17,16 @@ class SignupRoleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const visibleRoles = <SignupRole>[
+      SignupRole.student,
+      SignupRole.parent,
+      // TODO: Bật lại lựa chọn Giáo viên khi luồng đăng ký giáo viên sẵn sàng.
+      // SignupRole.teacher,
+    ];
+
     return Row(
       children: [
-        for (final role in SignupRole.values) ...[
+        for (final role in visibleRoles) ...[
           Expanded(
             child: SignupRoleCard(
               label: context.getText(_labelKey(role)),
@@ -28,7 +35,7 @@ class SignupRoleSelector extends StatelessWidget {
               onTap: () => onChanged(role),
             ),
           ),
-          if (role != SignupRole.values.last) const SizedBox(width: 10),
+          if (role != visibleRoles.last) const SizedBox(width: 10),
         ],
       ],
     );
