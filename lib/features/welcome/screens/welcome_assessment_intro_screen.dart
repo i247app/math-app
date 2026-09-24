@@ -49,6 +49,7 @@ class _WelcomeAssessmentIntroScreenState
   int _currentGrade = 0;
   List<int> _previousGrades = const <int>[];
   List<int> _testNumbers = const <int>[1];
+  DateTime? _lastSubmittedAt;
   int _chartRequestId = 0;
   final ScrollController _chartScrollController = ScrollController();
 
@@ -93,6 +94,7 @@ class _WelcomeAssessmentIntroScreenState
         _testNumbers = points.isEmpty
             ? const <int>[1]
             : points.map((point) => point.sequence).toList(growable: false);
+        _lastSubmittedAt = points.isEmpty ? null : points.last.completedDt;
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted &&
@@ -110,6 +112,31 @@ class _WelcomeAssessmentIntroScreenState
         setState(() => _isLoadingHistory = false);
       }
     }
+  }
+
+  Widget _buildProgressChart(double width, double availableHeight) {
+    return SizedBox(
+      key: const ValueKey('welcome-assessment-intro-chart'),
+      width: width,
+      child: SingleChildScrollView(
+        controller: _chartScrollController,
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: math.max(width, 210.0 + (_testNumbers.length - 1) * 64.0),
+          child: AssessmentProgressionChart(
+            finalGrade: _currentGrade,
+            previousGrades: _previousGrades,
+            testNumbers: _testNumbers,
+            lastSubmittedAt: _lastSubmittedAt,
+            maxVisiblePoints: null,
+            chartHeight: math.max(
+              100.0,
+              math.min(180.0, availableHeight - 140.0),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -330,50 +357,19 @@ class _WelcomeAssessmentIntroScreenState
                                     Expanded(
                                       child: Center(
                                         child: _hasExamProgress
-                                            ? FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: SizedBox(
-                                                  key: const ValueKey(
-                                                    'welcome-assessment-intro-chart',
-                                                  ),
-                                                  width: contentWidth,
-                                                  child: SingleChildScrollView(
-                                                    controller:
-                                                        _chartScrollController,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: SizedBox(
-                                                      width: math.max(
-                                                        contentWidth,
-                                                        72.0 +
-                                                            (_testNumbers
-                                                                        .length -
-                                                                    1) *
-                                                                64.0,
-                                                      ),
+                                            ? height < 700
+                                                  ? FittedBox(
+                                                      fit: BoxFit.scaleDown,
                                                       child:
-                                                          AssessmentProgressionChart(
-                                                            finalGrade:
-                                                                _currentGrade,
-                                                            previousGrades:
-                                                                _previousGrades,
-                                                            testNumbers:
-                                                                _testNumbers,
-                                                            maxVisiblePoints:
-                                                                null,
-                                                            chartHeight: math.max(
-                                                              100.0,
-                                                              math.min(
-                                                                180.0,
-                                                                contentHeight -
-                                                                    140,
-                                                              ),
-                                                            ),
+                                                          _buildProgressChart(
+                                                            contentWidth,
+                                                            contentHeight,
                                                           ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
+                                                    )
+                                                  : _buildProgressChart(
+                                                      contentWidth,
+                                                      contentHeight,
+                                                    )
                                             : Image.asset(
                                                 WelcomeAssessmentIntroScreen
                                                     ._mascotAsset,

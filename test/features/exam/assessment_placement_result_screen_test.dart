@@ -68,13 +68,13 @@ void main() {
     expect(find.byType(AssessmentResultScreen), findsNothing);
     expect(find.byType(PageHeader), findsOneWidget);
     expect(find.text('Kết Quả'), findsOneWidget);
-    expect(find.text('Trình độ'), findsOneWidget);
+    expect(find.text('Trình độ'), findsNWidgets(2));
     expect(find.text('MẪU GIÁO'), findsOneWidget);
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
     expect(find.text('Xem chi tiết'), findsOneWidget);
     expect(find.text('Luyện tập'), findsOneWidget);
-    final levelRect = tester.getRect(find.text('Trình độ'));
+    final levelRect = tester.getRect(find.text('Trình độ').first);
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
     );
@@ -365,9 +365,9 @@ void main() {
         'assets/images/grade-ribbon-numbers.png',
       ),
     );
-    expect(find.text('Grade'), findsOneWidget);
-    expect(find.text('Lớp'), findsNothing);
-    expect(tester.widget<Text>(find.text('Grade')).style?.color, Colors.black);
+    expect(find.text('GRADE'), findsOneWidget);
+    expect(find.text('LỚP'), findsNothing);
+    expect(tester.widget<Text>(find.text('GRADE')).style?.color, Colors.black);
 
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
@@ -390,11 +390,18 @@ void main() {
       tester.getRect(find.byKey(const ValueKey('placement-grade-container'))),
       vietnameseGradeContainerRect,
     );
-    expect(
-      tester.getRect(find.byKey(const ValueKey('placement-view-details'))),
-      vietnameseDetailsButtonRect,
+    final detailsButtonRect = tester.getRect(
+      find.byKey(const ValueKey('placement-view-details')),
     );
-    expect(practiceButtonRect, vietnamesePracticeButtonRect);
+    expect(detailsButtonRect.left, vietnameseDetailsButtonRect.left);
+    expect(detailsButtonRect.size, vietnameseDetailsButtonRect.size);
+    expect(detailsButtonRect.top, closeTo(vietnameseDetailsButtonRect.top, 5));
+    expect(practiceButtonRect.left, vietnamesePracticeButtonRect.left);
+    expect(practiceButtonRect.size, vietnamesePracticeButtonRect.size);
+    expect(
+      practiceButtonRect.top,
+      closeTo(vietnamesePracticeButtonRect.top, 5),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -440,7 +447,7 @@ void main() {
     final markerLabel = find.byKey(
       const ValueKey('placement-current-grade-label'),
     );
-    expect(find.text('Lớp'), findsOneWidget);
+    expect(find.text('LỚP'), findsOneWidget);
     expect(tester.widget<Text>(markerLabel).style?.color, Colors.black);
     expect(
       tester.getBottomLeft(markerLabel).dy,
@@ -471,7 +478,7 @@ void main() {
     );
     expect(find.text('Bài 1'), findsOneWidget);
     expect(find.text('Bài 5'), findsNothing);
-    expect(find.text('M.Giáo'), findsOneWidget);
+    expect(find.text('K'), findsOneWidget);
     final ribbonImage = tester.widget<Image>(
       find.descendant(
         of: find.byKey(const ValueKey('placement-grade-ribbon')),
@@ -614,7 +621,8 @@ void main() {
       expect(chart.finalGrade, 5);
       expect(chart.firstTestNumber, 2);
       expect(chart.testNumbers, [2, 3, 4, 5, 6]);
-      expect(find.text('Bài 2'), findsOneWidget);
+      expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 6));
+      expect(find.text('Bài 2'), findsNothing);
       expect(find.text('Bài 6'), findsOneWidget);
       expect(find.text('Bài 1'), findsNothing);
       expect(
@@ -669,9 +677,8 @@ void main() {
         find.byKey(const ValueKey('placement-progression-chart')),
         findsOneWidget,
       );
-      // Both previous grade (Lớp 3) and current grade (Lớp 2) badges are present in the transition
-      expect(find.text('Lớp 3'), findsWidgets);
-      expect(find.text('Lớp 2'), findsWidgets);
+      expect(find.text('L2'), findsOneWidget);
+      expect(find.text('Bài 5'), findsOneWidget);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
       );
@@ -759,13 +766,12 @@ void main() {
 
       // Finish animation
       await tester.pumpAndSettle();
-      expect(find.text('Lớp 3'), findsWidgets);
-      expect(find.text('Lớp 2'), findsWidgets);
+      expect(find.text('L2'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
 
-  testWidgets('chart shows only the final grade badge, not a previous badge', (
+  testWidgets('chart shows current grade without redundant grade text', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -789,14 +795,33 @@ void main() {
       ),
     );
 
-    expect(find.text('Grade 0'), findsOneWidget);
-    expect(find.text('Grade 1'), findsNWidgets(2));
+    expect(find.text('G1'), findsOneWidget);
+    expect(find.text('K'), findsOneWidget);
+    expect(find.text('Grade 1'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('placement-progression-final-badge')),
+      findsNothing,
+    );
+    final plot = tester.getRect(
+      find.byKey(const ValueKey('placement-progression-plot')),
+    );
+    for (final grade in <int>[5, 3, 0]) {
+      final label = find.byKey(
+        ValueKey('placement-progression-axis-label-$grade'),
+      );
+      final tick = find.byKey(ValueKey('placement-progression-tick-$grade'));
+      final expectedY = plot.top + 12 + (5 - grade) * (plot.height - 24) / 5;
+      expect(
+        tester.getCenter(label).dy,
+        closeTo(tester.getCenter(tick).dy, 0.5),
+      );
+      expect(tester.getCenter(label).dy, closeTo(expectedY, 0.5));
+      expect(tester.widget<Text>(label).style?.fontSize, 14);
+    }
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('English grade-zero chart shows Grade 0 on axis and badge', (
-    tester,
-  ) async {
+  testWidgets('English grade-zero chart shows G0 and K axis', (tester) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     await lingo.setLanguage(AppLanguage.en);
@@ -814,14 +839,61 @@ void main() {
       ),
     );
 
-    expect(find.text('Grade 0'), findsNWidgets(2));
+    expect(find.text('G0'), findsOneWidget);
+    expect(tester.widget<Text>(find.text('G0')).style?.fontSize, 64);
+    expect(find.text('K'), findsOneWidget);
+    expect(find.text('Grade 0'), findsNothing);
     expect(find.text('Kinder.'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('single assessment aligns its label and badge with the y axis', (
+  testWidgets('chart formats last submission time in both languages', (
     tester,
   ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await lingo.setLanguage(AppLanguage.en);
+
+    Future<void> showSubmittedAt(DateTime submittedAt) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LingoScope(
+            lingo: lingo,
+            child: Scaffold(
+              body: Center(
+                child: AssessmentProgressionChart(
+                  finalGrade: 2,
+                  lastSubmittedAt: submittedAt,
+                  animate: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    await showSubmittedAt(DateTime.now().subtract(const Duration(hours: 2)));
+    expect(find.text('G2'), findsOneWidget);
+    expect(find.textContaining(RegExp(r' · \d{2}:\d{2}')), findsOneWidget);
+
+    await showSubmittedAt(DateTime.now().subtract(const Duration(hours: 26)));
+    expect(find.text(' · 1 day ago'), findsOneWidget);
+
+    await showSubmittedAt(DateTime.now().subtract(const Duration(days: 8)));
+    expect(find.text(' · 1 week ago'), findsOneWidget);
+
+    await showSubmittedAt(DateTime.now().subtract(const Duration(days: 65)));
+    expect(find.text(' · 2 months ago'), findsOneWidget);
+
+    await lingo.setLanguage(AppLanguage.vi);
+    await showSubmittedAt(DateTime.now().subtract(const Duration(days: 8)));
+    expect(find.text('L2'), findsOneWidget);
+    expect(find.text(' · 1 tuần trước'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('single assessment uses the new level card', (tester) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
 
@@ -838,22 +910,20 @@ void main() {
       ),
     );
 
-    final plotLeft = tester
-        .getTopLeft(find.byKey(const ValueKey('placement-progression-plot')))
-        .dx;
-    final badgeLeft = tester
-        .getTopLeft(
-          find.byKey(const ValueKey('placement-progression-final-badge')),
-        )
-        .dx;
-    final labelCenter = tester.getCenter(find.text('Bài 1')).dx;
-
-    expect(badgeLeft, inInclusiveRange(plotLeft, plotLeft + 16));
-    expect(labelCenter, closeTo(plotLeft, 1));
+    expect(find.text('L5'), findsOneWidget);
+    expect(find.text('Bài 1'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('placement-progression-plot')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-progression-final-badge')),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('test labels are centered under their chart points', (
+  testWidgets('header identifies the latest test without per-point labels', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -877,22 +947,14 @@ void main() {
       ),
     );
 
-    final plot = tester.getRect(
-      find.byKey(const ValueKey('placement-progression-plot')),
-    );
-    expect(tester.getCenter(find.text('Bài 2')).dx, closeTo(plot.left, 1));
-    expect(
-      tester.getCenter(find.text('Bài 4')).dx,
-      closeTo(plot.left + (plot.width - 28) / 2, 1),
-    );
-    expect(
-      tester.getCenter(find.text('Bài 7')).dx,
-      closeTo(plot.right - 28, 1),
-    );
+    expect(find.text('Bài 2'), findsNothing);
+    expect(find.text('Bài 4'), findsNothing);
+    expect(find.text('Bài 7'), findsOneWidget);
+    expect(find.text('L5'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('last test label stays inside a narrow chart', (tester) async {
+  testWidgets('latest test header stays inside a narrow chart', (tester) async {
     tester.view.physicalSize = const Size(264, 190);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -924,12 +986,8 @@ void main() {
     final chart = tester.getRect(
       find.byKey(const ValueKey('placement-progression-chart')),
     );
-    final plot = tester.getRect(
-      find.byKey(const ValueKey('placement-progression-plot')),
-    );
     final lastLabel = tester.getRect(find.text('Test 2'));
-    expect(tester.getCenter(find.text('Test 1')).dx, closeTo(plot.left, 1));
-    expect(lastLabel.center.dx, closeTo(plot.right - 28, 1));
+    expect(find.text('Test 1'), findsNothing);
     expect(lastLabel.right, lessThan(chart.right));
     expect(tester.takeException(), isNull);
   });

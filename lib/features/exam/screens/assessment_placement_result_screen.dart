@@ -70,6 +70,7 @@ class _AssessmentPlacementResultScreenState
   List<int> _resolvedPreviousGrades = const <int>[];
   List<int> _resolvedPreviousTestNumbers = const <int>[];
   int _resolvedCurrentTestNumber = 1;
+  DateTime? _resolvedCurrentSubmittedAt;
 
   int get _grade =>
       AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
@@ -117,6 +118,7 @@ class _AssessmentPlacementResultScreenState
       if (mounted) {
         setState(() {
           if (!hasUsableProgress) {
+            _resolvedCurrentSubmittedAt = null;
             _resolvedPreviousGrades = widget.previousGrade == null
                 ? const <int>[]
                 : <int>[widget.previousGrade!];
@@ -176,6 +178,7 @@ class _AssessmentPlacementResultScreenState
         .map((point) => point.sequence)
         .toList(growable: false);
     _resolvedCurrentTestNumber = currentTestNumber;
+    _resolvedCurrentSubmittedAt = currentPoint?.completedDt;
     return true;
   }
 
@@ -446,6 +449,7 @@ class _AssessmentPlacementResultScreenState
                             firstTestNumber:
                                 _resolvedCurrentTestNumber -
                                 _resolvedPreviousGrades.length,
+                            lastSubmittedAt: _resolvedCurrentSubmittedAt,
                             chartHeight: isCompact ? 145.0 : 180.0,
                           ),
                         ),

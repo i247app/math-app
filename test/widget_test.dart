@@ -263,6 +263,10 @@ void main() {
     testWidgets('assessment intro shows journey chart without stats', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(720, 1600);
+      tester.view.devicePixelRatio = 2;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final examService = _IntroHistoryExamService(
         stats: const <ExamStats>[],
         progress: ExamProgressResponse(
@@ -332,7 +336,33 @@ void main() {
       expect(chart.previousGrades, <int>[1]);
       expect(chart.finalGrade, 3);
       expect(chart.testNumbers, <int>[1, 2]);
+      expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 2));
       expect(chart.maxVisiblePoints, isNull);
+      expect(find.text('L3'), findsOneWidget);
+      expect(tester.widget<Text>(find.text('L3')).style?.fontSize, 64);
+      expect(
+        tester
+            .getRect(
+              find.byKey(const ValueKey('welcome-assessment-intro-chart')),
+            )
+            .width,
+        closeTo(328, 1),
+      );
+      final chartRect = tester.getRect(
+        find.byKey(const ValueKey('placement-progression-chart')),
+      );
+      final plotRect = tester.getRect(
+        find.byKey(const ValueKey('placement-progression-plot')),
+      );
+      final gradeTickRect = tester.getRect(
+        find.byKey(const ValueKey('placement-progression-tick-3')),
+      );
+      expect(plotRect.left - gradeTickRect.right, closeTo(12, 0.5));
+      expect(plotRect.width, greaterThan(140));
+      final submittedTimeRect = tester.getRect(
+        find.byKey(const ValueKey('placement-progression-submitted-time')),
+      );
+      expect(submittedTimeRect.right, closeTo(chartRect.right - 19, 1));
       expect(examService.statsCalls, 0);
       expect(examService.progressCalls, 1);
     });
@@ -380,7 +410,8 @@ void main() {
       expect(chart.finalGrade, 1);
       expect(chart.testNumbers, <int>[1, 2, 3, 4, 5, 6, 7]);
       expect(chart.maxVisiblePoints, isNull);
-      expect(find.text('Bài 1'), findsOneWidget);
+      expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 7));
+      expect(find.text('Bài 1'), findsNothing);
       expect(find.text('Bài 7'), findsOneWidget);
       final scrollable = find.descendant(
         of: find.byKey(const ValueKey('welcome-assessment-intro-chart')),

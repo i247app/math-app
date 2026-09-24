@@ -1,16 +1,19 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/localization/lingo_scope.dart';
 
-// Keep the final point and its centered test label clear of the right edge.
-const double _plotRightInset = 28.0;
+// The first test sits on the Y axis; the last keeps room for its halo.
+const double _plotRightInset = 8;
 
-double _pointX(int index, int pointCount, double width) {
-  if (pointCount <= 1) return 0.0;
-  final usableWidth = width > _plotRightInset ? width - _plotRightInset : 0.0;
-  return usableWidth * index / (pointCount - 1);
+double _pointX(int index, int count, double width) {
+  if (count <= 1) return 0;
+  return math.max(0, width - _plotRightInset) * index / (count - 1);
 }
 
 class AssessmentProgressionChart extends StatefulWidget {
@@ -21,7 +24,8 @@ class AssessmentProgressionChart extends StatefulWidget {
     this.testNumbers,
     this.firstTestNumber = 1,
     this.maxVisiblePoints = 5,
-    this.chartHeight = 150.0,
+    this.chartHeight = 150,
+    this.lastSubmittedAt,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
   }) : assert(maxVisiblePoints == null || maxVisiblePoints > 0);
@@ -30,21 +34,11 @@ class AssessmentProgressionChart extends StatefulWidget {
   final List<int> previousGrades;
   final List<int>? testNumbers;
   final int firstTestNumber;
-
-  /// Set to null to plot the full history. Other placements keep five points.
   final int? maxVisiblePoints;
   final double chartHeight;
+  final DateTime? lastSubmittedAt;
   final bool animate;
   final Duration animationDuration;
-
-  static const List<_YAxisGradeConfig> _yGrades = [
-    _YAxisGradeConfig(barColor: Color(0xFFFF8A80), level: 5),
-    _YAxisGradeConfig(barColor: Color(0xFFFFA726), level: 4),
-    _YAxisGradeConfig(barColor: Color(0xFFFFD54F), level: 3),
-    _YAxisGradeConfig(barColor: Color(0xFF81C784), level: 2),
-    _YAxisGradeConfig(barColor: Color(0xFF4DD0E1), level: 1),
-    _YAxisGradeConfig(barColor: Color(0xFF26C6DA), level: 0),
-  ];
 
   @override
   State<AssessmentProgressionChart> createState() =>
@@ -67,11 +61,10 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
       parent: _controller,
       curve: Curves.easeInOutCubic,
     );
-
     if (widget.animate) {
       _controller.forward();
     } else {
-      _controller.value = 1.0;
+      _controller.value = 1;
     }
   }
 
@@ -79,18 +72,16 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   void didUpdateWidget(covariant AssessmentProgressionChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!widget.animate) {
-      _controller.value = 1.0;
+      _controller.value = 1;
       return;
     }
-
-    final dataChanged =
+    if (!oldWidget.animate ||
         oldWidget.finalGrade != widget.finalGrade ||
         !listEquals(oldWidget.previousGrades, widget.previousGrades) ||
         !listEquals(oldWidget.testNumbers, widget.testNumbers) ||
         oldWidget.firstTestNumber != widget.firstTestNumber ||
-        oldWidget.maxVisiblePoints != widget.maxVisiblePoints;
-    if (!oldWidget.animate || dataChanged) {
-      _controller.forward(from: 0.0);
+        oldWidget.maxVisiblePoints != widget.maxVisiblePoints) {
+      _controller.forward(from: 0);
     }
   }
 
@@ -101,7 +92,6 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   }
 
   List<double> _resolvePoints() {
-    final target = widget.finalGrade.clamp(0, 5).toDouble();
     final historyLimit = widget.maxVisiblePoints == null
         ? null
         : widget.maxVisiblePoints! - 1;
@@ -111,439 +101,368 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
             widget.previousGrades.length - historyLimit,
           )
         : widget.previousGrades;
-    return <double>[
+    return [
       ...history.map((grade) => grade.clamp(0, 5).toDouble()),
-      target,
+      widget.finalGrade.clamp(0, 5).toDouble(),
     ];
   }
 
-  String _gradeLabel(BuildContext context, int grade) {
-    if (grade <= 0) {
-      return context.getText(AppKeys.placementResultKindergartenShort);
+  int _lastTestNumber(int pointCount) {
+    if (widget.testNumbers != null && widget.testNumbers!.isNotEmpty) {
+      return widget.testNumbers!.last;
     }
-    return context.formatText(AppKeys.placementResultRibbonGrade, {
-      'grade': grade,
+    return widget.firstTestNumber + pointCount - 1;
+  }
+
+  String? _submittedTimeLabel(BuildContext context) {
+    final submittedAt = widget.lastSubmittedAt;
+    if (submittedAt == null) return null;
+    final elapsed = DateTime.now().difference(submittedAt);
+    if (elapsed.inDays < 1) {
+      final local = submittedAt.toLocal();
+      return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+    }
+    final days = elapsed.inDays;
+    final count = days >= 30
+        ? days ~/ 30
+        : days >= 7
+        ? days ~/ 7
+        : days;
+    final key = days >= 30
+        ? AppKeys.placementResultMonthsAgo
+        : days >= 7
+        ? AppKeys.placementResultWeeksAgo
+        : AppKeys.placementResultDaysAgo;
+    return context.formatText(key, {
+      'count': count,
+      'plural': count == 1 ? '' : 's',
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final points = _resolvePoints();
-    final pointCount = points.length;
-
-    return Container(
-      key: const ValueKey('placement-progression-chart'),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEEEEEE), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    final grade = widget.finalGrade.clamp(0, 5);
+    final levelLabel = context.getText(AppKeys.placementResultLevel);
+    final testLabel = context.formatText(AppKeys.placementResultTest, {
+      'number': _lastTestNumber(points.length),
+    });
+    final submittedTimeLabel = _submittedTimeLabel(context);
+    final gradePrefix = LingoScope.of(context).language == AppLanguage.vi
+        ? 'L'
+        : 'G';
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chartHeight = constraints.hasBoundedHeight
+            ? math.min(
+                widget.chartHeight,
+                math.max(60.0, constraints.maxHeight - 90.0),
+              )
+            : widget.chartHeight;
+        final axisRowHeight = math.min(24.0, chartHeight / 6);
+        return Container(
+          key: const ValueKey('placement-progression-chart'),
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFD8E6EA)),
+            borderRadius: BorderRadius.circular(28),
           ),
-        ],
-      ),
-      padding: const EdgeInsets.fromLTRB(10, 18, 14, 14),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Main chart row: Y-axis on left + Canvas on right
-          SizedBox(
-            height: widget.chartHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Y-Axis labels
-                SizedBox(
-                  width: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: AssessmentProgressionChart._yGrades.map((config) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                config.level == 0
-                                    ? context.getText(
-                                        AppKeys
-                                            .placementResultKindergartenShort,
-                                      )
-                                    : context.formatText(
-                                        AppKeys.placementResultRibbonGrade,
-                                        {'grade': config.level},
-                                      ),
-                                style: GoogleFonts.andika(
-                                  color: const Color(0xFF6B7280),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          Container(
-                            width: 3,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: config.barColor,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // Plot canvas
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return AnimatedBuilder(
-                        animation: _animation,
-                        builder: (context, child) {
-                          final progress = _animation.value;
-                          return Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              CustomPaint(
-                                key: const ValueKey(
-                                  'placement-progression-plot',
-                                ),
-                                size: Size(
-                                  constraints.maxWidth,
-                                  constraints.maxHeight,
-                                ),
-                                painter: _AssessmentChartPainter(
-                                  points: points,
-                                  yGradeCount: AssessmentProgressionChart
-                                      ._yGrades
-                                      .length,
-                                  animationProgress: progress,
-                                ),
-                              ),
-                              // Floating badge for final point
-                              _buildFinalPointBadge(
-                                constraints: constraints,
-                                points: points,
-                                label: _gradeLabel(context, widget.finalGrade),
-                                progress: progress,
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          // X-Axis labels row aligned with canvas
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(width: 48),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) => SizedBox(
-                    height: 16,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: List.generate(pointCount, (index) {
-                        final x = _pointX(
-                          index,
-                          pointCount,
-                          constraints.maxWidth,
-                        );
-                        return Positioned(
-                          left: x,
-                          top: 0,
-                          child: FractionalTranslation(
-                            translation: const Offset(-0.5, 0),
-                            child: Text(
-                              context.formatText(AppKeys.placementResultTest, {
-                                'number':
-                                    widget.testNumbers != null &&
-                                        index < widget.testNumbers!.length
-                                    ? widget.testNumbers![index]
-                                    : widget.firstTestNumber + index,
-                              }),
+              Row(
+                children: [
+                  const _StairsIcon(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 1,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        levelLabel,
+                        style: GoogleFonts.andika(
+                          color: const Color(0xFF1C3A43),
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              testLabel,
                               style: GoogleFonts.andika(
-                                color: const Color(0xFF9CA3AF),
-                                fontSize: 9.5,
+                                color: const Color(0xFF61747B),
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                            if (submittedTimeLabel != null)
+                              Text(
+                                ' · $submittedTimeLabel',
+                                key: const ValueKey(
+                                  'placement-progression-submitted-time',
+                                ),
+                                style: GoogleFonts.andika(
+                                  color: const Color(0xFF61747B),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 96,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '$gradePrefix$grade',
+                        style: GoogleFonts.andika(
+                          color: const Color(0xFF1C3A43),
+                          fontSize: 64,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: SizedBox(
+                      height: chartHeight,
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 29,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                for (var value = 5; value >= 0; value--)
+                                  SizedBox(
+                                    height: axisRowHeight,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              value == 0 ? 'K' : '$value',
+                                              key: ValueKey(
+                                                'placement-progression-axis-label-$value',
+                                              ),
+                                              style: GoogleFonts.andika(
+                                                color: const Color(0xFF61747B),
+                                                fontSize: math.min(
+                                                  14.0,
+                                                  axisRowHeight * 0.7,
+                                                ),
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          key: ValueKey(
+                                            'placement-progression-tick-$value',
+                                          ),
+                                          width: 4,
+                                          height: math.min(
+                                            12.0,
+                                            axisRowHeight * 0.5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _levelColor(value),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: AnimatedBuilder(
+                              animation: _animation,
+                              builder: (context, child) => CustomPaint(
+                                key: const ValueKey(
+                                  'placement-progression-plot',
+                                ),
+                                painter: _AssessmentChartPainter(
+                                  points: points,
+                                  progress: _animation.value,
+                                  axisInset: axisRowHeight / 2,
+                                ),
+                                size: Size.infinite,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFinalPointBadge({
-    required BoxConstraints constraints,
-    required List<double> points,
-    required String label,
-    required double progress,
-  }) {
-    if (points.isEmpty) return const SizedBox.shrink();
-    final lastPoint = points.last;
-    final height = constraints.maxHeight;
-    const yLevels = 5.0; // 0..5
-    final lastY = height - (lastPoint / yLevels) * height;
-
-    final badgeProgress = ((progress - 0.75) / 0.25).clamp(0.0, 1.0);
-    if (badgeProgress <= 0) return const SizedBox.shrink();
-
-    final scale = Curves.easeOutBack.transform(badgeProgress);
-
-    return Positioned(
-      left: points.length == 1 ? 8 : null,
-      right: points.length == 1 ? null : _plotRightInset,
-      top: (lastY - 26).clamp(0.0, height - 24),
-      child: Transform.scale(
-        scale: scale,
-        child: Opacity(
-          opacity: badgeProgress,
-          child: Container(
-            key: const ValueKey('placement-progression-final-badge'),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFA726),
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFA726).withValues(alpha: 0.3),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              label,
-              style: GoogleFonts.andika(
-                color: Colors.white,
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _YAxisGradeConfig {
-  const _YAxisGradeConfig({required this.barColor, required this.level});
+Color _levelColor(int value) => switch (value) {
+  5 => const Color(0xFFD75A4C),
+  4 => const Color(0xFFE18B30),
+  3 => const Color(0xFFD1AE31),
+  2 => const Color(0xFF48A05D),
+  1 => const Color(0xFF22A3A9),
+  _ => const Color(0xFF279BC0),
+};
 
-  final Color barColor;
-  final int level;
+class _StairsIcon extends StatelessWidget {
+  const _StairsIcon();
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: const Size(24, 24), painter: _StairsPainter());
+}
+
+class _StairsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF2D9CC2)
+      ..strokeWidth = 3
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    canvas.drawPath(
+      Path()
+        ..moveTo(1, 22)
+        ..lineTo(6, 22)
+        ..lineTo(6, 15)
+        ..lineTo(12, 15)
+        ..lineTo(12, 8)
+        ..lineTo(18, 8)
+        ..lineTo(18, 2)
+        ..lineTo(23, 2),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _StairsPainter oldDelegate) => false;
 }
 
 class _AssessmentChartPainter extends CustomPainter {
   const _AssessmentChartPainter({
     required this.points,
-    required this.yGradeCount,
-    required this.animationProgress,
+    required this.progress,
+    required this.axisInset,
   });
 
   final List<double> points;
-  final int yGradeCount;
-  final double animationProgress;
+  final double progress;
+  final double axisInset;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final width = size.width;
-    final height = size.height;
-
-    // 1. Draw horizontal gridlines and Y-axis line
     final gridPaint = Paint()
-      ..color = const Color(0xFFF0F2F5)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    final yAxisPaint = Paint()
-      ..color = const Color(0xFFE5E7EB)
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-
-    // Y-axis vertical line at x = 0
-    canvas.drawLine(const Offset(0, 0), Offset(0, height), yAxisPaint);
-
-    final levels = yGradeCount - 1; // 5 levels between 6 labels
-    for (var i = 0; i <= levels; i++) {
-      final y = height * (i / levels);
-      canvas.drawLine(Offset(0, y), Offset(width, y), gridPaint);
+      ..color = const Color(0xFFE5ECEE)
+      ..strokeWidth = 1;
+    final plotHeight = math.max(0.0, size.height - 2 * axisInset);
+    double yForGrade(double grade) => axisInset + plotHeight * (1 - grade / 5);
+    for (var grade = 0; grade <= 5; grade++) {
+      final y = yForGrade(grade.toDouble());
+      canvas.drawLine(
+        Offset.zero.translate(0, y),
+        Offset(size.width, y),
+        gridPaint,
+      );
     }
-
     if (points.isEmpty) return;
 
-    // 2. Map every supplied chart point across the available plot width.
-    final count = points.length;
-    final offsets = <Offset>[];
-    for (var i = 0; i < count; i++) {
-      final x = _pointX(i, count, width);
-      final val = points[i].clamp(0.0, 5.0);
-      final y = height - (val / 5.0) * height;
-      offsets.add(Offset(x, y));
-    }
-
-    final progress = animationProgress.clamp(0.0, 1.0);
-    final lastSegmentIndex = count - 2;
-    final segmentProgress = count > 1 ? progress : 1.0;
-    final segmentStart = count > 1 ? offsets[lastSegmentIndex] : offsets.last;
-    final currentHead = count > 1
-        ? Offset.lerp(segmentStart, offsets.last, segmentProgress)!
-        : offsets.last;
-    final currentVal = count > 1
-        ? points[lastSegmentIndex] +
-              (points.last - points[lastSegmentIndex]) * segmentProgress
-        : points.last;
-
-    // Keep every historical segment visible; only the final segment animates.
-    if (count > 1) {
-      final areaPath = Path()..moveTo(offsets.first.dx, offsets.first.dy);
-      for (var i = 1; i < count - 1; i++) {
-        areaPath.lineTo(offsets[i].dx, offsets[i].dy);
-      }
-      areaPath
-        ..lineTo(currentHead.dx, currentHead.dy)
-        ..lineTo(currentHead.dx, height)
-        ..lineTo(offsets.first.dx, height)
-        ..close();
-
-      final areaShader = const LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [
-          Color(0x3500B4D8), // Cyan
-          Color(0x3526A69A), // Teal
-          Color(0x3566BB6A), // Green
-          Color(0x45FDD835), // Yellow
-          Color(0x50FFA726), // Orange
-        ],
-        stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, width, height));
-
-      final areaPaint = Paint()
-        ..shader = areaShader
-        ..style = PaintingStyle.fill;
-
-      canvas.drawPath(areaPath, areaPaint);
-    }
-
-    // 3. Draw historical segments followed by the animated new segment.
-    for (var i = 0; i < count - 1; i++) {
-      final isNewSegment = i == lastSegmentIndex;
-      if (isNewSegment && segmentProgress <= 0) continue;
-
-      final startPt = offsets[i];
-      final endPt = isNewSegment ? currentHead : offsets[i + 1];
-      final color1 = _colorForValue(points[i]);
-      final color2 = _colorForValue(isNewSegment ? currentVal : points[i + 1]);
-      final linePaint = Paint()
-        ..strokeWidth = 3.2
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke;
-
-      if (color1 == color2 || (endPt - startPt).distance < 1.0) {
-        linePaint.color = color1;
-      } else {
-        linePaint.shader = LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [color1, color2],
-        ).createShader(Rect.fromPoints(startPt, endPt));
-      }
-      canvas.drawLine(startPt, endPt, linePaint);
-    }
-
-    // Draw all completed assessment points; reveal the new point at the end.
-    for (var i = 0; i < count - 1; i++) {
-      _drawHistoricalPoint(canvas, offsets[i], _colorForValue(points[i]));
-    }
-    if (count == 1 || progress >= 1.0) {
-      final pointColor = _colorForValue(points.last);
-      final haloRadius = count == 1
-          ? 10.0
-          : 10.0 *
-                Curves.easeOutBack.transform(
-                  ((progress - 0.9) / 0.1).clamp(0.0, 1.0),
-                );
-      canvas.drawCircle(
-        offsets.last,
-        haloRadius,
-        Paint()..color = pointColor.withValues(alpha: 0.25),
-      );
-      canvas.drawCircle(offsets.last, 5.5, Paint()..color = pointColor);
-      canvas.drawCircle(offsets.last, 2.5, Paint()..color = Colors.white);
-    }
-
-    // Moving pen is restricted to the final segment between the latest tests.
-    if (count > 1 && progress > 0.02 && progress < 0.99) {
-      final penColor = _colorForValue(currentVal);
-
-      // Outer glow pulse
-      final glowPaint = Paint()
-        ..color = penColor.withValues(alpha: 0.35)
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(currentHead, 9.0, glowPaint);
-
-      // Main pen bead
-      final penPaint = Paint()
-        ..color = penColor
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(currentHead, 5.0, penPaint);
-
-      // Inner white sparkle
-      final innerSparkle = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(currentHead, 2.2, innerSparkle);
-    }
-  }
-
-  Color _colorForValue(double val) {
-    if (val <= 0.8) return const Color(0xFF00B4D8); // Cyan
-    if (val <= 1.8) return const Color(0xFF00ACC1); // Teal
-    if (val <= 2.8) return const Color(0xFF43A047); // Green
-    if (val <= 3.8) return const Color(0xFFFFB300); // Yellow/Amber
-    return const Color(0xFFFFA726); // Orange
-  }
-
-  void _drawHistoricalPoint(Canvas canvas, Offset point, Color color) {
-    canvas.drawCircle(point, 4.5, Paint()..color = color);
-    canvas.drawCircle(
-      point,
-      4.5,
-      Paint()
-        ..color = Colors.white
-        ..strokeWidth = 1.5
-        ..style = PaintingStyle.stroke,
+    Offset position(int index) => Offset(
+      _pointX(index, points.length, size.width),
+      yForGrade(points[index].clamp(0, 5)),
     );
+    final offsets = [for (var i = 0; i < points.length; i++) position(i)];
+    final reveal = progress.clamp(0.0, 1.0);
+    final linePaint = Paint()
+      ..color = const Color(0xFF93AEB2)
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    for (var i = 1; i < offsets.length; i++) {
+      final endpoint = i == offsets.length - 1
+          ? Offset.lerp(offsets[i - 1], offsets[i], reveal)!
+          : offsets[i];
+      canvas.drawLine(offsets[i - 1], endpoint, linePaint);
+    }
+
+    void drawDot(Offset center, Color border, {bool finalPoint = false}) {
+      if (finalPoint) {
+        canvas.drawCircle(
+          center,
+          math.min(12.0, axisInset),
+          Paint()..color = const Color(0xFFD9EED5),
+        );
+      }
+      canvas.drawCircle(center, 6.5, Paint()..color = Colors.white);
+      canvas.drawCircle(
+        center,
+        6.5,
+        Paint()
+          ..color = border
+          ..strokeWidth = 2.7
+          ..style = PaintingStyle.stroke,
+      );
+    }
+
+    for (var i = 0; i < offsets.length - 1; i++) {
+      drawDot(offsets[i], const Color(0xFF2496AB));
+    }
+    if (offsets.length == 1 || reveal >= 1) {
+      drawDot(offsets.last, const Color(0xFF3A9B44), finalPoint: true);
+    } else if (reveal > 0) {
+      drawDot(
+        Offset.lerp(offsets[offsets.length - 2], offsets.last, reveal)!,
+        const Color(0xFF3A9B44),
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _AssessmentChartPainter oldDelegate) {
-    return oldDelegate.points != points ||
-        oldDelegate.yGradeCount != yGradeCount ||
-        oldDelegate.animationProgress != animationProgress;
-  }
+  bool shouldRepaint(covariant _AssessmentChartPainter oldDelegate) =>
+      oldDelegate.progress != progress ||
+      oldDelegate.axisInset != axisInset ||
+      !listEquals(oldDelegate.points, points);
 }
