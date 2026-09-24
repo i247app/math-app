@@ -6,6 +6,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'numi_brand_text.dart';
+import 'welcome_assessment_button.dart';
 import 'welcome_login_button.dart';
 import 'welcome_start_button.dart';
 
@@ -127,10 +128,9 @@ class WelcomeComposition extends StatelessWidget {
                       ),
                       Column(
                         children: [
-                          WelcomeLoginButton(
+                          WelcomeAssessmentButton(
                             key: const ValueKey('welcome-assessment-action'),
-                            onLogin: onAssessment,
-                            labelText: 'TRY YOUR SKILLS ?',
+                            onPressed: onAssessment,
                           ),
                           const SizedBox(height: 32),
                           Image.asset(

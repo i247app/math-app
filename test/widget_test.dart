@@ -155,8 +155,39 @@ void main() {
       await tester.pumpWidget(const NumiApp());
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
-      expect(find.text('try your skill ?'), findsOneWidget);
-      expect(find.text('sign up'), findsOneWidget);
+      expect(find.text('TEST YOUR SKILL'), findsOneWidget);
+      expect(find.text('SIGN UP'), findsOneWidget);
+      final assessment = find.byKey(
+        const ValueKey('welcome-assessment-action'),
+      );
+      expect(
+        find.descendant(
+          of: assessment,
+          matching: find.byIcon(Icons.timer_outlined),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: assessment,
+          matching: find.byIcon(Icons.chevron_right_rounded),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widgetList<Material>(
+              find.descendant(of: assessment, matching: find.byType(Material)),
+            )
+            .any((material) => material.color == const Color(0xFFF45D2D)),
+        isTrue,
+      );
+      final assessmentMaterial = find.descendant(
+        of: assessment,
+        matching: find.byType(Material),
+      );
+      expect(tester.getSize(assessmentMaterial).width, lessThanOrEqualTo(264));
+      expect(tester.getSize(assessmentMaterial).height, 60);
     });
 
     testWidgets('places assessment action 32 pixels above the books', (
@@ -177,7 +208,7 @@ void main() {
       );
       expect(
         tester.getBottomLeft(books).dy,
-        lessThan(tester.getTopLeft(find.text('sign up')).dy),
+        lessThan(tester.getTopLeft(find.text('SIGN UP')).dy),
       );
     });
 
@@ -196,11 +227,11 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('sign up')).style?.fontSize,
+        tester.widget<Text>(find.text('SIGN UP')).style?.fontSize,
         FontSize.large,
       );
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
 
       expect(guestAccounts.ensureCalls, 1);
@@ -242,8 +273,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
 
@@ -278,8 +309,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
 
       expect(
@@ -353,8 +384,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
 
       expect(
@@ -464,8 +495,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
 
       final chart = tester.widget<AssessmentProgressionChart>(
@@ -657,8 +688,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('try your skill ?'));
-      await tester.tap(find.text('try your skill ?'));
+      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
+      await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
 
       expect(find.text('AI MATH'), findsOneWidget);
