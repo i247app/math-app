@@ -205,12 +205,17 @@ class _WelcomeAssessmentIntroScreenState
                     isTablet ? 390.0 : 310.0,
                   );
                   final contentWidth = math.min(width - 32, 430.0);
-                  final contentTop = math.max(
-                    height * (height < 700 ? 0.34 : 0.36),
-                    isTablet ? 250.0 : 190.0,
-                  );
+                  const contentLift = 25.0;
+                  final contentTop =
+                      math.max(
+                        height * (height < 700 ? 0.34 : 0.36),
+                        isTablet ? 250.0 : 190.0,
+                      ) -
+                      contentLift;
                   final contentBottom =
-                      MediaQuery.viewPaddingOf(context).bottom + 182;
+                      MediaQuery.viewPaddingOf(context).bottom +
+                      182 +
+                      contentLift;
                   final contentHeight = math.max(
                     0.0,
                     height - contentTop - contentBottom,
@@ -350,8 +355,11 @@ class _WelcomeAssessmentIntroScreenState
                                 ),
                                 child: Column(
                                   children: [
-                                    AssessmentGradeRibbon(
-                                      currentGrade: _currentGrade,
+                                    Transform.translate(
+                                      offset: const Offset(0, -24),
+                                      child: AssessmentGradeRibbon(
+                                        currentGrade: _currentGrade,
+                                      ),
                                     ),
                                     const SizedBox(height: 8),
                                     Expanded(
