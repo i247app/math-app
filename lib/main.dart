@@ -20,7 +20,7 @@ export 'package:numi/app/numi_app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-	// 2. Execute storage lifecycle cleanup before doing anything else
+  // 2. Execute storage lifecycle cleanup before doing anything else
   await initStorageOnLaunch();
 
   if (kDebugMode) {
@@ -80,16 +80,7 @@ Future<void> initStorageOnLaunch() async {
   final hasRunBefore = prefs.getBool('has_run_before') ?? false;
 
   if (!hasRunBefore) {
-    // Check if upgrading from an older version without this flag
-    final existingToken = await secureStorage.read(key: 'auth_token');
-
-    if (existingToken != null) {
-      // User is upgrading: preserve session, just mark the flag
-      await prefs.setBool('has_run_before', true);
-    } else {
-      // Fresh install or Reinstall: wipe stale Keychain entries
-      await secureStorage.deleteAll();
-      await prefs.setBool('has_run_before', true);
-    }
+    await secureStorage.deleteAll();
+    await prefs.setBool('has_run_before', true);
   }
 }
