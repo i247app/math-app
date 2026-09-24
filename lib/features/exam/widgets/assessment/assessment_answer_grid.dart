@@ -18,15 +18,19 @@ class AssessmentAnswerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasOnlyNumericAnswers =
+    final hasOnlyCompactAnswers =
         answers.isNotEmpty &&
-        answers.every((answer) => isNumericAssessmentContent(answer.content));
+        answers.every(
+          (answer) =>
+              isNumericAssessmentContent(answer.content) ||
+              isIconAssessmentContent(answer.content),
+        );
     final hasLongNumericAnswer = answers.any(
       (answer) => RegExp(r'\d').allMatches(answer.content).length >= 4,
     );
-    final useNumericGrid = hasOnlyNumericAnswers && !hasLongNumericAnswer;
+    final useCompactGrid = hasOnlyCompactAnswers && !hasLongNumericAnswer;
 
-    if (!useNumericGrid) {
+    if (!useCompactGrid) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -59,6 +63,7 @@ class AssessmentAnswerGrid extends StatelessWidget {
         final answer = answers[index];
         return AssessmentAnswerButton(
           answer: answer,
+          compact: true,
           selected: answer.label == selectedAnswerLabel,
           feedbackCorrect: answer.label == selectedAnswerLabel
               ? selectedAnswerFeedbackCorrect

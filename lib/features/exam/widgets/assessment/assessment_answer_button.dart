@@ -12,12 +12,14 @@ class AssessmentAnswerButton extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.feedbackCorrect,
+    this.compact = false,
   });
 
   final ExamAnswer answer;
   final bool selected;
   final VoidCallback onTap;
   final bool? feedbackCorrect;
+  final bool compact;
 
   static const double _borderRadius = 20;
 
@@ -34,6 +36,7 @@ class AssessmentAnswerButton extends StatelessWidget {
         feedbackColor ??
         (selected ? colors.brandStrong : Colors.black.withValues(alpha: 0));
     final isNumeric = isNumericAssessmentContent(displayContent);
+    final isIcon = isIconAssessmentContent(displayContent);
     final textColor =
         feedbackColor ??
         (selected && isNumeric ? colors.brandStrong : colors.textPrimary);
@@ -68,7 +71,7 @@ class AssessmentAnswerButton extends StatelessWidget {
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 20,
+              horizontal: compact ? 12 : 20,
               vertical: isNumeric ? 6 : 2,
             ),
             child: Row(
@@ -94,9 +97,9 @@ class AssessmentAnswerButton extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 18),
+                SizedBox(width: compact ? 10 : 18),
                 Expanded(
-                  child: isNumeric
+                  child: isNumeric || isIcon
                       ? FittedBox(
                           alignment: Alignment.centerLeft,
                           fit: BoxFit.scaleDown,
@@ -126,7 +129,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                         ),
                 ),
                 if (feedbackCorrect != null) ...[
-                  const SizedBox(width: 10),
+                  SizedBox(width: compact ? 6 : 10),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 180),
                     child: Icon(
@@ -139,7 +142,7 @@ class AssessmentAnswerButton extends StatelessWidget {
                             : 'assessment-answer-feedback-incorrect',
                       ),
                       color: feedbackColor,
-                      size: 28,
+                      size: compact ? 24 : 28,
                     ),
                   ),
                 ],
@@ -186,4 +189,12 @@ bool isNumericAssessmentContent(String value) {
   return normalized.isNotEmpty &&
       RegExp(r'\d').hasMatch(normalized) &&
       RegExp(r'^[0-9\s+×xX*/÷:()=?.,%\-−]+$').hasMatch(normalized);
+}
+
+bool isIconAssessmentContent(String value) {
+  final normalized = value.trim();
+  return normalized.isNotEmpty &&
+      normalized.characters.length == 1 &&
+      RegExp(r'[\p{S}\u20E3]', unicode: true).hasMatch(normalized) &&
+      !isNumericAssessmentContent(normalized);
 }
