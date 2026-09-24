@@ -1,16 +1,16 @@
 part of '../auth_cubit.dart';
 
 extension AuthFlowLogin on AuthFlowCubit {
-  Future<void> lookupSignupPhone(String phone) async {
+  Future<void> lookupSignupEmail(String email) async {
     if (state.authEntryMode != AuthEntryMode.signup ||
-        (state.isCheckingLoginName && state.checkedLoginName == phone)) {
+        state.isCheckingLoginName) {
       return;
     }
 
     _emitState(
       state.copyWith(
-        loginName: phone,
-        checkedLoginName: phone,
+        loginName: email,
+        checkedLoginName: email,
         isCheckingLoginName: true,
         clearLoginNameExists: true,
         clearLoginLookupUser: true,
@@ -24,17 +24,18 @@ extension AuthFlowLogin on AuthFlowCubit {
     );
 
     try {
-      final result = await _authService.lookupLoginName(phone);
+      final result = await _authService.lookupLoginName(email);
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
-          state.checkedLoginName != phone) {
+          state.screen != AuthScreen.login ||
+          state.checkedLoginName != email) {
         return;
       }
 
       _emitState(
         state.copyWith(
-          loginName: phone,
-          checkedLoginName: phone,
+          loginName: email,
+          checkedLoginName: email,
           isCheckingLoginName: false,
           loginNameExists: result.exists,
           loginLookupUser: result.user,
@@ -49,15 +50,15 @@ extension AuthFlowLogin on AuthFlowCubit {
         ),
       );
     } on AuthException catch (error) {
-      if (isClosed || state.checkedLoginName != phone) {
+      if (isClosed || state.checkedLoginName != email) {
         return;
       }
 
       if (isAuthUserNotFoundStatus(error.status)) {
         _emitState(
           state.copyWith(
-            loginName: phone,
-            checkedLoginName: phone,
+            loginName: email,
+            checkedLoginName: email,
             isCheckingLoginName: false,
             loginNameExists: false,
             loginLookupError: error.message,
@@ -70,8 +71,8 @@ extension AuthFlowLogin on AuthFlowCubit {
 
       _emitState(
         state.copyWith(
-          loginName: phone,
-          checkedLoginName: phone,
+          loginName: email,
+          checkedLoginName: email,
           isCheckingLoginName: false,
           loginLookupError: error.message,
           loginLookupErrorStatus: error.status,
@@ -79,14 +80,14 @@ extension AuthFlowLogin on AuthFlowCubit {
         ),
       );
     } catch (_) {
-      if (isClosed || state.checkedLoginName != phone) {
+      if (isClosed || state.checkedLoginName != email) {
         return;
       }
 
       _emitState(
         state.copyWith(
-          loginName: phone,
-          checkedLoginName: phone,
+          loginName: email,
+          checkedLoginName: email,
           isCheckingLoginName: false,
           loginLookupError: AppStrings.current(
             AppKeys.authLoginNameCheckFailed,
@@ -103,25 +104,17 @@ extension AuthFlowLogin on AuthFlowCubit {
     }
 
     final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
-    if (isSignupEntry && loginName.contains('@')) {
-      _emitState(
-        state.copyWith(authError: AppStrings.current(AppKeys.invalidPhone)),
-      );
-      return;
-    }
-
     if (isSignupEntry) {
-      if (state.loginNameExists == true &&
-          state.checkedLoginName == loginName) {
-        _emitState(
-          state.copyWith(
-            authError: AppStrings.current(AppKeys.signupPhoneAlreadyRegistered),
-          ),
-        );
+      await lookupSignupEmail(loginName);
+      if (isClosed ||
+          state.screen != AuthScreen.login ||
+          state.authEntryMode != AuthEntryMode.signup ||
+          state.checkedLoginName != loginName ||
+          state.loginNameExists != false ||
+          state.isCheckingLoginName) {
         return;
       }
-
-      _pendingSignupPhone = loginName;
+      _pendingSignupEmail = loginName;
       _pendingSignupForm = null;
       _emitState(
         state.copyWith(

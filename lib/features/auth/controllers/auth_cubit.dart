@@ -27,7 +27,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
 
   final AuthService _authService;
   SignupFormData? _pendingSignupForm;
-  String? _pendingSignupPhone;
+  String? _pendingSignupEmail;
 
   SignupFormData? get pendingSignupForm => _pendingSignupForm;
 

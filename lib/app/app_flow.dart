@@ -44,7 +44,6 @@ class _AppFlowState extends State<AppFlow> {
   bool _loginNameHasInput = false;
   LoginNameKind? _loginNameKind;
   bool _loginNameSubmitAttempted = false;
-  String? _lastSignupPhoneLookup;
 
   LoginNameValidationResult _normalizedLoginNameInput(
     PhoneRegion region,
@@ -53,7 +52,7 @@ class _AppFlowState extends State<AppFlow> {
     return normalizeLoginNameInput(
       region,
       loginNameController.text,
-      phoneOnly: mode == AuthEntryMode.signup,
+      emailOnly: mode == AuthEntryMode.signup,
     );
   }
 
@@ -85,7 +84,6 @@ class _AppFlowState extends State<AppFlow> {
   }
 
   void clearLoginNameInput() {
-    _lastSignupPhoneLookup = null;
     if (loginNameController.text.isEmpty &&
         !_loginNameHasInput &&
         !_loginNameSubmitAttempted) {
@@ -109,7 +107,7 @@ class _AppFlowState extends State<AppFlow> {
     final hasInput = value.trim().isNotEmpty;
     final kind = detectLoginNameKind(
       value,
-      phoneOnly: mode == AuthEntryMode.signup,
+      emailOnly: mode == AuthEntryMode.signup,
     );
     if (_loginNameHasInput != hasInput ||
         _loginNameKind != kind ||
@@ -121,26 +119,7 @@ class _AppFlowState extends State<AppFlow> {
       });
     }
 
-    if (mode != AuthEntryMode.signup) {
-      _lastSignupPhoneLookup = null;
-      cubit.clearLoginLookup();
-      return;
-    }
-
-    final normalized = normalizeLoginNameInput(region, value, phoneOnly: true);
-    if (!normalized.isValid) {
-      _lastSignupPhoneLookup = null;
-      cubit.clearLoginLookup();
-      return;
-    }
-
-    FocusScope.of(context).unfocus();
-    if (_lastSignupPhoneLookup == normalized.loginName) {
-      return;
-    }
-
-    _lastSignupPhoneLookup = normalized.loginName;
-    cubit.lookupSignupPhone(normalized.loginName!);
+    cubit.clearLoginLookup();
   }
 
   void submitLoginName(

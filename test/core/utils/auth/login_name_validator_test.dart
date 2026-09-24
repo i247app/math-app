@@ -34,7 +34,7 @@ void main() {
       expect(result.errorKey, AppKeys.invalidEmail);
     });
 
-    test('keeps signup phone-only', () {
+    test('keeps signup phone-only when phoneOnly is true', () {
       final result = normalizeLoginNameInput(
         PhoneRegion.vn,
         'learner@example.com',
@@ -43,6 +43,26 @@ void main() {
 
       expect(result.kind, LoginNameKind.phone);
       expect(result.isValid, isFalse);
+    });
+
+    test('validates email-only for signup mode', () {
+      final valid = normalizeLoginNameInput(
+        PhoneRegion.vn,
+        'learner@example.com',
+        emailOnly: true,
+      );
+      expect(valid.kind, LoginNameKind.email);
+      expect(valid.isValid, isTrue);
+      expect(valid.loginName, 'learner@example.com');
+
+      final invalid = normalizeLoginNameInput(
+        PhoneRegion.vn,
+        '0901234567',
+        emailOnly: true,
+      );
+      expect(invalid.kind, LoginNameKind.email);
+      expect(invalid.isValid, isFalse);
+      expect(invalid.errorKey, AppKeys.invalidEmail);
     });
   });
 

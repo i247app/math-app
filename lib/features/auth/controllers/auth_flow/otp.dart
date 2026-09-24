@@ -214,9 +214,9 @@ extension AuthFlowOtp on AuthFlowCubit {
       }
 
       if (otpFlow == OtpFlow.signup) {
-        final signupPhone = _pendingSignupPhone;
+        final signupEmail = _pendingSignupEmail;
         final signupForm = _pendingSignupForm;
-        if (signupPhone == null || signupForm == null) {
+        if (signupEmail == null || signupForm == null) {
           _emitState(
             state.copyWith(
               isVerifyingOtp: false,
@@ -230,7 +230,7 @@ extension AuthFlowOtp on AuthFlowCubit {
 
         try {
           await _completeSignup(
-            phone: signupPhone,
+            email: signupEmail,
             form: signupForm,
             isVerifyingOtp: false,
           );

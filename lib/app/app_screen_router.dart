@@ -118,22 +118,13 @@ class AppScreenRouter extends StatelessWidget {
             );
             final lookupMatchesLoginName =
                 state.checkedLoginName == normalizedLoginName.loginName;
-            final blocksSignupPhoneAction =
-                isSignupEntry &&
-                lookupMatchesLoginName &&
-                state.loginNameExists == true;
-            final canSubmitLoginName = isSignupEntry
-                ? normalizedLoginName.isValid && !blocksSignupPhoneAction
-                : loginNameHasInput;
+            final canSubmitLoginName = loginNameHasInput;
             final validationErrorKey = normalizedLoginName.errorKey;
             final delaysValidationError =
                 validationErrorKey == AppKeys.invalidEmail ||
                 validationErrorKey == AppKeys.phoneTooShort;
-            final loginNameInputErrorKey = isSignupEntry
-                ? validationErrorKey == AppKeys.phoneTooShort
-                      ? null
-                      : validationErrorKey
-                : delaysValidationError && !loginNameSubmitAttempted
+            final loginNameInputErrorKey =
+                delaysValidationError && !loginNameSubmitAttempted
                 ? null
                 : validationErrorKey;
             final loginNameErrorText =
@@ -239,7 +230,7 @@ class AppScreenRouter extends StatelessWidget {
                       controller: loginNameController,
                       region: state.phoneRegion,
                       showPhoneRegion:
-                          isSignupEntry ||
+                          !isSignupEntry &&
                           (normalizedLoginName.kind == LoginNameKind.phone &&
                               RegExp(r'\d').hasMatch(loginNameController.text)),
                       onRegionChanged: (region) {
@@ -317,6 +308,11 @@ class AppScreenRouter extends StatelessWidget {
                       onBack: cubit.cancelSignupToLogin,
                       isSigningUp: state.isSigningUp,
                       initialForm: cubit.pendingSignupForm,
+                      initialEmail:
+                          state.loginName != null &&
+                              state.loginName!.contains('@')
+                          ? state.loginName
+                          : null,
                       authError: state.authError,
                       onContinue: (form) {
                         HapticFeedback.mediumImpact();
@@ -461,7 +457,7 @@ String? _loginLookupErrorText({
   }
 
   if (isSignupEntry && loginNameExists == true) {
-    return context.getText(AppKeys.signupPhoneAlreadyRegistered);
+    return context.getText(AppKeys.signupEmailAlreadyRegistered);
   }
 
   if (isSignupEntry && loginNameExists == false) {

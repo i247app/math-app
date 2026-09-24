@@ -46,6 +46,29 @@ class _FailingLoginLookupAuthService implements AuthService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _SignupLookupAuthService implements AuthService {
+  _SignupLookupAuthService({this.accountExists = false});
+
+  final bool accountExists;
+  final List<String> lookedUpNames = <String>[];
+
+  @override
+  Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
+    lookedUpNames.add(loginName);
+    return AuthLoginLookupResult(
+      loginName: loginName,
+      exists: accountExists,
+      user: accountExists ? LoginUser(id: 7, email: loginName) : null,
+    );
+  }
+
+  @override
+  Future<void> logout() async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _PendingExamService implements ExamService {
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -643,23 +666,116 @@ void main() {
       expect(find.text('TOÁN AI'), findsNothing);
     });
 
-    testWidgets('continues from welcome directly to the login screen in signup mode', (
+    testWidgets(
+      'continues from welcome directly to the login screen in signup mode',
+      (tester) async {
+        await tester.pumpWidget(const NumiApp());
+
+        final signupButton = find.text('SIGN UP');
+        await tester.ensureVisible(signupButton);
+        await tester.tap(signupButton);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('login')), findsOneWidget);
+        expect(find.byKey(const ValueKey('welcome-details')), findsNothing);
+
+        await tester.tap(find.byType(AppBackButton));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'signup entry uses email field, delays email errors until submit, and proceeds to signup screen on valid email',
+      (tester) async {
+        final authService = _SignupLookupAuthService();
+        FlutterSecureStorage.setMockInitialValues(<String, String>{});
+        await tester.pumpWidget(NumiApp(authService: authService));
+
+        final signupButton = find.text('SIGN UP');
+        await tester.ensureVisible(signupButton);
+        await tester.tap(signupButton);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('login')), findsOneWidget);
+        expect(find.text('🇻🇳'), findsNothing);
+        expect(find.text('example@numinumi.com'), findsOneWidget);
+
+        final input = find.byType(EditableText);
+        await tester.enterText(input, 'invalid-email');
+        await tester.pump();
+
+        expect(authService.lookedUpNames, isEmpty);
+        expect(find.text('🇻🇳'), findsNothing);
+        expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
+
+        final actionButton = find.byType(ElevatedButton);
+        expect(
+          tester.widget<ElevatedButton>(actionButton).onPressed,
+          isNotNull,
+        );
+
+        await tester.tap(actionButton);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+        final invalidEmailError = find.byKey(
+          const ValueKey('login-name-error'),
+        );
+        expect(
+          tester.widget<Text>(invalidEmailError).style?.color,
+          tester.element(invalidEmailError).themeColors.error,
+        );
+        expect(find.byKey(const ValueKey('signup')), findsNothing);
+        expect(authService.lookedUpNames, isEmpty);
+
+        await tester.enterText(input, 'learner@example.com');
+        await tester.pumpAndSettle();
+        expect(authService.lookedUpNames, isEmpty);
+
+        await tester.tap(actionButton);
+        await tester.pumpAndSettle();
+
+        expect(authService.lookedUpNames, <String>['learner@example.com']);
+        expect(find.byKey(const ValueKey('signup')), findsOneWidget);
+        expect(find.text('learner@example.com'), findsOneWidget);
+        final signupEmailField = tester
+            .widgetList<TextField>(find.byType(TextField))
+            .singleWhere(
+              (field) => field.controller?.text == 'learner@example.com',
+            );
+        expect(signupEmailField.readOnly, isTrue);
+      },
+    );
+
+    testWidgets('signup shows an inline error for an existing email', (
       tester,
     ) async {
-      await tester.pumpWidget(const NumiApp());
+      final authService = _SignupLookupAuthService(accountExists: true);
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      await tester.pumpWidget(NumiApp(authService: authService));
 
       final signupButton = find.text('SIGN UP');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const ValueKey('login')), findsOneWidget);
-      expect(find.byKey(const ValueKey('welcome-details')), findsNothing);
+      await tester.enterText(find.byType(EditableText), 'learner@example.com');
+      await tester.pumpAndSettle();
+      expect(authService.lookedUpNames, isEmpty);
 
-      await tester.tap(find.byType(AppBackButton));
+      await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
+      expect(authService.lookedUpNames, <String>['learner@example.com']);
+      expect(find.byKey(const ValueKey('login')), findsOneWidget);
+      expect(find.byKey(const ValueKey('signup')), findsNothing);
+      expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+      final errorText = tester.widget<Text>(
+        find.byKey(const ValueKey('login-name-error')),
+      );
+      expect(errorText.data?.toLowerCase(), contains('email'));
     });
 
     testWidgets('returns login to the welcome screen that opened it', (

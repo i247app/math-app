@@ -5,11 +5,10 @@ abstract interface class AuthService {
 
   Future<LoginUser?> restoreSession();
 
-  Future<LoginUser> signupWithPhone({
-    required String phone,
+  Future<LoginUser> signupWithEmail({
+    required String email,
     required String name,
     required String role,
-    String? email,
   });
 
   Future<LoginUser> updateUser({

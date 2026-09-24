@@ -25,7 +25,6 @@ class _FakeAuthService implements AuthService {
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
-  String? signupPhone;
   String? signupEmail;
   AuthOtpKind? sentOtpKind;
   int? sentOtpUserId;
@@ -103,15 +102,13 @@ class _FakeAuthService implements AuthService {
   Future<LoginUser?> restoreSession() async => null;
 
   @override
-  Future<LoginUser> signupWithPhone({
-    required String phone,
+  Future<LoginUser> signupWithEmail({
+    required String email,
     required String name,
     required String role,
-    String? email,
   }) async {
-    signupPhone = phone;
     signupEmail = email;
-    return LoginUser(id: 0, phone: phone, email: email, name: name, role: role);
+    return LoginUser(id: 0, email: email, name: name, role: role);
   }
 
   @override
@@ -266,30 +263,31 @@ void main() {
     await cubit.close();
   });
 
-  test('checks a signup phone before opening the signup form', () async {
-    final authService = _FakeAuthService(accountExists: false);
-    final cubit = _buildCubit(
-      authService: authService,
-      initialState: const AuthFlowState(
-        screen: AuthScreen.login,
-        authEntryMode: AuthEntryMode.signup,
-      ),
-    );
+  test(
+    'checks a signup email only on submit before opening the form',
+    () async {
+      final authService = _FakeAuthService(accountExists: false);
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(
+          screen: AuthScreen.login,
+          authEntryMode: AuthEntryMode.signup,
+        ),
+      );
 
-    await cubit.lookupSignupPhone('+84901234567');
+      expect(authService.lookedUpLoginName, isNull);
+      await cubit.submitLoginName('learner@example.com');
 
-    expect(authService.lookedUpLoginName, '+84901234567');
-    expect(cubit.state.loginNameExists, isFalse);
-
-    await cubit.submitLoginName('+84901234567');
-
-    expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AuthScreen.signup);
-    await cubit.close();
-  });
+      expect(authService.lookedUpLoginName, 'learner@example.com');
+      expect(cubit.state.loginNameExists, isFalse);
+      expect(authService.sentOtpLoginName, isNull);
+      expect(cubit.state.screen, AuthScreen.signup);
+      await cubit.close();
+    },
+  );
 
   test(
-    'keeps signup phone lookup failures out of the dialog error state',
+    'keeps signup email lookup failures inline on the login screen',
     () async {
       final authService = _FakeAuthService(
         accountExists: false,
@@ -303,17 +301,19 @@ void main() {
         ),
       );
 
-      await cubit.lookupSignupPhone('+84901234567');
+      await cubit.submitLoginName('learner@example.com');
 
+      expect(authService.lookedUpLoginName, 'learner@example.com');
       expect(cubit.state.authError, isNull);
       expect(cubit.state.loginLookupError, 'Service unavailable');
       expect(cubit.state.loginLookupErrorStatus, 503);
       expect(cubit.state.isCheckingLoginName, isFalse);
+      expect(cubit.state.screen, AuthScreen.login);
       await cubit.close();
     },
   );
 
-  test('treats a 4206 signup lookup response as an available phone', () async {
+  test('treats a 4206 signup lookup response as an available email', () async {
     final authService = _FakeAuthService(
       lookupFailure: const AuthException('User not found', status: 4206),
     );
@@ -325,33 +325,35 @@ void main() {
       ),
     );
 
-    await cubit.lookupSignupPhone('+84901234567');
+    await cubit.submitLoginName('learner@example.com');
 
     expect(cubit.state.authError, isNull);
     expect(cubit.state.loginNameExists, isFalse);
     expect(cubit.state.loginLookupErrorStatus, 4206);
-    await cubit.close();
-  });
-
-  test('signup submit does not depend on the login lookup', () async {
-    final authService = _FakeAuthService(accountExists: false);
-    final cubit = _buildCubit(
-      authService: authService,
-      initialState: const AuthFlowState(
-        screen: AuthScreen.login,
-        authEntryMode: AuthEntryMode.signup,
-      ),
-    );
-
-    await cubit.submitLoginName('+84901234567');
-
-    expect(authService.lookedUpLoginName, isNull);
-    expect(authService.sentOtpLoginName, isNull);
     expect(cubit.state.screen, AuthScreen.signup);
     await cubit.close();
   });
 
-  test('signup without email creates the account and opens home', () async {
+  test('existing signup email stays on login and does not send OTP', () async {
+    final authService = _FakeAuthService(accountExists: true);
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AuthScreen.login,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('learner@example.com');
+
+    expect(authService.lookedUpLoginName, 'learner@example.com');
+    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.state.loginNameExists, isTrue);
+    expect(cubit.state.screen, AuthScreen.login);
+    await cubit.close();
+  });
+
+  test('signup uses the checked email even when the form omits it', () async {
     final authService = _FakeAuthService(accountExists: false);
     final cubit = _buildCubit(
       authService: authService,
@@ -361,7 +363,7 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('+84901234567');
+    await cubit.submitLoginName('learner@example.com');
     await cubit.submitSignup(
       const SignupFormData(
         name: 'Learner',
@@ -370,11 +372,9 @@ void main() {
       ),
     );
 
-    expect(authService.sentOtpLoginName, isNull);
-    expect(authService.signupPhone, '+84901234567');
+    expect(authService.sentOtpLoginName, 'learner@example.com');
     expect(authService.signupEmail, isNull);
-    expect(cubit.state.screen, AuthScreen.signup);
-    expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
+    expect(cubit.state.screen, AuthScreen.otp);
     await cubit.close();
   });
 
@@ -393,7 +393,7 @@ void main() {
         ),
       );
 
-      await cubit.submitLoginName('+84901234567');
+      await cubit.submitLoginName('learner@example.com');
       await cubit.submitSignup(
         const SignupFormData(
           name: 'Learner',
@@ -405,21 +405,21 @@ void main() {
 
       expect(authService.sentOtpLoginName, 'learner@example.com');
       expect(authService.sentOtpKind, AuthOtpKind.signup);
-      expect(authService.signupPhone, isNull);
+      expect(authService.signupEmail, isNull);
       expect(cubit.state.screen, AuthScreen.otp);
 
       await cubit.verifyOtp('1234');
 
       expect(authService.verifiedOtpLoginName, 'learner@example.com');
-      expect(authService.signupPhone, '+84901234567');
       expect(authService.signupEmail, 'learner@example.com');
+      expect(cubit.state.authenticationResult?.user.phone, isNull);
       expect(cubit.state.screen, AuthScreen.otp);
       expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
       await cubit.close();
     },
   );
 
-  test('back from signup OTP restores the signup form and phone', () async {
+  test('back from signup OTP restores the signup form and email', () async {
     final authService = _FakeAuthService(accountExists: false);
     final cubit = _buildCubit(
       authService: authService,
@@ -429,7 +429,7 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('+84901234567');
+    await cubit.submitLoginName('learner@example.com');
     await cubit.submitSignup(
       const SignupFormData(
         name: 'Learner',
@@ -441,12 +441,12 @@ void main() {
     cubit.backFromOtp();
 
     expect(cubit.state.screen, AuthScreen.signup);
-    expect(cubit.state.loginName, '+84901234567');
+    expect(cubit.state.loginName, 'learner@example.com');
     expect(cubit.pendingSignupForm?.email, 'learner@example.com');
     await cubit.close();
   });
 
-  test('does not accept an email in the phone-only signup flow', () async {
+  test('accepts an email in the signup flow and opens signup screen', () async {
     final authService = _FakeAuthService(accountExists: false);
     final cubit = _buildCubit(
       authService: authService,
@@ -458,9 +458,10 @@ void main() {
 
     await cubit.submitLoginName('learner@example.com');
 
-    expect(authService.lookedUpLoginName, isNull);
+    expect(authService.lookedUpLoginName, 'learner@example.com');
     expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.screen, AuthScreen.login);
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.loginName, 'learner@example.com');
     await cubit.close();
   });
 

@@ -146,8 +146,8 @@ void main() {
     );
 
     await expectLater(
-      api.signupWithPhone(
-        phone: '+84901234567',
+      api.signupWithEmail(
+        email: 'learner@example.com',
         name: 'Learner',
         role: 'STUDENT',
       ),
@@ -159,6 +159,53 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('users/create sends email and omits phone', () async {
+    String? requestPath;
+    Map<String, String>? fields;
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requestPath = options.path;
+            fields = Map<String, String>.fromEntries(
+              (options.data as FormData).fields,
+            );
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{
+                  'mstatus': 200,
+                  'user': <String, dynamic>{
+                    'uid': 7,
+                    'email': 'learner@example.com',
+                  },
+                },
+              ),
+            );
+          },
+        ),
+      );
+    final api = AuthApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    final user = await api.signupWithEmail(
+      email: 'learner@example.com',
+      name: 'Learner',
+      role: 'STUDENT',
+    );
+
+    expect(requestPath, '/users/create');
+    expect(fields, <String, String>{
+      'email': 'learner@example.com',
+      'name': 'Learner',
+      'role': 'STUDENT',
+    });
+    expect(user.email, 'learner@example.com');
+    expect(user.phone, isNull);
   });
 
   test('listDevices posts the request and parses the response', () async {

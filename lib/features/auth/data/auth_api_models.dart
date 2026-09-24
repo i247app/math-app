@@ -4,10 +4,9 @@ part 'auth_api_models.g.dart';
 
 @JsonSerializable(includeIfNull: false)
 class SignupRequest {
-  const SignupRequest({required this.phone, this.email, this.name, this.role});
+  const SignupRequest({required this.email, this.name, this.role});
 
-  final String phone;
-  final String? email;
+  final String email;
   final String? name;
   final String? role;
 

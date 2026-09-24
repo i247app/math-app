@@ -106,9 +106,9 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
 
-    final signupPhone = _pendingSignupPhone;
+    final signupEmail = _pendingSignupEmail;
     if (state.otpFlow == OtpFlow.signup &&
-        signupPhone != null &&
+        signupEmail != null &&
         _pendingSignupForm != null) {
       final otpIdentifier = state.loginName?.trim();
       if (otpIdentifier != null && otpIdentifier.isNotEmpty) {
@@ -117,7 +117,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       _emitState(
         state.copyWith(
           screen: AuthScreen.signup,
-          loginName: signupPhone,
+          loginName: signupEmail,
           isSendingOtp: false,
           isVerifyingOtp: false,
           isSigningUp: false,

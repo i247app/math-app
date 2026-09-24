@@ -44,7 +44,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabel: 'Tên',
     AppKeys.signupNameInvalid: 'Tên chỉ được gồm chữ, số và khoảng trắng.',
     AppKeys.signupUsernameExists: 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
-    AppKeys.signupEmailLabel: 'Email (không bắt buộc)',
+    AppKeys.signupEmailLabel: 'Email',
     AppKeys.signupRoleLabel: 'Bạn là',
     AppKeys.signupRoleStudent: 'Học Sinh',
     AppKeys.signupRoleParent: 'Phụ huynh',
@@ -73,6 +73,8 @@ const authStrings = <String, Map<String, String>>{
         'Số điện thoại hoặc email này chưa có tài khoản. Vui lòng đăng ký.',
     AppKeys.signupPhoneAlreadyRegistered:
         'Số điện thoại này đã có tài khoản. Vui lòng đăng nhập.',
+    AppKeys.signupEmailAlreadyRegistered:
+        'Email này đã có tài khoản. Vui lòng đăng nhập.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
     AppKeys.pinLoginFailed:
@@ -128,7 +130,7 @@ const authStrings = <String, Map<String, String>>{
         'First name can only include letters, numbers, and spaces.',
     AppKeys.signupUsernameExists:
         'This name already exists. Please choose another name.',
-    AppKeys.signupEmailLabel: 'Email (optional)',
+    AppKeys.signupEmailLabel: 'Email',
     AppKeys.signupRoleLabel: 'You are',
     AppKeys.signupRoleStudent: 'Student',
     AppKeys.signupRoleParent: 'Parent',
@@ -157,6 +159,8 @@ const authStrings = <String, Map<String, String>>{
         'This phone number or email does not have an account. Please sign up.',
     AppKeys.signupPhoneAlreadyRegistered:
         'This phone number already has an account. Please log in.',
+    AppKeys.signupEmailAlreadyRegistered:
+        'This email already has an account. Please log in.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
     AppKeys.pinLoginFailed: 'Could not log in with PIN. Please log in again.',

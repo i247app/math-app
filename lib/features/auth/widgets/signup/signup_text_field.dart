@@ -11,6 +11,7 @@ class SignupTextField extends StatelessWidget {
     this.prefixIcon,
     this.keyboardType,
     this.textInputAction,
+    this.readOnly = false,
     this.errorText,
   });
 
@@ -19,6 +20,7 @@ class SignupTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final bool readOnly;
   final String? errorText;
 
   @override
@@ -32,6 +34,7 @@ class SignupTextField extends StatelessWidget {
           height: 53,
           child: TextField(
             controller: controller,
+            readOnly: readOnly,
             keyboardType: keyboardType,
             textInputAction: textInputAction,
             autofillHints: null,

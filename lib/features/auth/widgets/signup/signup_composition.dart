@@ -21,6 +21,7 @@ class SignupComposition extends StatelessWidget {
     super.key,
     required this.usernameController,
     required this.emailController,
+    required this.emailReadOnly,
     required this.role,
     required this.gender,
     required this.usernameErrorText,
@@ -35,6 +36,7 @@ class SignupComposition extends StatelessWidget {
 
   final TextEditingController usernameController;
   final TextEditingController emailController;
+  final bool emailReadOnly;
   final SignupRole? role;
   final SignupGender? gender;
   final String? usernameErrorText;
@@ -133,10 +135,12 @@ class SignupComposition extends StatelessWidget {
                         const SizedBox(height: 16),
                         SignupFieldLabel(
                           label: context.getText(AppKeys.signupEmailLabel),
+                          isRequired: true,
                         ),
                         const SizedBox(height: 6),
                         SignupTextField(
                           controller: emailController,
+                          readOnly: emailReadOnly,
                           hintText: context.getText(AppKeys.signupEmailHint),
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,

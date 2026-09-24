@@ -20,9 +20,8 @@ extension AuthUserDtoConversion on AuthUser {
 
 extension AuthResponseDtoConversion on AuthResponse {
   LoginUser toSignupModel({
-    required String fallbackPhone,
     required String fallbackName,
-    String? fallbackEmail,
+    required String fallbackEmail,
   }) {
     final dtoUser = user;
     final dtoProfile = profile;
@@ -30,7 +29,7 @@ extension AuthResponseDtoConversion on AuthResponse {
       id: dtoUser?.userId ?? dtoUser?.id ?? dtoProfile?.userId ?? 0,
       email: dtoUser?.email ?? fallbackEmail,
       name: dtoProfile?.name ?? dtoUser?.name ?? fallbackName,
-      phone: dtoUser?.phone ?? fallbackPhone,
+      phone: dtoUser?.phone,
       avatarUrl: dtoProfile?.avatarUrl ?? dtoUser?.avatarUrl,
       role: dtoUser?.role,
       createDt: dtoUser?.createDt ?? dtoProfile?.createDt,

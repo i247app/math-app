@@ -29,10 +29,17 @@ class LoginNameValidationResult {
   bool get isValid => loginName != null && errorKey == null;
 }
 
-LoginNameKind? detectLoginNameKind(String rawValue, {bool phoneOnly = false}) {
+LoginNameKind? detectLoginNameKind(
+  String rawValue, {
+  bool phoneOnly = false,
+  bool emailOnly = false,
+}) {
   final value = rawValue.trim();
   if (value.isEmpty) {
     return null;
+  }
+  if (emailOnly) {
+    return LoginNameKind.email;
   }
   if (phoneOnly) {
     return LoginNameKind.phone;
@@ -46,9 +53,14 @@ LoginNameValidationResult normalizeLoginNameInput(
   PhoneRegion region,
   String rawValue, {
   bool phoneOnly = false,
+  bool emailOnly = false,
 }) {
   final value = rawValue.trim();
-  final kind = detectLoginNameKind(value, phoneOnly: phoneOnly);
+  final kind = detectLoginNameKind(
+    value,
+    phoneOnly: phoneOnly,
+    emailOnly: emailOnly,
+  );
   if (kind == null) {
     return const LoginNameValidationResult.empty();
   }

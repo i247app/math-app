@@ -878,6 +878,7 @@ class AppKeys {
   static const authLoginNameCheckFailed = 'auth_login_name_check_failed';
   static const loginNameNotRegistered = 'login_name_not_registered';
   static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
+  static const signupEmailAlreadyRegistered = 'signup_email_already_registered';
   static const signupOtpFailed = 'signup_otp_failed';
   static const loginOtpFailed = 'login_otp_failed';
   static const pinLoginFailed = 'pin_login_failed';

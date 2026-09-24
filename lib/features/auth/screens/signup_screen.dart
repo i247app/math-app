@@ -16,6 +16,7 @@ class SignupScreen extends StatefulWidget {
     required this.onContinue,
     required this.isSigningUp,
     this.initialForm,
+    this.initialEmail,
     this.authError,
   });
 
@@ -23,6 +24,7 @@ class SignupScreen extends StatefulWidget {
   final ValueChanged<SignupFormData> onContinue;
   final bool isSigningUp;
   final SignupFormData? initialForm;
+  final String? initialEmail;
   final String? authError;
 
   @override
@@ -46,9 +48,11 @@ class _SignupScreenState extends State<SignupScreen> {
     final initialForm = widget.initialForm;
     if (initialForm != null) {
       _usernameController.text = initialForm.name;
-      _emailController.text = initialForm.email ?? '';
+      _emailController.text = initialForm.email ?? widget.initialEmail ?? '';
       _selectedRole = initialForm.role;
       _selectedGender = initialForm.gender;
+    } else if (widget.initialEmail != null) {
+      _emailController.text = widget.initialEmail!;
     }
     _usernameController.addListener(_rebuildForFormInput);
     _emailController.addListener(_rebuildForFormInput);
@@ -101,7 +105,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final isUsernameValid = _isValidName(username);
-    final isEmailValid = email.isEmpty || isValidEmailInput(email);
+    final isEmailValid = isValidEmailInput(email);
     final isFormValid =
         isUsernameValid &&
         isEmailValid &&
@@ -122,6 +126,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return SignupComposition(
       usernameController: _usernameController,
       emailController: _emailController,
+      emailReadOnly: widget.initialEmail != null,
       role: _selectedRole,
       gender: _selectedGender,
       usernameErrorText: usernameError,

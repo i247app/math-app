@@ -2,13 +2,9 @@ part of '../auth_cubit.dart';
 
 extension AuthFlowSignup on AuthFlowCubit {
   Future<void> submitSignup(SignupFormData form) async {
-    final phone = _pendingSignupPhone ?? state.loginName;
+    final email = _pendingSignupEmail ?? state.loginName;
     final trimmedName = form.name.trim();
-    final emailValue = form.email?.trim();
-    final trimmedEmail = emailValue == null || emailValue.isEmpty
-        ? null
-        : emailValue;
-    if (state.isSigningUp || phone == null) {
+    if (state.isSigningUp || email == null) {
       return;
     }
 
@@ -21,7 +17,7 @@ extension AuthFlowSignup on AuthFlowCubit {
       return;
     }
 
-    if (trimmedEmail != null && !isValidEmailInput(trimmedEmail)) {
+    if (!isValidEmailInput(email)) {
       _emitState(
         state.copyWith(authError: AppStrings.current(AppKeys.invalidEmail)),
       );
@@ -30,59 +26,36 @@ extension AuthFlowSignup on AuthFlowCubit {
 
     final normalizedForm = SignupFormData(
       name: trimmedName,
-      email: trimmedEmail,
+      email: email,
       role: form.role,
       gender: form.gender,
     );
-    _pendingSignupPhone = phone;
+    _pendingSignupEmail = email;
     _pendingSignupForm = normalizedForm;
 
-    if (trimmedEmail != null) {
-      _emitState(
-        state.copyWith(
-          loginName: trimmedEmail,
-          isSigningUp: true,
-          otpFlow: OtpFlow.signup,
-          clearAuthError: true,
-          clearOtpExpiry: true,
-          clearOtpError: true,
-        ),
-      );
-      await _sendSignupOtp(trimmedEmail);
-      return;
-    }
-
-    _emitState(state.copyWith(isSigningUp: true, clearAuthError: true));
-
-    try {
-      await _completeSignup(
-        phone: phone,
-        form: normalizedForm,
-        isSigningUp: false,
-      );
-    } on AuthException catch (error) {
-      _emitState(state.copyWith(isSigningUp: false, authError: error.message));
-    } catch (_) {
-      _emitState(
-        state.copyWith(
-          isSigningUp: false,
-          authError: AppStrings.current(AppKeys.signupFailed),
-        ),
-      );
-    }
+    _emitState(
+      state.copyWith(
+        loginName: email,
+        isSigningUp: true,
+        otpFlow: OtpFlow.signup,
+        clearAuthError: true,
+        clearOtpExpiry: true,
+        clearOtpError: true,
+      ),
+    );
+    await _sendSignupOtp(email);
   }
 
   Future<void> _completeSignup({
-    required String phone,
+    required String email,
     required SignupFormData form,
     bool? isVerifyingOtp,
     bool? isSigningUp,
   }) async {
-    final user = await _authService.signupWithPhone(
-      phone: phone,
+    final user = await _authService.signupWithEmail(
+      email: email,
       name: form.name,
       role: form.role.apiValue,
-      email: form.email,
     );
     _clearPendingSignup();
     _emitAuthenticationSucceeded(
@@ -94,11 +67,11 @@ extension AuthFlowSignup on AuthFlowCubit {
   }
 
   void _returnToSignupAfterOtp(String message) {
-    final signupPhone = _pendingSignupPhone;
+    final signupEmail = _pendingSignupEmail;
     _emitState(
       state.copyWith(
         screen: AuthScreen.signup,
-        loginName: signupPhone,
+        loginName: signupEmail,
         isVerifyingOtp: false,
         isSigningUp: false,
         authError: message,
@@ -109,7 +82,7 @@ extension AuthFlowSignup on AuthFlowCubit {
   }
 
   void _clearPendingSignup() {
-    _pendingSignupPhone = null;
+    _pendingSignupEmail = null;
     _pendingSignupForm = null;
   }
 }

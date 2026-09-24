@@ -118,24 +118,19 @@ class AuthApi implements AuthService {
   }
 
   @override
-  Future<LoginUser> signupWithPhone({
-    required String phone,
+  Future<LoginUser> signupWithEmail({
+    required String email,
     required String name,
     required String role,
-    String? email,
   }) async {
     final response = await _request(
-      () => _signup(
-        SignupRequest(phone: phone, name: name, email: email, role: role),
-      ),
+      () => _signup(SignupRequest(email: email, name: name, role: role)),
     );
 
     final user = response.toSignupModel(
-      fallbackPhone: phone,
       fallbackName: name,
       fallbackEmail: email,
     );
-    _loginUsers[phone] = user;
     final userEmail = user.email?.trim();
     if (userEmail != null && userEmail.isNotEmpty) {
       _loginUsers[userEmail] = user;
@@ -255,8 +250,7 @@ class AuthApi implements AuthService {
     String? avatarPath,
   }) async {
     final formData = FormData.fromMap({
-      'phone': request.phone,
-      if (request.email?.isNotEmpty == true) 'email': request.email,
+      'email': request.email,
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.role?.isNotEmpty == true) 'role': request.role,
       if (avatarPath?.isNotEmpty == true)

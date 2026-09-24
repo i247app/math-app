@@ -6,7 +6,6 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
-import 'package:numi/core/utils/phone/phone_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/widgets/login/login_action_button.dart';
 import 'package:numi/features/auth/widgets/login/phone_region_menu.dart';
@@ -75,9 +74,7 @@ class LoginCard extends StatelessWidget {
                     '${region.name}-${isSignupEntry ? 'signup' : 'login'}',
                   ),
                   controller: controller,
-                  keyboardType: isSignupEntry
-                      ? TextInputType.phone
-                      : TextInputType.emailAddress,
+                  keyboardType: TextInputType.emailAddress,
                   autofillHints: null,
                   autocorrect: false,
                   enableSuggestions: false,
@@ -86,14 +83,13 @@ class LoginCard extends StatelessWidget {
                   smartQuotesType: SmartQuotesType.disabled,
                   inputFormatters: isSignupEntry
                       ? <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                          PhoneInputFormatter(region),
+                          FilteringTextInputFormatter.deny(RegExp(r'\s')),
                         ]
                       : <TextInputFormatter>[LoginNameInputFormatter(region)],
                   onChanged: onLoginNameChanged,
                   decoration: InputDecoration(
                     hintText: isSignupEntry
-                        ? region.hint
+                        ? context.getText(AppKeys.signupEmailHint)
                         : context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
