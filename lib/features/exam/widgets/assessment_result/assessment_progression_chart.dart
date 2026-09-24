@@ -454,17 +454,17 @@ class _AssessmentChartPainter extends CustomPainter {
       if (finalPoint) {
         canvas.drawCircle(
           center,
-          math.min(12.0, axisInset),
+          math.min(10.0, axisInset),
           Paint()..color = const Color(0xFFD9EED5),
         );
       }
-      canvas.drawCircle(center, 6.5, Paint()..color = Colors.white);
+      canvas.drawCircle(center, 5, Paint()..color = Colors.white);
       canvas.drawCircle(
         center,
-        6.5,
+        5,
         Paint()
           ..color = border
-          ..strokeWidth = 2.7
+          ..strokeWidth = 2.2
           ..style = PaintingStyle.stroke,
       );
     }
