@@ -132,6 +132,30 @@ void main() {
       await tester.pumpWidget(const NumiApp());
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
+      expect(find.text('try your skill ?'), findsOneWidget);
+      expect(find.text('sign up'), findsOneWidget);
+    });
+
+    testWidgets('places assessment action 32 pixels above the books', (
+      tester,
+    ) async {
+      await tester.pumpWidget(const NumiApp());
+
+      final assessment = find.byKey(
+        const ValueKey('welcome-assessment-action'),
+      );
+      final books = find.byKey(const ValueKey('welcome-books'));
+      await tester.ensureVisible(assessment);
+
+      expect(books, findsOneWidget);
+      expect(
+        tester.getTopLeft(books).dy - tester.getBottomLeft(assessment).dy,
+        closeTo(32, 0.5),
+      );
+      expect(
+        tester.getBottomLeft(books).dy,
+        lessThan(tester.getTopLeft(find.text('sign up')).dy),
+      );
     });
 
     testWidgets('opens guest assessment from the initial welcome screen', (
@@ -149,11 +173,11 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('BẮT ĐẦU')).style?.fontSize,
+        tester.widget<Text>(find.text('sign up')).style?.fontSize,
         FontSize.large,
       );
-      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
-      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
 
       expect(guestAccounts.ensureCalls, 1);
@@ -195,8 +219,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
-      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
 
@@ -231,8 +255,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
-      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
 
       expect(
@@ -306,8 +330,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
-      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
 
       expect(
@@ -417,8 +441,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('ĐÁNH GIÁ'));
-      await tester.tap(find.text('ĐÁNH GIÁ'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
 
       final chart = tester.widget<AssessmentProgressionChart>(
@@ -610,8 +634,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('ASSESSMENT'));
-      await tester.tap(find.text('ASSESSMENT'));
+      await tester.ensureVisible(find.text('try your skill ?'));
+      await tester.tap(find.text('try your skill ?'));
       await tester.pumpAndSettle();
 
       expect(find.text('AI MATH'), findsOneWidget);
@@ -624,7 +648,8 @@ void main() {
     ) async {
       await tester.pumpWidget(const NumiApp());
 
-      await tester.tap(find.text('BẮT ĐẦU'));
+      await tester.ensureVisible(find.text('sign up'));
+      await tester.tap(find.text('sign up'));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('welcome-details')), findsOneWidget);
 

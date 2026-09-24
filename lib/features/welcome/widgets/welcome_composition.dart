@@ -127,8 +127,15 @@ class WelcomeComposition extends StatelessWidget {
                       ),
                       Column(
                         children: [
+                          WelcomeLoginButton(
+                            key: const ValueKey('welcome-assessment-action'),
+                            onLogin: onAssessment,
+                            labelText: 'TRY YOUR SKILLS ?',
+                          ),
+                          const SizedBox(height: 32),
                           Image.asset(
                             _booksAsset,
+                            key: const ValueKey('welcome-books'),
                             height: isTablet ? 180 : 130,
                             fit: BoxFit.contain,
                           ),
@@ -145,16 +152,14 @@ class WelcomeComposition extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    WelcomeStartButton(onStart: onStart),
+                                    WelcomeStartButton(
+                                      onStart: onStart,
+                                      labelText: 'SIGN UP',
+                                    ),
                                     const SizedBox(height: 20),
                                     WelcomeLoginButton(
                                       onLogin: onLogin,
                                       labelKey: AppKeys.welcomeLogin,
-                                    ),
-                                    const SizedBox(height: 20),
-                                    WelcomeLoginButton(
-                                      onLogin: onAssessment,
-                                      labelKey: AppKeys.assessmentAction,
                                     ),
                                   ],
                                 ),

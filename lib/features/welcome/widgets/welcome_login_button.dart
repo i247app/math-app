@@ -12,10 +12,12 @@ class WelcomeLoginButton extends StatelessWidget {
     super.key,
     required this.onLogin,
     this.labelKey = AppKeys.login,
+    this.labelText,
   });
 
   final VoidCallback onLogin;
   final String labelKey;
+  final String? labelText;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class WelcomeLoginButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Text(
-            context.getText(labelKey).toUpperCase(),
+            labelText ?? context.getText(labelKey).toUpperCase(),
             style: GoogleFonts.nunito(
               color: loginColor,
               fontSize: FontSize.large,
