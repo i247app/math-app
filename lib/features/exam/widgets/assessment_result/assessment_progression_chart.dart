@@ -107,6 +107,11 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     final grade = widget.finalGrade.clamp(0, 5);
     final activityLabel = context.getText(AppKeys.placementResultActivity);
     final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
+    final headerTextStyle = GoogleFonts.andika(
+      color: const Color(0xFF1C3A43),
+      fontSize: 22,
+      fontWeight: FontWeight.w800,
+    );
     return LayoutBuilder(
       builder: (context, constraints) {
         // A narrow card leaves less space after the grade and vertical axis.
@@ -147,11 +152,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                         key: const ValueKey(
                           'placement-progression-grade-title',
                         ),
-                        style: GoogleFonts.andika(
-                          color: const Color(0xFF1C3A43),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: headerTextStyle,
                       ),
                     ),
                   ),
@@ -163,14 +164,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          activityLabel,
-                          style: GoogleFonts.andika(
-                            color: const Color(0xFF61747B),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: Text(activityLabel, style: headerTextStyle),
                       ),
                     ),
                   ),

@@ -1323,6 +1323,11 @@ void main() {
     final chart = tester.getRect(
       find.byKey(const ValueKey('placement-progression-chart')),
     );
+    final levelTitle = tester.widget<Text>(
+      find.byKey(const ValueKey('placement-progression-grade-title')),
+    );
+    final activityTitle = tester.widget<Text>(find.text('Activity'));
+    expect(activityTitle.style, levelTitle.style);
     final lastLabel = tester.getRect(find.text('Activity'));
     expect(find.text('Test 1'), findsNothing);
     expect(lastLabel.right, lessThan(chart.right));
