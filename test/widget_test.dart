@@ -433,7 +433,7 @@ void main() {
       expect(chart.finalGrade, 3);
       expect(chart.testNumbers, <int>[1, 2]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 2));
-      expect(chart.headerLabel, isNull);
+      expect(find.text('Activity'), findsOneWidget);
       expect(chart.maxVisiblePoints, 7);
       final currentGrade = find.byKey(
         const ValueKey('placement-progression-current-grade'),
@@ -474,10 +474,10 @@ void main() {
       );
       expect(plotRect.left - gradeTickRect.right, closeTo(12, 0.5));
       expect(plotRect.width, closeTo(chartRect.width - 200, 1));
-      final submittedTimeRect = tester.getRect(
+      expect(
         find.byKey(const ValueKey('placement-progression-submitted-time')),
+        findsNothing,
       );
-      expect(submittedTimeRect.right, closeTo(chartRect.right - 19, 1));
       expect(examService.statsCalls, 0);
       expect(examService.progressCalls, 1);
     });
@@ -527,7 +527,7 @@ void main() {
       expect(chart.maxVisiblePoints, 7);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 7));
       expect(find.text('Bài 1'), findsNothing);
-      expect(find.text('Bài 7'), findsOneWidget);
+      expect(find.text('Activity'), findsOneWidget);
       final scrollable = find.descendant(
         of: find.byKey(const ValueKey('welcome-assessment-intro-chart')),
         matching: find.byType(Scrollable),

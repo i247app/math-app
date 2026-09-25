@@ -69,7 +69,7 @@ void main() {
         find.byType(AssessmentProgressionChart),
       );
       expect(chart.chartHeight, 150);
-      expect(chart.headerLabel, isNull);
+      expect(find.text('Activity'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);

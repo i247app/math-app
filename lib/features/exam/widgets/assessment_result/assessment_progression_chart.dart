@@ -23,7 +23,6 @@ class AssessmentProgressionChart extends StatefulWidget {
     this.firstTestNumber = 1,
     this.maxVisiblePoints = 7,
     this.chartHeight = 150,
-    this.headerLabel,
     this.lastSubmittedAt,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
@@ -35,7 +34,6 @@ class AssessmentProgressionChart extends StatefulWidget {
   final int firstTestNumber;
   final int maxVisiblePoints;
   final double chartHeight;
-  final String? headerLabel;
   final DateTime? lastSubmittedAt;
   final bool animate;
   final Duration animationDuration;
@@ -104,49 +102,10 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     ];
   }
 
-  int _lastTestNumber() {
-    if (widget.testNumbers != null && widget.testNumbers!.isNotEmpty) {
-      return widget.testNumbers!.last;
-    }
-    return widget.firstTestNumber + widget.previousGrades.length;
-  }
-
-  String? _submittedTimeLabel(BuildContext context) {
-    final submittedAt = widget.lastSubmittedAt;
-    if (submittedAt == null) return null;
-    final elapsed = DateTime.now().difference(submittedAt);
-    if (elapsed.inDays < 1) {
-      final local = submittedAt.toLocal();
-      return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
-    }
-    final days = elapsed.inDays;
-    final count = days >= 30
-        ? days ~/ 30
-        : days >= 7
-        ? days ~/ 7
-        : days;
-    final key = days >= 30
-        ? AppKeys.placementResultMonthsAgo
-        : days >= 7
-        ? AppKeys.placementResultWeeksAgo
-        : AppKeys.placementResultDaysAgo;
-    return context.formatText(key, {
-      'count': count,
-      'plural': count == 1 ? '' : 's',
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final grade = widget.finalGrade.clamp(0, 5);
-    final resolvedHeaderLabel =
-        widget.headerLabel ??
-        context.formatText(AppKeys.placementResultTest, {
-          'number': _lastTestNumber(),
-        });
-    final submittedTimeLabel = widget.headerLabel == null
-        ? _submittedTimeLabel(context)
-        : null;
+    final activityLabel = context.getText(AppKeys.placementResultActivity);
     final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -204,30 +163,13 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerRight,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              resolvedHeaderLabel,
-                              style: GoogleFonts.andika(
-                                color: const Color(0xFF61747B),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (submittedTimeLabel != null)
-                              Text(
-                                ' · $submittedTimeLabel',
-                                key: const ValueKey(
-                                  'placement-progression-submitted-time',
-                                ),
-                                style: GoogleFonts.andika(
-                                  color: const Color(0xFF61747B),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                          ],
+                        child: Text(
+                          activityLabel,
+                          style: GoogleFonts.andika(
+                            color: const Color(0xFF61747B),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

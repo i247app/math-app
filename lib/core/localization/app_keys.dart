@@ -859,11 +859,7 @@ class AppKeys {
   static const placementResultChartGrade = 'placement_result_chart_grade';
   static const placementResultKindergartenShort =
       'placement_result_kindergarten_short';
-  static const placementResultTest = 'placement_result_test';
   static const placementResultActivity = 'placement_result_activity';
-  static const placementResultDaysAgo = 'placement_result_days_ago';
-  static const placementResultWeeksAgo = 'placement_result_weeks_ago';
-  static const placementResultMonthsAgo = 'placement_result_months_ago';
   static const examReviewPracticeBannerTitle =
       'exam_review_practice_banner_title';
   static const examReviewTopicConjunction = 'exam_review_topic_conjunction';

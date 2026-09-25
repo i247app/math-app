@@ -455,9 +455,6 @@ class _AssessmentPlacementResultScreenState
                                 _resolvedCurrentTestNumber -
                                 _resolvedPreviousGrades.length,
                             lastSubmittedAt: _resolvedCurrentSubmittedAt,
-                            headerLabel: context.getText(
-                              AppKeys.placementResultActivity,
-                            ),
                             chartHeight: isCompact ? 90.0 : 115.0,
                           ),
                         ),
