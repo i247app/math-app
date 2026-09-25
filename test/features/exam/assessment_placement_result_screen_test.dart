@@ -228,6 +228,109 @@ void main() {
     });
   }
 
+  for (final viewport
+      in <
+        ({
+          String name,
+          double width,
+          double height,
+          double topInset,
+          double bottomInset,
+          double textScale,
+        })
+      >[
+        (
+          name: 'iPhone with home indicator',
+          width: 393,
+          height: 852,
+          topInset: 59,
+          bottomInset: 34,
+          textScale: 1,
+        ),
+        (
+          name: 'small iPhone',
+          width: 375,
+          height: 667,
+          topInset: 20,
+          bottomInset: 0,
+          textScale: 1,
+        ),
+        (
+          name: 'narrow phone',
+          width: 320,
+          height: 568,
+          topInset: 20,
+          bottomInset: 0,
+          textScale: 1,
+        ),
+        (
+          name: 'iPhone with larger text',
+          width: 393,
+          height: 852,
+          topInset: 59,
+          bottomInset: 34,
+          textScale: 1.3,
+        ),
+      ]) {
+    testWidgets('result fits ${viewport.name} safe area', (tester) async {
+      tester.view.physicalSize = Size(viewport.width, viewport.height);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = FakeViewPadding(
+        top: viewport.topInset,
+        bottom: viewport.bottomInset,
+      );
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPadding);
+
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(viewport.textScale)),
+            child: child!,
+          ),
+          theme: ThemeData(
+            platform: TargetPlatform.iOS,
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: const AssessmentPlacementResultScreen(
+              grade: 0,
+              correctAnswers: 5,
+              totalQuestions: 8,
+              examService: _UnusedExamService(),
+              practiceWeakTopics: <ExamPracticeTopic>[
+                ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final scrollable = find.descendant(
+        of: find.byKey(const ValueKey('assessment-placement-result')),
+        matching: find.byType(Scrollable),
+      );
+      expect(
+        tester.state<ScrollableState>(scrollable).position.maxScrollExtent,
+        0,
+      );
+      expect(
+        tester
+            .getRect(find.byKey(const ValueKey('placement-practice-again')))
+            .bottom,
+        lessThanOrEqualTo(viewport.height - viewport.bottomInset),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('shows a numbered grade', (tester) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);

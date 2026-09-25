@@ -153,13 +153,13 @@ class WelcomeComposition extends StatelessWidget {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     WelcomeStartButton(
-                                      onStart: onStart,
-                                      labelText: 'SIGN UP',
+                                      onStart: onLogin,
+                                      labelText: 'LOGIN',
                                     ),
                                     const SizedBox(height: 20),
                                     WelcomeLoginButton(
-                                      onLogin: onLogin,
-                                      labelKey: AppKeys.welcomeLogin,
+                                      onLogin: onStart,
+                                      labelText: 'SIGNUP',
                                     ),
                                   ],
                                 ),

@@ -24,7 +24,7 @@ const welcomeStrings = <String, Map<String, String>>{
     AppKeys.welcomeTitleN: 'NUMI',
     AppKeys.welcomeSubtitlePrefix: 'Join Numi',
     AppKeys.welcomeSubtitle: 'and become a math wizard!',
-    AppKeys.welcomeLogin: 'LOG IN',
+    AppKeys.welcomeLogin: 'LOGIN',
     AppKeys.start: 'START',
     AppKeys.welcomeTaglineMath: 'Math ',
     AppKeys.welcomeTaglineStudyAssessment: 'Learn & Assessment',

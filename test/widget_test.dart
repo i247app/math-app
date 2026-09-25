@@ -156,7 +156,25 @@ void main() {
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
       expect(find.text('TEST YOUR SKILL'), findsOneWidget);
-      expect(find.text('SIGN UP'), findsOneWidget);
+      expect(find.text('LOGIN'), findsOneWidget);
+      expect(find.text('SIGNUP'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('LOGIN')).dy,
+        lessThan(tester.getTopLeft(find.text('SIGNUP')).dy),
+      );
+      expect(
+        tester
+            .widget<Material>(
+              find
+                  .ancestor(
+                    of: find.text('LOGIN'),
+                    matching: find.byType(Material),
+                  )
+                  .first,
+            )
+            .color,
+        tester.element(find.text('LOGIN')).themeColors.accent,
+      );
       final assessment = find.byKey(
         const ValueKey('welcome-assessment-action'),
       );
@@ -208,7 +226,7 @@ void main() {
       );
       expect(
         tester.getBottomLeft(books).dy,
-        lessThan(tester.getTopLeft(find.text('SIGN UP')).dy),
+        lessThan(tester.getTopLeft(find.text('LOGIN')).dy),
       );
     });
 
@@ -227,7 +245,7 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('SIGN UP')).style?.fontSize,
+        tester.widget<Text>(find.text('LOGIN')).style?.fontSize,
         FontSize.large,
       );
       await tester.ensureVisible(find.text('TEST YOUR SKILL'));
@@ -691,6 +709,11 @@ void main() {
         ),
       );
 
+      expect(find.text('LOGIN'), findsOneWidget);
+      expect(find.text('SIGNUP'), findsOneWidget);
+      expect(find.text('LOG IN'), findsNothing);
+      expect(find.text('SIGN UP'), findsNothing);
+
       await tester.ensureVisible(find.text('TEST YOUR SKILL'));
       await tester.tap(find.text('TEST YOUR SKILL'));
       await tester.pumpAndSettle();
@@ -700,39 +723,38 @@ void main() {
       expect(find.text('TOÁN AI'), findsNothing);
     });
 
+    testWidgets('continues from welcome directly to the signup entry screen', (
+      tester,
+    ) async {
+      await tester.pumpWidget(const NumiApp());
+
+      final signupButton = find.text('SIGNUP');
+      await tester.ensureVisible(signupButton);
+      await tester.tap(signupButton);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('signup')), findsOneWidget);
+      expect(find.byKey(const ValueKey('welcome-details')), findsNothing);
+
+      await tester.tap(find.byType(AppBackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
+    });
+
     testWidgets(
-      'continues from welcome directly to the login screen in signup mode',
-      (tester) async {
-        await tester.pumpWidget(const NumiApp());
-
-        final signupButton = find.text('SIGN UP');
-        await tester.ensureVisible(signupButton);
-        await tester.tap(signupButton);
-        await tester.pumpAndSettle();
-
-        expect(find.byKey(const ValueKey('login')), findsOneWidget);
-        expect(find.byKey(const ValueKey('welcome-details')), findsNothing);
-
-        await tester.tap(find.byType(AppBackButton));
-        await tester.pumpAndSettle();
-
-        expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'signup entry uses email field, delays email errors until submit, and proceeds to signup screen on valid email',
+      'signup entry uses email field, delays email errors until submit, and proceeds to registration profile on valid email',
       (tester) async {
         final authService = _SignupLookupAuthService();
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(NumiApp(authService: authService));
 
-        final signupButton = find.text('SIGN UP');
+        final signupButton = find.text('SIGNUP');
         await tester.ensureVisible(signupButton);
         await tester.tap(signupButton);
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const ValueKey('login')), findsOneWidget);
+        expect(find.byKey(const ValueKey('signup')), findsOneWidget);
         expect(find.text('🇻🇳'), findsNothing);
         expect(
           tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
@@ -745,7 +767,10 @@ void main() {
 
         expect(authService.lookedUpNames, isEmpty);
         expect(find.text('🇻🇳'), findsNothing);
-        expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
+        expect(
+          find.byKey(const ValueKey('auth-identifier-error')),
+          findsNothing,
+        );
 
         final actionButton = find.byType(ElevatedButton);
         expect(
@@ -756,15 +781,18 @@ void main() {
         await tester.tap(actionButton);
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('auth-identifier-error')),
+          findsOneWidget,
+        );
         final invalidEmailError = find.byKey(
-          const ValueKey('login-name-error'),
+          const ValueKey('auth-identifier-error'),
         );
         expect(
           tester.widget<Text>(invalidEmailError).style?.color,
           tester.element(invalidEmailError).themeColors.error,
         );
-        expect(find.byKey(const ValueKey('signup')), findsNothing);
+        expect(find.byKey(const ValueKey('signup')), findsOneWidget);
         expect(authService.lookedUpNames, isEmpty);
 
         await tester.enterText(input, 'learner@example.com');
@@ -775,7 +803,10 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(authService.lookedUpNames, <String>['learner@example.com']);
-        expect(find.byKey(const ValueKey('signup')), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('registration-profile')),
+          findsOneWidget,
+        );
         expect(find.text('learner@example.com'), findsOneWidget);
         final signupEmailField = tester
             .widgetList<TextField>(find.byType(TextField))
@@ -793,7 +824,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('SIGN UP');
+      final signupButton = find.text('SIGNUP');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -806,11 +837,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(authService.lookedUpNames, <String>['learner@example.com']);
-      expect(find.byKey(const ValueKey('login')), findsOneWidget);
-      expect(find.byKey(const ValueKey('signup')), findsNothing);
-      expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+      expect(find.byKey(const ValueKey('signup')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('auth-identifier-error')),
+        findsOneWidget,
+      );
       final errorText = tester.widget<Text>(
-        find.byKey(const ValueKey('login-name-error')),
+        find.byKey(const ValueKey('auth-identifier-error')),
       );
       expect(errorText.data?.toLowerCase(), contains('email'));
     });
@@ -821,7 +854,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(const NumiApp());
 
-      final welcomeLogin = find.text('ĐĂNG NHẬP');
+      final welcomeLogin = find.text('LOGIN');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -840,7 +873,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(const NumiApp());
 
-        final welcomeLogin = find.text('ĐĂNG NHẬP');
+        final welcomeLogin = find.text('LOGIN');
         await tester.ensureVisible(welcomeLogin);
         await tester.tap(welcomeLogin);
         await tester.pumpAndSettle();
@@ -882,7 +915,7 @@ void main() {
         NumiApp(authService: _FailingLoginLookupAuthService()),
       );
 
-      final welcomeLogin = find.text('ĐĂNG NHẬP');
+      final welcomeLogin = find.text('LOGIN');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -900,7 +933,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: _FakeAuthService()));
 
-      final welcomeLogin = find.text('ĐĂNG NHẬP');
+      final welcomeLogin = find.text('LOGIN');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
