@@ -258,8 +258,8 @@ class _WelcomeAssessmentIntroScreenState
                                 fit: BoxFit.scaleDown,
                                 child: Text(
                                   isVietnamese
-                                      ? 'Kiểm Tra Năng Lực'
-                                      : 'ASESSMENT TEST',
+                                      ? 'ĐÁNH GIÁ NĂNG LỰC'
+                                      : 'ASESSMENT',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: 'NunitoVariable',
