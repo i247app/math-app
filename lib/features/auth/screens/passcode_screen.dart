@@ -275,7 +275,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   String get _secondaryLabelKey {
     if (widget.mode == PasscodeScreenMode.unlock) {
-      return AppKeys.passcodeLoginWithPhone;
+      return AppKeys.passcodeLoginWithEmail;
     }
     return AppKeys.passcodeSkip;
   }
