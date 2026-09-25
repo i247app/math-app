@@ -415,6 +415,7 @@ void main() {
       expect(chart.finalGrade, 3);
       expect(chart.testNumbers, <int>[1, 2]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 2));
+      expect(chart.headerLabel, isNull);
       expect(chart.maxVisiblePoints, 7);
       final currentGrade = find.byKey(
         const ValueKey('placement-progression-current-grade'),

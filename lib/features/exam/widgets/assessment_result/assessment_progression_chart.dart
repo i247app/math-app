@@ -23,6 +23,7 @@ class AssessmentProgressionChart extends StatefulWidget {
     this.firstTestNumber = 1,
     this.maxVisiblePoints = 7,
     this.chartHeight = 150,
+    this.headerLabel,
     this.lastSubmittedAt,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
@@ -34,6 +35,7 @@ class AssessmentProgressionChart extends StatefulWidget {
   final int firstTestNumber;
   final int maxVisiblePoints;
   final double chartHeight;
+  final String? headerLabel;
   final DateTime? lastSubmittedAt;
   final bool animate;
   final Duration animationDuration;
@@ -137,10 +139,14 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   @override
   Widget build(BuildContext context) {
     final grade = widget.finalGrade.clamp(0, 5);
-    final testLabel = context.formatText(AppKeys.placementResultTest, {
-      'number': _lastTestNumber(),
-    });
-    final submittedTimeLabel = _submittedTimeLabel(context);
+    final resolvedHeaderLabel =
+        widget.headerLabel ??
+        context.formatText(AppKeys.placementResultTest, {
+          'number': _lastTestNumber(),
+        });
+    final submittedTimeLabel = widget.headerLabel == null
+        ? _submittedTimeLabel(context)
+        : null;
     final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -202,7 +208,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              testLabel,
+                              resolvedHeaderLabel,
                               style: GoogleFonts.andika(
                                 color: const Color(0xFF61747B),
                                 fontSize: 16,

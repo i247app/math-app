@@ -1,14 +1,17 @@
 import 'package:numi/features/exam/models/exam.dart';
 
+List<String> examPracticeTopicNames(Iterable<ExamPracticeTopic> topics) =>
+    topics
+        .map((topic) => topic.topic.trim())
+        .where((topic) => topic.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+
 String formatExamPracticeTopics(
   Iterable<ExamPracticeTopic> topics, {
   required String conjunction,
 }) {
-  final topicNames = topics
-      .map((topic) => topic.topic.trim())
-      .where((topic) => topic.isNotEmpty)
-      .toSet()
-      .toList(growable: false);
+  final topicNames = examPracticeTopicNames(topics);
   if (topicNames.isEmpty) {
     return '';
   }

@@ -65,6 +65,11 @@ void main() {
       expect(find.byType(AssessmentGradeRibbon), findsOneWidget);
       expect(find.byType(HomeBanner), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byType(AssessmentProgressionChart),
+      );
+      expect(chart.chartHeight, 150);
+      expect(chart.headerLabel, isNull);
       expect(find.byType(LearningStreakCard), findsNothing);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);

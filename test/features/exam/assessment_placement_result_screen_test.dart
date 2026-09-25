@@ -70,6 +70,14 @@ void main() {
     expect(find.text('Kết Quả'), findsOneWidget);
     expect(find.text('Trình độ'), findsOneWidget);
     expect(find.text('MẪU GIÁO'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('Trình độ')).style?.fontFamily,
+      'NunitoVariable',
+    );
+    expect(
+      tester.widget<Text>(find.text('M')).style?.fontFamily,
+      'NunitoVariable',
+    );
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
     expect(find.text('Xem chi tiết'), findsOneWidget);
@@ -78,8 +86,18 @@ void main() {
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
     );
-    expect(gradeRect.top - levelRect.bottom, greaterThanOrEqualTo(16));
+    expect(gradeRect.top - levelRect.bottom, greaterThanOrEqualTo(8));
     expect(find.byKey(const ValueKey('placement-mascot')), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('placement-mascot'))),
+      const Size(120, 120),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const ValueKey('placement-grade-container')))
+          .height,
+      48,
+    );
     final mascotImage = tester.widget<Image>(
       find.byKey(const ValueKey('placement-mascot-character')),
     );
@@ -116,6 +134,99 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('uses smaller mascot and grade title on compact screens', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: const AssessmentPlacementResultScreen(
+            grade: 0,
+            correctAnswers: 5,
+            totalQuestions: 8,
+            examService: _UnusedExamService(),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      tester.getSize(find.byKey(const ValueKey('placement-mascot'))),
+      const Size(76.8, 76.8),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const ValueKey('placement-grade-container')))
+          .height,
+      44,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final height in <double>[520, 760]) {
+    testWidgets('keeps actions visible without scrolling at height $height', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(360, height);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: const AssessmentPlacementResultScreen(
+              grade: 0,
+              correctAnswers: 5,
+              totalQuestions: 8,
+              examService: _UnusedExamService(),
+              practiceWeakTopics: <ExamPracticeTopic>[
+                ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byType(AssessmentProgressionChart),
+      );
+      expect(chart.chartHeight, height <= 740 ? 90 : 115);
+      expect(chart.headerLabel, 'Hoạt động');
+      final scrollable = find.descendant(
+        of: find.byKey(const ValueKey('assessment-placement-result')),
+        matching: find.byType(Scrollable),
+      );
+      final position = tester.state<ScrollableState>(scrollable).position;
+      expect(position.maxScrollExtent, 0);
+      expect(
+        tester
+            .getRect(find.byKey(const ValueKey('placement-practice-again')))
+            .bottom,
+        lessThanOrEqualTo(height),
+      );
+    });
+  }
 
   testWidgets('shows a numbered grade', (tester) async {
     final lingo = LingoProvider();
@@ -180,9 +291,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('shows the same normalized weak topics used by practice', (
-    tester,
-  ) async {
+  testWidgets('expands distinct weak topics as bullet points', (tester) async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
 
@@ -218,7 +328,30 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const ValueKey('placement-weak-topics')), findsOneWidget);
-    expect(find.text('Luyện Phép trừ có nhớ và Toán đố'), findsOneWidget);
+    expect(find.text('Điểm con cần cải thiện'), findsOneWidget);
+    expect(find.text('Phép trừ có nhớ'), findsNothing);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('placement-weak-topics-toggle')),
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('placement-weak-topics-toggle')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Phép trừ có nhớ'), findsOneWidget);
+    expect(find.text('Toán đố'), findsOneWidget);
+    expect(find.text('•'), findsNWidgets(2));
+
+    await tester.tap(
+      find.byKey(const ValueKey('placement-weak-topics-toggle')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Phép trừ có nhớ'), findsNothing);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+    expect(find.text('Child Weaknesses'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -367,6 +500,12 @@ void main() {
     );
     expect(find.text('GRADE'), findsOneWidget);
     expect(find.text('LỚP'), findsNothing);
+    expect(find.text('Activity'), findsOneWidget);
+    expect(find.textContaining('Test '), findsNothing);
+    expect(
+      find.byKey(const ValueKey('placement-progression-submitted-time')),
+      findsNothing,
+    );
     expect(tester.widget<Text>(find.text('GRADE')).style?.color, Colors.black);
 
     final gradeRect = tester.getRect(
@@ -476,7 +615,7 @@ void main() {
       find.byKey(const ValueKey('placement-progression-chart')),
       findsOneWidget,
     );
-    expect(find.text('Bài 1'), findsOneWidget);
+    expect(find.text('Hoạt động'), findsOneWidget);
     expect(find.text('Bài 5'), findsNothing);
     expect(find.text('K'), findsOneWidget);
     final ribbonImage = tester.widget<Image>(
@@ -623,7 +762,11 @@ void main() {
       expect(chart.testNumbers, [1, 2, 3, 4, 5, 6]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 6));
       expect(find.text('Bài 2'), findsNothing);
-      expect(find.text('Bài 6'), findsOneWidget);
+      expect(find.text('Hoạt động'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('placement-progression-submitted-time')),
+        findsNothing,
+      );
       expect(find.text('Bài 1'), findsNothing);
       expect(
         find.byKey(const ValueKey('placement-grade-ribbon')),
@@ -685,7 +828,7 @@ void main() {
             .data,
         '2',
       );
-      expect(find.text('Bài 5'), findsOneWidget);
+      expect(find.text('Hoạt động'), findsOneWidget);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
       );

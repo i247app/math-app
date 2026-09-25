@@ -320,19 +320,17 @@ class _AssessmentPlacementResultScreenState
       AppKeys.placementResultCorrectSummary,
       {'correct': _correctAnswers, 'total': _totalQuestions},
     );
-    final weakTopics = formatExamPracticeTopics(
-      widget.practiceWeakTopics,
-      conjunction: context.getText(AppKeys.examReviewTopicConjunction),
-    );
+    final weakTopics = examPracticeTopicNames(widget.practiceWeakTopics);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewportHeight = constraints.maxHeight;
         final isCompact = viewportHeight <= 740;
+        final isVeryCompact = viewportHeight <= 600;
         final mascotSize = isCompact
-            ? (viewportHeight * 0.17).clamp(118.0, 138.0)
-            : (viewportHeight * 0.21).clamp(150.0, 180.0);
-        final sectionSpacing = isCompact ? 8.0 : 12.0;
+            ? (viewportHeight * 0.12).clamp(76.0, 92.0)
+            : (viewportHeight * 0.15).clamp(104.0, 124.0);
+        final sectionSpacing = isVeryCompact ? 4.0 : (isCompact ? 6.0 : 10.0);
 
         return SingleChildScrollView(
           key: const ValueKey('assessment-placement-result'),
@@ -343,6 +341,7 @@ class _AssessmentPlacementResultScreenState
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 PageHeader(
+                  scale: 0.9,
                   title: null,
                   topInset: 0,
                   backgroundColor: Colors.white,
@@ -393,15 +392,18 @@ class _AssessmentPlacementResultScreenState
                 Text(
                   context.getText(AppKeys.placementResultLevel),
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.andika(
+                  style: const TextStyle(
+                    fontFamily: 'NunitoVariable',
                     color: const Color(0xFF04A8B3),
                     fontSize: FontSize.xxl,
                     fontWeight: FontWeight.w800,
                     height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 16),
-                _PlacementGradeTitle(grade: _grade),
+                SizedBox(
+                  height: isVeryCompact ? 4.0 : (isCompact ? 8.0 : 10.0),
+                ),
+                _PlacementGradeTitle(grade: _grade, compact: isCompact),
                 if (widget.level case final level?) ...[
                   const SizedBox(height: 6),
                   Text(
@@ -409,7 +411,8 @@ class _AssessmentPlacementResultScreenState
                       'level': level,
                     }),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.andika(
+                    style: TextStyle(
+                      fontFamily: 'NunitoVariable',
                       color: colors.brandStrong,
                       fontSize: FontSize.large,
                       fontWeight: FontWeight.w800,
@@ -417,9 +420,11 @@ class _AssessmentPlacementResultScreenState
                     ),
                   ),
                 ],
-                SizedBox(height: isCompact ? 2.0 : 4.0),
-                _CelebrationMascot(size: mascotSize),
-                SizedBox(height: isCompact ? 2.0 : 4.0),
+                if (!isVeryCompact) ...[
+                  SizedBox(height: isCompact ? 2.0 : 4.0),
+                  _CelebrationMascot(size: mascotSize),
+                  SizedBox(height: isCompact ? 2.0 : 4.0),
+                ],
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0, end: 1),
                   duration: const Duration(milliseconds: 400),
@@ -450,7 +455,10 @@ class _AssessmentPlacementResultScreenState
                                 _resolvedCurrentTestNumber -
                                 _resolvedPreviousGrades.length,
                             lastSubmittedAt: _resolvedCurrentSubmittedAt,
-                            chartHeight: isCompact ? 145.0 : 180.0,
+                            headerLabel: context.getText(
+                              AppKeys.placementResultActivity,
+                            ),
+                            chartHeight: isCompact ? 90.0 : 115.0,
                           ),
                         ),
                       ],
@@ -461,7 +469,10 @@ class _AssessmentPlacementResultScreenState
                   SizedBox(height: sectionSpacing),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: _PlacementWeakTopicsBanner(topics: weakTopics),
+                    child: _PlacementWeakTopicsDropdown(
+                      topics: weakTopics,
+                      maxExpandedHeight: viewportHeight * 0.25,
+                    ),
                   ),
                 ],
                 SizedBox(height: sectionSpacing),
@@ -496,7 +507,9 @@ class _AssessmentPlacementResultScreenState
                     ],
                   ),
                 ),
-                SizedBox(height: isCompact ? 14.0 : 24.0),
+                SizedBox(
+                  height: isVeryCompact ? 4.0 : (isCompact ? 10.0 : 16.0),
+                ),
               ],
             ),
           ),
@@ -506,42 +519,126 @@ class _AssessmentPlacementResultScreenState
   }
 }
 
-class _PlacementWeakTopicsBanner extends StatelessWidget {
-  const _PlacementWeakTopicsBanner({required this.topics});
+class _PlacementWeakTopicsDropdown extends StatefulWidget {
+  const _PlacementWeakTopicsDropdown({
+    required this.topics,
+    required this.maxExpandedHeight,
+  });
 
-  final String topics;
+  final List<String> topics;
+  final double maxExpandedHeight;
+
+  @override
+  State<_PlacementWeakTopicsDropdown> createState() =>
+      _PlacementWeakTopicsDropdownState();
+}
+
+class _PlacementWeakTopicsDropdownState
+    extends State<_PlacementWeakTopicsDropdown> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = GoogleFonts.andika(
+      color: AppColors.coral600,
+      fontSize: FontSize.small,
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
+
     return Container(
       key: const ValueKey('placement-weak-topics'),
-      constraints: const BoxConstraints(minHeight: 36),
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFFE2D6),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(
-        context.formatText(AppKeys.placementResultWeakTopics, {
-          'topics': topics,
-        }),
-        textAlign: TextAlign.center,
-        style: GoogleFonts.andika(
-          color: AppColors.coral600,
-          fontSize: FontSize.small,
-          fontWeight: FontWeight.w700,
-          height: 1.2,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Semantics(
+            button: true,
+            expanded: _expanded,
+            child: InkWell(
+              key: const ValueKey('placement-weak-topics-toggle'),
+              onTap: () => setState(() => _expanded = !_expanded),
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                height: 40,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          context.getText(
+                            AppKeys.placementResultWeaknessesTitle,
+                          ),
+                          style: textStyle,
+                        ),
+                      ),
+                      AnimatedRotation(
+                        turns: _expanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 250),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppColors.coral600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          ClipRect(
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _expanded
+                  ? ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: widget.maxExpandedHeight,
+                      ),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (final topic in widget.topics)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('•', style: textStyle),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(topic, style: textStyle),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _PlacementGradeTitle extends StatelessWidget {
-  const _PlacementGradeTitle({required this.grade});
+  const _PlacementGradeTitle({required this.grade, required this.compact});
 
   final int grade;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -553,16 +650,17 @@ class _PlacementGradeTitle extends StatelessWidget {
         ? (label.characters.length / 2).ceil()
         : label.characters.toList().indexOf(' ');
     final glyphs = label.characters.toList();
-    final textStyle = GoogleFonts.andika(
-      fontSize: 44,
+    final textStyle = TextStyle(
+      fontFamily: 'NunitoVariable',
+      fontSize: compact ? 34 : 38,
       fontWeight: FontWeight.w900,
-      height: 1.08,
-      letterSpacing: 1.2,
+      height: 1,
+      letterSpacing: 0.5,
     );
 
     return SizedBox(
       key: const ValueKey('placement-grade-container'),
-      height: 58,
+      height: compact ? 44 : 48,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Semantics(
