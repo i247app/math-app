@@ -162,7 +162,7 @@ class _AssessmentPlacementResultScreenState
     final historyEndIndex = hasCurrentResult
         ? currentIndex
         : validPoints.length;
-    final historyStartIndex = historyEndIndex > 4 ? historyEndIndex - 4 : 0;
+    final historyStartIndex = historyEndIndex > 6 ? historyEndIndex - 6 : 0;
     final previousPoints = validPoints.sublist(
       historyStartIndex,
       historyEndIndex,

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -413,28 +412,13 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                 children: [
                   AssessmentGradeRibbon(currentGrade: _currentGrade),
                   const SizedBox(height: 18),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final chartWidth = math.max(
-                        constraints.maxWidth,
-                        210.0 + (_testNumbers.length - 1) * 64.0,
-                      );
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SizedBox(
-                          width: chartWidth,
-                          child: AssessmentProgressionChart(
-                            key: const ValueKey('parent-home-progress-chart'),
-                            finalGrade: _currentGrade,
-                            previousGrades: _previousGrades,
-                            testNumbers: _testNumbers,
-                            lastSubmittedAt: _lastSubmittedAt,
-                            maxVisiblePoints: null,
-                            chartHeight: 150,
-                          ),
-                        ),
-                      );
-                    },
+                  AssessmentProgressionChart(
+                    key: const ValueKey('parent-home-progress-chart'),
+                    finalGrade: _currentGrade,
+                    previousGrades: _previousGrades,
+                    testNumbers: _testNumbers,
+                    lastSubmittedAt: _lastSubmittedAt,
+                    chartHeight: 150,
                   ),
                   const SizedBox(height: 24),
                   ParentHomeActionButton(

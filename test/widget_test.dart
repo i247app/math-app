@@ -415,7 +415,7 @@ void main() {
       expect(chart.finalGrade, 3);
       expect(chart.testNumbers, <int>[1, 2]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 2));
-      expect(chart.maxVisiblePoints, isNull);
+      expect(chart.maxVisiblePoints, 7);
       final currentGrade = find.byKey(
         const ValueKey('placement-progression-current-grade'),
       );
@@ -463,7 +463,7 @@ void main() {
       expect(examService.progressCalls, 1);
     });
 
-    testWidgets('assessment intro keeps every assessment in scrollable chart', (
+    testWidgets('assessment intro fits recent assessments without scrolling', (
       tester,
     ) async {
       final examService = _IntroHistoryExamService(
@@ -505,7 +505,7 @@ void main() {
       expect(chart.previousGrades, <int>[1, 2, 3, 4, 5, 0]);
       expect(chart.finalGrade, 1);
       expect(chart.testNumbers, <int>[1, 2, 3, 4, 5, 6, 7]);
-      expect(chart.maxVisiblePoints, isNull);
+      expect(chart.maxVisiblePoints, 7);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 7));
       expect(find.text('Bài 1'), findsNothing);
       expect(find.text('Bài 7'), findsOneWidget);
@@ -513,9 +513,11 @@ void main() {
         of: find.byKey(const ValueKey('welcome-assessment-intro-chart')),
         matching: find.byType(Scrollable),
       );
-      final position = tester.state<ScrollableState>(scrollable).position;
-      expect(position.maxScrollExtent, greaterThan(0));
-      expect(position.pixels, position.maxScrollExtent);
+      expect(scrollable, findsNothing);
+      final plot = tester.widget<CustomPaint>(
+        find.byKey(const ValueKey('placement-progression-plot')),
+      );
+      expect((plot.painter as dynamic).points, hasLength(7));
       expect(examService.statsCalls, 0);
     });
 

@@ -51,7 +51,6 @@ class _WelcomeAssessmentIntroScreenState
   List<int> _testNumbers = const <int>[1];
   DateTime? _lastSubmittedAt;
   int _chartRequestId = 0;
-  final ScrollController _chartScrollController = ScrollController();
 
   @override
   void initState() {
@@ -96,15 +95,6 @@ class _WelcomeAssessmentIntroScreenState
             : points.map((point) => point.sequence).toList(growable: false);
         _lastSubmittedAt = points.isEmpty ? null : points.last.completedDt;
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted &&
-            requestId == _chartRequestId &&
-            _chartScrollController.hasClients) {
-          _chartScrollController.jumpTo(
-            _chartScrollController.position.maxScrollExtent,
-          );
-        }
-      });
     } catch (_) {
       // Keep the last rendered state if progress cannot be refreshed.
     } finally {
@@ -118,31 +108,14 @@ class _WelcomeAssessmentIntroScreenState
     return SizedBox(
       key: const ValueKey('welcome-assessment-intro-chart'),
       width: width,
-      child: SingleChildScrollView(
-        controller: _chartScrollController,
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: math.max(width, 210.0 + (_testNumbers.length - 1) * 64.0),
-          child: AssessmentProgressionChart(
-            finalGrade: _currentGrade,
-            previousGrades: _previousGrades,
-            testNumbers: _testNumbers,
-            lastSubmittedAt: _lastSubmittedAt,
-            maxVisiblePoints: null,
-            chartHeight: math.max(
-              100.0,
-              math.min(180.0, availableHeight - 140.0),
-            ),
-          ),
-        ),
+      child: AssessmentProgressionChart(
+        finalGrade: _currentGrade,
+        previousGrades: _previousGrades,
+        testNumbers: _testNumbers,
+        lastSubmittedAt: _lastSubmittedAt,
+        chartHeight: math.max(100.0, math.min(180.0, availableHeight - 140.0)),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _chartScrollController.dispose();
-    super.dispose();
   }
 
   Future<void> _startAssessment() async {

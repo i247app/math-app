@@ -542,7 +542,7 @@ void main() {
   });
 
   testWidgets(
-    'waits for journey progress, then shows four previous assessments and the new one',
+    'waits for journey progress, then shows recent assessments and the new one',
     (tester) async {
       final lingo = LingoProvider();
       addTearDown(lingo.dispose);
@@ -617,10 +617,10 @@ void main() {
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
       );
-      expect(chart.previousGrades, [1, 2, 3, 4]);
+      expect(chart.previousGrades, [0, 1, 2, 3, 4]);
       expect(chart.finalGrade, 5);
-      expect(chart.firstTestNumber, 2);
-      expect(chart.testNumbers, [2, 3, 4, 5, 6]);
+      expect(chart.firstTestNumber, 1);
+      expect(chart.testNumbers, [1, 2, 3, 4, 5, 6]);
       expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 6));
       expect(find.text('Bài 2'), findsNothing);
       expect(find.text('Bài 6'), findsOneWidget);
@@ -1011,6 +1011,50 @@ void main() {
           .data,
       '5',
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('chart shows the latest seven or six points to fit its width', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    Future<void> showChart(double width) => tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: width,
+                child: const AssessmentProgressionChart(
+                  finalGrade: 2,
+                  previousGrades: <int>[0, 1, 2, 3, 4, 5, 0, 1],
+                  animate: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    List<double> plottedPoints() {
+      final plot = tester.widget<CustomPaint>(
+        find.byKey(const ValueKey('placement-progression-plot')),
+      );
+      return List<double>.from((plot.painter as dynamic).points as List);
+    }
+
+    await showChart(360);
+    expect(plottedPoints(), [2, 3, 4, 5, 0, 1, 2]);
+    expect(find.text('Bài 9'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await showChart(320);
+    expect(plottedPoints(), [3, 4, 5, 0, 1, 2]);
+    expect(find.text('Bài 9'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -21,18 +21,18 @@ class AssessmentProgressionChart extends StatefulWidget {
     this.previousGrades = const <int>[],
     this.testNumbers,
     this.firstTestNumber = 1,
-    this.maxVisiblePoints = 5,
+    this.maxVisiblePoints = 7,
     this.chartHeight = 150,
     this.lastSubmittedAt,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
-  }) : assert(maxVisiblePoints == null || maxVisiblePoints > 0);
+  }) : assert(maxVisiblePoints > 0);
 
   final int finalGrade;
   final List<int> previousGrades;
   final List<int>? testNumbers;
   final int firstTestNumber;
-  final int? maxVisiblePoints;
+  final int maxVisiblePoints;
   final double chartHeight;
   final DateTime? lastSubmittedAt;
   final bool animate;
@@ -89,12 +89,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     super.dispose();
   }
 
-  List<double> _resolvePoints() {
-    final historyLimit = widget.maxVisiblePoints == null
-        ? null
-        : widget.maxVisiblePoints! - 1;
-    final history =
-        historyLimit != null && widget.previousGrades.length > historyLimit
+  List<double> _resolvePoints(int visibleCount) {
+    final historyLimit = visibleCount - 1;
+    final history = widget.previousGrades.length > historyLimit
         ? widget.previousGrades.sublist(
             widget.previousGrades.length - historyLimit,
           )
@@ -105,11 +102,11 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
     ];
   }
 
-  int _lastTestNumber(int pointCount) {
+  int _lastTestNumber() {
     if (widget.testNumbers != null && widget.testNumbers!.isNotEmpty) {
       return widget.testNumbers!.last;
     }
-    return widget.firstTestNumber + pointCount - 1;
+    return widget.firstTestNumber + widget.previousGrades.length;
   }
 
   String? _submittedTimeLabel(BuildContext context) {
@@ -139,15 +136,20 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
 
   @override
   Widget build(BuildContext context) {
-    final points = _resolvePoints();
     final grade = widget.finalGrade.clamp(0, 5);
     final testLabel = context.formatText(AppKeys.placementResultTest, {
-      'number': _lastTestNumber(points.length),
+      'number': _lastTestNumber(),
     });
     final submittedTimeLabel = _submittedTimeLabel(context);
     final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
     return LayoutBuilder(
       builder: (context, constraints) {
+        // A narrow card leaves less space after the grade and vertical axis.
+        final visibleCount = math.min(
+          widget.maxVisiblePoints,
+          constraints.maxWidth < 330 ? 6 : 7,
+        );
+        final points = _resolvePoints(visibleCount);
         final chartHeight = constraints.hasBoundedHeight
             ? math.min(
                 widget.chartHeight,
@@ -454,17 +456,17 @@ class _AssessmentChartPainter extends CustomPainter {
       if (finalPoint) {
         canvas.drawCircle(
           center,
-          math.min(10.0, axisInset),
+          math.min(20.0 / 3, axisInset),
           Paint()..color = const Color(0xFFD9EED5),
         );
       }
-      canvas.drawCircle(center, 5, Paint()..color = Colors.white);
+      canvas.drawCircle(center, 10.0 / 3, Paint()..color = Colors.white);
       canvas.drawCircle(
         center,
-        5,
+        10.0 / 3,
         Paint()
           ..color = border
-          ..strokeWidth = 2.2
+          ..strokeWidth = 2.2 * 2 / 3
           ..style = PaintingStyle.stroke,
       );
     }
