@@ -8,6 +8,7 @@ extension AuthFlowSession on AuthFlowCubit {
     _emitState(
       state.copyWith(
         screen: AuthScreen.login,
+        authEntryMode: AuthEntryMode.login,
         loginName: loginName,
         checkedLoginName: loginName,
         isCheckingLoginName: true,

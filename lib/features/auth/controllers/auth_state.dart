@@ -5,9 +5,10 @@ enum AuthScreen {
   welcome,
   welcomeDetails,
   login,
+  signup,
   deviceVerification,
   otp,
-  signup,
+  registrationProfile,
 }
 
 enum OtpFlow { login, signup }
@@ -30,8 +31,8 @@ class AuthenticationResult {
 class AuthFlowState {
   const AuthFlowState({
     this.screen = AuthScreen.welcome,
-    this.loginBackScreen = AuthScreen.welcomeDetails,
-    this.loginEntryMode = AuthEntryMode.login,
+    this.entryBackScreen = AuthScreen.welcomeDetails,
+    this.initialEntryMode = AuthEntryMode.login,
     this.phoneRegion = PhoneRegion.vn,
     this.loginName,
     this.checkedLoginName,
@@ -60,8 +61,8 @@ class AuthFlowState {
   });
 
   final AuthScreen screen;
-  final AuthScreen loginBackScreen;
-  final AuthEntryMode loginEntryMode;
+  final AuthScreen entryBackScreen;
+  final AuthEntryMode initialEntryMode;
   final PhoneRegion phoneRegion;
   final String? loginName;
   final String? checkedLoginName;
@@ -90,8 +91,8 @@ class AuthFlowState {
 
   AuthFlowState copyWith({
     AuthScreen? screen,
-    AuthScreen? loginBackScreen,
-    AuthEntryMode? loginEntryMode,
+    AuthScreen? entryBackScreen,
+    AuthEntryMode? initialEntryMode,
     PhoneRegion? phoneRegion,
     String? loginName,
     String? checkedLoginName,
@@ -133,8 +134,8 @@ class AuthFlowState {
   }) {
     return AuthFlowState(
       screen: screen ?? this.screen,
-      loginBackScreen: loginBackScreen ?? this.loginBackScreen,
-      loginEntryMode: loginEntryMode ?? this.loginEntryMode,
+      entryBackScreen: entryBackScreen ?? this.entryBackScreen,
+      initialEntryMode: initialEntryMode ?? this.initialEntryMode,
       phoneRegion: phoneRegion ?? this.phoneRegion,
       loginName: clearLoginName ? null : loginName ?? this.loginName,
       checkedLoginName: clearLoginLookup

@@ -16,8 +16,8 @@ import 'package:numi/features/auth/widgets/signup/signup_section_card.dart';
 import 'package:numi/features/auth/widgets/signup/signup_text_field.dart';
 import 'package:numi/shared/layouts/screen_frame.dart';
 
-class SignupComposition extends StatelessWidget {
-  const SignupComposition({
+class RegistrationProfileContent extends StatelessWidget {
+  const RegistrationProfileContent({
     super.key,
     required this.usernameController,
     required this.emailController,

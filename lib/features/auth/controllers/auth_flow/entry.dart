@@ -1,8 +1,9 @@
 part of '../auth_cubit.dart';
 
-extension AuthFlowLogin on AuthFlowCubit {
+extension AuthFlowEntry on AuthFlowCubit {
   Future<void> lookupSignupEmail(String email) async {
-    if (state.authEntryMode != AuthEntryMode.signup ||
+    if (state.screen != AuthScreen.signup ||
+        state.authEntryMode != AuthEntryMode.signup ||
         state.isCheckingLoginName) {
       return;
     }
@@ -27,7 +28,7 @@ extension AuthFlowLogin on AuthFlowCubit {
       final result = await _authService.lookupLoginName(email);
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
-          state.screen != AuthScreen.login ||
+          state.screen != AuthScreen.signup ||
           state.checkedLoginName != email) {
         return;
       }
@@ -107,7 +108,7 @@ extension AuthFlowLogin on AuthFlowCubit {
     if (isSignupEntry) {
       await lookupSignupEmail(loginName);
       if (isClosed ||
-          state.screen != AuthScreen.login ||
+          state.screen != AuthScreen.signup ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.checkedLoginName != loginName ||
           state.loginNameExists != false ||
@@ -118,7 +119,7 @@ extension AuthFlowLogin on AuthFlowCubit {
       _pendingSignupForm = null;
       _emitState(
         state.copyWith(
-          screen: AuthScreen.signup,
+          screen: AuthScreen.registrationProfile,
           loginName: loginName,
           isCheckingLoginName: false,
           isSendingOtp: false,

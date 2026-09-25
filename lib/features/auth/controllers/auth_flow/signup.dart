@@ -70,7 +70,7 @@ extension AuthFlowSignup on AuthFlowCubit {
     final signupEmail = _pendingSignupEmail;
     _emitState(
       state.copyWith(
-        screen: AuthScreen.signup,
+        screen: AuthScreen.registrationProfile,
         loginName: signupEmail,
         isVerifyingOtp: false,
         isSigningUp: false,

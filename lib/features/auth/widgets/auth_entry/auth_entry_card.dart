@@ -7,42 +7,43 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
-import 'package:numi/features/auth/widgets/login/login_action_button.dart';
-import 'package:numi/features/auth/widgets/login/phone_region_menu.dart';
+import 'package:numi/features/auth/controllers/auth_state.dart';
+import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
+import 'package:numi/features/auth/widgets/auth_entry/phone_region_menu.dart';
 
-class LoginCard extends StatelessWidget {
-  const LoginCard({
+class AuthEntryCard extends StatelessWidget {
+  const AuthEntryCard({
     super.key,
     required this.controller,
     required this.region,
-    required this.isSignupEntry,
+    required this.mode,
     required this.showPhoneRegion,
     required this.onRegionChanged,
-    required this.onSendOtp,
+    required this.onSubmitIdentifier,
     required this.actionLabel,
-    required this.isSendingOtp,
-    required this.isCheckingLoginName,
-    required this.canSendOtp,
+    required this.isSubmitting,
+    required this.isCheckingIdentifier,
+    required this.canSubmit,
     required this.canLoginWithPin,
     required this.onLoginWithPin,
-    required this.onLoginNameChanged,
-    this.loginNameErrorText,
+    required this.onIdentifierChanged,
+    this.identifierErrorText,
   });
 
   final TextEditingController controller;
   final PhoneRegion region;
-  final bool isSignupEntry;
+  final AuthEntryMode mode;
   final bool showPhoneRegion;
   final ValueChanged<PhoneRegion> onRegionChanged;
-  final VoidCallback onSendOtp;
+  final VoidCallback onSubmitIdentifier;
   final String actionLabel;
-  final bool isSendingOtp;
-  final bool isCheckingLoginName;
-  final bool canSendOtp;
+  final bool isSubmitting;
+  final bool isCheckingIdentifier;
+  final bool canSubmit;
   final bool canLoginWithPin;
   final VoidCallback onLoginWithPin;
-  final ValueChanged<String> onLoginNameChanged;
-  final String? loginNameErrorText;
+  final ValueChanged<String> onIdentifierChanged;
+  final String? identifierErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +62,7 @@ class LoginCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (showPhoneRegion) ...[
+              if (mode == AuthEntryMode.login && showPhoneRegion) ...[
                 PhoneRegionMenu(region: region, onChanged: onRegionChanged),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -70,9 +71,7 @@ class LoginCard extends StatelessWidget {
               ],
               Expanded(
                 child: TextField(
-                  key: ValueKey(
-                    '${region.name}-${isSignupEntry ? 'signup' : 'login'}',
-                  ),
+                  key: ValueKey('${region.name}-${mode.name}'),
                   controller: controller,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: null,
@@ -81,14 +80,14 @@ class LoginCard extends StatelessWidget {
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: isSignupEntry
+                  inputFormatters: mode == AuthEntryMode.signup
                       ? <TextInputFormatter>[
                           FilteringTextInputFormatter.deny(RegExp(r'\s')),
                         ]
                       : <TextInputFormatter>[LoginNameInputFormatter(region)],
-                  onChanged: onLoginNameChanged,
+                  onChanged: onIdentifierChanged,
                   decoration: InputDecoration(
-                    hintText: isSignupEntry
+                    hintText: mode == AuthEntryMode.signup
                         ? context.getText(AppKeys.signupEmailHint)
                         : context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -119,13 +118,13 @@ class LoginCard extends StatelessWidget {
         ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
-          child: loginNameErrorText == null
+          child: identifierErrorText == null
               ? const SizedBox(height: 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
-                    loginNameErrorText!,
-                    key: const ValueKey('login-name-error'),
+                    identifierErrorText!,
+                    key: const ValueKey('auth-identifier-error'),
                     style: TextStyle(
                       color: colors.error,
                       fontSize: FontSize.xs,
@@ -135,18 +134,18 @@ class LoginCard extends StatelessWidget {
                   ),
                 ),
         ),
-        LoginActionButton(
+        AuthEntryActionButton(
           label: actionLabel,
-          onPressed: canSendOtp && !isCheckingLoginName && !isSendingOtp
-              ? onSendOtp
+          onPressed: canSubmit && !isCheckingIdentifier && !isSubmitting
+              ? onSubmitIdentifier
               : null,
-          isBusy: canSendOtp && (isCheckingLoginName || isSendingOtp),
+          isBusy: canSubmit && (isCheckingIdentifier || isSubmitting),
         ),
         SizedBox(
           height: 76,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 180),
-            child: canLoginWithPin
+            child: mode == AuthEntryMode.login && canLoginWithPin
                 ? Center(
                     key: const ValueKey('login-with-pin'),
                     child: InkWell(
