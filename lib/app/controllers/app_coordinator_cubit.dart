@@ -28,12 +28,15 @@ class AppCoordinatorCubit extends Cubit<AppCoordinatorState> {
     AuthScreen.welcome => AppScreen.welcome,
     AuthScreen.welcomeDetails => AppScreen.welcomeDetails,
     AuthScreen.login => AppScreen.login,
+    AuthScreen.signup => AppScreen.signup,
     AuthScreen.deviceVerification => AppScreen.deviceVerification,
     AuthScreen.otp => AppScreen.otp,
-    AuthScreen.signup => AppScreen.signup,
+    AuthScreen.registrationProfile => AppScreen.registrationProfile,
   });
 
   void showLogin() => _show(AppScreen.login);
+
+  void showSignup() => _show(AppScreen.signup);
 
   void showPasscode() => _show(AppScreen.passcode);
 

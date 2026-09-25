@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/features/auth/widgets/auth_action_button.dart';
 
-class LoginActionButton extends StatelessWidget {
-  const LoginActionButton({
+class AuthEntryActionButton extends StatelessWidget {
+  const AuthEntryActionButton({
     super.key,
     required this.label,
     required this.onPressed,

@@ -143,7 +143,7 @@ void main() {
       expect(cubit.state.screen, AuthScreen.welcomeDetails);
 
       cubit.openSignupEntry();
-      expect(cubit.state.screen, AuthScreen.login);
+      expect(cubit.state.screen, AuthScreen.signup);
       expect(cubit.state.authEntryMode, AuthEntryMode.signup);
       await cubit.close();
     },
@@ -270,7 +270,7 @@ void main() {
       final cubit = _buildCubit(
         authService: authService,
         initialState: const AuthFlowState(
-          screen: AuthScreen.login,
+          screen: AuthScreen.signup,
           authEntryMode: AuthEntryMode.signup,
         ),
       );
@@ -281,37 +281,34 @@ void main() {
       expect(authService.lookedUpLoginName, 'learner@example.com');
       expect(cubit.state.loginNameExists, isFalse);
       expect(authService.sentOtpLoginName, isNull);
-      expect(cubit.state.screen, AuthScreen.signup);
+      expect(cubit.state.screen, AuthScreen.registrationProfile);
       await cubit.close();
     },
   );
 
-  test(
-    'keeps signup email lookup failures inline on the login screen',
-    () async {
-      final authService = _FakeAuthService(
-        accountExists: false,
-        lookupFailure: const AuthException('Service unavailable', status: 503),
-      );
-      final cubit = _buildCubit(
-        authService: authService,
-        initialState: const AuthFlowState(
-          screen: AuthScreen.login,
-          authEntryMode: AuthEntryMode.signup,
-        ),
-      );
+  test('keeps signup email lookup failures on signup screen', () async {
+    final authService = _FakeAuthService(
+      accountExists: false,
+      lookupFailure: const AuthException('Service unavailable', status: 503),
+    );
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AuthScreen.signup,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
 
-      await cubit.submitLoginName('learner@example.com');
+    await cubit.submitLoginName('learner@example.com');
 
-      expect(authService.lookedUpLoginName, 'learner@example.com');
-      expect(cubit.state.authError, isNull);
-      expect(cubit.state.loginLookupError, 'Service unavailable');
-      expect(cubit.state.loginLookupErrorStatus, 503);
-      expect(cubit.state.isCheckingLoginName, isFalse);
-      expect(cubit.state.screen, AuthScreen.login);
-      await cubit.close();
-    },
-  );
+    expect(authService.lookedUpLoginName, 'learner@example.com');
+    expect(cubit.state.authError, isNull);
+    expect(cubit.state.loginLookupError, 'Service unavailable');
+    expect(cubit.state.loginLookupErrorStatus, 503);
+    expect(cubit.state.isCheckingLoginName, isFalse);
+    expect(cubit.state.screen, AuthScreen.signup);
+    await cubit.close();
+  });
 
   test('treats a 4206 signup lookup response as an available email', () async {
     final authService = _FakeAuthService(
@@ -320,7 +317,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -330,16 +327,16 @@ void main() {
     expect(cubit.state.authError, isNull);
     expect(cubit.state.loginNameExists, isFalse);
     expect(cubit.state.loginLookupErrorStatus, 4206);
-    expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
     await cubit.close();
   });
 
-  test('existing signup email stays on login and does not send OTP', () async {
+  test('existing signup email stays on signup and does not send OTP', () async {
     final authService = _FakeAuthService(accountExists: true);
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -349,7 +346,7 @@ void main() {
     expect(authService.lookedUpLoginName, 'learner@example.com');
     expect(authService.sentOtpLoginName, isNull);
     expect(cubit.state.loginNameExists, isTrue);
-    expect(cubit.state.screen, AuthScreen.login);
+    expect(cubit.state.screen, AuthScreen.signup);
     await cubit.close();
   });
 
@@ -358,7 +355,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -388,7 +385,7 @@ void main() {
       final cubit = _buildCubit(
         authService: authService,
         initialState: const AuthFlowState(
-          screen: AuthScreen.login,
+          screen: AuthScreen.signup,
           authEntryMode: AuthEntryMode.signup,
         ),
       );
@@ -424,7 +421,7 @@ void main() {
     final cubit = _buildCubit(
       authService: authService,
       initialState: const AuthFlowState(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
@@ -440,28 +437,50 @@ void main() {
     );
     cubit.backFromOtp();
 
-    expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
     expect(cubit.state.loginName, 'learner@example.com');
     expect(cubit.pendingSignupForm?.email, 'learner@example.com');
     await cubit.close();
   });
 
-  test('accepts an email in the signup flow and opens signup screen', () async {
-    final authService = _FakeAuthService(accountExists: false);
+  test(
+    'accepts an email in the signup flow and opens registration profile',
+    () async {
+      final authService = _FakeAuthService(accountExists: false);
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(
+          screen: AuthScreen.signup,
+          authEntryMode: AuthEntryMode.signup,
+        ),
+      );
+
+      await cubit.submitLoginName('learner@example.com');
+
+      expect(authService.lookedUpLoginName, 'learner@example.com');
+      expect(authService.sentOtpLoginName, isNull);
+      expect(cubit.state.screen, AuthScreen.registrationProfile);
+      expect(cubit.state.loginName, 'learner@example.com');
+      await cubit.close();
+    },
+  );
+
+  test('Back from registration profile returns to signup', () async {
     final cubit = _buildCubit(
-      authService: authService,
+      authService: _FakeAuthService(accountExists: false),
       initialState: const AuthFlowState(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         authEntryMode: AuthEntryMode.signup,
       ),
     );
 
     await cubit.submitLoginName('learner@example.com');
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
 
-    expect(authService.lookedUpLoginName, 'learner@example.com');
-    expect(authService.sentOtpLoginName, isNull);
+    expect(cubit.handleSystemBack(), isTrue);
     expect(cubit.state.screen, AuthScreen.signup);
-    expect(cubit.state.loginName, 'learner@example.com');
+    expect(cubit.state.authEntryMode, AuthEntryMode.signup);
+    expect(cubit.state.loginName, isNull);
     await cubit.close();
   });
 
@@ -491,13 +510,14 @@ void main() {
     },
   );
 
-  test('returns login to the screen that opened it', () async {
+  test('returns auth entry to the screen that opened it', () async {
     final cubit = _buildCubit();
 
-    cubit.openLogin();
+    cubit.openAuthEntry();
     expect(cubit.state.screen, AuthScreen.login);
 
     cubit.switchAuthEntryMode(AuthEntryMode.signup);
+    expect(cubit.state.screen, AuthScreen.signup);
     expect(cubit.handleSystemBack(), isTrue);
     expect(cubit.state.screen, AuthScreen.login);
     expect(cubit.state.authEntryMode, AuthEntryMode.login);
@@ -507,11 +527,12 @@ void main() {
 
     cubit.openWelcomeDetails();
     cubit.openSignupEntry();
-    expect(cubit.state.screen, AuthScreen.login);
+    expect(cubit.state.screen, AuthScreen.signup);
 
     cubit.switchAuthEntryMode(AuthEntryMode.login);
-    expect(cubit.handleSystemBack(), isTrue);
     expect(cubit.state.screen, AuthScreen.login);
+    expect(cubit.handleSystemBack(), isTrue);
+    expect(cubit.state.screen, AuthScreen.signup);
     expect(cubit.state.authEntryMode, AuthEntryMode.signup);
 
     expect(cubit.handleSystemBack(), isTrue);

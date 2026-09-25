@@ -1,5 +1,10 @@
 part of '../auth_cubit.dart';
 
+AuthScreen _screenForEntryMode(AuthEntryMode mode) => switch (mode) {
+  AuthEntryMode.login => AuthScreen.login,
+  AuthEntryMode.signup => AuthScreen.signup,
+};
+
 extension AuthFlowNavigation on AuthFlowCubit {
   void openWelcome() => _emitState(state.copyWith(screen: AuthScreen.welcome));
 
@@ -17,7 +22,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
         openWelcome();
         return true;
       case AuthScreen.login:
-        backFromLogin();
+      case AuthScreen.signup:
+        backFromAuthEntry();
         return true;
       case AuthScreen.deviceVerification:
         backFromDeviceVerification();
@@ -25,53 +31,56 @@ extension AuthFlowNavigation on AuthFlowCubit {
       case AuthScreen.otp:
         backFromOtp();
         return true;
-      case AuthScreen.signup:
-        cancelSignupToLogin();
+      case AuthScreen.registrationProfile:
+        backFromRegistrationProfile();
         return true;
       case AuthScreen.welcome:
         return false;
     }
   }
 
-  AuthScreen _loginBackScreenForCurrentFlow() {
+  AuthScreen _entryBackScreenForCurrentFlow() {
     return switch (state.screen) {
       AuthScreen.login ||
+      AuthScreen.signup ||
       AuthScreen.deviceVerification ||
       AuthScreen.otp ||
-      AuthScreen.signup => state.loginBackScreen,
+      AuthScreen.registrationProfile => state.entryBackScreen,
       final screen => screen,
     };
   }
 
-  AuthEntryMode _loginEntryModeForCurrentFlow(AuthEntryMode nextMode) {
+  AuthEntryMode _initialEntryModeForCurrentFlow(AuthEntryMode nextMode) {
     return switch (state.screen) {
       AuthScreen.login ||
+      AuthScreen.signup ||
       AuthScreen.deviceVerification ||
       AuthScreen.otp ||
-      AuthScreen.signup => state.loginEntryMode,
+      AuthScreen.registrationProfile => state.initialEntryMode,
       AuthScreen.welcome || AuthScreen.welcomeDetails => nextMode,
     };
   }
 
-  bool get backFromLoginSwitchesEntryMode =>
-      state.screen == AuthScreen.login &&
-      state.authEntryMode != state.loginEntryMode;
+  bool get backFromAuthEntrySwitchesMode =>
+      (state.screen == AuthScreen.login || state.screen == AuthScreen.signup) &&
+      state.authEntryMode != state.initialEntryMode;
 
-  void backFromLogin() {
-    if (state.screen != AuthScreen.login) {
+  void backFromAuthEntry() {
+    if (state.screen != AuthScreen.login && state.screen != AuthScreen.signup) {
       return;
     }
 
-    if (backFromLoginSwitchesEntryMode) {
-      switchAuthEntryMode(state.loginEntryMode);
+    if (backFromAuthEntrySwitchesMode) {
+      switchAuthEntryMode(state.initialEntryMode);
       return;
     }
 
-    final target = switch (state.loginBackScreen) {
+    final target = switch (state.entryBackScreen) {
       AuthScreen.login ||
+      AuthScreen.signup ||
       AuthScreen.deviceVerification ||
       AuthScreen.otp ||
-      AuthScreen.signup => AuthScreen.welcomeDetails,
+      AuthScreen.registrationProfile => AuthScreen.welcomeDetails,
       final screen => screen,
     };
     _emitState(
@@ -88,13 +97,13 @@ extension AuthFlowNavigation on AuthFlowCubit {
     );
   }
 
-  void openLogin({AuthEntryMode? mode}) {
+  void openAuthEntry({AuthEntryMode? mode}) {
     final nextMode = mode ?? state.authEntryMode;
     _emitState(
       state.copyWith(
-        screen: AuthScreen.login,
-        loginBackScreen: _loginBackScreenForCurrentFlow(),
-        loginEntryMode: _loginEntryModeForCurrentFlow(nextMode),
+        screen: _screenForEntryMode(nextMode),
+        entryBackScreen: _entryBackScreenForCurrentFlow(),
+        initialEntryMode: _initialEntryModeForCurrentFlow(nextMode),
         authEntryMode: nextMode,
         clearOtpError: true,
       ),
@@ -116,7 +125,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       }
       _emitState(
         state.copyWith(
-          screen: AuthScreen.signup,
+          screen: AuthScreen.registrationProfile,
           loginName: signupEmail,
           isSendingOtp: false,
           isVerifyingOtp: false,
@@ -147,7 +156,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
 
-    openLogin();
+    openAuthEntry();
   }
 
   void backFromDeviceVerification() {
@@ -168,15 +177,15 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void openLoginFromWelcome() {
-    openLogin(mode: AuthEntryMode.login);
+    openAuthEntry(mode: AuthEntryMode.login);
   }
 
   void openSignupEntry() {
     _emitState(
       state.copyWith(
-        screen: AuthScreen.login,
-        loginBackScreen: _loginBackScreenForCurrentFlow(),
-        loginEntryMode: AuthEntryMode.signup,
+        screen: AuthScreen.signup,
+        entryBackScreen: _entryBackScreenForCurrentFlow(),
+        initialEntryMode: AuthEntryMode.signup,
         authEntryMode: AuthEntryMode.signup,
         clearAuthError: true,
         clearOtpError: true,
@@ -188,12 +197,14 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void switchAuthEntryMode(AuthEntryMode mode) {
-    if (state.authEntryMode == mode) {
+    if (state.authEntryMode == mode &&
+        state.screen == _screenForEntryMode(mode)) {
       return;
     }
 
     _emitState(
       state.copyWith(
+        screen: _screenForEntryMode(mode),
         authEntryMode: mode,
         clearAuthError: true,
         clearOtpError: true,
@@ -207,7 +218,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
     );
   }
 
-  void cancelSignupToLogin() {
+  void backFromRegistrationProfile() {
     final loginName = state.loginName?.trim();
     if (loginName != null && loginName.isNotEmpty) {
       unawaited(_authService.clearPendingLogin(loginName));
@@ -216,7 +227,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
 
     _emitState(
       state.copyWith(
-        screen: AuthScreen.login,
+        screen: AuthScreen.signup,
         clearLoginName: true,
         isVerifyingOtp: false,
         isSigningUp: false,

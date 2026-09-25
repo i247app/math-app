@@ -16,9 +16,11 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/helpers/auth_error_messages.dart';
 import 'package:numi/features/auth/screens/device_verification_screen.dart';
 import 'package:numi/features/auth/screens/login_screen.dart';
+import 'package:numi/features/auth/screens/signup_screen.dart';
 import 'package:numi/features/auth/screens/otp_screen.dart';
 import 'package:numi/features/auth/screens/passcode_screen.dart';
-import 'package:numi/features/auth/screens/signup_screen.dart';
+import 'package:numi/features/auth/screens/registration_profile_screen.dart';
+import 'package:numi/features/auth/widgets/auth_entry/auth_entry_view.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/assessment_screen.dart';
@@ -67,7 +69,7 @@ class AppScreenRouter extends StatelessWidget {
   submitLoginName;
 
   static bool _isInlineSignupUsernameError(AuthFlowState state) {
-    if (state.screen != AuthScreen.signup) {
+    if (state.screen != AuthScreen.registrationProfile) {
       return false;
     }
 
@@ -86,20 +88,24 @@ class AppScreenRouter extends StatelessWidget {
             final hasNewError =
                 previous.authError != current.authError &&
                 current.authError != null;
-            final leftLoginScreen =
-                previous.screen == AuthScreen.login &&
-                current.screen != AuthScreen.login;
+            final leftAuthEntryScreen =
+                (previous.screen == AuthScreen.login ||
+                    previous.screen == AuthScreen.signup) &&
+                current.screen != AuthScreen.login &&
+                current.screen != AuthScreen.signup;
 
-            return hasNewError || leftLoginScreen;
+            return hasNewError || leftAuthEntryScreen;
           },
           listener: (context, state) {
-            if (state.screen != AuthScreen.login) {
+            if (state.screen != AuthScreen.login &&
+                state.screen != AuthScreen.signup) {
               clearLoginNameInput();
             }
 
             final authError = state.authError;
             if (authError != null &&
                 state.screen != AuthScreen.login &&
+                state.screen != AuthScreen.signup &&
                 state.screen != AuthScreen.otp &&
                 !_isInlineSignupUsernameError(state)) {
               context.showErrorDialog(localizedAuthError(context, authError));
@@ -128,7 +134,9 @@ class AppScreenRouter extends StatelessWidget {
                 ? null
                 : validationErrorKey;
             final loginNameErrorText =
-                state.screen == AuthScreen.login && state.authError != null
+                (state.screen == AuthScreen.login ||
+                        state.screen == AuthScreen.signup) &&
+                    state.authError != null
                 ? localizedAuthError(context, state.authError!)
                 : !loginNameHasInput
                 ? null
@@ -141,8 +149,50 @@ class AppScreenRouter extends StatelessWidget {
                     loginNameExists: state.loginNameExists,
                     loginLookupError: state.loginLookupError,
                   );
-            final actionLabel = context.getText(
-              isSignupEntry ? AppKeys.signup : AppKeys.login,
+            final entryBindings = AuthEntryBindings(
+              controller: loginNameController,
+              region: state.phoneRegion,
+              showPhoneRegion:
+                  !isSignupEntry &&
+                  normalizedLoginName.kind == LoginNameKind.phone &&
+                  RegExp(r'\d').hasMatch(loginNameController.text),
+              onRegionChanged: (region) {
+                clearLoginNameInput();
+                cubit.clearLoginLookup();
+                cubit.selectPhoneRegion(region);
+              },
+              onBack: () {
+                if (cubit.backFromAuthEntrySwitchesMode) {
+                  clearLoginNameInput();
+                }
+                cubit.backFromAuthEntry();
+              },
+              onSubmitIdentifier: () => submitLoginName(
+                cubit,
+                state.phoneRegion,
+                state.authEntryMode,
+              ),
+              isSubmitting: state.isSendingOtp,
+              isCheckingIdentifier: state.isCheckingLoginName,
+              canSubmit: canSubmitLoginName,
+              canLoginWithPin: passcodeState.canLoginWithPin,
+              onLoginWithPin: () {
+                passcodeCubit.openPinLogin();
+                coordinator.showPasscode();
+              },
+              onSwitchEntryMode: () {
+                clearLoginNameInput();
+                cubit.switchAuthEntryMode(
+                  isSignupEntry ? AuthEntryMode.login : AuthEntryMode.signup,
+                );
+              },
+              onIdentifierChanged: (value) => handleLoginNameInputChanged(
+                cubit,
+                state.phoneRegion,
+                state.authEntryMode,
+                value,
+              ),
+              identifierErrorText: loginNameErrorText,
             );
             Future<void> openGuestAssessment(BuildContext introContext) async {
               final guest = await introContext
@@ -176,7 +226,7 @@ class AppScreenRouter extends StatelessWidget {
                       key: const ValueKey('welcome'),
                       onStart: () {
                         cubit.openSignupEntry();
-                        coordinator.showLogin();
+                        coordinator.showSignup();
                       },
                       onAssessment: () {
                         final guestAccounts = context
@@ -199,7 +249,7 @@ class AppScreenRouter extends StatelessWidget {
                               onSkip: () {
                                 Navigator.of(context).pop();
                                 cubit.openSignupEntry();
-                                coordinator.showLogin();
+                                coordinator.showSignup();
                               },
                             ),
                           ),
@@ -218,7 +268,7 @@ class AppScreenRouter extends StatelessWidget {
                       key: const ValueKey('welcome-details'),
                       onStart: () {
                         cubit.openSignupEntry();
-                        coordinator.showLogin();
+                        coordinator.showSignup();
                       },
                       onBack: () {
                         cubit.openWelcome();
@@ -227,54 +277,11 @@ class AppScreenRouter extends StatelessWidget {
                     ),
                     AppScreen.login => LoginScreen(
                       key: const ValueKey('login'),
-                      controller: loginNameController,
-                      region: state.phoneRegion,
-                      showPhoneRegion:
-                          !isSignupEntry &&
-                          (normalizedLoginName.kind == LoginNameKind.phone &&
-                              RegExp(r'\d').hasMatch(loginNameController.text)),
-                      onRegionChanged: (region) {
-                        clearLoginNameInput();
-                        cubit.clearLoginLookup();
-                        cubit.selectPhoneRegion(region);
-                      },
-                      onBack: () {
-                        if (cubit.backFromLoginSwitchesEntryMode) {
-                          clearLoginNameInput();
-                        }
-                        cubit.backFromLogin();
-                      },
-                      onSendOtp: () => submitLoginName(
-                        cubit,
-                        state.phoneRegion,
-                        state.authEntryMode,
-                      ),
-                      actionLabel: actionLabel,
-                      isSignupEntry: isSignupEntry,
-                      isSendingOtp: state.isSendingOtp,
-                      isCheckingLoginName: state.isCheckingLoginName,
-                      canSendOtp: canSubmitLoginName,
-                      canLoginWithPin: passcodeState.canLoginWithPin,
-                      onLoginWithPin: () {
-                        passcodeCubit.openPinLogin();
-                        coordinator.showPasscode();
-                      },
-                      onSwitchEntryMode: () {
-                        clearLoginNameInput();
-                        cubit.switchAuthEntryMode(
-                          isSignupEntry
-                              ? AuthEntryMode.login
-                              : AuthEntryMode.signup,
-                        );
-                      },
-                      onLoginNameChanged: (value) =>
-                          handleLoginNameInputChanged(
-                            cubit,
-                            state.phoneRegion,
-                            state.authEntryMode,
-                            value,
-                          ),
-                      loginNameErrorText: loginNameErrorText,
+                      bindings: entryBindings,
+                    ),
+                    AppScreen.signup => SignupScreen(
+                      key: const ValueKey('signup'),
+                      bindings: entryBindings,
                     ),
                     AppScreen.deviceVerification => DeviceVerificationScreen(
                       key: const ValueKey('device-verification'),
@@ -303,9 +310,9 @@ class AppScreenRouter extends StatelessWidget {
                       otpError: state.otpError,
                       otpErrorId: state.otpErrorId,
                     ),
-                    AppScreen.signup => SignupScreen(
-                      key: const ValueKey('signup'),
-                      onBack: cubit.cancelSignupToLogin,
+                    AppScreen.registrationProfile => RegistrationProfileScreen(
+                      key: const ValueKey('registration-profile'),
+                      onBack: cubit.backFromRegistrationProfile,
                       isSigningUp: state.isSigningUp,
                       initialForm: cubit.pendingSignupForm,
                       initialEmail:
@@ -343,7 +350,7 @@ class AppScreenRouter extends StatelessWidget {
                     AppScreen.home => SessionDashboardScreen(
                       key: const ValueKey('home'),
                       onBack: () {
-                        cubit.openLogin(mode: AuthEntryMode.login);
+                        cubit.openAuthEntry(mode: AuthEntryMode.login);
                         coordinator.showLogin();
                       },
                       onLogout: context.read<AppSessionCubit>().logout,
@@ -369,10 +376,9 @@ class AppScreenRouter extends StatelessWidget {
               children: [
                 if (!coordinatorState.isRestoringSession &&
                     screen == AppScreen.welcome)
-                  _LoginScreenWarmup(
+                  _AuthEntryViewWarmup(
                     region: state.phoneRegion,
-                    actionLabel: actionLabel,
-                    isSignupEntry: isSignupEntry,
+                    mode: state.authEntryMode,
                   ),
                 _AppScreenSlideSwitcher(
                   screen: coordinatorState.isRestoringSession ? null : screen,
@@ -387,25 +393,20 @@ class AppScreenRouter extends StatelessWidget {
   }
 }
 
-/// Builds Login while the initial Welcome page is visible. This executes the
+/// Builds the auth entry screen while the initial Welcome page is visible. This executes the
 /// Android debug/JIT path for its TextField and font styles before the user
 /// starts the horizontal transition, without rendering or exposing it.
-class _LoginScreenWarmup extends StatefulWidget {
-  const _LoginScreenWarmup({
-    required this.region,
-    required this.actionLabel,
-    required this.isSignupEntry,
-  });
+class _AuthEntryViewWarmup extends StatefulWidget {
+  const _AuthEntryViewWarmup({required this.region, required this.mode});
 
   final PhoneRegion region;
-  final String actionLabel;
-  final bool isSignupEntry;
+  final AuthEntryMode mode;
 
   @override
-  State<_LoginScreenWarmup> createState() => _LoginScreenWarmupState();
+  State<_AuthEntryViewWarmup> createState() => _AuthEntryViewWarmupState();
 }
 
-class _LoginScreenWarmupState extends State<_LoginScreenWarmup> {
+class _AuthEntryViewWarmupState extends State<_AuthEntryViewWarmup> {
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -421,22 +422,23 @@ class _LoginScreenWarmupState extends State<_LoginScreenWarmup> {
         enabled: false,
         child: IgnorePointer(
           child: ExcludeSemantics(
-            child: LoginScreen(
-              controller: _controller,
-              region: widget.region,
-              showPhoneRegion: true,
-              onRegionChanged: (_) {},
-              onBack: () {},
-              onSendOtp: () {},
-              actionLabel: widget.actionLabel,
-              isSignupEntry: widget.isSignupEntry,
-              isSendingOtp: false,
-              isCheckingLoginName: false,
-              canSendOtp: false,
-              canLoginWithPin: false,
-              onLoginWithPin: () {},
-              onSwitchEntryMode: () {},
-              onLoginNameChanged: (_) {},
+            child: AuthEntryView(
+              mode: widget.mode,
+              bindings: AuthEntryBindings(
+                controller: _controller,
+                region: widget.region,
+                showPhoneRegion: true,
+                onRegionChanged: (_) {},
+                onBack: () {},
+                onSubmitIdentifier: () {},
+                isSubmitting: false,
+                isCheckingIdentifier: false,
+                canSubmit: false,
+                canLoginWithPin: false,
+                onLoginWithPin: () {},
+                onSwitchEntryMode: () {},
+                onIdentifierChanged: (_) {},
+              ),
             ),
           ),
         ),
@@ -626,8 +628,10 @@ class _AppScreenSlideSwitcherState extends State<_AppScreenSlideSwitcher>
         to == AppScreen.welcome || to == AppScreen.welcomeDetails;
 
     if ((fromWelcomeFlow && toWelcomeFlow) ||
-        (fromWelcomeFlow && to == AppScreen.login) ||
-        (from == AppScreen.login && toWelcomeFlow)) {
+        (fromWelcomeFlow &&
+            (to == AppScreen.login || to == AppScreen.signup)) ||
+        ((from == AppScreen.login || from == AppScreen.signup) &&
+            toWelcomeFlow)) {
       return _AuthScreenTransition.pageSlide;
     }
 
@@ -644,9 +648,10 @@ class _AppScreenSlideSwitcherState extends State<_AppScreenSlideSwitcher>
       AppScreen.welcome => 0,
       AppScreen.welcomeDetails => 1,
       AppScreen.login => 2,
+      AppScreen.signup => 2,
       AppScreen.deviceVerification => 3,
       AppScreen.otp => 4,
-      AppScreen.signup => 5,
+      AppScreen.registrationProfile => 5,
       AppScreen.passcode => 6,
       AppScreen.restoring => 7,
       AppScreen.home => 8,

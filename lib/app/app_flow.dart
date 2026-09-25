@@ -276,7 +276,7 @@ class _AppFlowState extends State<AppFlow> {
                     }
                   case PasscodeOutcomeType.cancelled:
                     final authCubit = context.read<AuthFlowCubit>();
-                    authCubit.openLogin(mode: AuthEntryMode.login);
+                    authCubit.openAuthEntry(mode: AuthEntryMode.login);
                     context.read<AppCoordinatorCubit>().showLogin();
                 }
                 if (context.mounted) {
@@ -305,7 +305,7 @@ class _AppFlowState extends State<AppFlow> {
                   case SessionStatus.unauthenticated:
                     clearLoginNameInput();
                     final authCubit = context.read<AuthFlowCubit>();
-                    authCubit.openLogin(mode: AuthEntryMode.login);
+                    authCubit.openAuthEntry(mode: AuthEntryMode.login);
                     coordinator.showLogin();
                 }
               },
@@ -319,9 +319,10 @@ class _AppFlowState extends State<AppFlow> {
                   switch (coordinatorState.screen) {
                     AppScreen.welcomeDetails ||
                     AppScreen.login ||
+                    AppScreen.signup ||
                     AppScreen.deviceVerification ||
                     AppScreen.otp ||
-                    AppScreen.signup => true,
+                    AppScreen.registrationProfile => true,
                     AppScreen.welcome ||
                     AppScreen.passcode ||
                     AppScreen.restoring ||
@@ -342,7 +343,7 @@ class _AppFlowState extends State<AppFlow> {
                       return;
                     }
                     final cubit = context.read<AuthFlowCubit>();
-                    if (cubit.backFromLoginSwitchesEntryMode) {
+                    if (cubit.backFromAuthEntrySwitchesMode) {
                       clearLoginNameInput();
                     }
                     cubit.handleSystemBack();
@@ -355,6 +356,7 @@ class _AppFlowState extends State<AppFlow> {
                     resizeToAvoidBottomInset:
                         coordinatorState.screen != AppScreen.home &&
                         coordinatorState.screen != AppScreen.login &&
+                        coordinatorState.screen != AppScreen.signup &&
                         coordinatorState.screen != AppScreen.otp &&
                         coordinatorState.screen != AppScreen.passcode,
                     body: AppScreenRouter(

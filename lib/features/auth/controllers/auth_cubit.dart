@@ -15,7 +15,7 @@ import 'package:numi/features/auth/models/signup_form_data.dart';
 import 'package:numi/features/auth/controllers/auth_state.dart';
 
 part 'auth_flow/navigation.dart';
-part 'auth_flow/login.dart';
+part 'auth_flow/entry.dart';
 part 'auth_flow/otp.dart';
 part 'auth_flow/signup.dart';
 part 'auth_flow/session.dart';
