@@ -1,23 +1,20 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
 
 import 'numi_brand_text.dart';
-import 'welcome_assessment_button.dart';
+import 'welcome_background.dart';
 import 'welcome_login_button.dart';
 import 'welcome_start_button.dart';
+import 'welcome_thinking_scene.dart';
 
 class WelcomeComposition extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onAssessment;
   final VoidCallback onLogin;
-
-  static const _mascotAsset = 'assets/images/numi-mascot-hero.png';
-  static const _wavesAsset = 'assets/images/welcome-figma-waves.png';
-  static const _booksAsset = 'assets/images/welcome-figma-books.png';
 
   const WelcomeComposition({
     super.key,
@@ -29,66 +26,54 @@ class WelcomeComposition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final safePadding = MediaQuery.paddingOf(context);
 
     return Stack(
       children: [
-        Positioned.fill(child: ColoredBox(color: colors.pageBackground)),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Image.asset(
-            _wavesAsset,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
+        const Positioned.fill(child: WelcomeBackground()),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final sceneWidth = math.min(constraints.maxWidth, 420.0);
+            final sceneHeight = sceneWidth * 300 / 360;
+            // Reserve enough space for enlarged text and short viewports.
+            final minimumHeight =
+                sceneHeight +
+                textScaler.scale(40) * 1.2 +
+                textScaler.scale(18) * 3.7 +
+                textScaler.scale(16) * 1.2 +
+                180 +
+                safePadding.vertical;
 
-        SafeArea(
-          bottom: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
-
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+            return SingleChildScrollView(
+              key: const ValueKey('welcome-scroll'),
+              physics: const ClampingScrollPhysics(),
+              child: SizedBox(
+                height: math.max(constraints.maxHeight, minimumHeight),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 14),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(height: isTablet ? 48 : 24),
-
-                          // Mascot Graphics
-                          Image.asset(
-                            _mascotAsset,
-                            height: isTablet ? 220 : 160,
-                            fit: BoxFit.contain,
+                          const FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: NumiBrandText(
+                              fontSize: 40,
+                              height: 1.2,
+                              letterSpacing: 0,
+                            ),
                           ),
-                          const SizedBox(height: 16),
-
-                          // Brand text
-                          const NumiBrandText(),
-
                           const SizedBox(height: 4),
-
-                          // Math AI Subtitle
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodyMedium!
-                                  .copyWith(
-                                    fontSize: FontSize.headlineLarge,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          Text.rich(
+                            TextSpan(
                               children: [
                                 TextSpan(
                                   text: context.getText(
                                     AppKeys.welcomeTaglineMath,
                                   ),
-                                  style: TextStyle(color: colors.brand),
                                 ),
                                 TextSpan(
                                   text: 'AI',
@@ -96,88 +81,70 @@ class WelcomeComposition extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'NunitoVariable',
+                              color: colors.brand,
+                              fontSize: 18,
+                              height: 1.25,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-
-                          const SizedBox(height: 4),
-
-                          // Learning & Assessment Tagline
                           Text(
                             context.getText(
                               AppKeys.welcomeTaglineStudyAssessment,
                             ),
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.nunito(
+                            style: TextStyle(
+                              fontFamily: 'NunitoVariable',
                               color: colors.brand,
-                              fontSize: FontSize.xl,
+                              fontSize: 18,
+                              height: 1.25,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-
-                          const SizedBox(height: 12),
-
-                          // Accent Orange Divider
-                          Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: colors.accentStrong,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
                         ],
                       ),
-                      Column(
-                        children: [
-                          WelcomeAssessmentButton(
-                            key: const ValueKey('welcome-assessment-action'),
-                            onPressed: onAssessment,
-                          ),
-                          const SizedBox(height: 32),
-                          Image.asset(
-                            _booksAsset,
-                            key: const ValueKey('welcome-books'),
-                            height: isTablet ? 180 : 130,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(height: 24),
-                          Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 420),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 56,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    WelcomeStartButton(
-                                      onStart: onLogin,
-                                      labelText: 'LOGIN',
-                                    ),
-                                    const SizedBox(height: 20),
-                                    WelcomeLoginButton(
-                                      onLogin: onStart,
-                                      labelText: 'SIGNUP',
-                                    ),
-                                  ],
-                                ),
-                              ),
+                    ),
+                    const Spacer(flex: 11),
+                    SizedBox(
+                      width: sceneWidth,
+                      height: sceneHeight,
+                      child: WelcomeThinkingScene(onTry: onAssessment),
+                    ),
+                    const Spacer(flex: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: SizedBox(
+                        width: math.min(280, constraints.maxWidth * 0.64),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            WelcomeStartButton(
+                              key: const ValueKey('welcome-login-action'),
+                              onStart: onLogin,
+                              labelKey: AppKeys.welcomeLogin,
+                              cornerRadius: 20,
+                              verticalPadding: 14,
+                              fitLabel: true,
                             ),
-                          ),
-                          SizedBox(
-                            height:
-                                MediaQuery.viewPaddingOf(context).bottom + 20,
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            WelcomeLoginButton(
+                              key: const ValueKey('welcome-signup-action'),
+                              onLogin: onStart,
+                              labelKey: AppKeys.welcomeSignup,
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const Spacer(flex: 12),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
     );

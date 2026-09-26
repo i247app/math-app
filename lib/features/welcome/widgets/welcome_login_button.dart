@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -22,7 +21,7 @@ class WelcomeLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final loginColor = colors.accentStrong;
+    final loginColor = colors.brandStrong;
 
     return Center(
       child: InkWell(
@@ -32,10 +31,12 @@ class WelcomeLoginButton extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(999),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
           child: Text(
-            labelText ?? context.getText(labelKey).toUpperCase(),
-            style: GoogleFonts.nunito(
+            labelText ?? context.getText(labelKey),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'NunitoVariable',
               color: loginColor,
               fontSize: FontSize.large,
               fontWeight: FontWeight.w800,

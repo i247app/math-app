@@ -34,6 +34,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
+    - family: BagelFatOne
+      fonts:
+        - asset: assets/fonts/BagelFatOne-Regular.ttf
     - family: Andika
       fonts:
         - asset: assets/fonts/Andika-Regular.ttf

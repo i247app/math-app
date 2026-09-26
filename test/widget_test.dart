@@ -157,60 +157,36 @@ void main() {
       await tester.pumpWidget(const NumiApp());
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
-      expect(find.text('TEST YOUR SKILL'), findsOneWidget);
-      expect(find.text('LOGIN'), findsOneWidget);
-      expect(find.text('SIGNUP'), findsOneWidget);
+      expect(find.text('Thử Ngay!'), findsOneWidget);
+      expect(find.text('Đăng Nhập'), findsOneWidget);
+      expect(find.text('Đăng Ký'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('LOGIN')).dy,
-        lessThan(tester.getTopLeft(find.text('SIGNUP')).dy),
+        tester.getTopLeft(find.text('Đăng Nhập')).dy,
+        lessThan(tester.getTopLeft(find.text('Đăng Ký')).dy),
       );
       expect(
         tester
             .widget<Material>(
               find
                   .ancestor(
-                    of: find.text('LOGIN'),
+                    of: find.text('Đăng Nhập'),
                     matching: find.byType(Material),
                   )
                   .first,
             )
             .color,
-        tester.element(find.text('LOGIN')).themeColors.accent,
-      );
-      final assessment = find.byKey(
-        const ValueKey('welcome-assessment-action'),
+        tester.element(find.text('Đăng Nhập')).themeColors.accent,
       );
       expect(
         find.descendant(
-          of: assessment,
-          matching: find.byIcon(Icons.timer_outlined),
+          of: find.byKey(const ValueKey('welcome-assessment-action')),
+          matching: find.text('Thử Ngay!'),
         ),
         findsOneWidget,
       );
-      expect(
-        find.descendant(
-          of: assessment,
-          matching: find.byIcon(Icons.chevron_right_rounded),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        tester
-            .widgetList<Material>(
-              find.descendant(of: assessment, matching: find.byType(Material)),
-            )
-            .any((material) => material.color == const Color(0xFFF45D2D)),
-        isTrue,
-      );
-      final assessmentMaterial = find.descendant(
-        of: assessment,
-        matching: find.byType(Material),
-      );
-      expect(tester.getSize(assessmentMaterial).width, lessThanOrEqualTo(264));
-      expect(tester.getSize(assessmentMaterial).height, 60);
     });
 
-    testWidgets('places assessment action 32 pixels above the books', (
+    testWidgets('places Try It in the cloud above the mascot and login', (
       tester,
     ) async {
       await tester.pumpWidget(const NumiApp());
@@ -218,17 +194,17 @@ void main() {
       final assessment = find.byKey(
         const ValueKey('welcome-assessment-action'),
       );
-      final books = find.byKey(const ValueKey('welcome-books'));
+      final mascot = find.byKey(const ValueKey('welcome-thinking-mascot'));
       await tester.ensureVisible(assessment);
 
-      expect(books, findsOneWidget);
+      expect(mascot, findsOneWidget);
       expect(
-        tester.getTopLeft(books).dy - tester.getBottomLeft(assessment).dy,
-        closeTo(32, 0.5),
+        tester.getBottomLeft(assessment).dy,
+        lessThan(tester.getTopLeft(mascot).dy),
       );
       expect(
-        tester.getBottomLeft(books).dy,
-        lessThan(tester.getTopLeft(find.text('LOGIN')).dy),
+        tester.getBottomLeft(mascot).dy,
+        lessThan(tester.getTopLeft(find.text('Đăng Nhập')).dy),
       );
     });
 
@@ -247,11 +223,11 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('LOGIN')).style?.fontSize,
+        tester.widget<Text>(find.text('Đăng Nhập')).style?.fontSize,
         FontSize.large,
       );
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Thử Ngay!'));
+      await tester.tap(find.text('Thử Ngay!'));
       await tester.pumpAndSettle();
 
       expect(guestAccounts.ensureCalls, 1);
@@ -293,8 +269,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Thử Ngay!'));
+      await tester.tap(find.text('Thử Ngay!'));
       await tester.pumpAndSettle();
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
 
@@ -329,8 +305,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Thử Ngay!'));
+      await tester.tap(find.text('Thử Ngay!'));
       await tester.pumpAndSettle();
 
       expect(
@@ -404,8 +380,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Thử Ngay!'));
+      await tester.tap(find.text('Thử Ngay!'));
       await tester.pumpAndSettle();
 
       expect(
@@ -516,8 +492,8 @@ void main() {
         ),
       );
 
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Thử Ngay!'));
+      await tester.tap(find.text('Thử Ngay!'));
       await tester.pumpAndSettle();
 
       final chart = tester.widget<AssessmentProgressionChart>(
@@ -716,8 +692,8 @@ void main() {
       expect(find.text('LOG IN'), findsNothing);
       expect(find.text('SIGN UP'), findsNothing);
 
-      await tester.ensureVisible(find.text('TEST YOUR SKILL'));
-      await tester.tap(find.text('TEST YOUR SKILL'));
+      await tester.ensureVisible(find.text('Try It Now!'));
+      await tester.tap(find.text('Try It Now!'));
       await tester.pumpAndSettle();
 
       expect(find.text('AI MATH'), findsOneWidget);
@@ -730,7 +706,7 @@ void main() {
     ) async {
       await tester.pumpWidget(const NumiApp());
 
-      final signupButton = find.text('SIGNUP');
+      final signupButton = find.text('Đăng Ký');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -751,7 +727,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(NumiApp(authService: authService));
 
-        final signupButton = find.text('SIGNUP');
+        final signupButton = find.text('Đăng Ký');
         await tester.ensureVisible(signupButton);
         await tester.tap(signupButton);
         await tester.pumpAndSettle();
@@ -826,7 +802,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('SIGNUP');
+      final signupButton = find.text('Đăng Ký');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -856,7 +832,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(const NumiApp());
 
-      final welcomeLogin = find.text('LOGIN');
+      final welcomeLogin = find.text('Đăng Nhập');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -875,7 +851,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(const NumiApp());
 
-        final welcomeLogin = find.text('LOGIN');
+        final welcomeLogin = find.text('Đăng Nhập');
         await tester.ensureVisible(welcomeLogin);
         await tester.tap(welcomeLogin);
         await tester.pumpAndSettle();
@@ -917,7 +893,7 @@ void main() {
         NumiApp(authService: _FailingLoginLookupAuthService()),
       );
 
-      final welcomeLogin = find.text('LOGIN');
+      final welcomeLogin = find.text('Đăng Nhập');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -935,7 +911,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: _FakeAuthService()));
 
-      final welcomeLogin = find.text('LOGIN');
+      final welcomeLogin = find.text('Đăng Nhập');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();

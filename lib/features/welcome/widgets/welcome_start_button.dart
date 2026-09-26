@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -34,7 +33,8 @@ class WelcomeStartButton extends StatelessWidget {
     final radius = BorderRadius.circular(cornerRadius);
     final label = Text(
       labelText ?? context.getText(labelKey),
-      style: GoogleFonts.nunito(
+      style: TextStyle(
+        fontFamily: 'NunitoVariable',
         color: Theme.of(context).colorScheme.onSecondary,
         fontSize: fontSize,
         fontWeight: FontWeight.w900,
