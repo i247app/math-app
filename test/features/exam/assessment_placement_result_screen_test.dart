@@ -26,8 +26,6 @@ void main() {
       'assets/images/assessment-result-blocks.png',
       'assets/images/assessment-result-checklist.png',
       'assets/images/assessment-result-pencil.png',
-      'assets/images/grade-ribbon.png',
-      'assets/images/grade-ribbon-en.png',
       'assets/images/grade-ribbon-numbers.png',
     ];
 
