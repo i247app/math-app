@@ -42,14 +42,14 @@ class ProfileOptionsCache {
     return snapshot;
   }
 
-  void save({
+  ProfileOptionsSnapshot save({
     required int userId,
     required List<SchoolModel> schools,
     required List<GradeModel> grades,
     required List<ProgramModel> programs,
     required List<SemesterModel> semesters,
   }) {
-    _snapshot = ProfileOptionsSnapshot(
+    final snapshot = ProfileOptionsSnapshot(
       userId: userId,
       schools: List<SchoolModel>.unmodifiable(schools),
       grades: List<GradeModel>.unmodifiable(grades),
@@ -57,6 +57,8 @@ class ProfileOptionsCache {
       semesters: List<SemesterModel>.unmodifiable(semesters),
       createdAt: DateTime.now(),
     );
+    _snapshot = snapshot;
+    return snapshot;
   }
 
   void clear() {

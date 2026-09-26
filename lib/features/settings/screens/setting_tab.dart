@@ -1,4 +1,3 @@
-import 'package:numi/features/profile/models/profile_id_type_option.dart';
 import 'package:numi/features/settings/models/settings_constants.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/material.dart';
@@ -32,6 +31,8 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/profile/data/profile_options_cache.dart';
 import 'package:numi/features/settings/controllers/settings_passcode_controller.dart';
+import 'package:numi/features/settings/data/settings_profile_form_service.dart';
+import 'package:numi/features/settings/models/settings_profile_form.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/settings/helpers/settings_account_helpers.dart';
 import 'package:numi/features/settings/helpers/settings_profile_helpers.dart';

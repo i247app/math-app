@@ -4,9 +4,12 @@ mixin _SettingProfileFormMixin
     on State<SettingTab>, _SettingProfileManagementMixin {
   final GuardedExitController<bool> _profileExitController =
       GuardedExitController<bool>();
-  ProfileService get _formProfileService => context.read<ProfileService>();
-  GradeService get _gradeService => context.read<GradeService>();
-  SchoolService get _schoolService => context.read<SchoolService>();
+  SettingsProfileFormService get _profileFormService =>
+      SettingsProfileFormService(
+        profileService: context.read<ProfileService>(),
+        gradeService: context.read<GradeService>(),
+        schoolService: context.read<SchoolService>(),
+      );
 
   final TextEditingController _profileNameController = TextEditingController();
   final TextEditingController _profilePhoneController = TextEditingController();
@@ -30,6 +33,20 @@ mixin _SettingProfileFormMixin
   ProgramModel? _selectedProgram;
   SemesterModel? _selectedSemester;
   String? _selectedProfileIdType;
+
+  SettingsProfileDraft get _profileDraft => SettingsProfileDraft(
+    user: widget.user,
+    name: _profileNameController.text,
+    hasProfiles: _profiles.isNotEmpty,
+    editingProfile: _editingProfile,
+    schoolId: _selectedSchool?.schoolId,
+    gradeId: _selectedGrade?.gradeId,
+    programId: _selectedProgram?.programId,
+    semesterId: _selectedSemester?.semesterId,
+    avatarKey: _selectedProfileAvatarKey,
+    idType: _selectedProfileIdType,
+    identifier: _profileIdController.text,
+  );
 
   void _initializeProfileFormState() {
     _suppressProfileDraftTracking = true;
@@ -205,35 +222,13 @@ mixin _SettingProfileFormMixin
     });
 
     try {
-      final results = await Future.wait<Object>([
-        _schoolService.listSchools(),
-        _gradeService.listGrades(userId: userId),
-        _formProfileService.listPrograms(userId: userId),
-        _formProfileService.listSemesters(userId: userId),
-      ]);
-      final schools = results[0] as List<SchoolModel>;
-      final grades = results[1] as List<GradeModel>;
-      final programs = results[2] as List<ProgramModel>;
-      final semesters = results[3] as List<SemesterModel>;
-      ProfileOptionsCache.instance.save(
-        userId: userId,
-        schools: schools,
-        grades: grades,
-        programs: programs,
-        semesters: semesters,
-      );
+      final options = await _profileFormService.loadOptions(userId);
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _applyProfileOptions(
-          schools: schools,
-          grades: grades,
-          programs: programs,
-          semesters: semesters,
-          profileToSelect: profileToSelect,
-        );
+        _applyProfileOptions(options, profileToSelect: profileToSelect);
         _isLoadingProfileOptions = false;
       });
     } on GradeException catch (error) {
@@ -283,19 +278,13 @@ mixin _SettingProfileFormMixin
     required int userId,
     StudentProfile? profileToSelect,
   }) {
-    final cached = ProfileOptionsCache.instance.readFresh(userId: userId);
+    final cached = _profileFormService.cachedOptions(userId);
     if (cached == null) {
       return false;
     }
     if (mounted) {
       setState(() {
-        _applyProfileOptions(
-          schools: cached.schools,
-          grades: cached.grades,
-          programs: cached.programs,
-          semesters: cached.semesters,
-          profileToSelect: profileToSelect,
-        );
+        _applyProfileOptions(cached, profileToSelect: profileToSelect);
         _isLoadingProfileOptions = false;
         _profileOptionsError = null;
       });
@@ -303,17 +292,14 @@ mixin _SettingProfileFormMixin
     return true;
   }
 
-  void _applyProfileOptions({
-    required List<SchoolModel> schools,
-    required List<GradeModel> grades,
-    required List<ProgramModel> programs,
-    required List<SemesterModel> semesters,
+  void _applyProfileOptions(
+    ProfileOptionsSnapshot options, {
     StudentProfile? profileToSelect,
   }) {
-    _schoolOptions = schools;
-    _gradeOptions = grades;
-    _programOptions = programs;
-    _semesterOptions = semesters;
+    _schoolOptions = options.schools;
+    _gradeOptions = options.grades;
+    _programOptions = options.programs;
+    _semesterOptions = options.semesters;
     final profile = profileToSelect ?? _editingProfile;
     if (profile != null) {
       _selectOptionsForProfile(profile);
@@ -321,7 +307,9 @@ mixin _SettingProfileFormMixin
       _selectedSchool = null;
       _selectedGrade = null;
       _selectedProgram = null;
-      _selectedSemester ??= semesters.isEmpty ? null : semesters.first;
+      _selectedSemester ??= options.semesters.isEmpty
+          ? null
+          : options.semesters.first;
     }
   }
 
@@ -336,74 +324,10 @@ mixin _SettingProfileFormMixin
   }
 
   Future<void> _saveProfileForm() async {
-    final userId = widget.user?.id;
-    final name = _profileNameController.text.trim();
-    final school = _selectedSchool;
-    final grade = _selectedGrade;
-    final program = _selectedProgram;
-    final semester = _selectedSemester;
-    final editingProfile = _editingProfile;
-    final formRole = settingsProfileFormRole(
-      user: widget.user,
-      editingProfile: editingProfile,
-    );
-    final isTeacherProfile = formRole == 'TEACHER';
-    final isParentProfile = formRole == 'PARENT';
-    final normalizedIdType = settingsNormalizedProfileIdType(
-      _selectedProfileIdType,
-      formRole,
-    );
-    final profileIdValue = _profileIdController.text.trim();
-    final shouldSubmitTeacherId =
-        isTeacherProfile &&
-        normalizedIdType != null &&
-        profileIdValue.isNotEmpty;
-    final isCreatingFirstProfile = editingProfile == null && _profiles.isEmpty;
-    final isUpdatingProfile = editingProfile != null;
-    StudentProfile? createdActiveProfile;
-
-    if (userId == null || userId <= 0) {
-      setState(
-        () => _profileCreateError = context.readText(AppKeys.missingAccount),
-      );
-      return;
-    }
-    if ((editingProfile == null || isParentProfile) && name.isEmpty) {
-      setState(
-        () =>
-            _profileCreateError = context.readText(AppKeys.missingProfileName),
-      );
-      return;
-    }
-    if (!isParentProfile && school?.schoolId == null) {
-      setState(
-        () => _profileCreateError = context.readText(
-          AppKeys.missingProfileSelections,
-        ),
-      );
-      return;
-    }
-    if (!isTeacherProfile &&
-        !isParentProfile &&
-        editingProfile == null &&
-        (grade?.gradeId == null ||
-            program?.programId == null ||
-            semester?.semesterId == null)) {
-      setState(
-        () => _profileCreateError = context.readText(
-          AppKeys.missingProfileSelections,
-        ),
-      );
-      return;
-    }
-    if (isTeacherProfile &&
-        normalizedIdType == null &&
-        profileIdValue.isNotEmpty) {
-      setState(
-        () => _profileCreateError = context.readText(
-          AppKeys.missingProfileSelections,
-        ),
-      );
+    final draft = _profileDraft;
+    final errorKey = draft.validationErrorKey;
+    if (errorKey != null) {
+      setState(() => _profileCreateError = context.readText(errorKey));
       return;
     }
 
@@ -414,68 +338,19 @@ mixin _SettingProfileFormMixin
     });
 
     try {
-      if (editingProfile == null) {
-        final createdProfile = await _formProfileService.createProfile(
-          userId: userId,
-          schoolId: school!.schoolId!,
-          name: name,
-          gradeId: isTeacherProfile ? null : grade!.gradeId!,
-          programId: isTeacherProfile ? null : program!.programId!,
-          semesterId: isTeacherProfile ? null : semester!.semesterId!,
-          isDefault: _profiles.isEmpty,
-          role: formRole,
-          avatarKey: _selectedProfileAvatarKey,
-          idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
-          studentId: isTeacherProfile ? null : profileIdValue,
-          teacherId: shouldSubmitTeacherId ? profileIdValue : null,
-        );
-        if (formRole == 'STUDENT' || isCreatingFirstProfile) {
-          final profileId = profileStableId(createdProfile);
-          if (profileId != null) {
-            createdActiveProfile = createdProfile;
-          }
-        }
-      } else {
-        final profileId = editingProfile.profileId;
-        if (profileId == null) {
-          throw ProfileException(context.readText(AppKeys.missingProfileId));
-        }
-
-        if (isParentProfile) {
-          await _formProfileService.updateProfile(
-            profileId: profileId,
-            name: name,
-            avatarKey: _selectedProfileAvatarKey,
-          );
-        } else {
-          await _formProfileService.updateProfile(
-            profileId: profileId,
-            schoolId: school!.schoolId!,
-            name: settingsEmptyToNull(name),
-            gradeId: isTeacherProfile ? null : grade?.gradeId,
-            programId: isTeacherProfile ? null : program?.programId,
-            semesterId: isTeacherProfile ? null : semester?.semesterId,
-            isDefault: editingProfile.isDefault,
-            role: formRole,
-            dob: settingsProfileDateOnly(editingProfile.dob),
-            avatarKey: _selectedProfileAvatarKey,
-            idType: isTeacherProfile ? normalizedIdType : profileIdTypeMoet,
-            studentId: isTeacherProfile ? null : profileIdValue,
-            teacherId: shouldSubmitTeacherId ? profileIdValue : null,
-          );
-        }
-      }
+      final result = await _profileFormService.save(draft);
       if (!mounted) {
         return;
       }
 
-      if (isUpdatingProfile) {
+      if (result.requiresProfileRefresh) {
         await (widget.onRefreshProfiles?.call() ?? Future<void>.value());
         if (!mounted) {
           return;
         }
       }
 
+      final createdActiveProfile = result.profileToActivate;
       if (createdActiveProfile != null) {
         await widget.onActivateProfile(createdActiveProfile);
         if (!mounted) {
@@ -507,9 +382,11 @@ mixin _SettingProfileFormMixin
       }
 
       setState(() {
-        _profileCreateError = editingProfile == null
-            ? context.readText(AppKeys.profileCreateFailed)
-            : context.readText(AppKeys.profileUpdateFailed);
+        _profileCreateError = context.readText(
+          draft.isUpdating
+              ? AppKeys.profileUpdateFailed
+              : AppKeys.profileCreateFailed,
+        );
         _isSavingProfile = false;
       });
     }
@@ -574,33 +451,9 @@ mixin _SettingProfileFormMixin
   }
 
   bool get _canSaveProfileForm {
-    if (_isSavingProfile || _isLoadingProfileOptions) {
-      return false;
-    }
-
-    final name = _profileNameController.text.trim();
-    if (name.isEmpty) {
-      return false;
-    }
-
-    final formRole = settingsProfileFormRole(
-      user: widget.user,
-      editingProfile: _editingProfile,
-    );
-    if (formRole == 'PARENT') {
-      return true;
-    }
-
-    if (_selectedSchool?.schoolId == null) {
-      return false;
-    }
-
-    if (formRole == 'TEACHER') {
-      return true;
-    }
-
-    return _selectedProgram?.programId != null &&
-        _selectedGrade?.gradeId != null;
+    return !_isSavingProfile &&
+        !_isLoadingProfileOptions &&
+        _profileDraft.canSave;
   }
 
   void _applyProfileIdFields(StudentProfile profile) {
