@@ -53,13 +53,15 @@ class _SignupLookupAuthService implements AuthService {
   final List<String> lookedUpNames = <String>[];
 
   @override
-  Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
-    lookedUpNames.add(loginName);
-    return AuthLoginLookupResult(
-      loginName: loginName,
-      exists: accountExists,
-      user: accountExists ? LoginUser(id: 7, email: loginName) : null,
-    );
+  Future<dynamic> checkIdentifier(String identifier) async {
+    lookedUpNames.add(identifier);
+    return <String, dynamic>{
+      'mstatus': 200,
+      'status': 'Success',
+      'user': accountExists
+          ? <String, dynamic>{'id': 43, 'uid': 22, 'email': identifier}
+          : null,
+    };
   }
 
   @override

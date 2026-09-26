@@ -7,6 +7,7 @@ import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/helpers/auth_status.dart';
+import 'package:numi/features/auth/helpers/identifier_check_response.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/models/auth_models.dart';

@@ -25,7 +25,7 @@ extension AuthFlowEntry on AuthFlowCubit {
     );
 
     try {
-      final result = await _authService.lookupLoginName(email);
+      final response = await _authService.checkIdentifier(email);
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
@@ -33,25 +33,32 @@ extension AuthFlowEntry on AuthFlowCubit {
         return;
       }
 
+      final exists = identifierExistsFromResponse(response);
+      if (exists == null) {
+        throw AuthException(
+          AppStrings.current(AppKeys.authLoginNameCheckFailed),
+        );
+      }
+
       _emitState(
         state.copyWith(
           loginName: email,
           checkedLoginName: email,
           isCheckingLoginName: false,
-          loginNameExists: result.exists,
-          loginLookupUser: result.user,
-          loginLookupError: result.exists ? null : result.message,
-          loginLookupErrorStatus: result.exists ? null : result.status,
+          loginNameExists: exists,
           otpFlow: OtpFlow.signup,
           clearAuthError: true,
-          clearLoginLookupError: result.exists,
-          clearLoginLookupErrorStatus: result.exists,
+          clearLoginLookupError: true,
+          clearLoginLookupErrorStatus: true,
           clearOtpExpiry: true,
           clearOtpError: true,
         ),
       );
     } on AuthException catch (error) {
-      if (isClosed || state.checkedLoginName != email) {
+      if (isClosed ||
+          state.authEntryMode != AuthEntryMode.signup ||
+          state.screen != AuthScreen.signup ||
+          state.checkedLoginName != email) {
         return;
       }
 
@@ -81,7 +88,10 @@ extension AuthFlowEntry on AuthFlowCubit {
         ),
       );
     } catch (_) {
-      if (isClosed || state.checkedLoginName != email) {
+      if (isClosed ||
+          state.authEntryMode != AuthEntryMode.signup ||
+          state.screen != AuthScreen.signup ||
+          state.checkedLoginName != email) {
         return;
       }
 

@@ -15,6 +15,7 @@ class _FakeAuthService implements AuthService {
     this.isTrusted,
     this.trustedDevices = const <AuthTrustedDevice>[],
     this.lookupFailure,
+    this.identifierResponse,
   });
 
   final bool accountExists;
@@ -22,6 +23,8 @@ class _FakeAuthService implements AuthService {
   final bool? isTrusted;
   final List<AuthTrustedDevice> trustedDevices;
   final Object? lookupFailure;
+  final Object? identifierResponse;
+  String? checkedIdentifier;
   String? lookedUpLoginName;
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
@@ -30,6 +33,20 @@ class _FakeAuthService implements AuthService {
   int? sentOtpUserId;
   int? sentOtpTargetDeviceId;
   int? listedDeviceUserId;
+
+  @override
+  Future<dynamic> checkIdentifier(String identifier) async {
+    checkedIdentifier = identifier;
+    if (lookupFailure != null) throw lookupFailure!;
+    return identifierResponse ??
+        <String, dynamic>{
+          'mstatus': 200,
+          'status': 'Success',
+          'user': accountExists
+              ? <String, dynamic>{'id': 43, 'uid': 22, 'email': identifier}
+              : null,
+        };
+  }
 
   @override
   Future<AuthLoginLookupResult> lookupLoginName(String loginName) async {
@@ -275,10 +292,11 @@ void main() {
         ),
       );
 
-      expect(authService.lookedUpLoginName, isNull);
+      expect(authService.checkedIdentifier, isNull);
       await cubit.submitLoginName('learner@example.com');
 
-      expect(authService.lookedUpLoginName, 'learner@example.com');
+      expect(authService.checkedIdentifier, 'learner@example.com');
+      expect(authService.lookedUpLoginName, isNull);
       expect(cubit.state.loginNameExists, isFalse);
       expect(authService.sentOtpLoginName, isNull);
       expect(cubit.state.screen, AuthScreen.registrationProfile);
@@ -301,12 +319,34 @@ void main() {
 
     await cubit.submitLoginName('learner@example.com');
 
-    expect(authService.lookedUpLoginName, 'learner@example.com');
+    expect(authService.checkedIdentifier, 'learner@example.com');
     expect(cubit.state.authError, isNull);
     expect(cubit.state.loginLookupError, 'Service unavailable');
     expect(cubit.state.loginLookupErrorStatus, 503);
     expect(cubit.state.isCheckingLoginName, isFalse);
     expect(cubit.state.screen, AuthScreen.signup);
+    await cubit.close();
+  });
+
+  test('unknown identifier response keeps signup blocked', () async {
+    final authService = _FakeAuthService(
+      identifierResponse: const <String, dynamic>{'mstatus': 200},
+    );
+    final cubit = _buildCubit(
+      authService: authService,
+      initialState: const AuthFlowState(
+        screen: AuthScreen.signup,
+        authEntryMode: AuthEntryMode.signup,
+      ),
+    );
+
+    await cubit.submitLoginName('learner@example.com');
+
+    expect(cubit.state.loginNameExists, isNull);
+    expect(cubit.state.loginLookupError, isNotEmpty);
+    expect(cubit.state.isCheckingLoginName, isFalse);
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(authService.sentOtpLoginName, isNull);
     await cubit.close();
   });
 
@@ -331,24 +371,27 @@ void main() {
     await cubit.close();
   });
 
-  test('existing signup email stays on signup and does not send OTP', () async {
-    final authService = _FakeAuthService(accountExists: true);
-    final cubit = _buildCubit(
-      authService: authService,
-      initialState: const AuthFlowState(
-        screen: AuthScreen.signup,
-        authEntryMode: AuthEntryMode.signup,
-      ),
-    );
+  test(
+    'returned user keeps existing email on signup without sending OTP',
+    () async {
+      final authService = _FakeAuthService(accountExists: true);
+      final cubit = _buildCubit(
+        authService: authService,
+        initialState: const AuthFlowState(
+          screen: AuthScreen.signup,
+          authEntryMode: AuthEntryMode.signup,
+        ),
+      );
 
-    await cubit.submitLoginName('learner@example.com');
+      await cubit.submitLoginName('learner@example.com');
 
-    expect(authService.lookedUpLoginName, 'learner@example.com');
-    expect(authService.sentOtpLoginName, isNull);
-    expect(cubit.state.loginNameExists, isTrue);
-    expect(cubit.state.screen, AuthScreen.signup);
-    await cubit.close();
-  });
+      expect(authService.checkedIdentifier, 'learner@example.com');
+      expect(authService.sentOtpLoginName, isNull);
+      expect(cubit.state.loginNameExists, isTrue);
+      expect(cubit.state.screen, AuthScreen.signup);
+      await cubit.close();
+    },
+  );
 
   test('signup uses the checked email even when the form omits it', () async {
     final authService = _FakeAuthService(accountExists: false);
@@ -457,7 +500,7 @@ void main() {
 
       await cubit.submitLoginName('learner@example.com');
 
-      expect(authService.lookedUpLoginName, 'learner@example.com');
+      expect(authService.checkedIdentifier, 'learner@example.com');
       expect(authService.sentOtpLoginName, isNull);
       expect(cubit.state.screen, AuthScreen.registrationProfile);
       expect(cubit.state.loginName, 'learner@example.com');

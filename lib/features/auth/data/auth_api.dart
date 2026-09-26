@@ -23,6 +23,16 @@ class AuthApi implements AuthService {
   final Map<String, LoginUser> _loginUsers = {};
 
   @override
+  Future<dynamic> checkIdentifier(String identifier) => _request(() async {
+    final json = await _networkClient.postJson(
+      '/users/check-identifier',
+      <String, dynamic>{'identifier': identifier.trim()},
+    );
+    NetworkClient.throwForApiStatus(json);
+    return json;
+  });
+
+  @override
   Future<LoginUser?> restoreSession() async {
     if (!await _networkClient.hasAuthToken()) {
       return null;

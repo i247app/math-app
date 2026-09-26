@@ -3,6 +3,8 @@ import 'package:numi/features/auth/models/auth_models.dart';
 abstract interface class AuthService {
   Future<AuthLoginLookupResult> lookupLoginName(String loginName);
 
+  Future<dynamic> checkIdentifier(String identifier);
+
   Future<LoginUser?> restoreSession();
 
   Future<LoginUser> signupWithEmail({

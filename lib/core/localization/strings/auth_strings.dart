@@ -158,9 +158,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.loginNameNotRegistered:
         'This phone number or email does not have an account. Please sign up.',
     AppKeys.signupPhoneAlreadyRegistered:
-        'This phone number already has an account. Please log in.',
-    AppKeys.signupEmailAlreadyRegistered:
-        'This email already has an account. Please log in.',
+        'This phone number already has an account.',
+    AppKeys.signupEmailAlreadyRegistered: 'This email already has an account.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
     AppKeys.pinLoginFailed: 'Could not log in with PIN. Please log in again.',
