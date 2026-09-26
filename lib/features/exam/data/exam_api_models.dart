@@ -102,26 +102,6 @@ class ExamStatsRequest {
   Map<String, dynamic> toJson() => _$ExamStatsRequestToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
-class ExamProgressRequest {
-  const ExamProgressRequest({
-    required this.profileId,
-    required this.fromDt,
-    required this.toDt,
-    required this.examType,
-  });
-
-  final int profileId;
-  final DateTime fromDt;
-  final DateTime toDt;
-  final String examType;
-
-  factory ExamProgressRequest.fromJson(Map<String, dynamic> json) =>
-      _$ExamProgressRequestFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExamProgressRequestToJson(this);
-}
-
 @JsonSerializable(explicitToJson: true)
 class GenerateExamResponseDto {
   const GenerateExamResponseDto({
