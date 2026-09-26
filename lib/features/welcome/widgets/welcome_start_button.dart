@@ -16,6 +16,7 @@ class WelcomeStartButton extends StatelessWidget {
     this.fontSize = FontSize.large,
     this.cornerRadius = 28,
     this.verticalPadding = 16,
+    this.fitLabel = false,
   });
 
   final VoidCallback onStart;
@@ -24,12 +25,22 @@ class WelcomeStartButton extends StatelessWidget {
   final double fontSize;
   final double cornerRadius;
   final double verticalPadding;
+  final bool fitLabel;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
     final radius = BorderRadius.circular(cornerRadius);
+    final label = Text(
+      labelText ?? context.getText(labelKey),
+      style: GoogleFonts.nunito(
+        color: Theme.of(context).colorScheme.onSecondary,
+        fontSize: fontSize,
+        fontWeight: FontWeight.w900,
+        height: 1.2,
+      ),
+    );
 
     return Material(
       color: colors.accent,
@@ -45,15 +56,15 @@ class WelcomeStartButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                labelText ?? context.getText(labelKey),
-                style: GoogleFonts.nunito(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w900,
-                  height: 1.2,
-                ),
-              ),
+              if (fitLabel)
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: FittedBox(fit: BoxFit.scaleDown, child: label),
+                  ),
+                )
+              else
+                label,
             ],
           ),
         ),

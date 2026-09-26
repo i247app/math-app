@@ -257,7 +257,7 @@ void main() {
       expect(guestAccounts.ensureCalls, 1);
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
       expect(find.text('TOÁN AI'), findsOneWidget);
-      expect(find.text('Kiểm Tra Năng Lực'), findsOneWidget);
+      expect(find.text('ĐÁNH GIÁ NĂNG LỰC'), findsOneWidget);
       expect(find.text('START'), findsOneWidget);
       expect(tester.widget<Text>(find.text('START')).style?.fontSize, 32);
       expect(
@@ -265,7 +265,7 @@ void main() {
         'NunitoVariable',
       );
       expect(
-        tester.widget<Text>(find.text('Kiểm Tra Năng Lực')).style?.fontFamily,
+        tester.widget<Text>(find.text('ĐÁNH GIÁ NĂNG LỰC')).style?.fontFamily,
         'NunitoVariable',
       );
 
@@ -721,7 +721,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('AI MATH'), findsOneWidget);
-      expect(find.text('ASESSMENT TEST'), findsOneWidget);
+      expect(find.text('ASESSMENT'), findsOneWidget);
       expect(find.text('TOÁN AI'), findsNothing);
     });
 

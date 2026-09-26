@@ -104,7 +104,7 @@ class _WelcomeAssessmentIntroScreenState
     }
   }
 
-  Widget _buildProgressChart(double width, double availableHeight) {
+  Widget _buildProgressChart(double width) {
     return SizedBox(
       key: const ValueKey('welcome-assessment-intro-chart'),
       width: width,
@@ -113,7 +113,7 @@ class _WelcomeAssessmentIntroScreenState
         previousGrades: _previousGrades,
         testNumbers: _testNumbers,
         lastSubmittedAt: _lastSubmittedAt,
-        chartHeight: math.max(100.0, math.min(180.0, availableHeight - 140.0)),
+        chartHeight: 180,
       ),
     );
   }
@@ -145,10 +145,211 @@ class _WelcomeAssessmentIntroScreenState
     }
   }
 
+  Widget _buildToolbar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AppBackButton(
+            key: const ValueKey('welcome-assessment-back'),
+            onPressed: () => Navigator.of(context).pop(),
+            color: AppColors.welcomeTeal,
+          ),
+          TextButton(
+            key: const ValueKey('welcome-assessment-skip'),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              widget.onSkip();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.welcomeTeal,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            ),
+            child: Text(
+              context.getText(AppKeys.skipUpper),
+              style: GoogleFonts.nunito(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context, {required bool isTablet}) {
+    final isVietnamese = LingoScope.of(context).language == AppLanguage.vi;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            isVietnamese ? 'TOÁN AI' : 'AI MATH',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'NunitoVariable',
+              fontWeight: FontWeight.w900,
+              color: AppColors.brandTeal,
+              fontSize: isTablet ? 52 : 42,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              isVietnamese ? 'ĐÁNH GIÁ NĂNG LỰC' : 'ASESSMENT',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'NunitoVariable',
+                fontWeight: FontWeight.w900,
+                color: AppColors.brandOrange,
+                fontSize: isTablet ? 38 : 32,
+                height: 1.1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistoryHeader(double contentWidth) {
+    if (_isLoadingHistory) {
+      return AppSkeletonLoader(
+        builder: (context, color) => AppSkeletonBlock(
+          key: const ValueKey('welcome-assessment-intro-history-skeleton'),
+          width: contentWidth,
+          height: 90,
+          radius: 28,
+          color: color,
+        ),
+      );
+    }
+
+    // The ribbon PNG has 72 transparent pixels on each side.
+    // Expand its width so the visible colors align with the chart.
+    final ribbonWidth = contentWidth * 2172 / 2028;
+    return SizedBox(
+      width: contentWidth,
+      height: 90,
+      child: OverflowBox(
+        alignment: Alignment.center,
+        minWidth: ribbonWidth,
+        maxWidth: ribbonWidth,
+        child: AssessmentGradeRibbon(currentGrade: _currentGrade),
+      ),
+    );
+  }
+
+  Widget _buildHistoryVisual(double contentWidth, double mascotWidth) {
+    if (_isLoadingHistory) {
+      return AppSkeletonLoader(
+        builder: (context, color) => AppSkeletonBlock(
+          width: contentWidth,
+          height: 240,
+          radius: 20,
+          color: color,
+        ),
+      );
+    }
+    if (_hasExamProgress) return _buildProgressChart(contentWidth);
+    return Image.asset(
+      WelcomeAssessmentIntroScreen._mascotAsset,
+      key: const ValueKey('welcome-assessment-intro-mascot'),
+      width: mascotWidth,
+      height: mascotWidth,
+      fit: BoxFit.contain,
+      semanticLabel: 'Numi assessment mascot',
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context, {
+    required bool isTablet,
+    required double contentWidth,
+    required double mascotWidth,
+  }) {
+    final content = CustomScrollView(
+      key: const ValueKey('welcome-assessment-intro-scroll'),
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              SizedBox(height: isTablet ? 32 : 24),
+              _buildTitle(context, isTablet: isTablet),
+              SizedBox(height: isTablet ? 48 : 32),
+              _buildHistoryHeader(contentWidth),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+        SliverLayoutBuilder(
+          builder: (context, constraints) => SliverToBoxAdapter(
+            // Fill spare space on tall screens, but let the visual keep its
+            // natural height and scroll on short screens or with larger text.
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: math.max(0.0, constraints.remainingPaintExtent),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Center(
+                  child: _buildHistoryVisual(contentWidth, mascotWidth),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+    if (_isLoadingHistory) return content;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+      builder: (context, opacity, child) => Opacity(
+        key: const ValueKey('welcome-assessment-intro-history-content'),
+        opacity: opacity,
+        child: child,
+      ),
+      child: content,
+    );
+  }
+
+  Widget _buildStartButton(double width) {
+    return Center(
+      child: SizedBox(
+        width: math.min(width - 112, 240),
+        child: IgnorePointer(
+          ignoring: _isStarting,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              WelcomeStartButton(
+                key: const ValueKey('welcome-assessment-intro-action'),
+                onStart: () => _startAssessment(),
+                labelText: 'START',
+                fontSize: 32,
+                cornerRadius: 16,
+                verticalPadding: 14,
+                fitLabel: true,
+              ),
+              if (_isStarting)
+                const CircularProgressIndicator(color: Colors.white),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final isVietnamese = LingoScope.of(context).language == AppLanguage.vi;
     final overlayStyle = Theme.of(context).brightness == Brightness.dark
         ? SystemUiOverlayStyle.light
         : SystemUiOverlayStyle.dark;
@@ -166,11 +367,9 @@ class _WelcomeAssessmentIntroScreenState
               filterQuality: FilterQuality.high,
             ),
             SafeArea(
-              bottom: false,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
-                  final height = constraints.maxHeight;
                   final isTablet =
                       MediaQuery.sizeOf(context).shortestSide >= 600;
                   final mascotWidth = math.min(
@@ -178,239 +377,21 @@ class _WelcomeAssessmentIntroScreenState
                     isTablet ? 390.0 : 310.0,
                   );
                   final contentWidth = math.min(width - 32, 430.0);
-                  // The ribbon PNG has 72 transparent pixels on each side.
-                  // Expand its layout so the visible colors align with the chart.
-                  final ribbonWidth = contentWidth * 2172 / 2028;
-                  const contentLift = 25.0;
-                  final contentTop =
-                      math.max(
-                        height * (height < 700 ? 0.34 : 0.36),
-                        isTablet ? 250.0 : 190.0,
-                      ) -
-                      contentLift;
-                  final contentBottom =
-                      MediaQuery.viewPaddingOf(context).bottom +
-                      182 +
-                      contentLift;
-                  final contentHeight = math.max(
-                    0.0,
-                    height - contentTop - contentBottom,
-                  );
 
-                  return Stack(
+                  return Column(
                     children: [
-                      Positioned(
-                        top: 2,
-                        left: 12,
-                        child: AppBackButton(
-                          key: const ValueKey('welcome-assessment-back'),
-                          onPressed: () => Navigator.of(context).pop(),
-                          color: AppColors.welcomeTeal,
+                      _buildToolbar(context),
+                      Expanded(
+                        child: _buildContent(
+                          context,
+                          isTablet: isTablet,
+                          contentWidth: contentWidth,
+                          mascotWidth: mascotWidth,
                         ),
                       ),
-                      Positioned(
-                        top: 2,
-                        right: 12,
-                        child: TextButton(
-                          key: const ValueKey('welcome-assessment-skip'),
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            widget.onSkip();
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.welcomeTeal,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                          ),
-                          child: Text(
-                            context.getText(AppKeys.skipUpper),
-                            style: GoogleFonts.nunito(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: isTablet ? 80 : 72,
-                        left: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                isVietnamese ? 'TOÁN AI' : 'AI MATH',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'NunitoVariable',
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.brandTeal,
-                                  fontSize: isTablet ? 52 : 42,
-                                  height: 1.1,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  isVietnamese
-                                      ? 'ĐÁNH GIÁ NĂNG LỰC'
-                                      : 'ASESSMENT',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: 'NunitoVariable',
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.brandOrange,
-                                    fontSize: isTablet ? 38 : 32,
-                                    height: 1.1,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: contentTop,
-                        bottom: contentBottom,
-                        left: (width - contentWidth) / 2,
-                        right: (width - contentWidth) / 2,
-                        child: _isLoadingHistory
-                            ? Column(
-                                children: [
-                                  Expanded(
-                                    child: AppSkeletonLoader(
-                                      builder: (context, color) => Column(
-                                        children: [
-                                          AppSkeletonBlock(
-                                            key: const ValueKey(
-                                              'welcome-assessment-intro-history-skeleton',
-                                            ),
-                                            width: contentWidth,
-                                            height: 56,
-                                            radius: 28,
-                                            color: color,
-                                          ),
-                                          const SizedBox(height: 24),
-                                          Expanded(
-                                            child: Center(
-                                              child: AppSkeletonBlock(
-                                                width: contentWidth,
-                                                height: math.max(
-                                                  100.0,
-                                                  math.min(
-                                                    180.0,
-                                                    contentHeight - 140,
-                                                  ),
-                                                ),
-                                                radius: 20,
-                                                color: color,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : TweenAnimationBuilder<double>(
-                                tween: Tween<double>(begin: 0, end: 1),
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeOut,
-                                builder: (context, opacity, child) => Opacity(
-                                  key: const ValueKey(
-                                    'welcome-assessment-intro-history-content',
-                                  ),
-                                  opacity: opacity,
-                                  child: child,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Transform.translate(
-                                      offset: const Offset(0, -24),
-                                      child: SizedBox(
-                                        height: 90,
-                                        child: OverflowBox(
-                                          alignment: Alignment.center,
-                                          minWidth: ribbonWidth,
-                                          maxWidth: ribbonWidth,
-                                          child: AssessmentGradeRibbon(
-                                            currentGrade: _currentGrade,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Expanded(
-                                      child: Center(
-                                        child: _hasExamProgress
-                                            ? height < 700
-                                                  ? FittedBox(
-                                                      fit: BoxFit.scaleDown,
-                                                      child:
-                                                          _buildProgressChart(
-                                                            contentWidth,
-                                                            contentHeight,
-                                                          ),
-                                                    )
-                                                  : _buildProgressChart(
-                                                      contentWidth,
-                                                      contentHeight,
-                                                    )
-                                            : Image.asset(
-                                                WelcomeAssessmentIntroScreen
-                                                    ._mascotAsset,
-                                                key: const ValueKey(
-                                                  'welcome-assessment-intro-mascot',
-                                                ),
-                                                width: mascotWidth,
-                                                fit: BoxFit.contain,
-                                                semanticLabel:
-                                                    'Numi assessment mascot',
-                                              ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: MediaQuery.viewPaddingOf(context).bottom + 96,
-                        child: Center(
-                          child: SizedBox(
-                            width: math.min(width - 112, 240),
-                            child: IgnorePointer(
-                              ignoring: _isStarting,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  WelcomeStartButton(
-                                    key: const ValueKey(
-                                      'welcome-assessment-intro-action',
-                                    ),
-                                    onStart: () => _startAssessment(),
-                                    labelText: 'START',
-                                    fontSize: 32,
-                                    cornerRadius: 16,
-                                    verticalPadding: 14,
-                                  ),
-                                  if (_isStarting)
-                                    const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 24),
+                      _buildStartButton(width),
+                      SizedBox(height: constraints.maxHeight < 700 ? 32 : 96),
                     ],
                   );
                 },
