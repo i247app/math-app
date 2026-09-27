@@ -7,28 +7,28 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
-class WelcomeLoginButton extends StatelessWidget {
-  const WelcomeLoginButton({
+class WelcomeTextButton extends StatelessWidget {
+  const WelcomeTextButton({
     super.key,
-    required this.onLogin,
+    required this.onPressed,
     this.labelKey = AppKeys.login,
     this.labelText,
   });
 
-  final VoidCallback onLogin;
+  final VoidCallback onPressed;
   final String labelKey;
   final String? labelText;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final loginColor = colors.brandStrong;
+    final textColor = colors.brandStrong;
 
     return Center(
       child: InkWell(
         onTap: () {
           HapticFeedback.lightImpact();
-          onLogin();
+          onPressed();
         },
         borderRadius: BorderRadius.circular(999),
         child: Padding(
@@ -37,11 +37,11 @@ class WelcomeLoginButton extends StatelessWidget {
             labelText ?? context.getText(labelKey),
             textAlign: TextAlign.center,
             style: GoogleFonts.nunito(
-              color: loginColor,
+              color: textColor,
               fontSize: FontSize.large,
               fontWeight: FontWeight.w800,
               height: 1.2,
-              decorationColor: loginColor,
+              decorationColor: textColor,
               decorationThickness: 1.6,
               decorationStyle: TextDecorationStyle.solid,
             ),

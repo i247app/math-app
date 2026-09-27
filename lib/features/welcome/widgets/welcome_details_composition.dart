@@ -7,11 +7,11 @@ import 'package:numi/features/welcome/widgets/welcome_details_header.dart';
 class WelcomeDetailsComposition extends StatelessWidget {
   const WelcomeDetailsComposition({
     super.key,
-    required this.onStart,
+    required this.onSignup,
     required this.onBack,
   });
 
-  final VoidCallback onStart;
+  final VoidCallback onSignup;
   final VoidCallback onBack;
 
   @override
@@ -64,7 +64,7 @@ class WelcomeDetailsComposition extends StatelessWidget {
                           child: Column(
                             children: [
                               const WelcomeDetailsFeatureGrid(),
-                              WelcomeDetailsControls(onStart: onStart),
+                              WelcomeDetailsControls(onSignup: onSignup),
                             ],
                           ),
                         ),

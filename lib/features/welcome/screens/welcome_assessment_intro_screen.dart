@@ -15,7 +15,7 @@ import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
-import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
+import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
@@ -327,9 +327,9 @@ class _WelcomeAssessmentIntroScreenState
           child: Stack(
             alignment: Alignment.center,
             children: [
-              WelcomeStartButton(
+              WelcomePrimaryButton(
                 key: const ValueKey('welcome-assessment-intro-action'),
-                onStart: () => _startAssessment(),
+                onPressed: () => _startAssessment(),
                 labelText: 'START',
                 fontSize: 32,
                 cornerRadius: 16,

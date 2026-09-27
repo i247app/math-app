@@ -7,10 +7,10 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
-class WelcomeStartButton extends StatelessWidget {
-  const WelcomeStartButton({
+class WelcomePrimaryButton extends StatelessWidget {
+  const WelcomePrimaryButton({
     super.key,
-    required this.onStart,
+    required this.onPressed,
     this.labelKey = AppKeys.start,
     this.labelText,
     this.fontSize = FontSize.large,
@@ -19,7 +19,7 @@ class WelcomeStartButton extends StatelessWidget {
     this.fitLabel = false,
   });
 
-  final VoidCallback onStart;
+  final VoidCallback onPressed;
   final String labelKey;
   final String? labelText;
   final double fontSize;
@@ -48,7 +48,7 @@ class WelcomeStartButton extends StatelessWidget {
       child: InkWell(
         onTap: () {
           HapticFeedback.lightImpact();
-          onStart();
+          onPressed();
         },
         borderRadius: radius,
         child: Padding(

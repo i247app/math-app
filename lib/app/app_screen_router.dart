@@ -224,7 +224,7 @@ class AppScreenRouter extends StatelessWidget {
                 : switch (screen) {
                     AppScreen.welcome => WelcomeScreen(
                       key: const ValueKey('welcome'),
-                      onStart: () {
+                      onSignup: () {
                         cubit.openSignupEntry();
                         coordinator.showSignup();
                       },
@@ -266,7 +266,7 @@ class AppScreenRouter extends StatelessWidget {
                     ),
                     AppScreen.welcomeDetails => WelcomeDetailsScreen(
                       key: const ValueKey('welcome-details'),
-                      onStart: () {
+                      onSignup: () {
                         cubit.openSignupEntry();
                         coordinator.showSignup();
                       },

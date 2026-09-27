@@ -8,18 +8,18 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'numi_brand_text.dart';
 import 'welcome_background.dart';
-import 'welcome_login_button.dart';
-import 'welcome_start_button.dart';
+import 'welcome_primary_button.dart';
+import 'welcome_text_button.dart';
 import 'welcome_thinking_scene.dart';
 
 class WelcomeComposition extends StatelessWidget {
-  final VoidCallback onStart;
+  final VoidCallback onSignup;
   final VoidCallback onAssessment;
   final VoidCallback onLogin;
 
   const WelcomeComposition({
     super.key,
-    required this.onStart,
+    required this.onSignup,
     required this.onAssessment,
     required this.onLogin,
   });
@@ -120,18 +120,18 @@ class WelcomeComposition extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            WelcomeStartButton(
+                            WelcomePrimaryButton(
                               key: const ValueKey('welcome-login-action'),
-                              onStart: onLogin,
+                              onPressed: onLogin,
                               labelKey: AppKeys.welcomeLogin,
                               cornerRadius: 20,
                               verticalPadding: 14,
                               fitLabel: true,
                             ),
                             const SizedBox(height: 4),
-                            WelcomeLoginButton(
+                            WelcomeTextButton(
                               key: const ValueKey('welcome-signup-action'),
-                              onLogin: onStart,
+                              onPressed: onSignup,
                               labelKey: AppKeys.welcomeSignup,
                             ),
                           ],

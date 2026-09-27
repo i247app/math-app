@@ -25,14 +25,14 @@ void main() {
       testWidgets('welcome actions remain reachable at $size / $textScale', (
         tester,
       ) async {
-        var starts = 0;
+        var signups = 0;
         var logins = 0;
         var assessments = 0;
         await _pumpWelcome(
           tester,
           size: size,
           textScale: textScale,
-          onStart: () => starts++,
+          onSignup: () => signups++,
           onLogin: () => logins++,
           onAssessment: () => assessments++,
         );
@@ -41,7 +41,7 @@ void main() {
         expect(find.text('Đăng Ký'), findsOneWidget);
         expect(find.text('Thử Ngay!'), findsOneWidget);
 
-        final start = find.byKey(const ValueKey('welcome-signup-action'));
+        final signup = find.byKey(const ValueKey('welcome-signup-action'));
         final login = find.byKey(const ValueKey('welcome-login-action'));
         final assessment = find.byKey(
           const ValueKey('welcome-assessment-action'),
@@ -49,13 +49,13 @@ void main() {
         await tester.ensureVisible(assessment);
         await tester.tap(assessment);
         await tester.pumpAndSettle();
-        await tester.ensureVisible(start);
-        await tester.tap(start);
+        await tester.ensureVisible(signup);
+        await tester.tap(signup);
         await tester.pumpAndSettle();
         await tester.ensureVisible(login);
         await tester.tap(login);
         await tester.pumpAndSettle();
-        expect(starts, 1);
+        expect(signups, 1);
         expect(logins, 1);
         expect(assessments, 1);
         expect(tester.takeException(), isNull);
@@ -84,13 +84,13 @@ void main() {
   ) async {
     await _pumpWelcome(tester, size: const Size(360, 800));
     final mascot = find.byKey(const ValueKey('welcome-thinking-mascot'));
-    final start = find.byKey(const ValueKey('welcome-login-action'));
-    final login = find.byKey(const ValueKey('welcome-signup-action'));
-    expect(tester.getRect(mascot).bottom, lessThan(tester.getRect(start).top));
-    expect(tester.getRect(start).bottom, lessThan(tester.getRect(login).top));
-    expect(start.hitTestable(), findsOneWidget);
+    final login = find.byKey(const ValueKey('welcome-login-action'));
+    final signup = find.byKey(const ValueKey('welcome-signup-action'));
+    expect(tester.getRect(mascot).bottom, lessThan(tester.getRect(login).top));
+    expect(tester.getRect(login).bottom, lessThan(tester.getRect(signup).top));
     expect(login.hitTestable(), findsOneWidget);
-    expect(tester.getSize(start).width, closeTo(230.4, 0.1));
+    expect(signup.hitTestable(), findsOneWidget);
+    expect(tester.getSize(login).width, closeTo(230.4, 0.1));
 
     // Optional review image: flutter test --dart-define=WELCOME_PREVIEW=true ...
     if (const bool.fromEnvironment('WELCOME_PREVIEW')) {
@@ -196,7 +196,7 @@ Future<LingoProvider> _pumpWelcome(
   double textScale = 1,
   AppLanguage language = AppLanguage.vi,
   bool dark = false,
-  VoidCallback? onStart,
+  VoidCallback? onSignup,
   VoidCallback? onLogin,
   VoidCallback? onAssessment,
 }) async {
@@ -224,7 +224,7 @@ Future<LingoProvider> _pumpWelcome(
         home: RepaintBoundary(
           key: const ValueKey('welcome-preview-boundary'),
           child: WelcomeScreen(
-            onStart: onStart ?? () {},
+            onSignup: onSignup ?? () {},
             onAssessment: onAssessment ?? () {},
             onLogin: onLogin ?? () {},
           ),

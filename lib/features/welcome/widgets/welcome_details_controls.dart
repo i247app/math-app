@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/welcome/widgets/welcome_start_button.dart';
+import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
 
 class WelcomeDetailsControls extends StatelessWidget {
-  const WelcomeDetailsControls({super.key, required this.onStart});
+  const WelcomeDetailsControls({super.key, required this.onSignup});
 
-  final VoidCallback onStart;
+  final VoidCallback onSignup;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,8 @@ class WelcomeDetailsControls extends StatelessWidget {
             const Spacer(),
             SizedBox(
               width: 143,
-              child: WelcomeStartButton(
-                onStart: onStart,
+              child: WelcomePrimaryButton(
+                onPressed: onSignup,
                 labelKey: AppKeys.continueUpper,
               ),
             ),

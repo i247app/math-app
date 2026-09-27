@@ -7,11 +7,11 @@ import 'package:numi/features/welcome/widgets/welcome_details_composition.dart';
 class WelcomeDetailsScreen extends StatelessWidget {
   const WelcomeDetailsScreen({
     super.key,
-    required this.onStart,
+    required this.onSignup,
     required this.onBack,
   });
 
-  final VoidCallback onStart;
+  final VoidCallback onSignup;
   final VoidCallback onBack;
 
   @override
@@ -25,7 +25,7 @@ class WelcomeDetailsScreen extends StatelessWidget {
       value: overlayStyle,
       child: Scaffold(
         backgroundColor: colors.pageBackground,
-        body: WelcomeDetailsComposition(onStart: onStart, onBack: onBack),
+        body: WelcomeDetailsComposition(onSignup: onSignup, onBack: onBack),
       ),
     );
   }
