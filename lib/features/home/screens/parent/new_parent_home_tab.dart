@@ -423,18 +423,32 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                     chartHeight: 150,
                   ),
                   const SizedBox(height: 24),
-                  ParentHomeActionButton(
-                    key: const ValueKey('parent-home-assessment-action'),
-                    label: 'Assessment Test',
-                    icon: Icons.timer_outlined,
-                    onTap: openInitialAssessment,
-                  ),
-                  const SizedBox(height: 18),
-                  ParentHomeActionButton(
-                    key: const ValueKey('parent-home-practice-action'),
-                    label: 'Learning & Practice',
-                    icon: Icons.menu_book_rounded,
-                    onTap: openGradeRoadmap,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ParentHomeActionButton(
+                          key: const ValueKey('parent-home-assessment-action'),
+                          label: 'Assessment Test',
+                          iconAsset:
+                              'assets/icons/home-assessment-stopwatch.png',
+                          colors: const [Color(0xFFFFBE54), Color(0xFFFF993C)],
+                          accentColor: const Color(0xFFFFDB70),
+                          onTap: openInitialAssessment,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ParentHomeActionButton(
+                          key: const ValueKey('parent-home-practice-action'),
+                          label: 'Learning & Practice',
+                          iconAsset: 'assets/icons/home-learning-book.png',
+                          colors: const [Color(0xFFFFA18C), Color(0xFFFA796B)],
+                          accentColor: const Color(0xFFFFB0AA),
+                          onTap: openGradeRoadmap,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

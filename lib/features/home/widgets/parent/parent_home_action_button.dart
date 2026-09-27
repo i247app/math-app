@@ -6,74 +6,145 @@ class ParentHomeActionButton extends StatelessWidget {
   const ParentHomeActionButton({
     super.key,
     required this.label,
-    required this.icon,
+    required this.iconAsset,
     required this.onTap,
-    this.color = const Color(0xFFF45D2D),
-    this.shadowColor = const Color(0xFFB8431A),
+    required this.colors,
+    required this.accentColor,
   });
 
   final String label;
-  final IconData icon;
+  final String iconAsset;
   final VoidCallback onTap;
-  final Color color;
-  final Color shadowColor;
+  final List<Color> colors;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(16);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: [
-          BoxShadow(color: shadowColor, offset: const Offset(0, 5)),
-          const BoxShadow(
-            color: Color(0x33000000),
-            offset: Offset(0, 8),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Material(
-        color: color,
-        borderRadius: radius,
-        child: InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            onTap();
-          },
-          borderRadius: radius,
-          child: SizedBox(
-            height: 64,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Row(
-                children: [
-                  Icon(icon, color: Colors.white, size: 25),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.nunito(
-                        color: Colors.white,
-                        fontSize: 19,
-                        fontWeight: FontWeight.w900,
+    final radius = BorderRadius.circular(18);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fontSize = ((constraints.maxWidth - 56) / 6.1).clamp(14.0, 18.0);
+        final textScale =
+            MediaQuery.textScalerOf(context).scale(fontSize) / fontSize;
+
+        return Semantics(
+          button: true,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              boxShadow: [
+                BoxShadow(
+                  color: colors.last.withValues(alpha: 0.22),
+                  offset: const Offset(0, 6),
+                  blurRadius: 12,
+                ),
+              ],
+            ),
+            child: Material(
+              color: colors.first,
+              borderRadius: radius,
+              clipBehavior: Clip.antiAlias,
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: colors,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -24,
+                      right: -18,
+                      child: IgnorePointer(
+                        child: Ink(
+                          width: 58,
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.07),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white,
-                    size: 26,
-                  ),
-                ],
+                    Positioned(
+                      bottom: -44,
+                      right: -16,
+                      child: IgnorePointer(
+                        child: Ink(
+                          width: 90,
+                          height: 66,
+                          decoration: BoxDecoration(
+                            color: accentColor,
+                            borderRadius: BorderRadius.circular(45),
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        onTap();
+                      },
+                      child: SizedBox(
+                        height:
+                            126 +
+                            (textScale - 1).clamp(0, double.infinity) * 48,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 10, 12, 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                iconAsset,
+                                width: 58,
+                                height: 58,
+                                fit: BoxFit.contain,
+                                excludeFromSemantics: true,
+                              ),
+                              const Spacer(),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      label,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.nunito(
+                                        color: const Color(0xFFFFFDF5),
+                                        fontSize: fontSize,
+                                        height: 1.15,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  DecoratedBox(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFFFFDF5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: colors.first,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
