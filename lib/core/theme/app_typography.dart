@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
@@ -10,15 +11,12 @@ import 'app_colors.dart';
 abstract final class AppTypography {
   const AppTypography._();
 
-  static const fontFamily = 'Andika';
-
   static TextTheme light() {
-    return ThemeData.light().textTheme.apply(fontFamily: fontFamily);
+    return GoogleFonts.andikaTextTheme(ThemeData.light().textTheme);
   }
 
   static TextTheme dark() {
-    return ThemeData.dark().textTheme.apply(
-      fontFamily: fontFamily,
+    return GoogleFonts.andikaTextTheme(ThemeData.dark().textTheme).apply(
       bodyColor: AppColors.darkOnSurface,
       displayColor: AppColors.darkOnSurface,
     );

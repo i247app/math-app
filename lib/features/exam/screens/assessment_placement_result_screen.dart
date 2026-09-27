@@ -392,8 +392,7 @@ class _AssessmentPlacementResultScreenState
                 Text(
                   context.getText(AppKeys.placementResultLevel),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'NunitoVariable',
+                  style: GoogleFonts.nunito(
                     color: const Color(0xFF04A8B3),
                     fontSize: FontSize.xxl,
                     fontWeight: FontWeight.w800,
@@ -411,8 +410,7 @@ class _AssessmentPlacementResultScreenState
                       'level': level,
                     }),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'NunitoVariable',
+                    style: GoogleFonts.nunito(
                       color: colors.brandStrong,
                       fontSize: FontSize.large,
                       fontWeight: FontWeight.w800,
@@ -647,8 +645,7 @@ class _PlacementGradeTitle extends StatelessWidget {
         ? (label.characters.length / 2).ceil()
         : label.characters.toList().indexOf(' ');
     final glyphs = label.characters.toList();
-    final textStyle = TextStyle(
-      fontFamily: 'NunitoVariable',
+    final textStyle = GoogleFonts.nunito(
       fontSize: compact ? 34 : 38,
       fontWeight: FontWeight.w900,
       height: 1,

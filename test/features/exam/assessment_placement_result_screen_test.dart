@@ -70,11 +70,11 @@ void main() {
     expect(find.text('MẪU GIÁO'), findsOneWidget);
     expect(
       tester.widget<Text>(find.text('Trình độ')).style?.fontFamily,
-      'NunitoVariable',
+      startsWith('Nunito_'),
     );
     expect(
       tester.widget<Text>(find.text('M')).style?.fontFamily,
-      'NunitoVariable',
+      startsWith('Nunito_'),
     );
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);

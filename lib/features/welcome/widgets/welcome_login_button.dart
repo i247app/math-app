@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -35,8 +36,7 @@ class WelcomeLoginButton extends StatelessWidget {
           child: Text(
             labelText ?? context.getText(labelKey),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'NunitoVariable',
+            style: GoogleFonts.nunito(
               color: loginColor,
               fontSize: FontSize.large,
               fontWeight: FontWeight.w800,

@@ -238,11 +238,11 @@ void main() {
       expect(tester.widget<Text>(find.text('START')).style?.fontSize, 32);
       expect(
         tester.widget<Text>(find.text('TOÁN AI')).style?.fontFamily,
-        'NunitoVariable',
+        startsWith('Nunito_'),
       );
       expect(
         tester.widget<Text>(find.text('ĐÁNH GIÁ NĂNG LỰC')).style?.fontFamily,
-        'NunitoVariable',
+        startsWith('Nunito_'),
       );
 
       await tester.tap(

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -82,8 +83,7 @@ class WelcomeComposition extends StatelessWidget {
                               ],
                             ),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'NunitoVariable',
+                            style: GoogleFonts.nunito(
                               color: colors.brand,
                               fontSize: 18,
                               height: 1.25,
@@ -95,8 +95,7 @@ class WelcomeComposition extends StatelessWidget {
                               AppKeys.welcomeTaglineStudyAssessment,
                             ),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'NunitoVariable',
+                            style: GoogleFonts.nunito(
                               color: colors.brand,
                               fontSize: 18,
                               height: 1.25,

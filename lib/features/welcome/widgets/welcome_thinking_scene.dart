@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -61,8 +62,7 @@ class WelcomeThinkingScene extends StatelessWidget {
                   textScaler: MediaQuery.textScalerOf(
                     context,
                   ).clamp(maxScaleFactor: 1.1),
-                  style: const TextStyle(
-                    fontFamily: 'NunitoVariable',
+                  style: GoogleFonts.nunito(
                     fontSize: 30,
                     height: 1.1,
                     fontWeight: FontWeight.w800,

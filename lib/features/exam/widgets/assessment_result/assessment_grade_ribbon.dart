@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -51,8 +52,7 @@ class AssessmentGradeRibbon extends StatelessWidget {
                         Text(
                           gradeLabel,
                           key: const ValueKey('placement-current-grade-label'),
-                          style: const TextStyle(
-                            fontFamily: 'NunitoVariable',
+                          style: GoogleFonts.nunito(
                             color: Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w800,

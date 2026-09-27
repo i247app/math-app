@@ -189,8 +189,7 @@ class _WelcomeAssessmentIntroScreenState
           Text(
             isVietnamese ? 'TOÁN AI' : 'AI MATH',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'NunitoVariable',
+            style: GoogleFonts.nunito(
               fontWeight: FontWeight.w900,
               color: AppColors.brandTeal,
               fontSize: isTablet ? 52 : 42,
@@ -203,8 +202,7 @@ class _WelcomeAssessmentIntroScreenState
             child: Text(
               isVietnamese ? 'ĐÁNH GIÁ NĂNG LỰC' : 'ASESSMENT',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'NunitoVariable',
+              style: GoogleFonts.nunito(
                 fontWeight: FontWeight.w900,
                 color: AppColors.brandOrange,
                 fontSize: isTablet ? 38 : 32,
