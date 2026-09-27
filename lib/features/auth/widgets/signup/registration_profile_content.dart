@@ -20,12 +20,9 @@ class RegistrationProfileContent extends StatelessWidget {
   const RegistrationProfileContent({
     super.key,
     required this.usernameController,
-    required this.emailController,
-    required this.emailReadOnly,
     required this.role,
     required this.gender,
     required this.usernameErrorText,
-    required this.emailErrorText,
     required this.isFormValid,
     required this.isSigningUp,
     required this.onBack,
@@ -35,12 +32,9 @@ class RegistrationProfileContent extends StatelessWidget {
   });
 
   final TextEditingController usernameController;
-  final TextEditingController emailController;
-  final bool emailReadOnly;
   final SignupRole? role;
   final SignupGender? gender;
   final String? usernameErrorText;
-  final String? emailErrorText;
   final bool isFormValid;
   final bool isSigningUp;
   final VoidCallback onBack;
@@ -129,23 +123,8 @@ class RegistrationProfileContent extends StatelessWidget {
                           controller: usernameController,
                           hintText: context.getText(AppKeys.signupNameHint),
                           prefixIcon: Icons.person_outline_rounded,
-                          textInputAction: TextInputAction.next,
-                          errorText: usernameErrorText,
-                        ),
-                        const SizedBox(height: 16),
-                        SignupFieldLabel(
-                          label: context.getText(AppKeys.signupEmailLabel),
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 6),
-                        SignupTextField(
-                          controller: emailController,
-                          readOnly: emailReadOnly,
-                          hintText: context.getText(AppKeys.signupEmailHint),
-                          prefixIcon: Icons.mail_outline_rounded,
-                          keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.done,
-                          errorText: emailErrorText,
+                          errorText: usernameErrorText,
                         ),
                         SizedBox(height: compact ? 20 : 24),
                         SignupActionButton(

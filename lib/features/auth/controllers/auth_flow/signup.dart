@@ -2,9 +2,12 @@ part of '../auth_cubit.dart';
 
 extension AuthFlowSignup on AuthFlowCubit {
   Future<void> submitSignup(SignupFormData form) async {
-    final email = _pendingSignupEmail ?? state.loginName;
+    final email = _pendingSignupEmail;
     final trimmedName = form.name.trim();
-    if (state.isSigningUp || email == null) {
+    if (state.screen != AuthScreen.registrationProfile ||
+        state.isSigningUp ||
+        email == null ||
+        _verifiedSignupEmail != email) {
       return;
     }
 
@@ -43,7 +46,22 @@ extension AuthFlowSignup on AuthFlowCubit {
         clearOtpError: true,
       ),
     );
-    await _sendSignupOtp(email);
+    final attemptId = _signupAttemptId;
+    try {
+      await _completeSignup(
+        email: email,
+        form: normalizedForm,
+        isSigningUp: false,
+      );
+    } on AuthException catch (error) {
+      if (!isClosed && attemptId == _signupAttemptId) {
+        _showSignupCreationError(error.message);
+      }
+    } catch (_) {
+      if (!isClosed && attemptId == _signupAttemptId) {
+        _showSignupCreationError(AppStrings.current(AppKeys.signupFailed));
+      }
+    }
   }
 
   Future<void> _completeSignup({
@@ -52,11 +70,15 @@ extension AuthFlowSignup on AuthFlowCubit {
     bool? isVerifyingOtp,
     bool? isSigningUp,
   }) async {
+    final attemptId = _signupAttemptId;
     final user = await _authService.signupWithEmail(
       email: email,
       name: form.name,
       role: form.role.apiValue,
     );
+    if (isClosed || attemptId != _signupAttemptId) {
+      return;
+    }
     _clearPendingSignup();
     _emitAuthenticationSucceeded(
       user,
@@ -66,7 +88,7 @@ extension AuthFlowSignup on AuthFlowCubit {
     );
   }
 
-  void _returnToSignupAfterOtp(String message) {
+  void _showSignupCreationError(String message) {
     final signupEmail = _pendingSignupEmail;
     _emitState(
       state.copyWith(
@@ -82,7 +104,9 @@ extension AuthFlowSignup on AuthFlowCubit {
   }
 
   void _clearPendingSignup() {
+    _signupAttemptId++;
     _pendingSignupEmail = null;
     _pendingSignupForm = null;
+    _verifiedSignupEmail = null;
   }
 }

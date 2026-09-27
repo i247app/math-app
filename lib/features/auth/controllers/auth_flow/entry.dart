@@ -125,11 +125,10 @@ extension AuthFlowEntry on AuthFlowCubit {
           state.isCheckingIdentifier) {
         return;
       }
+      _clearPendingSignup();
       _pendingSignupEmail = loginName;
-      _pendingSignupForm = null;
       _emitState(
         state.copyWith(
-          screen: AuthScreen.registrationProfile,
           loginName: loginName,
           isCheckingIdentifier: false,
           isSendingOtp: false,
@@ -139,6 +138,7 @@ extension AuthFlowEntry on AuthFlowCubit {
           clearOtpError: true,
         ),
       );
+      await _sendSignupOtp(loginName);
       return;
     }
 

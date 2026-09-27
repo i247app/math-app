@@ -402,8 +402,8 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
               ),
             ),
           ),
-        // Section "Tiện ích" tạm thời được ẩn. Bỏ comment và khôi phục các
-        // import liên quan khi cần hiển thị lại.
+        // The Utilities section is temporarily hidden. Uncomment it and restore
+        // the related imports when the section is needed again.
         /*
         Padding(
           padding: const EdgeInsets.only(top: 14),
@@ -431,7 +431,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     );
   }
 
-  // Dùng lại cùng section "Tiện ích" khi tính năng được bật lại.
+  // Reuse with the Utilities section when the feature is enabled again.
   /*
   void _openMessages(ParentRoomEntry entry) {
     HapticFeedback.selectionClick();

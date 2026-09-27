@@ -39,7 +39,11 @@ extension AuthFlowOtp on AuthFlowCubit {
 
   Future<void> resendLoginOtp() async {
     final loginName = state.loginName;
-    if (state.isSendingOtp || loginName == null || loginName.trim().isEmpty) {
+    if (state.screen != AuthScreen.otp ||
+        state.isSendingOtp ||
+        state.isVerifyingOtp ||
+        loginName == null ||
+        loginName.trim().isEmpty) {
       return;
     }
 
@@ -52,6 +56,8 @@ extension AuthFlowOtp on AuthFlowCubit {
   }
 
   Future<void> _sendSignupOtp(String email) async {
+    final attemptId = _signupAttemptId;
+    _verifiedSignupEmail = null;
     _emitState(
       state.copyWith(
         isSendingOtp: true,
@@ -65,18 +71,30 @@ extension AuthFlowOtp on AuthFlowCubit {
         loginName: email,
         kind: AuthOtpKind.signup,
       );
-      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+      if (isClosed ||
+          attemptId != _signupAttemptId ||
+          _pendingSignupEmail != email ||
+          state.loginName != email ||
+          state.otpFlow != OtpFlow.signup) {
         return;
       }
 
       _emitOtpSent(loginName: email, otp: otp, flow: OtpFlow.signup);
     } on AuthException catch (error) {
-      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+      if (isClosed ||
+          attemptId != _signupAttemptId ||
+          _pendingSignupEmail != email ||
+          state.loginName != email ||
+          state.otpFlow != OtpFlow.signup) {
         return;
       }
       _emitAuthError(error.message, isSendingOtp: false, isSigningUp: false);
     } catch (_) {
-      if (state.loginName != email || state.otpFlow != OtpFlow.signup) {
+      if (isClosed ||
+          attemptId != _signupAttemptId ||
+          _pendingSignupEmail != email ||
+          state.loginName != email ||
+          state.otpFlow != OtpFlow.signup) {
         return;
       }
       _emitAuthError(
@@ -165,8 +183,10 @@ extension AuthFlowOtp on AuthFlowCubit {
     required SendOtpResult otp,
     required OtpFlow flow,
   }) {
+    // Clear stale expiry without discarding a response containing only seconds.
+    final stateWithoutExpiry = state.copyWith(clearOtpExpiry: true);
     _emitState(
-      state.copyWith(
+      stateWithoutExpiry.copyWith(
         screen: AuthScreen.otp,
         loginName: loginName,
         otpExpiresAt: otp.expiresAt,
@@ -176,7 +196,6 @@ extension AuthFlowOtp on AuthFlowCubit {
         isSendingOtp: false,
         isSigningUp: false,
         clearAuthError: true,
-        clearOtpExpiry: otp.expiresAt == null,
         clearOtpError: true,
       ),
     );
@@ -184,9 +203,14 @@ extension AuthFlowOtp on AuthFlowCubit {
 
   Future<void> verifyOtp(String otpCode) async {
     final loginName = state.loginName;
-    if (state.isVerifyingOtp || loginName == null) {
+    if (state.screen != AuthScreen.otp ||
+        state.isSendingOtp ||
+        state.isVerifyingOtp ||
+        loginName == null) {
       return;
     }
+    final otpFlow = state.otpFlow;
+    final attemptId = _signupAttemptId;
 
     _emitState(
       state.copyWith(
@@ -197,7 +221,6 @@ extension AuthFlowOtp on AuthFlowCubit {
     );
 
     try {
-      final otpFlow = state.otpFlow;
       final result = await _authService.verifyOtp(
         loginName: loginName,
         otpCode: otpCode,
@@ -205,6 +228,13 @@ extension AuthFlowOtp on AuthFlowCubit {
             ? AuthOtpKind.signup
             : AuthOtpKind.login,
       );
+
+      if (isClosed ||
+          state.screen != AuthScreen.otp ||
+          state.loginName != loginName ||
+          (otpFlow == OtpFlow.signup && attemptId != _signupAttemptId)) {
+        return;
+      }
 
       if (!result.isValid) {
         _emitState(
@@ -220,8 +250,7 @@ extension AuthFlowOtp on AuthFlowCubit {
 
       if (otpFlow == OtpFlow.signup) {
         final signupEmail = _pendingSignupEmail;
-        final signupForm = _pendingSignupForm;
-        if (signupEmail == null || signupForm == null) {
+        if (signupEmail == null || signupEmail != loginName) {
           _emitState(
             state.copyWith(
               isVerifyingOtp: false,
@@ -233,17 +262,16 @@ extension AuthFlowOtp on AuthFlowCubit {
           return;
         }
 
-        try {
-          await _completeSignup(
-            email: signupEmail,
-            form: signupForm,
+        _verifiedSignupEmail = signupEmail;
+        _emitState(
+          state.copyWith(
+            screen: AuthScreen.registrationProfile,
             isVerifyingOtp: false,
-          );
-        } on AuthException catch (error) {
-          _returnToSignupAfterOtp(error.message);
-        } catch (_) {
-          _returnToSignupAfterOtp(AppStrings.current(AppKeys.signupFailed));
-        }
+            clearAuthError: true,
+            clearOtpExpiry: true,
+            clearOtpError: true,
+          ),
+        );
         return;
       }
 
@@ -261,6 +289,12 @@ extension AuthFlowOtp on AuthFlowCubit {
 
       _emitAuthenticationSucceeded(result.user!, isVerifyingOtp: false);
     } on AuthException catch (error) {
+      if (isClosed ||
+          state.screen != AuthScreen.otp ||
+          state.loginName != loginName ||
+          (otpFlow == OtpFlow.signup && attemptId != _signupAttemptId)) {
+        return;
+      }
       _emitState(
         state.copyWith(
           isVerifyingOtp: false,
@@ -270,6 +304,12 @@ extension AuthFlowOtp on AuthFlowCubit {
         ),
       );
     } catch (_) {
+      if (isClosed ||
+          state.screen != AuthScreen.otp ||
+          state.loginName != loginName ||
+          (otpFlow == OtpFlow.signup && attemptId != _signupAttemptId)) {
+        return;
+      }
       _emitState(
         state.copyWith(
           isVerifyingOtp: false,

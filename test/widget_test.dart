@@ -51,6 +51,28 @@ class _SignupLookupAuthService implements AuthService {
 
   final bool accountExists;
   final List<String> lookedUpNames = <String>[];
+  final List<String> verifiedCodes = <String>[];
+
+  @override
+  Future<void> clearPendingLogin(String loginName) async {}
+
+  @override
+  Future<SendOtpResult> sendOtp({
+    required String loginName,
+    required AuthOtpKind kind,
+    int? userId,
+    int? targetDeviceId,
+  }) async => const SendOtpResult(expiresIn: 30);
+
+  @override
+  Future<VerifyOtpResult> verifyOtp({
+    required String loginName,
+    required String otpCode,
+    required AuthOtpKind kind,
+  }) async {
+    verifiedCodes.add(otpCode);
+    return VerifyOtpResult(isValid: otpCode == '1234');
+  }
 
   @override
   Future<dynamic> checkIdentifier(String identifier) async {
@@ -721,7 +743,7 @@ void main() {
     });
 
     testWidgets(
-      'signup entry uses email field, delays email errors until submit, and proceeds to registration profile on valid email',
+      'signup validates email, opens OTP, restores email on Back, and opens profile only after verification',
       (tester) async {
         final authService = _SignupLookupAuthService();
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
@@ -781,17 +803,53 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(authService.lookedUpNames, <String>['learner@example.com']);
+        expect(find.byKey(const ValueKey('otp')), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('registration-profile')),
+          findsNothing,
+        );
+
+        await tester.tap(find.byType(AppBackButton));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('signup')), findsOneWidget);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).controller?.text,
+          'learner@example.com',
+        );
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('otp')), findsOneWidget);
+        for (var index = 0; index < 4; index++) {
+          await tester.enterText(
+            find.byType(EditableText).at(index),
+            '${index + 1}',
+          );
+        }
+        await tester.pump();
+        expect(
+          tester
+              .widgetList<TextField>(find.byType(TextField))
+              .map((field) => field.controller?.text),
+          <String>['1', '2', '3', '4'],
+        );
+        expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNotNull,
+        );
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pumpAndSettle();
+        expect(authService.verifiedCodes, <String>['1234']);
+
         expect(
           find.byKey(const ValueKey('registration-profile')),
           findsOneWidget,
         );
-        expect(find.text('learner@example.com'), findsOneWidget);
-        final signupEmailField = tester
-            .widgetList<TextField>(find.byType(TextField))
-            .singleWhere(
-              (field) => field.controller?.text == 'learner@example.com',
-            );
-        expect(signupEmailField.readOnly, isTrue);
+        expect(find.text('learner@example.com'), findsNothing);
+        expect(find.byType(TextField), findsOneWidget);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).textInputAction,
+          TextInputAction.done,
+        );
       },
     );
 

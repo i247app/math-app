@@ -75,6 +75,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
 
+    _clearPendingSignup();
+
     final target = switch (state.entryBackScreen) {
       AuthScreen.login ||
       AuthScreen.signup ||
@@ -99,12 +101,16 @@ extension AuthFlowNavigation on AuthFlowCubit {
 
   void openAuthEntry({AuthEntryMode? mode}) {
     final nextMode = mode ?? state.authEntryMode;
+    _clearPendingSignup();
     _emitState(
       state.copyWith(
         screen: _screenForEntryMode(nextMode),
         entryBackScreen: _entryBackScreenForCurrentFlow(),
         initialEntryMode: _initialEntryModeForCurrentFlow(nextMode),
         authEntryMode: nextMode,
+        isSendingOtp: false,
+        isVerifyingOtp: false,
+        isSigningUp: false,
         clearOtpError: true,
       ),
     );
@@ -116,16 +122,15 @@ extension AuthFlowNavigation on AuthFlowCubit {
     }
 
     final signupEmail = _pendingSignupEmail;
-    if (state.otpFlow == OtpFlow.signup &&
-        signupEmail != null &&
-        _pendingSignupForm != null) {
+    if (state.otpFlow == OtpFlow.signup && signupEmail != null) {
       final otpIdentifier = state.loginName?.trim();
       if (otpIdentifier != null && otpIdentifier.isNotEmpty) {
         unawaited(_authService.clearPendingLogin(otpIdentifier));
       }
+      _clearPendingSignup();
       _emitState(
         state.copyWith(
-          screen: AuthScreen.registrationProfile,
+          screen: AuthScreen.signup,
           loginName: signupEmail,
           isSendingOtp: false,
           isVerifyingOtp: false,
@@ -181,12 +186,16 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void openSignupEntry() {
+    _clearPendingSignup();
     _emitState(
       state.copyWith(
         screen: AuthScreen.signup,
         entryBackScreen: _entryBackScreenForCurrentFlow(),
         initialEntryMode: AuthEntryMode.signup,
         authEntryMode: AuthEntryMode.signup,
+        isSendingOtp: false,
+        isVerifyingOtp: false,
+        isSigningUp: false,
         clearAuthError: true,
         clearOtpError: true,
         clearLoginName: true,
@@ -202,6 +211,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
 
+    _clearPendingSignup();
+
     _emitState(
       state.copyWith(
         screen: _screenForEntryMode(mode),
@@ -211,6 +222,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
         clearOtpExpiry: true,
         isCheckingIdentifier: false,
         isSendingOtp: false,
+        isVerifyingOtp: false,
+        isSigningUp: false,
         clearLoginName: true,
         clearIdentifierLookup: true,
         clearTrustedDeviceState: true,
@@ -219,26 +232,28 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void backFromRegistrationProfile() {
-    final loginName = state.loginName?.trim();
-    if (loginName != null && loginName.isNotEmpty) {
-      unawaited(_authService.clearPendingLogin(loginName));
+    final email = _pendingSignupEmail;
+    if (state.screen != AuthScreen.registrationProfile || email == null) {
+      return;
     }
-    _clearPendingSignup();
+    _signupAttemptId++;
+    _verifiedSignupEmail = null;
 
     _emitState(
       state.copyWith(
-        screen: AuthScreen.signup,
-        clearLoginName: true,
+        screen: AuthScreen.otp,
+        loginName: email,
+        isSendingOtp: true,
         isVerifyingOtp: false,
         isSigningUp: false,
-        otpFlow: OtpFlow.login,
+        otpFlow: OtpFlow.signup,
         clearAuthError: true,
         clearOtpExpiry: true,
         clearOtpError: true,
-        clearIdentifierLookup: true,
-        clearTrustedDeviceState: true,
       ),
     );
+    // A verified code has already been consumed; request a fresh one on Back.
+    unawaited(_sendSignupOtp(email));
   }
 
   void selectPhoneRegion(PhoneRegion region) {

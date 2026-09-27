@@ -39,8 +39,8 @@ import 'package:numi/features/home/widgets/parent/parent_select_student_dialog.d
 part 'parent_home/snapshot_actions.dart';
 part 'parent_home/navigation_actions.dart';
 
-/// Parent Home gốc, giữ lại để có thể quay về giao diện cũ.
-/// Giao diện đang thử nghiệm nằm trong `new_parent_home_tab.dart`.
+/// Original Parent Home, retained so the previous layout can be restored.
+/// The experimental layout is in `new_parent_home_tab.dart`.
 class ParentHomeContent extends StatefulWidget {
   const ParentHomeContent({
     super.key,

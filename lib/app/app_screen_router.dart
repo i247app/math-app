@@ -94,9 +94,15 @@ class AppScreenRouter extends StatelessWidget {
                 current.screen != AuthScreen.login &&
                 current.screen != AuthScreen.signup;
 
-            return hasNewError || leftAuthEntryScreen;
+            final returnedToSignup =
+                previous.screen == AuthScreen.otp &&
+                current.screen == AuthScreen.signup;
+            return hasNewError || leftAuthEntryScreen || returnedToSignup;
           },
           listener: (context, state) {
+            if (state.screen == AuthScreen.signup && state.loginName != null) {
+              loginNameController.text = state.loginName!;
+            }
             if (state.screen != AuthScreen.login &&
                 state.screen != AuthScreen.signup) {
               clearLoginNameInput();

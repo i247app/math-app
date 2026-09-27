@@ -9,7 +9,7 @@ import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/auth/widgets/signup/registration_profile_content.dart';
 
-/// Collects profile details before signup verification creates the account.
+/// Collects profile details after email verification, then creates the account.
 class RegistrationProfileScreen extends StatefulWidget {
   const RegistrationProfileScreen({
     super.key,
@@ -35,7 +35,10 @@ class RegistrationProfileScreen extends StatefulWidget {
 
 class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
+
+  // Keep the verified email in the submission without displaying an input.
+  String get _signupEmail =>
+      (widget.initialEmail ?? widget.initialForm?.email ?? '').trim();
 
   SignupRole? _selectedRole;
   SignupGender? _selectedGender;
@@ -50,22 +53,16 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
     final initialForm = widget.initialForm;
     if (initialForm != null) {
       _usernameController.text = initialForm.name;
-      _emailController.text = initialForm.email ?? widget.initialEmail ?? '';
       _selectedRole = initialForm.role;
       _selectedGender = initialForm.gender;
-    } else if (widget.initialEmail != null) {
-      _emailController.text = widget.initialEmail!;
     }
     _usernameController.addListener(_rebuildForFormInput);
-    _emailController.addListener(_rebuildForFormInput);
   }
 
   @override
   void dispose() {
     _usernameController.removeListener(_rebuildForFormInput);
-    _emailController.removeListener(_rebuildForFormInput);
     _usernameController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 
@@ -95,7 +92,7 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
     widget.onContinue(
       SignupFormData(
         name: _usernameController.text,
-        email: _emailController.text,
+        email: _signupEmail,
         role: role,
         gender: gender,
       ),
@@ -105,9 +102,8 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
     final isUsernameValid = _isValidName(username);
-    final isEmailValid = isValidEmailInput(email);
+    final isEmailValid = isValidEmailInput(_signupEmail);
     final isFormValid =
         isUsernameValid &&
         isEmailValid &&
@@ -121,18 +117,12 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
         (isSignupUsernameExistsError(widget.authError)
             ? context.getText(AppKeys.signupUsernameExists)
             : null);
-    final emailError = email.isNotEmpty && !isEmailValid
-        ? context.getText(AppKeys.invalidEmail)
-        : null;
 
     return RegistrationProfileContent(
       usernameController: _usernameController,
-      emailController: _emailController,
-      emailReadOnly: widget.initialEmail != null,
       role: _selectedRole,
       gender: _selectedGender,
       usernameErrorText: usernameError,
-      emailErrorText: emailError,
       isFormValid: isFormValid,
       isSigningUp: widget.isSigningUp,
       onBack: widget.onBack,

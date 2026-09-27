@@ -31,7 +31,7 @@ import 'package:numi/features/settings/screens/setting_tab.dart';
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
 
-  // Đổi thành false để dùng lại Parent Home gốc.
+  // Set to false to restore the original Parent Home.
   static const bool _useNewParentHome = true;
 
   @override
