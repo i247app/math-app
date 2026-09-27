@@ -115,7 +115,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     final assessmentTabRoute = ModalRoute.of(context);
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => AiAssessmentScreen(
+        builder: (_) => ExamAttemptScreen(
           examService: widget.examService,
           initialExam: summaryExam,
           examType: summaryExam.examType ?? _contentExamType,
@@ -169,7 +169,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     final assessmentTabRoute = ModalRoute.of(context);
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => AiAssessmentScreen(
+        builder: (_) => ExamAttemptScreen(
           examService: widget.examService,
           examType: examTypeAssessment,
           gradeLabel: widget.activeProfile?.grade?.label,

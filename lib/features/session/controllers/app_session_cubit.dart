@@ -263,7 +263,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     );
   }
 
-  Future<void> activateProfile(StudentProfile profile) {
+  Future<void> activateProfile(UserProfile profile) {
     final user = state.user;
     final profileId = profileStableId(profile);
     if (isClosed ||
@@ -289,7 +289,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
   Future<void> _activateProfile(
     LoginUser user,
-    StudentProfile profile,
+    UserProfile profile,
     int profileId,
     int revision,
   ) async {
@@ -305,7 +305,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     }
     if (!_isCurrent(revision)) return;
 
-    final profiles = <StudentProfile>[
+    final profiles = <UserProfile>[
       for (final existing in state.profiles)
         if (profileStableId(existing) != profileId) existing,
       profile,

@@ -16,7 +16,7 @@ ParentChildSummary? parentPrimarySummary(List<ParentChildSummary> summaries) {
 }
 
 List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
-  final children = parent?.children ?? const <StudentProfile>[];
+  final children = parent?.children ?? const <UserProfile>[];
   if (children.isEmpty) {
     return const <ParentChildSummary>[];
   }
@@ -45,7 +45,7 @@ List<ParentChildSummary> summariesFromLayout(ParentHomeLayout? parent) {
 
 List<ClassroomModel> _classroomsForLayoutChild(
   ParentHomeLayout? parent,
-  StudentProfile child,
+  UserProfile child,
 ) {
   if (parent == null) {
     return const <ClassroomModel>[];

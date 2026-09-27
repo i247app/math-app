@@ -53,6 +53,6 @@ GeneratedExam examFromRecentCompletion(HomeLayoutRecentCompletion completion) {
   );
 }
 
-int? layoutChildId(StudentProfile? child) {
+int? layoutChildId(UserProfile? child) {
   return child == null ? null : profileStableId(child);
 }

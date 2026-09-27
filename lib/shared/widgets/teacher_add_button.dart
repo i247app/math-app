@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 
-class TeacherClassroomAddButton extends StatelessWidget {
-  const TeacherClassroomAddButton({super.key, required this.onTap});
+class TeacherAddButton extends StatelessWidget {
+  const TeacherAddButton({super.key, required this.onTap});
   final VoidCallback onTap;
 
   @override

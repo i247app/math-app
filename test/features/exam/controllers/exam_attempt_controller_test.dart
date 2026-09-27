@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 
@@ -30,7 +30,7 @@ void main() {
   );
 
   test('cannot continue before answering the current assessment question', () {
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       initialExam: exam,
     );
@@ -48,7 +48,7 @@ void main() {
   });
 
   test('jumps to any question and tracks the first unanswered question', () {
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       initialExam: exam,
     );
@@ -70,7 +70,7 @@ void main() {
   });
 
   test('checks answers by either their label or displayed content', () {
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       initialExam: exam,
     );
@@ -90,7 +90,7 @@ void main() {
   });
 
   test('tapping the selected assessment answer keeps it selected', () {
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       initialExam: exam,
     );
@@ -111,7 +111,7 @@ void main() {
 
   test('GRADE is ready to submit immediately after six perfect answers', () {
     const correctAnswer = ExamAnswer(label: 'A', content: '1');
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypeGrade,
       initialExam: GeneratedExam(
@@ -147,7 +147,7 @@ void main() {
 
   test('GRADE is ready to submit immediately after five wrong answers', () {
     const wrongAnswer = ExamAnswer(label: 'B', content: '2');
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypeGrade,
       initialExam: GeneratedExam(
@@ -185,7 +185,7 @@ void main() {
     'updates the current assessment journey status by user exam id',
     () async {
       final service = _RecordingExamService();
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: service,
         examType: examTypeAssessment,
         profileId: 21,
@@ -221,7 +221,7 @@ void main() {
           ),
         ],
       );
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: _UnusedExamService(),
         initialExam: examWithoutCorrectAnswer,
       );
@@ -234,7 +234,7 @@ void main() {
   test(
     'restores saved answers and resumes at the first unanswered question',
     () {
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: _UnusedExamService(),
         examType: examTypeAssessment,
         initialExam: GeneratedExam(
@@ -267,7 +267,7 @@ void main() {
   test(
     'uses the API resume position even when an earlier answer was skipped',
     () {
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: _UnusedExamService(),
         initialExam: GeneratedExam(
           examId: 301,
@@ -298,7 +298,7 @@ void main() {
 
   test('starts a generated assessment at kindergarten', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       gradeLabel: 'Lớp 4',
     );
@@ -314,7 +314,7 @@ void main() {
     'generates only after question six resolves grade 0 to grade 2',
     () async {
       final service = _RecordingExamService();
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: service,
         initialExam: _tenQuestionExam(examId: 77, grade: 0),
       );
@@ -353,7 +353,7 @@ void main() {
 
   test('waits for submit to finish before generating the next set', () async {
     final service = _SequentialTransitionExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 92, grade: 0),
     );
@@ -391,7 +391,7 @@ void main() {
     'does not generate when a missed first six continues the current set',
     () async {
       final service = _RecordingExamService();
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: service,
         initialExam: _tenQuestionExam(examId: 78, grade: 2),
       );
@@ -418,7 +418,7 @@ void main() {
 
   test('submits five answers and downgrades after five early misses', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 79, grade: 2),
     );
@@ -447,7 +447,7 @@ void main() {
 
   test('grade zero early fail generates recovery at the same grade', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 80, grade: 0),
     );
@@ -473,7 +473,7 @@ void main() {
 
   test('50 percent without Q3 or Q6 stops without changing grade', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 81, grade: 2),
     );
@@ -500,7 +500,7 @@ void main() {
 
   test('50 percent with only Q3 correct generates grade plus one', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 82, grade: 2),
     );
@@ -527,7 +527,7 @@ void main() {
 
   test('grade 5 submits only the first six correct answers', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       initialExam: _tenQuestionExam(examId: 88, grade: 5),
     );
@@ -546,7 +546,7 @@ void main() {
     expect(controller.shouldAutoSubmitAssessment, isTrue);
     expect(
       (await controller.submitCurrentExam()).status,
-      AssessmentSubmitStatus.submitted,
+      ExamAttemptSubmitStatus.submitted,
     );
     expect(service.generatedGradeLabels, isEmpty);
     expect(service.submittedAnswers, hasLength(6));
@@ -555,7 +555,7 @@ void main() {
 
   test('practice exams still require every question to be answered', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       examType: examTypePractice,
       initialExam: GeneratedExam(
@@ -584,13 +584,13 @@ void main() {
     expect(controller.shouldAutoSubmitAssessment, isFalse);
     expect(
       (await controller.submitCurrentExam()).status,
-      AssessmentSubmitStatus.unanswered,
+      ExamAttemptSubmitStatus.unanswered,
     );
     expect(service.submittedAnswers, isNull);
   });
 
   test('practice keeps the first answer while allowing retries', () {
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypePractice,
       initialExam: _tenQuestionExam(
@@ -630,7 +630,7 @@ void main() {
 
   test('practice submits the first six perfect first attempts', () async {
     final service = _RecordingExamService();
-    final controller = AssessmentController(
+    final controller = ExamAttemptController(
       examService: service,
       examType: examTypePractice,
       initialExam: _tenQuestionExam(
@@ -653,7 +653,7 @@ void main() {
 
     expect(action, AssessmentFlowAction.submit);
     final result = await controller.submitCurrentExam();
-    expect(result.status, AssessmentSubmitStatus.submitted);
+    expect(result.status, ExamAttemptSubmitStatus.submitted);
     expect(service.submittedAnswers, hasLength(6));
     expect(
       service.submittedAnswers!.every((answer) => answer.label == 'B'),
@@ -671,7 +671,7 @@ void main() {
     'practice submits after first-attempt mistakes exceed fifty percent',
     () async {
       final service = _RecordingExamService();
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: service,
         examType: examTypePractice,
         initialExam: _tenQuestionExam(
@@ -698,7 +698,7 @@ void main() {
 
       expect(action, AssessmentFlowAction.submit);
       final result = await controller.submitCurrentExam();
-      expect(result.status, AssessmentSubmitStatus.submitted);
+      expect(result.status, ExamAttemptSubmitStatus.submitted);
       expect(service.submittedAnswers, hasLength(6));
       expect(
         service.submittedAnswers!.every((answer) => answer.label == 'A'),

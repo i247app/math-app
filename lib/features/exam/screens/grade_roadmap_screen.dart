@@ -13,7 +13,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -381,7 +381,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     try {
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
-          builder: (_) => AiAssessmentScreen(
+          builder: (_) => ExamAttemptScreen(
             examService: widget.examService,
             initialExam: activeExam,
             examType: examTypeGrade,

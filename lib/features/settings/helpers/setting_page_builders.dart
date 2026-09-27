@@ -8,7 +8,7 @@ Widget buildPushedSettingPage({
   required BuildContext context,
   required SettingScreenArgs args,
   required SettingPageView initialView,
-  StudentProfile? initialEditingProfile,
+  UserProfile? initialEditingProfile,
   bool openAddProfileOnStart = false,
   VoidCallback? onProfileSaved,
 }) {

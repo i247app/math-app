@@ -23,7 +23,7 @@ import 'package:numi/features/auth/screens/registration_profile_screen.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_view.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/session/screens/session_dashboard_screen.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/passcode_cubit.dart';
@@ -42,7 +42,7 @@ class AppScreenRouter extends StatelessWidget {
     required this.clearLoginNameInput,
     required this.normalizedLoginNameInput,
     required this.handleLoginNameInputChanged,
-    required this.submitLoginName,
+    required this.submitAuthIdentifier,
   });
 
   final TextEditingController loginNameController;
@@ -66,7 +66,7 @@ class AppScreenRouter extends StatelessWidget {
     PhoneRegion region,
     AuthEntryMode mode,
   )
-  submitLoginName;
+  submitAuthIdentifier;
 
   static bool _isInlineSignupUsernameError(AuthFlowState state) {
     if (state.screen != AuthScreen.registrationProfile) {
@@ -123,7 +123,7 @@ class AppScreenRouter extends StatelessWidget {
               state.authEntryMode,
             );
             final lookupMatchesLoginName =
-                state.checkedLoginName == normalizedLoginName.loginName;
+                state.checkedIdentifier == normalizedLoginName.loginName;
             final canSubmitLoginName = loginNameHasInput;
             final validationErrorKey = normalizedLoginName.errorKey;
             final delaysValidationError =
@@ -146,8 +146,8 @@ class AppScreenRouter extends StatelessWidget {
                     context: context,
                     isSignupEntry: isSignupEntry,
                     lookupMatchesLoginName: lookupMatchesLoginName,
-                    loginNameExists: state.loginNameExists,
-                    loginLookupError: state.loginLookupError,
+                    identifierExists: state.identifierExists,
+                    identifierLookupError: state.identifierLookupError,
                   );
             final entryBindings = AuthEntryBindings(
               controller: loginNameController,
@@ -158,7 +158,7 @@ class AppScreenRouter extends StatelessWidget {
                   RegExp(r'\d').hasMatch(loginNameController.text),
               onRegionChanged: (region) {
                 clearLoginNameInput();
-                cubit.clearLoginLookup();
+                cubit.clearIdentifierLookup();
                 cubit.selectPhoneRegion(region);
               },
               onBack: () {
@@ -167,13 +167,13 @@ class AppScreenRouter extends StatelessWidget {
                 }
                 cubit.backFromAuthEntry();
               },
-              onSubmitIdentifier: () => submitLoginName(
+              onSubmitIdentifier: () => submitAuthIdentifier(
                 cubit,
                 state.phoneRegion,
                 state.authEntryMode,
               ),
               isSubmitting: state.isSendingOtp,
-              isCheckingIdentifier: state.isCheckingLoginName,
+              isCheckingIdentifier: state.isCheckingIdentifier,
               canSubmit: canSubmitLoginName,
               canLoginWithPin: passcodeState.canLoginWithPin,
               onLoginWithPin: () {
@@ -201,7 +201,7 @@ class AppScreenRouter extends StatelessWidget {
               if (!introContext.mounted) return;
               await Navigator.of(introContext).push<void>(
                 MaterialPageRoute<void>(
-                  builder: (_) => AiAssessmentScreen(
+                  builder: (_) => ExamAttemptScreen(
                     examType: examTypeAssessment,
                     profileId: guest.profileId,
                     allowQuestionNavigation: false,
@@ -451,26 +451,27 @@ String? _loginLookupErrorText({
   required BuildContext context,
   required bool isSignupEntry,
   required bool lookupMatchesLoginName,
-  required bool? loginNameExists,
-  required String? loginLookupError,
+  required bool? identifierExists,
+  required String? identifierLookupError,
 }) {
   if (!lookupMatchesLoginName) {
     return null;
   }
 
-  if (isSignupEntry && loginNameExists == true) {
+  if (isSignupEntry && identifierExists == true) {
     return context.getText(AppKeys.signupEmailAlreadyRegistered);
   }
 
-  if (isSignupEntry && loginNameExists == false) {
+  if (isSignupEntry && identifierExists == false) {
     return null;
   }
 
-  if (!isSignupEntry && loginNameExists == false) {
-    return loginLookupError ?? context.getText(AppKeys.loginNameNotRegistered);
+  if (!isSignupEntry && identifierExists == false) {
+    return identifierLookupError ??
+        context.getText(AppKeys.loginNameNotRegistered);
   }
 
-  return loginLookupError;
+  return identifierLookupError;
 }
 
 class _AppScreenSlideSwitcher extends StatefulWidget {

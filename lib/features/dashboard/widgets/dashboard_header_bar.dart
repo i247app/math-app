@@ -37,7 +37,7 @@ class DashboardHeaderBar extends StatelessWidget {
 
   final double topInset;
   final String name;
-  final StudentProfile? profile;
+  final UserProfile? profile;
   final ProfileRole role;
   final bool canSwitchProfile;
   final bool isProfileMenuOpen;

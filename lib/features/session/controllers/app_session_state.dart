@@ -7,15 +7,15 @@ enum SessionStatus { unauthenticated, restoring, authenticated }
 class AuthenticatedSession {
   const AuthenticatedSession({
     required this.user,
-    this.profiles = const <StudentProfile>[],
+    this.profiles = const <UserProfile>[],
     this.activeProfile,
     this.profileLoadError,
     this.isNewlyRegistered = false,
   });
 
   final LoginUser user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final String? profileLoadError;
   final bool isNewlyRegistered;
 }
@@ -25,7 +25,7 @@ class AppSessionState {
     this.status = SessionStatus.unauthenticated,
     this.sessionEpoch = 0,
     this.user,
-    this.profiles = const <StudentProfile>[],
+    this.profiles = const <UserProfile>[],
     this.activeProfile,
     this.profileLoadError,
     this.isResolvingProfile = false,
@@ -35,8 +35,8 @@ class AppSessionState {
   final SessionStatus status;
   final int sessionEpoch;
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final String? profileLoadError;
   final bool isResolvingProfile;
   final bool shouldShowChildProfileDialog;
@@ -54,8 +54,8 @@ class AppSessionState {
     SessionStatus? status,
     int? sessionEpoch,
     LoginUser? user,
-    List<StudentProfile>? profiles,
-    StudentProfile? activeProfile,
+    List<UserProfile>? profiles,
+    UserProfile? activeProfile,
     String? profileLoadError,
     bool? isResolvingProfile,
     bool? shouldShowChildProfileDialog,
@@ -71,7 +71,7 @@ class AppSessionState {
       sessionEpoch: sessionEpoch ?? this.sessionEpoch,
       user: clearsSession ? null : user ?? this.user,
       profiles: clearsSession
-          ? const <StudentProfile>[]
+          ? const <UserProfile>[]
           : profiles ?? this.profiles,
       activeProfile: clearsSession || clearActiveProfile
           ? null

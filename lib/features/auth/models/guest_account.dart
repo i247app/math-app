@@ -4,14 +4,14 @@ class GuestAccount {
   const GuestAccount({
     required this.uid,
     required this.user,
-    this.profiles = const <StudentProfile>[],
+    this.profiles = const <UserProfile>[],
   });
 
   final int uid;
 
   /// The complete user object returned by the guest API.
   final Map<String, dynamic> user;
-  final List<StudentProfile> profiles;
+  final List<UserProfile> profiles;
 
   int? get profileId {
     for (final profile in profiles) {

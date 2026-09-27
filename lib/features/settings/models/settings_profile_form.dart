@@ -22,7 +22,7 @@ class SettingsProfileDraft {
   final LoginUser? user;
   final String name;
   final bool hasProfiles;
-  final StudentProfile? editingProfile;
+  final UserProfile? editingProfile;
   final int? schoolId;
   final int? gradeId;
   final int? programId;
@@ -84,5 +84,5 @@ class SettingsProfileSaveResult {
   });
 
   final bool requiresProfileRefresh;
-  final StudentProfile? profileToActivate;
+  final UserProfile? profileToActivate;
 }

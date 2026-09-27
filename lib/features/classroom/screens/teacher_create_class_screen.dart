@@ -44,7 +44,7 @@ class TeacherCreateClassScreen extends StatefulWidget {
        _avatarPicker = avatarPicker;
 
   final LoginUser? user;
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final ClassroomService? _classroomService;
   final GradeService? _gradeService;
   final ProfileService? _profileService;

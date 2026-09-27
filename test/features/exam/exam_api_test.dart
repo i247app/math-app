@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
-import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
@@ -628,7 +628,7 @@ void main() {
       expect(exam.answers, isEmpty);
       expect(exam.resumeQuestionIndex, 0);
 
-      final controller = AssessmentController(
+      final controller = ExamAttemptController(
         examService: api,
         initialExam: exam,
         profileId: 21,

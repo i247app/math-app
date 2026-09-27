@@ -5,12 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/profile/widgets/form/add_profile_field_shell.dart';
-import 'package:numi/features/profile/widgets/form/add_profile_select_result.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_field_shell.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_select_result.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_keyboard.dart';
 
-class AddProfileDropdown<T> extends StatelessWidget {
-  const AddProfileDropdown({
+class ProfileFormDropdown<T> extends StatelessWidget {
+  const ProfileFormDropdown({
     super.key,
     required this.label,
     required this.hintText,
@@ -38,7 +38,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
         ? null
         : itemLabel(selectedValue);
 
-    return AddProfileFieldShell(
+    return ProfileFormFieldShell(
       label: label,
       child: Material(
         color: Colors.transparent,
@@ -85,7 +85,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
 
   Future<void> _openBottomSheet(BuildContext context, T? selectedValue) async {
     dismissProfileFormKeyboard();
-    final result = await showModalBottomSheet<AddProfileSelectResult<T>>(
+    final result = await showModalBottomSheet<ProfileFormSelectResult<T>>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
@@ -181,7 +181,7 @@ class AddProfileDropdown<T> extends StatelessWidget {
                               dismissProfileFormKeyboard();
                               Navigator.of(
                                 context,
-                              ).pop(AddProfileSelectResult<T>(item));
+                              ).pop(ProfileFormSelectResult<T>(item));
                             },
                           ),
                         );

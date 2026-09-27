@@ -10,8 +10,8 @@ extension AuthFlowSession on AuthFlowCubit {
         screen: AuthScreen.login,
         authEntryMode: AuthEntryMode.login,
         loginName: loginName,
-        checkedLoginName: loginName,
-        isCheckingLoginName: true,
+        checkedIdentifier: loginName,
+        isCheckingIdentifier: true,
         clearAuthError: true,
         clearOtpError: true,
         clearAuthenticationResult: true,
@@ -24,13 +24,13 @@ extension AuthFlowSession on AuthFlowCubit {
       }
       final user = result.user ?? fallbackUser;
       if (_canSkipLoginOtp(result)) {
-        _emitAuthenticationSucceeded(user, isCheckingLoginName: false);
+        _emitAuthenticationSucceeded(user, isCheckingIdentifier: false);
         return;
       }
       _emitState(
         state.copyWith(
           screen: AuthScreen.login,
-          isCheckingLoginName: false,
+          isCheckingIdentifier: false,
           authError: AppStrings.current(AppKeys.pinLoginFailed),
           clearOtpExpiry: true,
           clearOtpError: true,
@@ -41,7 +41,7 @@ extension AuthFlowSession on AuthFlowCubit {
         _emitState(
           state.copyWith(
             screen: AuthScreen.login,
-            isCheckingLoginName: false,
+            isCheckingIdentifier: false,
             authError: error.message,
           ),
         );
@@ -51,7 +51,7 @@ extension AuthFlowSession on AuthFlowCubit {
         _emitState(
           state.copyWith(
             screen: AuthScreen.login,
-            isCheckingLoginName: false,
+            isCheckingIdentifier: false,
             authError: AppStrings.current(AppKeys.loginOtpFailed),
           ),
         );
@@ -68,7 +68,7 @@ extension AuthFlowSession on AuthFlowCubit {
   void _emitAuthenticationSucceeded(
     LoginUser user, {
     bool isNewlyRegistered = false,
-    bool? isCheckingLoginName,
+    bool? isCheckingIdentifier,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -78,7 +78,7 @@ extension AuthFlowSession on AuthFlowCubit {
     }
     _emitState(
       state.copyWith(
-        isCheckingLoginName: isCheckingLoginName,
+        isCheckingIdentifier: isCheckingIdentifier,
         isSendingOtp: isSendingOtp,
         isVerifyingOtp: isVerifyingOtp,
         isSigningUp: isSigningUp,
@@ -96,7 +96,7 @@ extension AuthFlowSession on AuthFlowCubit {
 
   void _emitAuthError(
     String message, {
-    bool? isCheckingLoginName,
+    bool? isCheckingIdentifier,
     bool? isSendingOtp,
     bool? isVerifyingOtp,
     bool? isSigningUp,
@@ -104,7 +104,7 @@ extension AuthFlowSession on AuthFlowCubit {
     if (state.screen == AuthScreen.otp) {
       _emitState(
         state.copyWith(
-          isCheckingLoginName: isCheckingLoginName,
+          isCheckingIdentifier: isCheckingIdentifier,
           isSendingOtp: isSendingOtp,
           isVerifyingOtp: isVerifyingOtp,
           isSigningUp: isSigningUp,
@@ -118,7 +118,7 @@ extension AuthFlowSession on AuthFlowCubit {
 
     _emitState(
       state.copyWith(
-        isCheckingLoginName: isCheckingLoginName,
+        isCheckingIdentifier: isCheckingIdentifier,
         isSendingOtp: isSendingOtp,
         isVerifyingOtp: isVerifyingOtp,
         isSigningUp: isSigningUp,

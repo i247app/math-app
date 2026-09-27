@@ -16,7 +16,7 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 
 void main() {
@@ -42,8 +42,8 @@ void main() {
             home: Scaffold(
               body: ParentHomeContent(
                 user: const LoginUser(id: 271),
-                profiles: const <StudentProfile>[],
-                activeProfile: const StudentProfile(
+                profiles: const <UserProfile>[],
+                activeProfile: const UserProfile(
                   profileId: profileId,
                   role: 'PARENT',
                 ),
@@ -57,7 +57,7 @@ void main() {
                 onProfileSaved: _doNothingSync,
                 onOpenProfileMenu: _doNothingSync,
                 onOpenClassroomTab: _doNothingSync,
-                onOpenPracticeTab: _doNothingSync,
+                onOpenGamesTab: _doNothingSync,
                 onParentAssessmentStateChanged: (_) {},
                 bottomPadding: 0,
                 onOpenInitialAssessment: (context) =>
@@ -78,7 +78,7 @@ void main() {
     final statsCallsBeforeFirstTap = examService.statsCalls;
     await tester.tap(find.byType(HomeBanner).first);
     await tester.pumpAndSettle();
-    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
     expect(find.text('Resume question 3'), findsOneWidget);
     expect(examService.generatedCount, 0);
     expect(examService.statsCalls, statsCallsBeforeFirstTap + 1);
@@ -119,8 +119,8 @@ void main() {
               lingo: lingo,
               child: ParentHomeContent(
                 user: const LoginUser(id: 271),
-                profiles: const <StudentProfile>[],
-                activeProfile: const StudentProfile(
+                profiles: const <UserProfile>[],
+                activeProfile: const UserProfile(
                   profileId: profileId,
                   role: 'PARENT',
                 ),
@@ -134,7 +134,7 @@ void main() {
                 onProfileSaved: _doNothingSync,
                 onOpenProfileMenu: _doNothingSync,
                 onOpenClassroomTab: _doNothingSync,
-                onOpenPracticeTab: _doNothingSync,
+                onOpenGamesTab: _doNothingSync,
                 onParentAssessmentStateChanged: (_) {},
                 bottomPadding: 0,
                 onOpenAssessment: (_) async => gradeSelectionOpenCount++,
@@ -180,8 +180,8 @@ void main() {
                 lingo: lingo,
                 child: ParentHomeContent(
                   user: const LoginUser(id: 271),
-                  profiles: const <StudentProfile>[],
-                  activeProfile: const StudentProfile(
+                  profiles: const <UserProfile>[],
+                  activeProfile: const UserProfile(
                     profileId: profileId,
                     role: 'PARENT',
                   ),
@@ -195,7 +195,7 @@ void main() {
                   onProfileSaved: _doNothingSync,
                   onOpenProfileMenu: _doNothingSync,
                   onOpenClassroomTab: _doNothingSync,
-                  onOpenPracticeTab: _doNothingSync,
+                  onOpenGamesTab: _doNothingSync,
                   onParentAssessmentStateChanged: (_) {},
                   bottomPadding: 0,
                   onOpenExamReview: (_, exam) async {
@@ -236,7 +236,7 @@ void main() {
 
 Future<void> _doNothing() async {}
 
-Future<void> _activateNothing(StudentProfile _) async {}
+Future<void> _activateNothing(UserProfile _) async {}
 
 void _doNothingSync() {}
 

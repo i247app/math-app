@@ -29,7 +29,7 @@ extension _SettingNavigationActions on _SettingTabState {
 
   Future<void> _performPushView(
     SettingPageView view, {
-    StudentProfile? editingProfile,
+    UserProfile? editingProfile,
     bool openAddProfileOnStart = false,
   }) async {
     if (view != SettingPageView.account) {
@@ -60,7 +60,7 @@ extension _SettingNavigationActions on _SettingTabState {
 
   Widget _settingScreenForView(
     SettingPageView view,
-    StudentProfile? editingProfile, {
+    UserProfile? editingProfile, {
     bool openAddProfileOnStart = false,
   }) {
     final args = SettingScreenArgs(
@@ -94,7 +94,7 @@ extension _SettingNavigationActions on _SettingTabState {
           openAddProfileOnStart: openAddProfileOnStart,
         ),
       ),
-      SettingPageView.addProfile => SettingSafeScreen(
+      SettingPageView.profileForm => SettingSafeScreen(
         child: SettingTab.page(
           user: args.user,
           profiles: args.profiles,
@@ -106,7 +106,7 @@ extension _SettingNavigationActions on _SettingTabState {
           onProfileSaved: () => Navigator.of(context).pop(true),
           bottomPadding: 0,
           scale: args.scale,
-          initialView: SettingPageView.addProfile,
+          initialView: SettingPageView.profileForm,
           initialEditingProfile: editingProfile,
           isPushedPage: true,
         ),

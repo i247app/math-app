@@ -52,7 +52,7 @@ class AppDashboardNavigator implements DashboardNavigator {
                 onRefreshProfiles: request.onRefreshProfiles,
                 onProfileSaved: () => Navigator.of(routeContext).pop(true),
               ),
-              initialView: SettingPageView.addProfile,
+              initialView: SettingPageView.profileForm,
               initialEditingProfile: profile,
               onProfileSaved: () => Navigator.of(routeContext).pop(true),
             ),

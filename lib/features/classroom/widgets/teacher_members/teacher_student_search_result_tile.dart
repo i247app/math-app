@@ -16,7 +16,7 @@ class TeacherStudentSearchResultTile extends StatelessWidget {
     required this.onTap,
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final bool selected;
   final VoidCallback onTap;
 

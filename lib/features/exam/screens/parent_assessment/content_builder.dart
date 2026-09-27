@@ -23,9 +23,9 @@ extension _ParentAssessmentContentBuilder on _ParentAssessmentTabState {
     if (showAssessmentLanding) {
       return [
         _initialFadeIn(
-          child: ParentAssessmentEmptyPoster(
-            onTap: _showAssessmentContentAndLoad,
-            onSecondaryTap: _showGradeContentAndLoad,
+          child: ExamLandingPanel(
+            onOpenAssessment: _showAssessmentContentAndLoad,
+            onOpenGradeRoadmap: _showGradeContentAndLoad,
           ),
         ),
       ];

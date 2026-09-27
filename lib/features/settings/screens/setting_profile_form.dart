@@ -21,9 +21,9 @@ mixin _SettingProfileFormMixin
   bool _suppressProfileDraftTracking = false;
   String? _profileDraftBaseline;
   String? _profileOptionsError;
-  String? _profileCreateError;
+  String? _profileSaveError;
   String? _selectedProfileAvatarKey;
-  StudentProfile? _editingProfile;
+  UserProfile? _editingProfile;
   List<SchoolModel> _schoolOptions = const <SchoolModel>[];
   List<GradeModel> _gradeOptions = const <GradeModel>[];
   List<ProgramModel> _programOptions = const <ProgramModel>[];
@@ -76,7 +76,7 @@ mixin _SettingProfileFormMixin
         _preloadProfileOptions();
         return;
       }
-      if (_view != SettingPageView.addProfile) {
+      if (_view != SettingPageView.profileForm) {
         return;
       }
       final isEditingParent =
@@ -128,7 +128,7 @@ mixin _SettingProfileFormMixin
 
   void _onProfileDraftFieldChanged() {
     if (!mounted ||
-        _view != SettingPageView.addProfile ||
+        _view != SettingPageView.profileForm ||
         _suppressProfileDraftTracking) {
       return;
     }
@@ -158,7 +158,7 @@ mixin _SettingProfileFormMixin
     _profileDraftBaseline = _profileDraftFingerprint();
   }
 
-  void _cancelAddProfile() {
+  void _cancelProfileForm() {
     _requestProfileFormExit();
   }
 
@@ -190,7 +190,7 @@ mixin _SettingProfileFormMixin
     _loadProfileOptions();
   }
 
-  Future<void> _loadProfileOptions({StudentProfile? profileToSelect}) async {
+  Future<void> _loadProfileOptions({UserProfile? profileToSelect}) async {
     if (_isLoadingProfileOptions) {
       return;
     }
@@ -276,7 +276,7 @@ mixin _SettingProfileFormMixin
 
   bool _applyCachedProfileOptions({
     required int userId,
-    StudentProfile? profileToSelect,
+    UserProfile? profileToSelect,
   }) {
     final cached = _profileFormService.cachedOptions(userId);
     if (cached == null) {
@@ -294,7 +294,7 @@ mixin _SettingProfileFormMixin
 
   void _applyProfileOptions(
     ProfileOptionsSnapshot options, {
-    StudentProfile? profileToSelect,
+    UserProfile? profileToSelect,
   }) {
     _schoolOptions = options.schools;
     _gradeOptions = options.grades;
@@ -327,14 +327,14 @@ mixin _SettingProfileFormMixin
     final draft = _profileDraft;
     final errorKey = draft.validationErrorKey;
     if (errorKey != null) {
-      setState(() => _profileCreateError = context.readText(errorKey));
+      setState(() => _profileSaveError = context.readText(errorKey));
       return;
     }
 
     HapticFeedback.mediumImpact();
     setState(() {
       _isSavingProfile = true;
-      _profileCreateError = null;
+      _profileSaveError = null;
     });
 
     try {
@@ -373,7 +373,7 @@ mixin _SettingProfileFormMixin
       }
 
       setState(() {
-        _profileCreateError = error.message;
+        _profileSaveError = error.message;
         _isSavingProfile = false;
       });
     } catch (_) {
@@ -382,7 +382,7 @@ mixin _SettingProfileFormMixin
       }
 
       setState(() {
-        _profileCreateError = context.readText(
+        _profileSaveError = context.readText(
           draft.isUpdating
               ? AppKeys.profileUpdateFailed
               : AppKeys.profileCreateFailed,
@@ -400,7 +400,7 @@ mixin _SettingProfileFormMixin
     _profileIdController.clear();
     _selectedProfileAvatarKey = null;
     _editingProfile = null;
-    _profileCreateError = null;
+    _profileSaveError = null;
     _selectedProfileIdType = null;
     _selectedSchool = null;
     _selectedGrade = null;
@@ -412,7 +412,7 @@ mixin _SettingProfileFormMixin
     _captureProfileDraftBaseline();
   }
 
-  void _selectOptionsForProfile(StudentProfile profile) {
+  void _selectOptionsForProfile(UserProfile profile) {
     final hadUnsavedChanges = _isProfileDraftDirty;
     _suppressProfileDraftTracking = true;
     _selectedSchool = settingsFirstWhereOrNull(
@@ -456,7 +456,7 @@ mixin _SettingProfileFormMixin
         _profileDraft.canSave;
   }
 
-  void _applyProfileIdFields(StudentProfile profile) {
+  void _applyProfileIdFields(UserProfile profile) {
     final role = settingsProfileRole(profile);
     final idType = settingsNormalizedProfileIdType(profile.idType, role);
     _selectedProfileIdType = idType;

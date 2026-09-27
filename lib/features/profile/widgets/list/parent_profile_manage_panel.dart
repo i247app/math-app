@@ -27,15 +27,15 @@ class ParentProfileManagePanel extends StatelessWidget {
     required this.canAddProfile,
   });
 
-  final StudentProfile parentProfile;
-  final List<StudentProfile> children;
+  final UserProfile parentProfile;
+  final List<UserProfile> children;
   final int? activeProfileId;
   final int? switchingProfileId;
   final LoginUser? user;
   final VoidCallback onAdd;
-  final ValueChanged<StudentProfile> onSelect;
-  final ValueChanged<StudentProfile> onEdit;
-  final ValueChanged<StudentProfile> onDelete;
+  final ValueChanged<UserProfile> onSelect;
+  final ValueChanged<UserProfile> onEdit;
+  final ValueChanged<UserProfile> onDelete;
   final bool canAddProfile;
 
   @override
@@ -115,7 +115,7 @@ class ParentProfileManagePanel extends StatelessWidget {
     );
   }
 
-  List<StudentProfile> get _activeChildFirst {
+  List<UserProfile> get _activeChildFirst {
     if (activeProfileId == null) {
       return children;
     }
@@ -127,7 +127,7 @@ class ParentProfileManagePanel extends StatelessWidget {
       return children;
     }
 
-    return <StudentProfile>[
+    return <UserProfile>[
       children[activeIndex],
       ...children.take(activeIndex),
       ...children.skip(activeIndex + 1),

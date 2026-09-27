@@ -142,7 +142,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
 
   Future<void> _openStudentSearchSheet(BuildContext context) async {
     final cubit = context.read<ClassroomCubit>();
-    final selected = await showModalBottomSheet<List<StudentProfile>>(
+    final selected = await showModalBottomSheet<List<UserProfile>>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,

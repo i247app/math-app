@@ -56,7 +56,7 @@ void main() {
             child: Scaffold(
               body: TeacherHomeTab(
                 user: null,
-                activeProfile: const StudentProfile(
+                activeProfile: const UserProfile(
                   profileId: profileId,
                   name: 'Teacher',
                   role: 'TEACHER',
@@ -118,7 +118,7 @@ void main() {
               child: Scaffold(
                 body: TeacherHomeTab(
                   user: null,
-                  activeProfile: const StudentProfile(
+                  activeProfile: const UserProfile(
                     profileId: profileId,
                     name: 'Teacher',
                     role: 'TEACHER',

@@ -32,7 +32,7 @@ class StudentClassroomTab extends StatefulWidget {
 
   final double bottomPadding;
   final LoginUser? user;
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final ClassroomService classroomService;
   final bool isActive;
   final int activeRefreshTick;

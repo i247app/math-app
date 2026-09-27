@@ -183,7 +183,7 @@ void main() {
         (await service.save(draft)).profileToActivate,
         same(profiles.savedProfile),
       );
-      profiles.savedProfile = const StudentProfile(name: 'No ID');
+      profiles.savedProfile = const UserProfile(name: 'No ID');
       expect((await service.save(draft)).profileToActivate, isNull);
     },
   );
@@ -194,7 +194,7 @@ void main() {
         user: LoginUser(id: 7, role: 'PARENT'),
         name: ' Parent ',
         hasProfiles: true,
-        editingProfile: StudentProfile(profileId: 19, role: 'PARENT'),
+        editingProfile: UserProfile(profileId: 19, role: 'PARENT'),
         avatarKey: 'new-avatar',
         identifier: 'unused',
       ),
@@ -226,7 +226,7 @@ void main() {
         user: LoginUser(id: 7, role: 'PARENT'),
         name: ' ',
         hasProfiles: true,
-        editingProfile: StudentProfile(
+        editingProfile: UserProfile(
           profileId: 19,
           role: 'STUDENT',
           isDefault: true,
@@ -306,7 +306,7 @@ void main() {
             user: LoginUser(id: 7),
             name: 'Name',
             hasProfiles: true,
-            editingProfile: StudentProfile(role: 'PARENT'),
+            editingProfile: UserProfile(role: 'PARENT'),
           ),
           AppKeys.missingProfileId,
         ),
@@ -352,7 +352,7 @@ void main() {
         user: LoginUser(id: 7),
         name: 'Parent',
         hasProfiles: true,
-        editingProfile: StudentProfile(profileId: 19, role: 'PARENT'),
+        editingProfile: UserProfile(profileId: 19, role: 'PARENT'),
       ).canSave,
       isTrue,
     );
@@ -367,7 +367,7 @@ void main() {
           user: LoginUser(id: 7),
           name: 'Parent',
           hasProfiles: true,
-          editingProfile: StudentProfile(profileId: 19, role: 'PARENT'),
+          editingProfile: UserProfile(profileId: 19, role: 'PARENT'),
         ),
       ),
       throwsA(same(error)),
@@ -387,14 +387,14 @@ void main() {
       onRefresh: () async => events.add('refresh'),
       onSaved: () => events.add('saved'),
     );
-    var panel = tester.widget<AddProfilePanel>(find.byType(AddProfilePanel));
+    var panel = tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel));
     expect(panel.schools.single.schoolId, 1);
     panel.nameController.text = 'Student';
     panel.onSchoolChanged(panel.schools.single);
     panel.onGradeChanged(panel.grades.single);
     panel.onProgramChanged(panel.programs.single);
     await tester.pump();
-    panel = tester.widget<AddProfilePanel>(find.byType(AddProfilePanel));
+    panel = tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel));
     expect(panel.canSave, isTrue);
     panel.onSave();
     await tester.pumpAndSettle();
@@ -402,7 +402,7 @@ void main() {
     expect(profiles.calls.single.memberName, #createProfile);
     expect(profiles.calls.single.namedArguments, containsPair(#semesterId, 4));
     expect(
-      tester.widget<AddProfilePanel>(find.byType(AddProfilePanel)).isSaving,
+      tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel)).isSaving,
       isFalse,
     );
   });
@@ -417,7 +417,7 @@ void main() {
       profiles,
       grades,
       schools,
-      editingProfile: const StudentProfile(
+      editingProfile: const UserProfile(
         profileId: 19,
         role: 'PARENT',
         name: 'Parent',
@@ -430,13 +430,15 @@ void main() {
       onSaved: () => events.add('saved'),
     );
     expect(schools.calls, 0);
-    final panel = tester.widget<AddProfilePanel>(find.byType(AddProfilePanel));
+    final panel = tester.widget<ProfileFormPanel>(
+      find.byType(ProfileFormPanel),
+    );
     panel.nameController.text = 'Updated parent';
     panel.onSave();
     await tester.pump();
     expect(events, ['refresh']);
     expect(
-      tester.widget<AddProfilePanel>(find.byType(AddProfilePanel)).isSaving,
+      tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel)).isSaving,
       isTrue,
     );
     refresh.complete();
@@ -448,7 +450,7 @@ void main() {
       containsPair(#name, 'Updated parent'),
     );
     expect(
-      tester.widget<AddProfilePanel>(find.byType(AddProfilePanel)).isSaving,
+      tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel)).isSaving,
       isFalse,
     );
   });
@@ -465,17 +467,17 @@ void main() {
         profiles,
         grades,
         schools,
-        editingProfile: const StudentProfile(
+        editingProfile: const UserProfile(
           profileId: 19,
           role: 'PARENT',
           name: 'Parent',
         ),
         onSaved: () => saves++,
       );
-      tester.widget<AddProfilePanel>(find.byType(AddProfilePanel)).onSave();
+      tester.widget<ProfileFormPanel>(find.byType(ProfileFormPanel)).onSave();
       await tester.pumpAndSettle();
-      final panel = tester.widget<AddProfilePanel>(
-        find.byType(AddProfilePanel),
+      final panel = tester.widget<ProfileFormPanel>(
+        find.byType(ProfileFormPanel),
       );
       expect(panel.errorMessage, 'Server rejected the profile');
       expect(panel.isSaving, isFalse);
@@ -490,8 +492,8 @@ Future<void> _pumpForm(
   _Profiles profiles,
   _Grades grades,
   _Schools schools, {
-  StudentProfile? editingProfile,
-  Future<void> Function(StudentProfile)? onActivate,
+  UserProfile? editingProfile,
+  Future<void> Function(UserProfile)? onActivate,
   Future<void> Function()? onRefresh,
   VoidCallback? onSaved,
 }) async {
@@ -520,7 +522,7 @@ Future<void> _pumpForm(
               onRefreshProfiles: onRefresh,
               onProfileSaved: onSaved,
               bottomPadding: 0,
-              initialView: SettingPageView.addProfile,
+              initialView: SettingPageView.profileForm,
               initialEditingProfile: editingProfile,
             ),
           ),
@@ -545,7 +547,7 @@ class _Profiles implements ProfileService {
   final programUsers = <int>[];
   final semesterUsers = <int>[];
   final calls = <Invocation>[];
-  StudentProfile? savedProfile = const StudentProfile(profileId: 91);
+  UserProfile? savedProfile = const UserProfile(profileId: 91);
   Object? saveError;
 
   @override
@@ -567,8 +569,8 @@ class _Profiles implements ProfileService {
       calls.add(invocation);
       final error = saveError;
       return error == null
-          ? Future<StudentProfile?>.value(savedProfile)
-          : Future<StudentProfile?>.error(error);
+          ? Future<UserProfile?>.value(savedProfile)
+          : Future<UserProfile?>.error(error);
     }
     return super.noSuchMethod(invocation);
   }

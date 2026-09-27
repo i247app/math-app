@@ -81,7 +81,7 @@ class GuestAccountApi implements GuestAccountService {
     return GuestAccount(uid: user.uid, user: user.user, profiles: profiles);
   }
 
-  Future<List<StudentProfile>> _loadProfiles(int uid) async {
+  Future<List<UserProfile>> _loadProfiles(int uid) async {
     try {
       return await _profileService.listProfiles(
         userId: uid,
@@ -90,7 +90,7 @@ class GuestAccountApi implements GuestAccountService {
     } catch (error) {
       // Match login: a profile-list error must not prevent user resolution.
       AppLogger.warning('GUEST', 'Could not load guest profiles: $error');
-      return const <StudentProfile>[];
+      return const <UserProfile>[];
     }
   }
 

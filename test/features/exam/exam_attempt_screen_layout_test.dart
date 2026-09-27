@@ -5,11 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
@@ -812,7 +812,7 @@ Future<void> _pumpAssessment(
             padding: EdgeInsets.only(bottom: bottomInset),
             viewPadding: EdgeInsets.only(bottom: bottomInset),
           ),
-          child: AiAssessmentScreen(
+          child: ExamAttemptScreen(
             examService: examService ?? _UnusedExamService(),
             examType: examType,
             profileId: profileId,

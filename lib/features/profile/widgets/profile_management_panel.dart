@@ -11,8 +11,8 @@ import 'package:numi/features/profile/widgets/list/profile_add_button.dart';
 import 'package:numi/features/profile/widgets/list/profile_card.dart';
 import 'package:numi/features/profile/widgets/list/profile_state_panel.dart';
 
-class ProfilePlaceholderPanel extends StatelessWidget {
-  const ProfilePlaceholderPanel({
+class ProfileManagementPanel extends StatelessWidget {
+  const ProfileManagementPanel({
     super.key,
     required this.profiles,
     required this.activeProfile,
@@ -29,8 +29,8 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     required this.canAddProfile,
   });
 
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final LoginUser? user;
   final int? activeProfileId;
   final int? switchingProfileId;
@@ -38,9 +38,9 @@ class ProfilePlaceholderPanel extends StatelessWidget {
   final String? errorMessage;
   final VoidCallback onRetry;
   final VoidCallback onAdd;
-  final ValueChanged<StudentProfile> onSelect;
-  final ValueChanged<StudentProfile> onEdit;
-  final ValueChanged<StudentProfile> onDelete;
+  final ValueChanged<UserProfile> onSelect;
+  final ValueChanged<UserProfile> onEdit;
+  final ValueChanged<UserProfile> onDelete;
   final bool canAddProfile;
 
   @override
@@ -126,7 +126,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     );
   }
 
-  List<StudentProfile> get _activeFirstProfiles {
+  List<UserProfile> get _activeFirstProfiles {
     if (activeProfileId == null) {
       return profiles;
     }
@@ -138,14 +138,14 @@ class ProfilePlaceholderPanel extends StatelessWidget {
       return profiles;
     }
 
-    return <StudentProfile>[
+    return <UserProfile>[
       profiles[activeIndex],
       ...profiles.take(activeIndex),
       ...profiles.skip(activeIndex + 1),
     ];
   }
 
-  StudentProfile? get _parentProfile {
+  UserProfile? get _parentProfile {
     final activeProfileId = profileStableId(activeProfile);
     if (activeProfileId != null) {
       for (final profile in profiles) {
@@ -170,7 +170,7 @@ class ProfilePlaceholderPanel extends StatelessWidget {
     return null;
   }
 
-  List<StudentProfile> get _studentProfiles {
+  List<UserProfile> get _studentProfiles {
     return profiles
         .where(
           (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,

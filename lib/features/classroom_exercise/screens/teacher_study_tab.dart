@@ -16,7 +16,7 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
 import 'package:numi/features/classroom/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
+import 'package:numi/shared/widgets/teacher_add_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
@@ -53,7 +53,7 @@ class TeacherStudyTab extends StatefulWidget {
        _exerciseService = exerciseService;
 
   final LoginUser? user;
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final double bottomPadding;
   final int activeRefreshTick;
   final bool isActive;
@@ -172,7 +172,7 @@ class _TeacherStudyTabState extends State<TeacherStudyTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TeacherClassroomAddButton(onTap: _openCreateExercise),
+                    TeacherAddButton(onTap: _openCreateExercise),
                     Padding(
                       padding: const EdgeInsets.only(top: 18),
                       child: TeacherStudySearchField(

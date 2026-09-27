@@ -14,9 +14,9 @@ import 'package:numi/features/exam/models/exam.dart';
 const assessmentCorrectAnswerTarget =
     AssessmentFlowPolicy.firstQuestionsUpgradeTarget;
 
-enum AssessmentRetryAction { generate, submit }
+enum ExamAttemptRetryAction { generate, submit }
 
-enum AssessmentSubmitStatus {
+enum ExamAttemptSubmitStatus {
   submitted,
   missingExam,
   unanswered,
@@ -24,24 +24,25 @@ enum AssessmentSubmitStatus {
   ignored,
 }
 
-class AssessmentSubmitResult {
-  const AssessmentSubmitResult._(this.status, [this.exam]);
+class ExamAttemptSubmitResult {
+  const ExamAttemptSubmitResult._(this.status, [this.exam]);
 
-  const AssessmentSubmitResult.submitted(GeneratedExam exam)
-    : this._(AssessmentSubmitStatus.submitted, exam);
+  const ExamAttemptSubmitResult.submitted(GeneratedExam exam)
+    : this._(ExamAttemptSubmitStatus.submitted, exam);
 
-  const AssessmentSubmitResult.missingExam()
-    : this._(AssessmentSubmitStatus.missingExam);
+  const ExamAttemptSubmitResult.missingExam()
+    : this._(ExamAttemptSubmitStatus.missingExam);
 
-  const AssessmentSubmitResult.unanswered()
-    : this._(AssessmentSubmitStatus.unanswered);
+  const ExamAttemptSubmitResult.unanswered()
+    : this._(ExamAttemptSubmitStatus.unanswered);
 
-  const AssessmentSubmitResult.failed() : this._(AssessmentSubmitStatus.failed);
+  const ExamAttemptSubmitResult.failed()
+    : this._(ExamAttemptSubmitStatus.failed);
 
-  const AssessmentSubmitResult.ignored()
-    : this._(AssessmentSubmitStatus.ignored);
+  const ExamAttemptSubmitResult.ignored()
+    : this._(ExamAttemptSubmitStatus.ignored);
 
-  final AssessmentSubmitStatus status;
+  final ExamAttemptSubmitStatus status;
   final GeneratedExam? exam;
 }
 
@@ -65,8 +66,8 @@ class AssessmentSetRecord {
   final int correctAnswerCount;
 }
 
-class AssessmentController extends ChangeNotifier {
-  AssessmentController({
+class ExamAttemptController extends ChangeNotifier {
+  ExamAttemptController({
     required ExamService examService,
     GeneratedExam? initialExam,
     this.examType = examTypeAssessment,
@@ -108,7 +109,7 @@ class AssessmentController extends ChangeNotifier {
   final List<AssessmentSetRecord> _completedSets = <AssessmentSetRecord>[];
   final Map<int, GeneratedExam> _submittedSets = <int, GeneratedExam>{};
   String? _errorMessage;
-  AssessmentRetryAction? _errorRetryAction;
+  ExamAttemptRetryAction? _errorRetryAction;
   bool _isGeneratingExam = false;
   bool _isTransitioningSet = false;
   bool _isSubmittingExam = false;
@@ -156,7 +157,7 @@ class AssessmentController extends ChangeNotifier {
   Map<int, String> get selectedAnswerLabels =>
       Map<int, String>.unmodifiable(_selectedAnswerLabels);
   String? get errorMessage => _errorMessage;
-  AssessmentRetryAction? get errorRetryAction => _errorRetryAction;
+  ExamAttemptRetryAction? get errorRetryAction => _errorRetryAction;
   bool get isGeneratingExam => _isGeneratingExam || _isTransitioningSet;
   bool get isTransitioningSet => _isTransitioningSet;
   bool get isSubmittingExam => _isSubmittingExam;
@@ -573,9 +574,9 @@ class AssessmentController extends ChangeNotifier {
     return true;
   }
 
-  Future<AssessmentSubmitResult> submitCurrentExam() async {
+  Future<ExamAttemptSubmitResult> submitCurrentExam() async {
     if (_isSubmittingExam) {
-      return const AssessmentSubmitResult.ignored();
+      return const ExamAttemptSubmitResult.ignored();
     }
 
     final currentExam = _exam;
@@ -585,14 +586,14 @@ class AssessmentController extends ChangeNotifier {
       _errorMessage = AppStrings.current(AppKeys.missingExamToSubmit);
       _errorRetryAction = null;
       notifyListeners();
-      return const AssessmentSubmitResult.missingExam();
+      return const ExamAttemptSubmitResult.missingExam();
     }
 
     final firstUnansweredIndex = _firstUnansweredIndex(questions);
     if (firstUnansweredIndex != null && !_allowsPartialSubmit) {
       _questionIndex = firstUnansweredIndex;
       notifyListeners();
-      return const AssessmentSubmitResult.unanswered();
+      return const ExamAttemptSubmitResult.unanswered();
     }
 
     final answers = _answersForExam(currentExam);
@@ -604,15 +605,15 @@ class AssessmentController extends ChangeNotifier {
 
     try {
       final submittedExam = await _submitSet(currentExam, answers);
-      return AssessmentSubmitResult.submitted(submittedExam);
+      return ExamAttemptSubmitResult.submitted(submittedExam);
     } on ExamException catch (error) {
       _errorMessage = error.message;
-      _errorRetryAction = AssessmentRetryAction.submit;
-      return const AssessmentSubmitResult.failed();
+      _errorRetryAction = ExamAttemptRetryAction.submit;
+      return const ExamAttemptSubmitResult.failed();
     } catch (_) {
       _errorMessage = AppStrings.current(AppKeys.submitExamFailed);
-      _errorRetryAction = AssessmentRetryAction.submit;
-      return const AssessmentSubmitResult.failed();
+      _errorRetryAction = ExamAttemptRetryAction.submit;
+      return const ExamAttemptSubmitResult.failed();
     } finally {
       _isSubmittingExam = false;
       notifyListeners();
@@ -682,7 +683,7 @@ class AssessmentController extends ChangeNotifier {
       _errorMessage =
           submittedSetResult.errorMessage ??
           AppStrings.current(AppKeys.submitExamFailed);
-      _errorRetryAction = AssessmentRetryAction.generate;
+      _errorRetryAction = ExamAttemptRetryAction.generate;
       notifyListeners();
       return false;
     }
@@ -699,7 +700,7 @@ class AssessmentController extends ChangeNotifier {
       _errorMessage =
           generatedSetResult.errorMessage ??
           AppStrings.current(AppKeys.createQuestionFailed);
-      _errorRetryAction = AssessmentRetryAction.generate;
+      _errorRetryAction = ExamAttemptRetryAction.generate;
       notifyListeners();
       return false;
     }
@@ -903,7 +904,7 @@ class AssessmentController extends ChangeNotifier {
     _isGeneratingExam = false;
     _isTransitioningSet = false;
     _errorMessage = message;
-    _errorRetryAction = AssessmentRetryAction.generate;
+    _errorRetryAction = ExamAttemptRetryAction.generate;
     notifyListeners();
   }
 

@@ -6,28 +6,28 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/helpers/profile_display_helpers.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
-String settingsProfileName(BuildContext context, StudentProfile profile) {
+String settingsProfileName(BuildContext context, UserProfile profile) {
   final name = profile.name?.trim();
   return name == null || name.isEmpty
       ? context.getText(AppKeys.belovedChild)
       : name;
 }
 
-String settingsProfileGrade(BuildContext context, StudentProfile profile) {
+String settingsProfileGrade(BuildContext context, UserProfile profile) {
   final grade = profile.grade?.label?.trim();
   return grade == null || grade.isEmpty
       ? context.getText(AppKeys.notSelected)
       : grade;
 }
 
-String settingsProfileProgram(BuildContext context, StudentProfile profile) {
+String settingsProfileProgram(BuildContext context, UserProfile profile) {
   final program = profile.program?.label?.trim();
   return program == null || program.isEmpty
       ? context.getText(AppKeys.notSelected)
       : program;
 }
 
-String settingsProfileSchool(BuildContext context, StudentProfile profile) {
+String settingsProfileSchool(BuildContext context, UserProfile profile) {
   final school = profile.school?.name?.trim();
   return school == null || school.isEmpty
       ? context.getText(AppKeys.notSelected)

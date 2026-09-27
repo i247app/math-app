@@ -6,7 +6,7 @@ class ParentRoomEntry {
   const ParentRoomEntry({required this.layoutClassroom, required this.child});
 
   final HomeLayoutClassroom layoutClassroom;
-  final StudentProfile child;
+  final UserProfile child;
 
   ClassroomModel get classroom => layoutClassroom.classroom;
 

@@ -7,8 +7,8 @@ class ActiveProfileResolution {
     required this.activeProfile,
   });
 
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
 
   ProfileRole get role => ProfileRole.fromProfile(activeProfile);
 

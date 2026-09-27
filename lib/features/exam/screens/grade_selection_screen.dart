@@ -13,7 +13,7 @@ import 'package:numi/features/profile/data/grade_exception.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/helpers/default_grade_label.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
@@ -170,9 +170,9 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
         return;
       }
 
-      final result = await Navigator.of(context).push<AiAssessmentResult>(
-        MaterialPageRoute<AiAssessmentResult>(
-          builder: (_) => AiAssessmentScreen(
+      final result = await Navigator.of(context).push<ExamAttemptResult>(
+        MaterialPageRoute<ExamAttemptResult>(
+          builder: (_) => ExamAttemptScreen(
             examService: widget.examService,
             examType: widget.examType,
             gradeLabel: gradeLabel,
@@ -199,7 +199,7 @@ class _GradeSelectionScreenState extends State<GradeSelectionScreen> {
         }
       }
 
-      if (result == AiAssessmentResult.generationFailed) {
+      if (result == ExamAttemptResult.generationFailed) {
         setState(() => showGenerationFailed = true);
         return;
       }

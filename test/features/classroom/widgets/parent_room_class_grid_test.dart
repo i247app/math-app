@@ -59,7 +59,7 @@ void main() {
 
 ParentRoomEntry _entry(int id, String name) {
   return ParentRoomEntry(
-    child: StudentProfile(id: id, name: 'Bé $id'),
+    child: UserProfile(id: id, name: 'Bé $id'),
     layoutClassroom: HomeLayoutClassroom(
       memberProfileId: id,
       classroom: ClassroomModel(

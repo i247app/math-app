@@ -40,7 +40,7 @@ import 'package:numi/features/settings/models/setting_screen_args.dart';
 import 'package:numi/features/settings/navigation/settings_passcode_flow.dart';
 import 'package:numi/features/settings/screens/setting_account_screen.dart';
 import 'package:numi/features/profile/widgets/profile_form_panel.dart';
-import 'package:numi/features/profile/widgets/profile_list_panel.dart';
+import 'package:numi/features/profile/widgets/profile_management_panel.dart';
 import 'package:numi/features/settings/widgets/setting_header.dart';
 import 'package:numi/features/settings/widgets/setting_safe_screen.dart';
 import 'package:numi/features/settings/widgets/settings_menu_panel.dart';
@@ -50,7 +50,7 @@ part 'setting_profile_form.dart';
 
 part 'setting/navigation_actions.dart';
 
-enum SettingPageView { settings, account, profile, addProfile }
+enum SettingPageView { settings, account, profile, profileForm }
 
 class SettingTab extends StatefulWidget {
   const SettingTab({
@@ -85,7 +85,7 @@ class SettingTab extends StatefulWidget {
     required this.bottomPadding,
     this.scale = 1,
     SettingPageView initialView = SettingPageView.settings,
-    StudentProfile? initialEditingProfile,
+    UserProfile? initialEditingProfile,
     bool isPushedPage = false,
     bool openAddProfileOnStart = false,
     this.isActive = true,
@@ -97,11 +97,11 @@ class SettingTab extends StatefulWidget {
        assert(initialView != SettingPageView.account);
 
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final String? profileLoadError;
   final VoidCallback onLogout;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final Future<void> Function()? onRefreshProfiles;
   final VoidCallback? onProfileSaved;
   final int openAddProfileRequestId;
@@ -109,7 +109,7 @@ class SettingTab extends StatefulWidget {
   final double scale;
   final bool isActive;
   final SettingPageView _initialView;
-  final StudentProfile? _initialEditingProfile;
+  final UserProfile? _initialEditingProfile;
   final bool _isPushedPage;
   final bool _openAddProfileOnStart;
 
@@ -190,7 +190,7 @@ class _SettingTabState extends State<SettingTab>
     return GuardedExitScope<bool>(
       controller: _profileExitController,
       shouldConfirm:
-          _view == SettingPageView.addProfile && _isProfileDraftDirty,
+          _view == SettingPageView.profileForm && _isProfileDraftDirty,
       isExitBlocked: _isSavingProfile,
       confirmExit: showUnsavedChangesExitDialog,
       child: Stack(
@@ -218,7 +218,7 @@ class _SettingTabState extends State<SettingTab>
                     SettingHeader(
                       title: headerTitle,
                       canGoBack: canGoBack,
-                      onBack: _view == SettingPageView.addProfile
+                      onBack: _view == SettingPageView.profileForm
                           ? _requestProfileFormExit
                           : _returnToSettings,
                       backgroundColor: backgroundColor,
@@ -254,7 +254,7 @@ class _SettingTabState extends State<SettingTab>
                           onLogoutTap: widget.onLogout,
                         ),
                         SettingPageView.account => const SizedBox.shrink(),
-                        SettingPageView.profile => ProfilePlaceholderPanel(
+                        SettingPageView.profile => ProfileManagementPanel(
                           profiles: _profiles,
                           activeProfile: widget.activeProfile,
                           user: widget.user,
@@ -269,7 +269,7 @@ class _SettingTabState extends State<SettingTab>
                           onDelete: _confirmDeleteProfile,
                           canAddProfile: _canCreateProfile,
                         ),
-                        SettingPageView.addProfile => AddProfilePanel(
+                        SettingPageView.profileForm => ProfileFormPanel(
                           nameController: _profileNameController,
                           phoneController: _profilePhoneController,
                           emailController: _profileEmailController,
@@ -291,7 +291,7 @@ class _SettingTabState extends State<SettingTab>
                           isSaving: _isSavingProfile,
                           canSave: _canSaveProfileForm,
                           errorMessage:
-                              _profileOptionsError ?? _profileCreateError,
+                              _profileOptionsError ?? _profileSaveError,
                           canRetryOptions: _profileOptionsError != null,
                           onAvatarChanged: _selectProfileAvatar,
                           onClearAvatar: _clearProfileAvatar,
@@ -311,7 +311,7 @@ class _SettingTabState extends State<SettingTab>
                             });
                           },
                           onRetryOptions: _loadProfileOptions,
-                          onCancel: _cancelAddProfile,
+                          onCancel: _cancelProfileForm,
                           onSave: _saveProfileForm,
                         ),
                       },
@@ -336,13 +336,13 @@ class _SettingTabState extends State<SettingTab>
   static String _titleForView(
     BuildContext context,
     SettingPageView view,
-    StudentProfile? editingProfile,
+    UserProfile? editingProfile,
   ) {
     return switch (view) {
       SettingPageView.settings => context.getText(AppKeys.settingsTitle),
       SettingPageView.account => context.getText(AppKeys.accountTitle),
       SettingPageView.profile => context.getText(AppKeys.profileTitle),
-      SettingPageView.addProfile => context.getText(AppKeys.profileTitle),
+      SettingPageView.profileForm => context.getText(AppKeys.profileTitle),
     };
   }
 
@@ -351,14 +351,14 @@ class _SettingTabState extends State<SettingTab>
       SettingPageView.settings => 30,
       SettingPageView.account => 36,
       SettingPageView.profile => 30,
-      SettingPageView.addProfile => 30,
+      SettingPageView.profileForm => 30,
     };
   }
 
   @override
   Future<void> _pushView(
     SettingPageView view, {
-    StudentProfile? editingProfile,
+    UserProfile? editingProfile,
     bool openAddProfileOnStart = false,
   }) {
     return _performPushView(

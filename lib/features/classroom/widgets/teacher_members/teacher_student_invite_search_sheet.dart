@@ -31,11 +31,10 @@ class _TeacherStudentInviteSearchSheetState
     extends State<TeacherStudentInviteSearchSheet> {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedProfileIds = <int>{};
-  final Map<int, StudentProfile> _selectedProfilesById =
-      <int, StudentProfile>{};
+  final Map<int, UserProfile> _selectedProfilesById = <int, UserProfile>{};
 
   Timer? _debounce;
-  List<StudentProfile> _results = const <StudentProfile>[];
+  List<UserProfile> _results = const <UserProfile>[];
   bool _isSearching = false;
   String? _error;
   String? _lastSubmittedKeyword;
@@ -63,7 +62,7 @@ class _TeacherStudentInviteSearchSheetState
     if (keyword.isEmpty) {
       _lastSubmittedKeyword = null;
       setState(() {
-        _results = const <StudentProfile>[];
+        _results = const <UserProfile>[];
         _isSearching = false;
         _error = null;
       });
@@ -94,7 +93,7 @@ class _TeacherStudentInviteSearchSheetState
       }
       setState(() {
         _error = error.message;
-        _results = const <StudentProfile>[];
+        _results = const <UserProfile>[];
       });
     } finally {
       if (mounted && requestId == _requestSerial) {
@@ -103,7 +102,7 @@ class _TeacherStudentInviteSearchSheetState
     }
   }
 
-  void _toggleProfile(StudentProfile profile) {
+  void _toggleProfile(UserProfile profile) {
     final id = profileStableId(profile);
     if (id == null) {
       return;
@@ -118,7 +117,7 @@ class _TeacherStudentInviteSearchSheetState
     });
   }
 
-  List<StudentProfile> get _selectedProfiles =>
+  List<UserProfile> get _selectedProfiles =>
       _selectedProfilesById.values.toList(growable: false);
 
   @override

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/models/classroom.dart';
-import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_add_button.dart';
+import 'package:numi/shared/widgets/teacher_add_button.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_empty_state.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_list_card.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_search_field.dart';
@@ -33,11 +33,7 @@ class TeacherClassroomBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        entranceBuilder(
-          0,
-          TeacherClassroomAddButton(onTap: onCreateClass),
-          false,
-        ),
+        entranceBuilder(0, TeacherAddButton(onTap: onCreateClass), false),
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: entranceBuilder(

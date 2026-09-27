@@ -47,7 +47,7 @@ extension _DashboardActions on _DashboardScreenState {
 
   String _displayProfileName(
     BuildContext context,
-    StudentProfile? profile,
+    UserProfile? profile,
     ProfileRole role,
   ) {
     final name = profile?.name?.trim();

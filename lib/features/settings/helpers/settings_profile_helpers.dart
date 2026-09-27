@@ -24,7 +24,7 @@ String? settingsProfileDateOnly(String? value) {
   return parsed.toIso8601String().substring(0, 10);
 }
 
-String settingsProfileRole(StudentProfile profile) {
+String settingsProfileRole(UserProfile profile) {
   final role = profile.role?.trim().toUpperCase();
   return switch (role) {
     'TEACHER' || 'PARENT' || 'STUDENT' => role!,
@@ -34,7 +34,7 @@ String settingsProfileRole(StudentProfile profile) {
 
 String settingsProfileFormRole({
   required LoginUser? user,
-  StudentProfile? editingProfile,
+  UserProfile? editingProfile,
 }) {
   if (editingProfile != null) {
     return settingsProfileRole(editingProfile);
@@ -46,7 +46,7 @@ String settingsProfileFormRole({
 
 bool settingsCanCreateProfile({
   required LoginUser? user,
-  required List<StudentProfile> profiles,
+  required List<UserProfile> profiles,
 }) {
   final userRole = user?.role?.trim().toUpperCase();
   if (userRole == 'STUDENT' || userRole?.endsWith('_STUDENT') == true) {

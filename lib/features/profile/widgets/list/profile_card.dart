@@ -26,7 +26,7 @@ class ProfileCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final bool isActive;
   final bool isSwitching;
   final VoidCallback onSelect;

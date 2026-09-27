@@ -14,7 +14,7 @@ class ParentProfileCodeLine extends StatelessWidget {
     required this.isActive,
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final bool isActive;
 
   @override

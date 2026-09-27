@@ -8,11 +8,11 @@ class ProfileSessionResolution {
   });
 
   const ProfileSessionResolution.empty()
-    : profiles = const <StudentProfile>[],
+    : profiles = const <UserProfile>[],
       activeProfile = null,
       errorMessage = null;
 
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final String? errorMessage;
 }

@@ -4,19 +4,19 @@ extension AuthFlowEntry on AuthFlowCubit {
   Future<void> lookupSignupEmail(String email) async {
     if (state.screen != AuthScreen.signup ||
         state.authEntryMode != AuthEntryMode.signup ||
-        state.isCheckingLoginName) {
+        state.isCheckingIdentifier) {
       return;
     }
 
     _emitState(
       state.copyWith(
         loginName: email,
-        checkedLoginName: email,
-        isCheckingLoginName: true,
-        clearLoginNameExists: true,
-        clearLoginLookupUser: true,
-        clearLoginLookupError: true,
-        clearLoginLookupErrorStatus: true,
+        checkedIdentifier: email,
+        isCheckingIdentifier: true,
+        clearIdentifierExists: true,
+        clearIdentifierLookupUser: true,
+        clearIdentifierLookupError: true,
+        clearIdentifierLookupErrorStatus: true,
         clearTrustedDeviceState: true,
         clearAuthError: true,
         clearOtpExpiry: true,
@@ -29,7 +29,7 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedLoginName != email) {
+          state.checkedIdentifier != email) {
         return;
       }
 
@@ -43,13 +43,13 @@ extension AuthFlowEntry on AuthFlowCubit {
       _emitState(
         state.copyWith(
           loginName: email,
-          checkedLoginName: email,
-          isCheckingLoginName: false,
-          loginNameExists: exists,
+          checkedIdentifier: email,
+          isCheckingIdentifier: false,
+          identifierExists: exists,
           otpFlow: OtpFlow.signup,
           clearAuthError: true,
-          clearLoginLookupError: true,
-          clearLoginLookupErrorStatus: true,
+          clearIdentifierLookupError: true,
+          clearIdentifierLookupErrorStatus: true,
           clearOtpExpiry: true,
           clearOtpError: true,
         ),
@@ -58,7 +58,7 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedLoginName != email) {
+          state.checkedIdentifier != email) {
         return;
       }
 
@@ -66,11 +66,11 @@ extension AuthFlowEntry on AuthFlowCubit {
         _emitState(
           state.copyWith(
             loginName: email,
-            checkedLoginName: email,
-            isCheckingLoginName: false,
-            loginNameExists: false,
-            loginLookupError: error.message,
-            loginLookupErrorStatus: error.status,
+            checkedIdentifier: email,
+            isCheckingIdentifier: false,
+            identifierExists: false,
+            identifierLookupError: error.message,
+            identifierLookupErrorStatus: error.status,
             clearAuthError: true,
           ),
         );
@@ -80,10 +80,10 @@ extension AuthFlowEntry on AuthFlowCubit {
       _emitState(
         state.copyWith(
           loginName: email,
-          checkedLoginName: email,
-          isCheckingLoginName: false,
-          loginLookupError: error.message,
-          loginLookupErrorStatus: error.status,
+          checkedIdentifier: email,
+          isCheckingIdentifier: false,
+          identifierLookupError: error.message,
+          identifierLookupErrorStatus: error.status,
           clearAuthError: true,
         ),
       );
@@ -91,16 +91,16 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedLoginName != email) {
+          state.checkedIdentifier != email) {
         return;
       }
 
       _emitState(
         state.copyWith(
           loginName: email,
-          checkedLoginName: email,
-          isCheckingLoginName: false,
-          loginLookupError: AppStrings.current(
+          checkedIdentifier: email,
+          isCheckingIdentifier: false,
+          identifierLookupError: AppStrings.current(
             AppKeys.authLoginNameCheckFailed,
           ),
           clearAuthError: true,
@@ -109,7 +109,7 @@ extension AuthFlowEntry on AuthFlowCubit {
     }
   }
 
-  Future<void> submitLoginName(String loginName) async {
+  Future<void> submitAuthIdentifier(String loginName) async {
     if (state.isSendingOtp) {
       return;
     }
@@ -120,9 +120,9 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.screen != AuthScreen.signup ||
           state.authEntryMode != AuthEntryMode.signup ||
-          state.checkedLoginName != loginName ||
-          state.loginNameExists != false ||
-          state.isCheckingLoginName) {
+          state.checkedIdentifier != loginName ||
+          state.identifierExists != false ||
+          state.isCheckingIdentifier) {
         return;
       }
       _pendingSignupEmail = loginName;
@@ -131,7 +131,7 @@ extension AuthFlowEntry on AuthFlowCubit {
         state.copyWith(
           screen: AuthScreen.registrationProfile,
           loginName: loginName,
-          isCheckingLoginName: false,
+          isCheckingIdentifier: false,
           isSendingOtp: false,
           otpFlow: OtpFlow.signup,
           clearAuthError: true,
@@ -145,13 +145,13 @@ extension AuthFlowEntry on AuthFlowCubit {
     _emitState(
       state.copyWith(
         loginName: loginName,
-        checkedLoginName: loginName,
-        isCheckingLoginName: true,
+        checkedIdentifier: loginName,
+        isCheckingIdentifier: true,
         isSendingOtp: true,
-        clearLoginNameExists: true,
-        clearLoginLookupUser: true,
-        clearLoginLookupError: true,
-        clearLoginLookupErrorStatus: true,
+        clearIdentifierExists: true,
+        clearIdentifierLookupUser: true,
+        clearIdentifierLookupError: true,
+        clearIdentifierLookupErrorStatus: true,
         clearTrustedDeviceState: true,
         clearAuthError: true,
       ),
@@ -160,19 +160,19 @@ extension AuthFlowEntry on AuthFlowCubit {
     try {
       final result = await _authService.lookupLoginName(loginName);
       final user = result.user;
-      if (isClosed || state.checkedLoginName != loginName) {
+      if (isClosed || state.checkedIdentifier != loginName) {
         return;
       }
 
       _emitState(
         state.copyWith(
-          isCheckingLoginName: false,
-          loginNameExists: result.exists,
-          loginLookupUser: user,
-          loginLookupError: result.exists ? null : result.message,
-          loginLookupErrorStatus: result.exists ? null : result.status,
-          clearLoginLookupError: result.exists,
-          clearLoginLookupErrorStatus: result.exists,
+          isCheckingIdentifier: false,
+          identifierExists: result.exists,
+          identifierLookupUser: user,
+          identifierLookupError: result.exists ? null : result.message,
+          identifierLookupErrorStatus: result.exists ? null : result.status,
+          clearIdentifierLookupError: result.exists,
+          clearIdentifierLookupErrorStatus: result.exists,
         ),
       );
 
@@ -181,11 +181,11 @@ extension AuthFlowEntry on AuthFlowCubit {
           state.copyWith(
             screen: AuthScreen.login,
             loginName: loginName,
-            checkedLoginName: loginName,
-            loginNameExists: false,
-            loginLookupError: result.message,
-            loginLookupErrorStatus: result.status,
-            isCheckingLoginName: false,
+            checkedIdentifier: loginName,
+            identifierExists: false,
+            identifierLookupError: result.message,
+            identifierLookupErrorStatus: result.status,
+            isCheckingIdentifier: false,
             isSendingOtp: false,
             clearAuthError: true,
           ),
@@ -196,7 +196,7 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (user == null) {
         _emitState(
           state.copyWith(
-            isCheckingLoginName: false,
+            isCheckingIdentifier: false,
             isSendingOtp: false,
             authError: AppStrings.current(AppKeys.missingOtpUser),
           ),
@@ -219,7 +219,7 @@ extension AuthFlowEntry on AuthFlowCubit {
           screen: AuthScreen.otp,
           loginName: loginName,
           otpFlow: OtpFlow.login,
-          isCheckingLoginName: false,
+          isCheckingIdentifier: false,
           isSendingOtp: true,
           clearAuthError: true,
           clearOtpExpiry: true,
@@ -233,11 +233,11 @@ extension AuthFlowEntry on AuthFlowCubit {
           state.copyWith(
             screen: AuthScreen.login,
             loginName: loginName,
-            checkedLoginName: loginName,
-            loginNameExists: false,
-            loginLookupError: error.message,
-            loginLookupErrorStatus: error.status,
-            isCheckingLoginName: false,
+            checkedIdentifier: loginName,
+            identifierExists: false,
+            identifierLookupError: error.message,
+            identifierLookupErrorStatus: error.status,
+            isCheckingIdentifier: false,
             isSendingOtp: false,
             clearAuthError: true,
           ),
@@ -247,13 +247,13 @@ extension AuthFlowEntry on AuthFlowCubit {
 
       _emitAuthError(
         error.message,
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
       );
     } catch (_) {
       _emitAuthError(
         AppStrings.current(AppKeys.authLoginNameCheckFailed),
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
       );
     }
@@ -262,7 +262,7 @@ extension AuthFlowEntry on AuthFlowCubit {
   Future<void> _openDeviceVerification(LoginUser user) async {
     _emitState(
       state.copyWith(
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: true,
         isLoadingTrustedDevices: true,
         trustedDevices: const <AuthTrustedDevice>[],
@@ -277,7 +277,7 @@ extension AuthFlowEntry on AuthFlowCubit {
     try {
       final devices = await _authService.listTrustedDevices(userId: user.id);
       if (isClosed ||
-          state.loginLookupUser?.id != user.id ||
+          state.identifierLookupUser?.id != user.id ||
           state.loginName == null) {
         return;
       }
@@ -313,20 +313,20 @@ extension AuthFlowEntry on AuthFlowCubit {
     } on AuthException catch (error) {
       _emitAuthError(
         error.message,
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
       );
     } catch (_) {
       _emitAuthError(
         AppStrings.current(AppKeys.trustedDeviceLoadFailed),
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
       );
     }
   }
 
   Future<void> reloadTrustedDevices() async {
-    final user = state.loginLookupUser;
+    final user = state.identifierLookupUser;
     if (state.isLoadingTrustedDevices ||
         state.isSendingOtp ||
         state.screen != AuthScreen.deviceVerification ||
@@ -351,7 +351,7 @@ extension AuthFlowEntry on AuthFlowCubit {
       final devices = await _authService.listTrustedDevices(userId: user.id);
       if (isClosed ||
           state.screen != AuthScreen.deviceVerification ||
-          state.loginLookupUser?.id != user.id) {
+          state.identifierLookupUser?.id != user.id) {
         return;
       }
 

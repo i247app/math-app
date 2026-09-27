@@ -6,7 +6,7 @@ import 'package:numi/features/profile/models/semester.dart';
 
 class ProfileManagementState {
   const ProfileManagementState({
-    this.profiles = const <StudentProfile>[],
+    this.profiles = const <UserProfile>[],
     this.activeProfileId,
     this.schools = const <SchoolModel>[],
     this.grades = const <GradeModel>[],
@@ -19,7 +19,7 @@ class ProfileManagementState {
     this.errorMessage,
   });
 
-  final List<StudentProfile> profiles;
+  final List<UserProfile> profiles;
   final int? activeProfileId;
   final List<SchoolModel> schools;
   final List<GradeModel> grades;
@@ -32,7 +32,7 @@ class ProfileManagementState {
   final String? errorMessage;
 
   ProfileManagementState copyWith({
-    List<StudentProfile>? profiles,
+    List<UserProfile>? profiles,
     int? activeProfileId,
     List<SchoolModel>? schools,
     List<GradeModel>? grades,

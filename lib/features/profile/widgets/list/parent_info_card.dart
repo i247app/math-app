@@ -25,7 +25,7 @@ class ParentInfoCard extends StatelessWidget {
     required this.onEdit,
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final LoginUser? user;
   final bool isActive;
   final bool isSwitching;
@@ -132,7 +132,7 @@ class ParentInfoCard extends StatelessWidget {
 
   String _displayParentName(
     BuildContext context,
-    StudentProfile profile,
+    UserProfile profile,
     LoginUser? user,
   ) {
     final profileName = profile.name?.trim();

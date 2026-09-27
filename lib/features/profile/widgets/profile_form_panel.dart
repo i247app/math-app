@@ -11,12 +11,12 @@ import 'package:numi/features/profile/models/school.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/account/settings_cancel_button.dart';
 import 'package:numi/features/settings/widgets/account/settings_save_button.dart';
-import 'package:numi/features/profile/widgets/form/add_profile_avatar.dart';
-import 'package:numi/features/profile/widgets/form/add_profile_dropdown.dart';
-import 'package:numi/features/profile/widgets/form/add_profile_text_field.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_avatar.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_dropdown.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_text_field.dart';
 
-class AddProfilePanel extends StatelessWidget {
-  const AddProfilePanel({
+class ProfileFormPanel extends StatelessWidget {
+  const ProfileFormPanel({
     super.key,
     required this.nameController,
     required this.phoneController,
@@ -96,14 +96,14 @@ class AddProfilePanel extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
-          child: AddProfileAvatar(
+          child: ProfileFormAvatar(
             avatarKey: avatarKey,
             avatarUrl: avatarUrl,
             onChanged: onAvatarChanged,
             onClear: onClearAvatar,
           ),
         ),
-        AddProfileTextField(
+        ProfileFormTextField(
           label: context.getText(AppKeys.fullName),
           controller: nameController,
           hintText: isTeacherProfile
@@ -113,13 +113,13 @@ class AddProfilePanel extends StatelessWidget {
               : context.getText(AppKeys.studentNameHint),
         ),
         if (isParentProfile) ...[
-          AddProfileTextField(
+          ProfileFormTextField(
             label: context.getText(AppKeys.email),
             controller: emailController,
             hintText: context.getText(AppKeys.parentProfileEmailHint),
             keyboardType: TextInputType.emailAddress,
           ),
-          AddProfileTextField(
+          ProfileFormTextField(
             label: context.getText(AppKeys.phoneNumber),
             controller: phoneController,
             hintText: context.getText(AppKeys.parentProfilePhoneHint),
@@ -138,7 +138,7 @@ class AddProfilePanel extends StatelessWidget {
               ),
             ),
           if (!isLoadingOptions) ...[
-            AddProfileDropdown<SchoolModel>(
+            ProfileFormDropdown<SchoolModel>(
               label: context.getText(AppKeys.school),
               hintText: context.getText(AppKeys.notSelected),
               value: selectedSchool,
@@ -149,7 +149,7 @@ class AddProfilePanel extends StatelessWidget {
               onChanged: onSchoolChanged,
             ),
             if (!isTeacherProfile) ...[
-              AddProfileDropdown<ProgramModel>(
+              ProfileFormDropdown<ProgramModel>(
                 label: context.getText(AppKeys.learningProgram),
                 hintText: context.getText(AppKeys.notSelected),
                 value: selectedProgram,
@@ -159,7 +159,7 @@ class AddProfilePanel extends StatelessWidget {
                     : context.getText(AppKeys.program),
                 onChanged: onProgramChanged,
               ),
-              AddProfileDropdown<GradeModel>(
+              ProfileFormDropdown<GradeModel>(
                 label: context.getText(AppKeys.grade),
                 hintText: context.getText(AppKeys.notSelected),
                 value: selectedGrade,
@@ -171,7 +171,7 @@ class AddProfilePanel extends StatelessWidget {
               ),
             ],
             if (isTeacherProfile) ...[
-              AddProfileDropdown<ProfileIdTypeOption>(
+              ProfileFormDropdown<ProfileIdTypeOption>(
                 label: context.getText(AppKeys.profileIdTypeLabel),
                 hintText: context.getText(AppKeys.profileIdTypeHint),
                 value: selectedIdTypeOption,
@@ -180,7 +180,7 @@ class AddProfilePanel extends StatelessWidget {
                 onChanged: (option) => onIdTypeChanged(option?.value),
               ),
             ],
-            AddProfileTextField(
+            ProfileFormTextField(
               label: context.getText(AppKeys.profileIdValueLabel),
               controller: idController,
               hintText: isTeacherProfile

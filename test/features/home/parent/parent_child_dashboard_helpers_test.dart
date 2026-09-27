@@ -6,7 +6,7 @@ import 'package:numi/features/home/helpers/parent/parent_child_dashboard_helpers
 
 void main() {
   test('keeps every classroom joined by the same child', () {
-    const child = StudentProfile(id: 10, name: 'An');
+    const child = UserProfile(id: 10, name: 'An');
     const firstClass = ClassroomModel(
       classroomId: 101,
       name: '2A5',

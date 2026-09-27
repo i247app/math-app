@@ -86,10 +86,10 @@ extension AuthFlowNavigation on AuthFlowCubit {
     _emitState(
       state.copyWith(
         screen: target,
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
         clearLoginName: true,
-        clearLoginLookup: true,
+        clearIdentifierLookup: true,
         clearTrustedDeviceState: true,
         clearAuthError: true,
         clearOtpError: true,
@@ -190,7 +190,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
         clearAuthError: true,
         clearOtpError: true,
         clearLoginName: true,
-        clearLoginLookup: true,
+        clearIdentifierLookup: true,
         clearTrustedDeviceState: true,
       ),
     );
@@ -209,10 +209,10 @@ extension AuthFlowNavigation on AuthFlowCubit {
         clearAuthError: true,
         clearOtpError: true,
         clearOtpExpiry: true,
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
         clearLoginName: true,
-        clearLoginLookup: true,
+        clearIdentifierLookup: true,
         clearTrustedDeviceState: true,
       ),
     );
@@ -235,7 +235,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
         clearAuthError: true,
         clearOtpExpiry: true,
         clearOtpError: true,
-        clearLoginLookup: true,
+        clearIdentifierLookup: true,
         clearTrustedDeviceState: true,
       ),
     );
@@ -245,24 +245,24 @@ extension AuthFlowNavigation on AuthFlowCubit {
     _emitState(state.copyWith(phoneRegion: region));
   }
 
-  void clearLoginLookup() {
-    if (!state.isCheckingLoginName &&
+  void clearIdentifierLookup() {
+    if (!state.isCheckingIdentifier &&
         !state.isSendingOtp &&
-        state.checkedLoginName == null &&
-        state.loginNameExists == null &&
-        state.loginLookupUser == null &&
-        state.loginLookupError == null &&
-        state.loginLookupErrorStatus == null &&
+        state.checkedIdentifier == null &&
+        state.identifierExists == null &&
+        state.identifierLookupUser == null &&
+        state.identifierLookupError == null &&
+        state.identifierLookupErrorStatus == null &&
         state.authError == null) {
       return;
     }
 
     _emitState(
       state.copyWith(
-        isCheckingLoginName: false,
+        isCheckingIdentifier: false,
         isSendingOtp: false,
         clearAuthError: true,
-        clearLoginLookup: true,
+        clearIdentifierLookup: true,
       ),
     );
   }

@@ -20,7 +20,7 @@ class SignupRoleSelector extends StatelessWidget {
     const visibleRoles = <SignupRole>[
       SignupRole.student,
       SignupRole.parent,
-      // TODO: Bật lại lựa chọn Giáo viên khi luồng đăng ký giáo viên sẵn sàng.
+      // TODO: Enable teacher role when the feature is ready
       // SignupRole.teacher,
     ];
 

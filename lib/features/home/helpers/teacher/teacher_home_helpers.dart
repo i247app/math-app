@@ -1,7 +1,7 @@
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 
-bool isTeacherProfileComplete(StudentProfile? profile) {
+bool isTeacherProfileComplete(UserProfile? profile) {
   return profile?.profileStatus?.trim().toUpperCase() == 'OFFICIAL';
 }
 

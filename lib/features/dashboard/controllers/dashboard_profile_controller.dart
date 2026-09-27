@@ -87,9 +87,9 @@ class DashboardProfileController extends ChangeNotifier {
   /// Increments [DashboardProfileState.profileResetSignal] on success so that
   /// [RoleTabHost] resets its data without recreating the widget tree.
   Future<void> switchProfile(
-    StudentProfile profile, {
-    required StudentProfile? activeProfile,
-    required Future<void> Function(StudentProfile) onActivateProfile,
+    UserProfile profile, {
+    required UserProfile? activeProfile,
+    required Future<void> Function(UserProfile) onActivateProfile,
     void Function(String message)? onError,
   }) async {
     if (_state.isSwitchingProfile) return;

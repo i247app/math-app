@@ -15,7 +15,7 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -251,7 +251,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.byType(AiAssessmentScreen), findsOneWidget);
+      expect(find.byType(ExamAttemptScreen), findsOneWidget);
     });
 
     testWidgets('returns from assessment intro to the initial welcome screen', (

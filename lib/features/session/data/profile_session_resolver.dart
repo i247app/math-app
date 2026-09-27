@@ -54,13 +54,13 @@ class ProfileSessionResolver {
       });
     } on ProfileException catch (error) {
       return ProfileSessionResolution(
-        profiles: const <StudentProfile>[],
+        profiles: const <UserProfile>[],
         activeProfile: null,
         errorMessage: error.message,
       );
     } catch (_) {
       return ProfileSessionResolution(
-        profiles: const <StudentProfile>[],
+        profiles: const <UserProfile>[],
         activeProfile: null,
         errorMessage: AppStrings.current(AppKeys.profileLoadFailed),
       );
@@ -69,7 +69,7 @@ class ProfileSessionResolver {
 
   Future<void> rememberActiveProfile({
     required int userId,
-    required StudentProfile profile,
+    required UserProfile profile,
     bool Function()? isCurrent,
   }) async {
     final profileId = profileStableId(profile);

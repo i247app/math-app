@@ -39,7 +39,7 @@ extension _TeacherHomeSections on _TeacherRoleTabState {
           title: context.getText(AppKeys.teacherRecentlyAssigned),
           actionLabel: context.getText(AppKeys.viewAll),
           actionIcon: Icons.chevron_right_rounded,
-          onAction: widget.onOpenStudyTab,
+          onAction: widget.onOpenExercisesTab,
           titleStyle: TextStyle(
             color: context.themeColors.textPrimary,
             fontSize: FontSize.xl,

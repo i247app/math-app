@@ -1,6 +1,34 @@
 part of '../new_parent_home_tab.dart';
 
 extension ParentHomeNavigationActions on NewParentHomeContentState {
+  Future<void> openGradeRoadmap() async {
+    final profileId = profileStableId(widget.activeProfile);
+    if (isOpeningGradeRoadmap || profileId == null || profileId <= 0) {
+      return;
+    }
+
+    isOpeningGradeRoadmap = true;
+    HapticFeedback.lightImpact();
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => GradeRoadmapScreen(
+            profileId: profileId,
+            examService: widget.examService,
+            user: widget.user,
+            initialGrades: widget.initialGrades,
+            gradeService: widget.gradeService,
+          ),
+        ),
+      );
+      if (mounted) {
+        await loadHome(forceRefresh: true);
+      }
+    } finally {
+      isOpeningGradeRoadmap = false;
+    }
+  }
+
   Future<void> openAssessment() async {
     HapticFeedback.lightImpact();
     await widget.onOpenAssessment?.call(context);

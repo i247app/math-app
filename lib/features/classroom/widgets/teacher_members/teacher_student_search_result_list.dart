@@ -20,12 +20,12 @@ class TeacherStudentSearchResultList extends StatelessWidget {
   });
 
   final ScrollController scrollController;
-  final List<StudentProfile> profiles;
+  final List<UserProfile> profiles;
   final Set<int> selectedProfileIds;
   final bool isSearching;
   final String? error;
   final String query;
-  final ValueChanged<StudentProfile> onToggle;
+  final ValueChanged<UserProfile> onToggle;
 
   @override
   Widget build(BuildContext context) {

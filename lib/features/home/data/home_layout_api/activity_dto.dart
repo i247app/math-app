@@ -29,7 +29,7 @@ class HomeLayoutPendingExerciseDto {
     this.exercise,
   });
 
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final int? classroomExerciseId;
   final int? classroomId;
@@ -62,7 +62,7 @@ class HomeLayoutRecentCompletionDto {
     this.totalQuestions,
   });
 
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final int? classroomExerciseId;
   final int? classroomExerciseSubmissionId;

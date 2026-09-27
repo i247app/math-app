@@ -13,7 +13,7 @@ import 'package:numi/features/session/data/profile_session_resolver.dart';
 
 class _FakeProfileSessionResolver implements ProfileSessionResolver {
   int? rememberedUserId;
-  StudentProfile? rememberedProfile;
+  UserProfile? rememberedProfile;
 
   @override
   Future<ProfileSessionResolution> resolveForUserId(
@@ -26,7 +26,7 @@ class _FakeProfileSessionResolver implements ProfileSessionResolver {
   @override
   Future<void> rememberActiveProfile({
     required int userId,
-    required StudentProfile profile,
+    required UserProfile profile,
     bool Function()? isCurrent,
   }) async {
     rememberedUserId = userId;
@@ -47,7 +47,7 @@ class _ControlledProfileSessionResolver implements ProfileSessionResolver {
   @override
   Future<void> rememberActiveProfile({
     required int userId,
-    required StudentProfile profile,
+    required UserProfile profile,
     bool Function()? isCurrent,
   }) async {}
 }
@@ -186,7 +186,7 @@ void main() {
           const AuthenticatedSession(
             user: LoginUser(id: 8, role: 'PARENT'),
             profiles: [
-              StudentProfile(profileId: 81, role: 'STUDENT', name: 'Child'),
+              UserProfile(profileId: 81, role: 'STUDENT', name: 'Child'),
             ],
           ),
         );
@@ -209,7 +209,7 @@ void main() {
       await cubit.restoreSession();
       expect(cubit.state.user?.id, 9);
       expect(cubit.state.status, SessionStatus.authenticated);
-      const profile = StudentProfile(profileId: 91, role: 'STUDENT');
+      const profile = UserProfile(profileId: 91, role: 'STUDENT');
       await cubit.activateProfile(profile);
       expect(cubit.state.activeProfile?.profileId, 91);
       expect(resolver.rememberedUserId, 9);
@@ -234,8 +234,8 @@ void main() {
 
       resolver.resolution.complete(
         const ProfileSessionResolution(
-          profiles: [StudentProfile(profileId: 101, role: 'STUDENT')],
-          activeProfile: StudentProfile(profileId: 101, role: 'STUDENT'),
+          profiles: [UserProfile(profileId: 101, role: 'STUDENT')],
+          activeProfile: UserProfile(profileId: 101, role: 'STUDENT'),
         ),
       );
       await establish;

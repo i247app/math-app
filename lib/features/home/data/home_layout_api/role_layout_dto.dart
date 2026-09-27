@@ -2,14 +2,14 @@ part of '../home_layout_api_models.dart';
 
 class ParentHomeLayoutDto {
   const ParentHomeLayoutDto({
-    this.children = const <StudentProfile>[],
+    this.children = const <UserProfile>[],
     this.classrooms = const <HomeLayoutClassroomDto>[],
     this.pendingExercises = const <HomeLayoutPendingExerciseDto>[],
     this.expiredExercises = const <HomeLayoutPendingExerciseDto>[],
     this.recentCompletions = const <HomeLayoutRecentCompletionDto>[],
   });
 
-  final List<StudentProfile> children;
+  final List<UserProfile> children;
   final List<HomeLayoutClassroomDto> classrooms;
   final List<HomeLayoutPendingExerciseDto> pendingExercises;
   final List<HomeLayoutPendingExerciseDto> expiredExercises;
@@ -112,7 +112,7 @@ class HomeLayoutTaskDto {
   });
 
   final String? taskType;
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final ClassroomExercise? exercise;
   final HomeLayoutTaskSubmissionDto? submission;

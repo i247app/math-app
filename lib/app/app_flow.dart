@@ -119,10 +119,10 @@ class _AppFlowState extends State<AppFlow> {
       });
     }
 
-    cubit.clearLoginLookup();
+    cubit.clearIdentifierLookup();
   }
 
-  void submitLoginName(
+  void submitAuthIdentifier(
     AuthFlowCubit cubit,
     PhoneRegion region,
     AuthEntryMode mode,
@@ -139,7 +139,7 @@ class _AppFlowState extends State<AppFlow> {
     }
 
     FocusScope.of(context).unfocus();
-    cubit.submitLoginName(normalized.loginName!);
+    cubit.submitAuthIdentifier(normalized.loginName!);
   }
 
   @override
@@ -221,7 +221,7 @@ class _AppFlowState extends State<AppFlow> {
                   // after PIN verification. Keep PIN visible during that check.
                   if (isResumingPin &&
                       state.screen == AuthScreen.login &&
-                      state.isCheckingLoginName) {
+                      state.isCheckingIdentifier) {
                     return;
                   }
                   coordinator.showAuthScreen(state.screen);
@@ -366,7 +366,7 @@ class _AppFlowState extends State<AppFlow> {
                       clearLoginNameInput: clearLoginNameInput,
                       normalizedLoginNameInput: _normalizedLoginNameInput,
                       handleLoginNameInputChanged: handleLoginNameInputChanged,
-                      submitLoginName: submitLoginName,
+                      submitAuthIdentifier: submitAuthIdentifier,
                     ),
                   ),
                 ),

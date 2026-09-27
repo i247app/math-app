@@ -3,18 +3,18 @@ import 'package:numi/features/profile/models/program.dart';
 import 'package:numi/features/profile/models/semester.dart';
 
 abstract interface class ProfileService {
-  Future<List<StudentProfile>> listProfiles({
+  Future<List<UserProfile>> listProfiles({
     required int userId,
     bool useGuestToken = false,
   });
 
-  Future<List<StudentProfile>> searchProfiles({required String search});
+  Future<List<UserProfile>> searchProfiles({required String search});
 
   Future<List<ProgramModel>> listPrograms({required int userId});
 
   Future<List<SemesterModel>> listSemesters({required int userId});
 
-  Future<StudentProfile?> createProfile({
+  Future<UserProfile?> createProfile({
     required int userId,
     required int schoolId,
     required String name,
@@ -31,7 +31,7 @@ abstract interface class ProfileService {
     String? teacherId,
   });
 
-  Future<StudentProfile?> updateProfile({
+  Future<UserProfile?> updateProfile({
     required int profileId,
     int? schoolId,
     String? name,

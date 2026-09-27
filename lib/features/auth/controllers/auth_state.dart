@@ -35,12 +35,12 @@ class AuthFlowState {
     this.initialEntryMode = AuthEntryMode.login,
     this.phoneRegion = PhoneRegion.vn,
     this.loginName,
-    this.checkedLoginName,
-    this.isCheckingLoginName = false,
-    this.loginNameExists,
-    this.loginLookupUser,
-    this.loginLookupError,
-    this.loginLookupErrorStatus,
+    this.checkedIdentifier,
+    this.isCheckingIdentifier = false,
+    this.identifierExists,
+    this.identifierLookupUser,
+    this.identifierLookupError,
+    this.identifierLookupErrorStatus,
     this.trustedDevices = const <AuthTrustedDevice>[],
     this.selectedTrustedDeviceId,
     this.isLoadingTrustedDevices = false,
@@ -65,12 +65,12 @@ class AuthFlowState {
   final AuthEntryMode initialEntryMode;
   final PhoneRegion phoneRegion;
   final String? loginName;
-  final String? checkedLoginName;
-  final bool isCheckingLoginName;
-  final bool? loginNameExists;
-  final LoginUser? loginLookupUser;
-  final String? loginLookupError;
-  final int? loginLookupErrorStatus;
+  final String? checkedIdentifier;
+  final bool isCheckingIdentifier;
+  final bool? identifierExists;
+  final LoginUser? identifierLookupUser;
+  final String? identifierLookupError;
+  final int? identifierLookupErrorStatus;
   final List<AuthTrustedDevice> trustedDevices;
   final int? selectedTrustedDeviceId;
   final bool isLoadingTrustedDevices;
@@ -95,12 +95,12 @@ class AuthFlowState {
     AuthEntryMode? initialEntryMode,
     PhoneRegion? phoneRegion,
     String? loginName,
-    String? checkedLoginName,
-    bool? isCheckingLoginName,
-    bool? loginNameExists,
-    LoginUser? loginLookupUser,
-    String? loginLookupError,
-    int? loginLookupErrorStatus,
+    String? checkedIdentifier,
+    bool? isCheckingIdentifier,
+    bool? identifierExists,
+    LoginUser? identifierLookupUser,
+    String? identifierLookupError,
+    int? identifierLookupErrorStatus,
     List<AuthTrustedDevice>? trustedDevices,
     int? selectedTrustedDeviceId,
     bool? isLoadingTrustedDevices,
@@ -122,11 +122,11 @@ class AuthFlowState {
     bool clearOtpError = false,
     bool clearOtpExpiry = false,
     bool clearLoginName = false,
-    bool clearLoginLookup = false,
-    bool clearLoginNameExists = false,
-    bool clearLoginLookupUser = false,
-    bool clearLoginLookupError = false,
-    bool clearLoginLookupErrorStatus = false,
+    bool clearIdentifierLookup = false,
+    bool clearIdentifierExists = false,
+    bool clearIdentifierLookupUser = false,
+    bool clearIdentifierLookupError = false,
+    bool clearIdentifierLookupErrorStatus = false,
     bool clearTrustedDeviceState = false,
     bool clearSelectedTrustedDevice = false,
     bool clearTrustedDeviceError = false,
@@ -138,22 +138,23 @@ class AuthFlowState {
       initialEntryMode: initialEntryMode ?? this.initialEntryMode,
       phoneRegion: phoneRegion ?? this.phoneRegion,
       loginName: clearLoginName ? null : loginName ?? this.loginName,
-      checkedLoginName: clearLoginLookup
+      checkedIdentifier: clearIdentifierLookup
           ? null
-          : checkedLoginName ?? this.checkedLoginName,
-      isCheckingLoginName: isCheckingLoginName ?? this.isCheckingLoginName,
-      loginNameExists: clearLoginLookup || clearLoginNameExists
+          : checkedIdentifier ?? this.checkedIdentifier,
+      isCheckingIdentifier: isCheckingIdentifier ?? this.isCheckingIdentifier,
+      identifierExists: clearIdentifierLookup || clearIdentifierExists
           ? null
-          : loginNameExists ?? this.loginNameExists,
-      loginLookupUser: clearLoginLookup || clearLoginLookupUser
+          : identifierExists ?? this.identifierExists,
+      identifierLookupUser: clearIdentifierLookup || clearIdentifierLookupUser
           ? null
-          : loginLookupUser ?? this.loginLookupUser,
-      loginLookupError: clearLoginLookup || clearLoginLookupError
+          : identifierLookupUser ?? this.identifierLookupUser,
+      identifierLookupError: clearIdentifierLookup || clearIdentifierLookupError
           ? null
-          : loginLookupError ?? this.loginLookupError,
-      loginLookupErrorStatus: clearLoginLookup || clearLoginLookupErrorStatus
+          : identifierLookupError ?? this.identifierLookupError,
+      identifierLookupErrorStatus:
+          clearIdentifierLookup || clearIdentifierLookupErrorStatus
           ? null
-          : loginLookupErrorStatus ?? this.loginLookupErrorStatus,
+          : identifierLookupErrorStatus ?? this.identifierLookupErrorStatus,
       trustedDevices: clearTrustedDeviceState
           ? const <AuthTrustedDevice>[]
           : trustedDevices ?? this.trustedDevices,

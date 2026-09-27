@@ -11,14 +11,14 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
   bool _isSettingDefaultProfile = false;
   int? _switchingProfileId;
   String? _profileLoadError;
-  List<StudentProfile> _profiles = const <StudentProfile>[];
+  List<UserProfile> _profiles = const <UserProfile>[];
   int? _localActiveProfileId;
 
   SettingPageView get _view;
 
   Future<void> _pushView(
     SettingPageView view, {
-    StudentProfile? editingProfile,
+    UserProfile? editingProfile,
     bool openAddProfileOnStart = false,
   });
 
@@ -77,11 +77,11 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
       _pushView(SettingPageView.profile, openAddProfileOnStart: true);
       return;
     }
-    _pushView(SettingPageView.addProfile);
+    _pushView(SettingPageView.profileForm);
   }
 
-  void _openUpdateProfile(StudentProfile profile) {
-    _pushView(SettingPageView.addProfile, editingProfile: profile);
+  void _openUpdateProfile(UserProfile profile) {
+    _pushView(SettingPageView.profileForm, editingProfile: profile);
   }
 
   Future<void> _loadProfiles() async {
@@ -90,7 +90,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
       setState(() {
         _isLoadingProfiles = false;
         _profileLoadError = context.readText(AppKeys.noAccountForProfile);
-        _profiles = const <StudentProfile>[];
+        _profiles = const <UserProfile>[];
       });
       return;
     }
@@ -119,7 +119,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
     }
   }
 
-  Future<void> _confirmDeleteProfile(StudentProfile profile) async {
+  Future<void> _confirmDeleteProfile(UserProfile profile) async {
     final profileId = profile.profileId;
     if (profileId == null) {
       context.showErrorDialog(context.readText(AppKeys.missingProfileId));
@@ -162,7 +162,7 @@ mixin _SettingProfileManagementMixin on State<SettingTab> {
     await _deleteProfile(profileId);
   }
 
-  Future<void> _selectActiveProfile(StudentProfile selectedProfile) async {
+  Future<void> _selectActiveProfile(UserProfile selectedProfile) async {
     final userId = widget.user?.id;
     final profileId = profileStableId(selectedProfile);
     if (_isSettingDefaultProfile ||

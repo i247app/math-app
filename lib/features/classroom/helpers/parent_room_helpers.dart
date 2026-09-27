@@ -14,7 +14,7 @@ List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
     return const <ParentRoomEntry>[];
   }
 
-  final childById = <int, StudentProfile>{
+  final childById = <int, UserProfile>{
     for (final child in parent.children)
       if (profileStableId(child) != null) profileStableId(child)!: child,
   };
@@ -29,7 +29,7 @@ List<ParentRoomEntry> roomEntries(ParentHomeLayout? parent) {
 
   void addEntry({
     required HomeLayoutClassroom layoutClassroom,
-    required StudentProfile child,
+    required UserProfile child,
     int? memberProfileId,
   }) {
     final classroomId = layoutClassroom.classroom.stableId;

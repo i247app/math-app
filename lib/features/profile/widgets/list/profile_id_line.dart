@@ -15,7 +15,7 @@ class ProfileIdLine extends StatelessWidget {
     required this.isActive,
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final bool isActive;
 
   Future<void> _copyProfileCode(BuildContext context, String code) async {

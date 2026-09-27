@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/assessment_controller.dart';
+import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
@@ -28,10 +28,10 @@ import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/shared/widgets/guarded_exit_scope.dart';
 
-enum AiAssessmentResult { generationFailed }
+enum ExamAttemptResult { generationFailed }
 
-class AiAssessmentScreen extends StatefulWidget {
-  const AiAssessmentScreen({
+class ExamAttemptScreen extends StatefulWidget {
+  const ExamAttemptScreen({
     super.key,
     this.examService,
     this.initialExam,
@@ -63,21 +63,21 @@ class AiAssessmentScreen extends StatefulWidget {
   final ProfileGradeProgressStore? gradeProgressStore;
 
   @override
-  State<AiAssessmentScreen> createState() => _AiAssessmentScreenState();
+  State<ExamAttemptScreen> createState() => _ExamAttemptScreenState();
 }
 
-class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
-  late final AssessmentController _controller;
+class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
+  late final ExamAttemptController _controller;
   late final ProfileGradeProgressStore _gradeProgressStore;
   Timer? _practiceFeedbackTimer;
   bool _isCompletingAssessment = false;
-  final GuardedExitController<AiAssessmentResult> _exitController =
-      GuardedExitController<AiAssessmentResult>();
+  final GuardedExitController<ExamAttemptResult> _exitController =
+      GuardedExitController<ExamAttemptResult>();
 
   @override
   void initState() {
     super.initState();
-    _controller = AssessmentController(
+    _controller = ExamAttemptController(
       examService: widget.examService ?? context.read<ExamService>(),
       initialExam: widget.initialExam,
       examType: widget.examType,
@@ -107,7 +107,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     }
     final navigator = Navigator.of(context);
     if (navigator.canPop()) {
-      navigator.pop(AiAssessmentResult.generationFailed);
+      navigator.pop(ExamAttemptResult.generationFailed);
     }
   }
 
@@ -141,11 +141,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     }
   }
 
-  void goToNextQuestion() {
-    unawaited(_goToNextQuestion());
+  void handleContinue() {
+    unawaited(_advanceExamFlow());
   }
 
-  Future<void> _goToNextQuestion() async {
+  Future<void> _advanceExamFlow() async {
     if ((_controller.isAssessment ||
             _controller.isPractice ||
             _controller.isGrade) &&
@@ -230,11 +230,11 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
         ? null
         : _controller.gradeOutcome(savedGradeProgress);
     final result = await _controller.submitCurrentExam();
-    if (!mounted || result.status != AssessmentSubmitStatus.submitted) {
+    if (!mounted || result.status != ExamAttemptSubmitStatus.submitted) {
       if (mounted && isGradeSubmission) {
         setState(() => _isCompletingAssessment = false);
       }
-      if (result.status == AssessmentSubmitStatus.unanswered) {
+      if (result.status == ExamAttemptSubmitStatus.unanswered) {
         HapticFeedback.selectionClick();
       }
       return;
@@ -335,7 +335,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
               onPracticeAgainGenerated: (generatedExam) {
                 Navigator.of(resultContext).pushReplacement(
                   MaterialPageRoute<void>(
-                    builder: (_) => AiAssessmentScreen(
+                    builder: (_) => ExamAttemptScreen(
                       examService: examService,
                       initialExam: generatedExam,
                       examType: examTypePractice,
@@ -397,7 +397,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             onTestAgainGenerated: (generatedExam) {
               Navigator.of(resultContext).pushReplacement(
                 MaterialPageRoute<void>(
-                  builder: (_) => AiAssessmentScreen(
+                  builder: (_) => ExamAttemptScreen(
                     examService: examService,
                     initialExam: generatedExam,
                     examType: generatedExam.examType ?? examTypePractice,
@@ -438,7 +438,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
 
   Future<void> retryErrorAction() {
     return switch (_controller.errorRetryAction) {
-      AssessmentRetryAction.submit => submitCurrentExam(),
+      ExamAttemptRetryAction.submit => submitCurrentExam(),
       _ => retryGeneration(),
     };
   }
@@ -451,7 +451,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
     }
     final navigator = Navigator.of(context);
     if (navigator.canPop()) {
-      navigator.pop(AiAssessmentResult.generationFailed);
+      navigator.pop(ExamAttemptResult.generationFailed);
     }
   }
 
@@ -685,7 +685,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
                                             _controller.isAssessment,
                                         onBack: goToPreviousQuestion,
                                         onExit: _exitController.requestExit,
-                                        onContinue: goToNextQuestion,
+                                        onContinue: handleContinue,
                                       ),
                                     ),
                                   ),
@@ -699,7 +699,7 @@ class _AiAssessmentScreenState extends State<AiAssessmentScreen> {
             ),
           );
 
-          return GuardedExitScope<AiAssessmentResult>(
+          return GuardedExitScope<ExamAttemptResult>(
             controller: _exitController,
             shouldConfirm: hasActiveAttempt,
             isExitBlocked: isBusy,

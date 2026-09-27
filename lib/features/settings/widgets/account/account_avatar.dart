@@ -10,14 +10,14 @@ class AccountAvatar extends StatelessWidget {
     required this.avatarPath,
     required this.isEditing,
     required this.isPickingAvatar,
-    required this.onCameraTap,
+    required this.onPickAvatar,
   });
 
   final String? avatarUrl;
   final String? avatarPath;
   final bool isEditing;
   final bool isPickingAvatar;
-  final VoidCallback onCameraTap;
+  final VoidCallback onPickAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class AccountAvatar extends StatelessWidget {
                   borderColor: const Color(0xFFC21873),
                   foregroundColor: const Color(0xFF253228),
                   backgroundColor: Colors.white,
-                  onTap: onCameraTap,
+                  onTap: onPickAvatar,
                 ),
               ),
           ],

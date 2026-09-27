@@ -6,12 +6,12 @@ import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
 
-bool isStudentProfile(StudentProfile profile) {
+bool isStudentProfile(UserProfile profile) {
   final role = profile.role?.trim().toUpperCase();
   return role == null || role.isEmpty || role == 'STUDENT';
 }
 
-String? studentSearchSubtitle(BuildContext context, StudentProfile profile) {
+String? studentSearchSubtitle(BuildContext context, UserProfile profile) {
   final studentId = profile.studentId?.trim();
   if (studentId != null && studentId.isNotEmpty) {
     return studentId;

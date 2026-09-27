@@ -2,8 +2,8 @@ import 'package:numi/features/profile/models/program.dart';
 import 'package:numi/features/profile/models/school.dart';
 import 'package:numi/features/profile/models/semester.dart';
 
-class StudentProfile {
-  const StudentProfile({
+class UserProfile {
+  const UserProfile({
     this.id,
     this.profileId,
     this.profileCode,
@@ -58,7 +58,7 @@ class StudentProfile {
   int? get stableId => profileId ?? id;
 }
 
-int? profileStableId(StudentProfile? profile) => profile?.stableId;
+int? profileStableId(UserProfile? profile) => profile?.stableId;
 
 class ProfileGrade {
   const ProfileGrade({

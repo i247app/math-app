@@ -6,7 +6,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
@@ -228,9 +228,9 @@ void main() {
     await tester.tap(historicalLevel);
     await tester.pumpAndSettle();
 
-    expect(find.byType(AiAssessmentScreen), findsOneWidget);
-    final assessment = tester.widget<AiAssessmentScreen>(
-      find.byType(AiAssessmentScreen),
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    final assessment = tester.widget<ExamAttemptScreen>(
+      find.byType(ExamAttemptScreen),
     );
     expect(assessment.examType, examTypeGrade);
     expect(assessment.level, 1);
@@ -279,7 +279,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ExamReviewScreen), findsOneWidget);
-    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsNothing);
   });
 
   testWidgets('a skipped jump level opens the jump source review', (
@@ -329,7 +329,7 @@ void main() {
       find.byType(ExamReviewScreen),
     );
     expect(review.userExamId, 600);
-    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsNothing);
   });
 }
 

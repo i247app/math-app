@@ -16,11 +16,11 @@ class TeacherProfileNavigationRequest {
   });
 
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final String? profileLoadError;
   final VoidCallback onLogout;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final Future<void> Function() onRefreshProfiles;
 }
 

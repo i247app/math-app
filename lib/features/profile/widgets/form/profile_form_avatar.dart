@@ -8,8 +8,8 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/models/profile_avatar_catalog.dart';
 import 'package:numi/shared/widgets/profile_avatar_image.dart';
 
-class AddProfileAvatar extends StatelessWidget {
-  const AddProfileAvatar({
+class ProfileFormAvatar extends StatelessWidget {
+  const ProfileFormAvatar({
     super.key,
     required this.avatarKey,
     required this.avatarUrl,

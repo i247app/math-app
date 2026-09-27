@@ -1,7 +1,7 @@
 part of '../home_layout_api_models.dart';
 
 ParentHomeLayoutDto? _parentLayoutFromModernFields({
-  required List<StudentProfile> subProfiles,
+  required List<UserProfile> subProfiles,
   required List<HomeLayoutClassroomDto> rooms,
   required List<HomeLayoutTaskDto> tasks,
 }) {
@@ -127,8 +127,8 @@ Map<String, dynamic> _normalizedExerciseJson(Map<String, dynamic> json) {
   };
 }
 
-StudentProfile _studentProfileFromJson(Map<String, dynamic> json) {
-  return StudentProfile(
+UserProfile _studentProfileFromJson(Map<String, dynamic> json) {
+  return UserProfile(
     id: _intFromJson(json['id']),
     profileId: _intFromJson(json['profile_id']),
     profileCode: _stringFromJson(json['profile_code']),

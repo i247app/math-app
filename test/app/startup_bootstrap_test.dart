@@ -30,11 +30,11 @@ class _FakeAuthService implements AuthService {
 class _FakeProfileService implements ProfileService {
   _FakeProfileService(this.profiles);
 
-  final List<StudentProfile> profiles;
+  final List<UserProfile> profiles;
   int? requestedUserId;
 
   @override
-  Future<List<StudentProfile>> listProfiles({
+  Future<List<UserProfile>> listProfiles({
     required int userId,
     bool useGuestToken = false,
   }) async {
@@ -97,13 +97,8 @@ void main() {
     final authService = _FakeAuthService(
       const LoginUser(id: 7, phone: '0901234567'),
     );
-    final profileService = _FakeProfileService(const <StudentProfile>[
-      StudentProfile(
-        profileId: 71,
-        userId: 7,
-        name: 'Learner',
-        isDefault: true,
-      ),
+    final profileService = _FakeProfileService(const <UserProfile>[
+      UserProfile(profileId: 71, userId: 7, name: 'Learner', isDefault: true),
     ]);
     final passcodeService = _FakePasscodeService();
     final services = AppServices(
@@ -130,7 +125,7 @@ void main() {
 
   test('returns no initial session when no login can be restored', () async {
     final authService = _FakeAuthService(null);
-    final profileService = _FakeProfileService(const <StudentProfile>[]);
+    final profileService = _FakeProfileService(const <UserProfile>[]);
     final passcodeService = _FakePasscodeService();
     final services = AppServices(
       authService: authService,
@@ -155,7 +150,7 @@ void main() {
     });
     final authToken = _MemoryTokenStore('legacy-guest-jwt');
     final guestToken = _MemoryTokenStore(null);
-    final profileService = _FakeProfileService(const <StudentProfile>[]);
+    final profileService = _FakeProfileService(const <UserProfile>[]);
     final services = AppServices(
       networkClient: NetworkClient(
         authTokenStore: authToken,

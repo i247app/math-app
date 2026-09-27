@@ -14,7 +14,7 @@ enum ProfileRole {
     };
   }
 
-  static ProfileRole fromProfile(StudentProfile? profile) {
+  static ProfileRole fromProfile(UserProfile? profile) {
     return fromRole(profile?.role);
   }
 }

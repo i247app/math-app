@@ -49,13 +49,13 @@ class ParentRoomTab extends StatefulWidget {
   });
 
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final bool isActive;
   final int activeRefreshTick;
   final ClassroomExerciseService assignmentService;
   final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenProfileMenu;

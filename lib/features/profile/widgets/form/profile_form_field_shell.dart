@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/shared/layouts/app_form_field_layout.dart';
 
-class AddProfileFieldShell extends StatelessWidget {
-  const AddProfileFieldShell({
+class ProfileFormFieldShell extends StatelessWidget {
+  const ProfileFormFieldShell({
     super.key,
     required this.label,
     required this.child,

@@ -12,13 +12,13 @@ class SettingsAvatar extends StatelessWidget {
     required this.activeProfile,
     required this.fallbackAvatarUrl,
     required this.fallbackAvatarPath,
-    required this.onSwitchTap,
+    required this.onManageProfilesTap,
   });
 
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final String? fallbackAvatarUrl;
   final String? fallbackAvatarPath;
-  final VoidCallback onSwitchTap;
+  final VoidCallback onManageProfilesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class SettingsAvatar extends StatelessWidget {
                 ),
                 child: InkWell(
                   customBorder: const CircleBorder(),
-                  onTap: onSwitchTap,
+                  onTap: onManageProfilesTap,
                   child: const SizedBox(
                     width: 30,
                     height: 30,

@@ -113,7 +113,7 @@ class DeleteProfileRequest {
 class ProfileListResponse {
   const ProfileListResponse({
     required this.mstatus,
-    this.profiles = const <StudentProfileDto>[],
+    this.profiles = const <UserProfileDto>[],
     this.status,
     this.mmessage,
     this.debug,
@@ -122,7 +122,7 @@ class ProfileListResponse {
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
   @JsonKey(fromJson: _profilesFromJson)
-  final List<StudentProfileDto> profiles;
+  final List<UserProfileDto> profiles;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -153,8 +153,8 @@ class CreateProfileResponse {
 
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
-  @JsonKey(fromJson: _studentProfileFromJson)
-  final StudentProfileDto? profile;
+  @JsonKey(fromJson: _userProfileFromJson)
+  final UserProfileDto? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -177,8 +177,8 @@ class UpdateProfileResponse {
 
   @JsonKey(fromJson: _requiredIntFromJson)
   final int mstatus;
-  @JsonKey(fromJson: _studentProfileFromJson)
-  final StudentProfileDto? profile;
+  @JsonKey(fromJson: _userProfileFromJson)
+  final UserProfileDto? profile;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -211,8 +211,8 @@ class DeleteProfileResponse {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class StudentProfileDto {
-  const StudentProfileDto({
+class UserProfileDto {
+  const UserProfileDto({
     this.id,
     this.profileId,
     this.profileCode,
@@ -276,10 +276,10 @@ class StudentProfileDto {
   final String? createDt;
   final String? modifyDt;
 
-  factory StudentProfileDto.fromJson(Map<String, dynamic> json) =>
-      _$StudentProfileDtoFromJson(json);
+  factory UserProfileDto.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$StudentProfileDtoToJson(this);
+  Map<String, dynamic> toJson() => _$UserProfileDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -309,22 +309,20 @@ class ProfileGradeDto {
   Map<String, dynamic> toJson() => _$ProfileGradeDtoToJson(this);
 }
 
-List<StudentProfileDto> _profilesFromJson(Object? value) {
+List<UserProfileDto> _profilesFromJson(Object? value) {
   if (value is List) {
     return value
-        .map((item) => _objectFromJson(item, StudentProfileDto.fromJson))
-        .whereType<StudentProfileDto>()
+        .map((item) => _objectFromJson(item, UserProfileDto.fromJson))
+        .whereType<UserProfileDto>()
         .toList();
   }
 
-  final profile = _objectFromJson(value, StudentProfileDto.fromJson);
-  return profile == null
-      ? const <StudentProfileDto>[]
-      : <StudentProfileDto>[profile];
+  final profile = _objectFromJson(value, UserProfileDto.fromJson);
+  return profile == null ? const <UserProfileDto>[] : <UserProfileDto>[profile];
 }
 
-StudentProfileDto? _studentProfileFromJson(Object? value) {
-  return _objectFromJson(value, StudentProfileDto.fromJson);
+UserProfileDto? _userProfileFromJson(Object? value) {
+  return _objectFromJson(value, UserProfileDto.fromJson);
 }
 
 SchoolDto? _schoolFromJson(Object? value) {

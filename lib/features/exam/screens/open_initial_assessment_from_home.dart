@@ -5,7 +5,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 
 Future<void> openInitialAssessmentFromHome({
   required BuildContext context,
@@ -39,7 +39,7 @@ Future<void> openInitialAssessmentFromHome({
   final activeExam = stats == null ? null : latestActiveAssessmentExam(stats);
   await navigator.push<void>(
     MaterialPageRoute<void>(
-      builder: (_) => AiAssessmentScreen(
+      builder: (_) => ExamAttemptScreen(
         examService: examService,
         initialExam: activeExam,
         examType: activeExam?.examType ?? examTypeAssessment,

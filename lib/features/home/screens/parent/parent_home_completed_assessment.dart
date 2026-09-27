@@ -18,7 +18,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
           child: HomeBanner(
             data: HomeBannerData(
               image: const AssetImage(parentHomeAfterReviewBannerAsset),
-              onTap: widget.onOpenPracticeTab,
+              onTap: widget.onOpenGamesTab,
             ),
           ),
         ),
@@ -39,7 +39,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                         alignment: Alignment(0, 0.12),
                       ),
                       semanticLabel: 'Numi Farm',
-                      onTap: widget.onOpenPracticeTab,
+                      onTap: widget.onOpenGamesTab,
                     ),
                   ),
                   PromoActionCard(
@@ -50,7 +50,7 @@ extension ParentHomeCompletedAssessmentView on ParentHomeContentState {
                         alignment: Alignment(0, 0.08),
                       ),
                       semanticLabel: 'Electric Rescue',
-                      onTap: widget.onOpenPracticeTab,
+                      onTap: widget.onOpenGamesTab,
                     ),
                   ),
                 ],

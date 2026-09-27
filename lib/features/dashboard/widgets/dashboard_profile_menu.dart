@@ -13,8 +13,8 @@ class DashboardProfileMenu extends StatelessWidget {
     required this.onSelect,
   });
 
-  final List<StudentProfile> profiles;
-  final ValueChanged<StudentProfile> onSelect;
+  final List<UserProfile> profiles;
+  final ValueChanged<UserProfile> onSelect;
 
   @override
   Widget build(BuildContext context) {

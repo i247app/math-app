@@ -76,13 +76,13 @@ class DashboardScreen extends StatefulWidget {
        _notificationMessages = notificationMessages;
 
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final ProfileRole activeRole;
   final String? profileLoadError;
   final bool isResolvingProfile;
   final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final VoidCallback onBack;
   final VoidCallback onLogout;
   final bool showChildProfileDialogOnStart;
@@ -127,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final HomeTabPerformanceMonitor _tabPerformanceMonitor =
       HomeTabPerformanceMonitor();
   final ValueNotifier<double?> _tabSwipePosition = ValueNotifier(null);
-  bool _returnToPracticeAfterProfileSave = false;
+  bool _returnToGamesAfterProfileSave = false;
   int _parentStreakCount = 1;
 
   @override
@@ -338,20 +338,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           assignmentService: _assignmentService,
                           examService: _examService,
                           onLogout: _handleLogout,
-                          onAddProfileFromPractice: () {
+                          onAddProfileFromGames: () {
                             HapticFeedback.selectionClick();
                             _profileController.requestAddProfile();
                             setState(() {
-                              _returnToPracticeAfterProfileSave = true;
+                              _returnToGamesAfterProfileSave = true;
                             });
                             _selectTab(roleTabCubit, 4);
                           },
                           onProfileSaved: () {
-                            if (!_returnToPracticeAfterProfileSave) {
+                            if (!_returnToGamesAfterProfileSave) {
                               return;
                             }
                             setState(() {
-                              _returnToPracticeAfterProfileSave = false;
+                              _returnToGamesAfterProfileSave = false;
                             });
                             _selectTab(roleTabCubit, 3);
                           },
@@ -362,12 +362,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             roleTabCubit,
                             widget.activeRole == ProfileRole.teacher ? 1 : 2,
                           ),
-                          onOpenPracticeTab: () {
+                          onOpenGamesTab: () {
                             HapticFeedback.lightImpact();
-                            _selectTab(
-                              roleTabCubit,
-                              widget.activeRole == ProfileRole.teacher ? 2 : 3,
-                            );
+                            _selectTab(roleTabCubit, 3);
+                          },
+                          onOpenExercisesTab: () {
+                            HapticFeedback.lightImpact();
+                            _selectTab(roleTabCubit, 2);
                           },
                           onOpenProfileMenu: () {
                             if (switchableProfiles.isEmpty || isMenuOpen) {

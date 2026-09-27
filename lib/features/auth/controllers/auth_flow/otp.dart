@@ -19,7 +19,7 @@ extension AuthFlowOtp on AuthFlowCubit {
 
   Future<void> sendOtpToTrustedDevice() async {
     final loginName = state.loginName;
-    final user = state.loginLookupUser;
+    final user = state.identifierLookupUser;
     final targetDeviceId = state.selectedTrustedDeviceId;
     if (state.screen != AuthScreen.deviceVerification ||
         state.isSendingOtp ||
@@ -96,7 +96,9 @@ extension AuthFlowOtp on AuthFlowCubit {
         targetDeviceId ?? state.selectedTrustedDeviceId;
     final resolvedUserId =
         userId ??
-        (resolvedTargetDeviceId == null ? null : state.loginLookupUser?.id);
+        (resolvedTargetDeviceId == null
+            ? null
+            : state.identifierLookupUser?.id);
     _emitState(
       state.copyWith(
         isSendingOtp: true,
@@ -113,19 +115,22 @@ extension AuthFlowOtp on AuthFlowCubit {
         userId: resolvedUserId,
         targetDeviceId: resolvedTargetDeviceId,
       );
-      if (state.loginName != loginName || state.checkedLoginName != loginName) {
+      if (state.loginName != loginName ||
+          state.checkedIdentifier != loginName) {
         return;
       }
 
       _emitOtpSent(loginName: loginName, otp: otp, flow: OtpFlow.login);
     } on AuthException catch (error) {
-      if (state.loginName != loginName || state.checkedLoginName != loginName) {
+      if (state.loginName != loginName ||
+          state.checkedIdentifier != loginName) {
         return;
       }
 
       _emitLoginOtpSendError(error.message);
     } catch (_) {
-      if (state.loginName != loginName || state.checkedLoginName != loginName) {
+      if (state.loginName != loginName ||
+          state.checkedIdentifier != loginName) {
         return;
       }
 

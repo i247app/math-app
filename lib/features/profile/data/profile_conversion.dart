@@ -70,8 +70,8 @@ extension ProfileGradeDtoConversion on ProfileGradeDto {
   );
 }
 
-extension StudentProfileDtoConversion on StudentProfileDto {
-  StudentProfile toModel() => StudentProfile(
+extension UserProfileDtoConversion on UserProfileDto {
+  UserProfile toModel() => UserProfile(
     id: id,
     profileId: profileId,
     profileCode: profileCode,

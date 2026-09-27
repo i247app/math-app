@@ -62,7 +62,7 @@ class AccountDetailsPanel extends StatelessWidget {
                 avatarPath: avatarPath,
                 isEditing: isEditing,
                 isPickingAvatar: isPickingAvatar,
-                onCameraTap: onAvatarTap,
+                onPickAvatar: onAvatarTap,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4),

@@ -35,7 +35,7 @@ class SettingsMenuPanel extends StatelessWidget {
     required this.onLogoutTap,
   });
 
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final String? fallbackAvatarUrl;
   final String? fallbackAvatarPath;
   final String username;
@@ -68,7 +68,7 @@ class SettingsMenuPanel extends StatelessWidget {
                   activeProfile: activeProfile,
                   fallbackAvatarUrl: fallbackAvatarUrl,
                   fallbackAvatarPath: fallbackAvatarPath,
-                  onSwitchTap: onProfileTap,
+                  onManageProfilesTap: onProfileTap,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 14),

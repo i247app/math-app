@@ -21,7 +21,7 @@ class ProfileApi implements ProfileService {
   final NetworkClient _networkClient;
 
   @override
-  Future<List<StudentProfile>> listProfiles({
+  Future<List<UserProfile>> listProfiles({
     required int userId,
     bool useGuestToken = false,
   }) async {
@@ -37,7 +37,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<List<StudentProfile>> searchProfiles({required String search}) async {
+  Future<List<UserProfile>> searchProfiles({required String search}) async {
     try {
       final response = await _listProfiles(ProfileListRequest(search: search));
       return response.profiles.map((profile) => profile.toModel()).toList();
@@ -69,7 +69,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<StudentProfile?> createProfile({
+  Future<UserProfile?> createProfile({
     required int userId,
     required int schoolId,
     required String name,
@@ -111,7 +111,7 @@ class ProfileApi implements ProfileService {
   }
 
   @override
-  Future<StudentProfile?> updateProfile({
+  Future<UserProfile?> updateProfile({
     required int profileId,
     int? schoolId,
     String? name,

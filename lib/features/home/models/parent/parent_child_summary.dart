@@ -10,7 +10,7 @@ class ParentChildSummary {
     this.assessments = const <GeneratedExam>[],
   });
 
-  final StudentProfile profile;
+  final UserProfile profile;
   final ClassroomModel? classroom;
   final List<ClassroomModel> classrooms;
   final List<GeneratedExam> assessments;

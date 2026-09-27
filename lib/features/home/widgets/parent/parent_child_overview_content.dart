@@ -23,10 +23,8 @@ class ParentChildOverviewContent extends StatelessWidget {
     required this.completions,
     required this.entranceBuilder,
     required this.onCompletionTap,
-    required this.onViewTasks,
-    required this.onViewResults,
-    required this.onViewMessages,
-    required this.onPromoActionTap,
+    required this.onOpenClassroomOverview,
+    required this.onOpenGames,
     required this.isRefreshing,
     required this.errorMessage,
     required this.onRetry,
@@ -37,10 +35,8 @@ class ParentChildOverviewContent extends StatelessWidget {
   final List<HomeLayoutRecentCompletion> completions;
   final ParentHomeEntranceBuilder entranceBuilder;
   final ValueChanged<HomeLayoutRecentCompletion> onCompletionTap;
-  final VoidCallback onViewTasks;
-  final VoidCallback onViewResults;
-  final VoidCallback onViewMessages;
-  final VoidCallback onPromoActionTap;
+  final VoidCallback onOpenClassroomOverview;
+  final VoidCallback onOpenGames;
   final bool isRefreshing;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -59,7 +55,10 @@ class ParentChildOverviewContent extends StatelessWidget {
       children: [
         entranceBuilder(
           order: 0,
-          child: ParentClassCarousel(summaries: summaries, onTap: onViewTasks),
+          child: ParentClassCarousel(
+            summaries: summaries,
+            onTap: onOpenClassroomOverview,
+          ),
         ),
         if (pendingExercises.isNotEmpty) ...[
           Padding(
@@ -68,7 +67,9 @@ class ParentChildOverviewContent extends StatelessWidget {
               order: 1,
               child: AppContentSection(
                 title: context.getText(AppKeys.parentTasksTitle),
-                onViewAll: pendingExercises.length > 2 ? onViewTasks : null,
+                onViewAll: pendingExercises.length > 2
+                    ? onOpenClassroomOverview
+                    : null,
                 child: Column(
                   children: [
                     for (
@@ -95,7 +96,9 @@ class ParentChildOverviewContent extends StatelessWidget {
               order: 2,
               child: AppContentSection(
                 title: context.getText(AppKeys.assessmentResultTitle),
-                onViewAll: completions.length > 2 ? onViewResults : null,
+                onViewAll: completions.length > 2
+                    ? onOpenClassroomOverview
+                    : null,
                 child: Column(
                   children: [
                     for (
@@ -123,7 +126,7 @@ class ParentChildOverviewContent extends StatelessWidget {
             markOnEnd: !showGameSuggestions,
             child: AppContentSection(
               title: context.getText(AppKeys.parentMessagesTitle),
-              onViewAll: onViewMessages,
+              onViewAll: onOpenClassroomOverview,
               child: ParentTeacherMessagesList(summaries: summaries),
             ),
           ),
@@ -143,14 +146,14 @@ class ParentChildOverviewContent extends StatelessWidget {
                         'assets/images/game-numi-farm-banner.png',
                       ),
                       backgroundColor: const Color(0xFFDDF3EE),
-                      onTap: onPromoActionTap,
+                      onTap: onOpenGames,
                     ),
                   ),
                   PromoActionCard(
                     data: PromoActionData(
                       child: const HomeMonsterRescuePreviewArtwork(),
                       backgroundColor: const Color(0xFFDDF6E7),
-                      onTap: onPromoActionTap,
+                      onTap: onOpenGames,
                     ),
                   ),
                 ],

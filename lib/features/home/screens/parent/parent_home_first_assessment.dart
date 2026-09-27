@@ -31,7 +31,7 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
                 data: PromoActionData(
                   image: const AssetImage(parentHomeAfterReviewBannerAsset),
                   alignment: Alignment.centerLeft,
-                  onTap: widget.onOpenPracticeTab,
+                  onTap: widget.onOpenGamesTab,
                 ),
               ),
               PromoActionCard(
@@ -57,7 +57,7 @@ extension ParentHomeFirstAssessmentView on ParentHomeContentState {
                     openAssessment();
                     return;
                   case InitialAssessmentGuideItemId.roadmap:
-                    widget.onOpenPracticeTab();
+                    widget.onOpenGamesTab();
                     return;
                   case InitialAssessmentGuideItemId.classroom:
                     showClassroomMessage();

@@ -8,7 +8,7 @@ import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_screen.dart';
 
 /// Exam-specific route into the shared review-detail layout.
@@ -78,7 +78,7 @@ class ExamReviewScreen extends StatelessWidget {
               final reviewRoute = ModalRoute.of(context);
               await Navigator.of(context).push<void>(
                 MaterialPageRoute<void>(
-                  builder: (practiceContext) => AiAssessmentScreen(
+                  builder: (practiceContext) => ExamAttemptScreen(
                     examService: examService,
                     initialExam: generatedExam,
                     examType: examTypePractice,

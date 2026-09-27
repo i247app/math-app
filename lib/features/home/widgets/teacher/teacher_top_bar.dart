@@ -19,7 +19,7 @@ class TeacherTopBar extends StatelessWidget {
     this.hasUnreadNotifications = false,
   });
 
-  final StudentProfile? profile;
+  final UserProfile? profile;
   final double topPadding;
   final VoidCallback onNotificationTap;
   final bool hasUnreadNotifications;

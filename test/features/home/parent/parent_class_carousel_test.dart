@@ -10,9 +10,9 @@ import 'package:numi/features/home/widgets/parent/parent_class_carousel.dart';
 void main() {
   testWidgets('hides children who have not joined a class', (tester) async {
     const summaries = <ParentChildSummary>[
-      ParentChildSummary(profile: StudentProfile(name: 'Chưa có lớp')),
+      ParentChildSummary(profile: UserProfile(name: 'Chưa có lớp')),
       ParentChildSummary(
-        profile: StudentProfile(name: 'An'),
+        profile: UserProfile(name: 'An'),
         classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
       ),
     ];
@@ -43,7 +43,7 @@ void main() {
     tester,
   ) async {
     const summaries = <ParentChildSummary>[
-      ParentChildSummary(profile: StudentProfile(name: 'An')),
+      ParentChildSummary(profile: UserProfile(name: 'An')),
     ];
 
     await tester.pumpWidget(
@@ -64,7 +64,7 @@ void main() {
   ) async {
     const availableWidth = 332.0;
     const summary = ParentChildSummary(
-      profile: StudentProfile(name: 'An'),
+      profile: UserProfile(name: 'An'),
       classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
     );
 
@@ -95,7 +95,7 @@ void main() {
     const gap = 16.0;
     const summaries = <ParentChildSummary>[
       ParentChildSummary(
-        profile: StudentProfile(name: 'An'),
+        profile: UserProfile(name: 'An'),
         classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
         classrooms: [
           ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
@@ -137,15 +137,15 @@ void main() {
     var tapCount = 0;
     const summaries = <ParentChildSummary>[
       ParentChildSummary(
-        profile: StudentProfile(name: 'An'),
+        profile: UserProfile(name: 'An'),
         classroom: ClassroomModel(name: '2A5', teacherName: 'Thầy An'),
       ),
       ParentChildSummary(
-        profile: StudentProfile(name: 'Bình'),
+        profile: UserProfile(name: 'Bình'),
         classroom: ClassroomModel(name: '3B1', teacherName: 'Cô Ngân'),
       ),
       ParentChildSummary(
-        profile: StudentProfile(name: 'Chi'),
+        profile: UserProfile(name: 'Chi'),
         classroom: ClassroomModel(name: '4C2', teacherName: 'Cô Mai'),
       ),
     ];

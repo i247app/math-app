@@ -33,12 +33,13 @@ class RoleTabHost extends StatefulWidget {
     required this.assignmentService,
     required this.examService,
     required this.onLogout,
-    required this.onAddProfileFromPractice,
+    required this.onAddProfileFromGames,
     required this.onProfileSaved,
     required this.openAddProfileRequestId,
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
-    required this.onOpenPracticeTab,
+    required this.onOpenGamesTab,
+    required this.onOpenExercisesTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
     required this.profileResetSignal,
@@ -57,24 +58,25 @@ class RoleTabHost extends StatefulWidget {
   final DashboardTabFactory tabFactory;
   final int selectionRevision;
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final ProfileRole activeRole;
   final String? profileLoadError;
   final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final ClassroomService classroomService;
   final ClassroomExerciseService assignmentService;
   final ExamService examService;
   final VoidCallback onLogout;
-  final VoidCallback onAddProfileFromPractice;
+  final VoidCallback onAddProfileFromGames;
   final VoidCallback onProfileSaved;
   final int openAddProfileRequestId;
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenPracticeTab;
+  final VoidCallback onOpenGamesTab;
+  final VoidCallback onOpenExercisesTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final int profileResetSignal;

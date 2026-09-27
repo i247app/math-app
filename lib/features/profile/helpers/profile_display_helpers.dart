@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
-String profileDisplayName(BuildContext context, StudentProfile profile) {
+String profileDisplayName(BuildContext context, UserProfile profile) {
   final name = profile.name?.trim();
   if (name != null && name.isNotEmpty) {
     return name;

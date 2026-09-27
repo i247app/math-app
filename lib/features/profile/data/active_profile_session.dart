@@ -36,9 +36,9 @@ class ActiveProfileSession {
     await _storage.delete(key: key);
   }
 
-  Future<StudentProfile?> resolveActiveProfile({
+  Future<UserProfile?> resolveActiveProfile({
     required int userId,
-    required List<StudentProfile> profiles,
+    required List<UserProfile> profiles,
   }) async {
     final storedProfileId = await readActiveProfileId(userId);
     return resolveActiveProfileFromProfiles(
@@ -47,8 +47,8 @@ class ActiveProfileSession {
     );
   }
 
-  static StudentProfile? resolveActiveProfileFromProfiles({
-    required List<StudentProfile> profiles,
+  static UserProfile? resolveActiveProfileFromProfiles({
+    required List<UserProfile> profiles,
     int? storedProfileId,
   }) {
     if (profiles.isEmpty) {
@@ -72,7 +72,7 @@ class ActiveProfileSession {
     return profiles.first;
   }
 
-  static int? profileStableId(StudentProfile? profile) {
+  static int? profileStableId(UserProfile? profile) {
     return profile?.stableId;
   }
 

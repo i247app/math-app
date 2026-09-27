@@ -11,7 +11,7 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
@@ -38,7 +38,7 @@ void main() {
             ),
             home: ParentAssessmentTab(
               user: const LoginUser(id: 981243),
-              activeProfile: const StudentProfile(
+              activeProfile: const UserProfile(
                 profileId: 981243,
                 role: 'STUDENT',
               ),
@@ -91,7 +91,7 @@ void main() {
           ),
           home: ParentAssessmentTab(
             user: const LoginUser(id: 981245),
-            activeProfile: const StudentProfile(
+            activeProfile: const UserProfile(
               profileId: 981245,
               role: 'STUDENT',
             ),
@@ -115,7 +115,7 @@ void main() {
 
     expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
-    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsNothing);
 
     await tester.tap(find.byType(ParentAssessmentTabBanner));
     await tester.pumpAndSettle();
@@ -126,10 +126,10 @@ void main() {
     );
     expect(examService.requestedDetailId, isNull);
     expect(examService.requestedUserExamId, isNull);
-    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
     expect(find.text('Resume question 3'), findsOneWidget);
-    final assessment = tester.widget<AiAssessmentScreen>(
-      find.byType(AiAssessmentScreen),
+    final assessment = tester.widget<ExamAttemptScreen>(
+      find.byType(ExamAttemptScreen),
     );
     expect(assessment.allowQuestionNavigation, isFalse);
     expect(assessment.showQuestionNavigation, isFalse);
@@ -142,7 +142,7 @@ void main() {
     expect(examService.submittedAnswers, isNull);
     expect(examService.updatedUserExamId, isNull);
     expect(examService.updatedStatus, isNull);
-    expect(find.byType(AiAssessmentScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsNothing);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
     expect(find.byType(ParentAssessmentFullSkeleton), findsNothing);
 
@@ -155,7 +155,7 @@ void main() {
       find.byKey(const ValueKey('active-assessment-dialog')),
       findsNothing,
     );
-    expect(find.byType(AiAssessmentScreen), findsOneWidget);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
   });
 
   testWidgets(
@@ -174,7 +174,7 @@ void main() {
             ),
             home: ParentAssessmentTab(
               user: const LoginUser(id: 981245),
-              activeProfile: const StudentProfile(
+              activeProfile: const UserProfile(
                 profileId: 981245,
                 role: 'STUDENT',
               ),
@@ -197,7 +197,7 @@ void main() {
 
       expect(find.byType(ParentAssessmentActiveCard), findsNothing);
       expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
-      expect(find.byType(AiAssessmentScreen), findsNothing);
+      expect(find.byType(ExamAttemptScreen), findsNothing);
     },
   );
 
@@ -217,7 +217,7 @@ void main() {
             ),
             home: ParentAssessmentTab(
               user: const LoginUser(id: 981245),
-              activeProfile: const StudentProfile(
+              activeProfile: const UserProfile(
                 profileId: 981245,
                 role: 'STUDENT',
               ),
@@ -240,11 +240,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
-      expect(find.byType(AiAssessmentScreen), findsNothing);
+      expect(find.byType(ExamAttemptScreen), findsNothing);
 
       await tester.tap(find.byType(ParentAssessmentTabBanner));
       await tester.pumpAndSettle();
-      expect(find.byType(AiAssessmentScreen), findsOneWidget);
+      expect(find.byType(ExamAttemptScreen), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.close_rounded).first);
       await tester.pumpAndSettle();

@@ -36,19 +36,19 @@ class HomeLayoutDto {
     this.student,
     this.teacher,
     this.rooms = const <HomeLayoutClassroomDto>[],
-    this.subProfiles = const <StudentProfile>[],
+    this.subProfiles = const <UserProfile>[],
     this.tasks = const <HomeLayoutTaskDto>[],
     this.messages = const <HomeLayoutMessageDto>[],
     this.exams = const <HomeLayoutExamDto>[],
   });
 
   final String? role;
-  final StudentProfile? profile;
+  final UserProfile? profile;
   final ParentHomeLayoutDto? parent;
   final StudentHomeLayoutDto? student;
   final TeacherHomeLayoutDto? teacher;
   final List<HomeLayoutClassroomDto> rooms;
-  final List<StudentProfile> subProfiles;
+  final List<UserProfile> subProfiles;
   final List<HomeLayoutTaskDto> tasks;
   final List<HomeLayoutMessageDto> messages;
   final List<HomeLayoutExamDto> exams;
@@ -109,7 +109,7 @@ class HomeLayoutMessageDto {
   final String? title;
   final String? message;
   final String? createdAt;
-  final StudentProfile? sender;
+  final UserProfile? sender;
   final ClassroomModel? classroom;
 
   factory HomeLayoutMessageDto.fromJson(Map<String, dynamic> json) {

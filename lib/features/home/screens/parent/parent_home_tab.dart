@@ -57,7 +57,7 @@ class ParentHomeContent extends StatefulWidget {
     required this.onProfileSaved,
     required this.onOpenProfileMenu,
     required this.onOpenClassroomTab,
-    required this.onOpenPracticeTab,
+    required this.onOpenGamesTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
     this.showChildProfileDialogOnStart = false,
@@ -71,19 +71,19 @@ class ParentHomeContent extends StatefulWidget {
   });
 
   final LoginUser? user;
-  final List<StudentProfile> profiles;
-  final StudentProfile? activeProfile;
+  final List<UserProfile> profiles;
+  final UserProfile? activeProfile;
   final bool isActive;
   final int activeRefreshTick;
   final List<GradeModel> initialGrades;
   final GradeService gradeService;
   final ExamService examService;
   final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(StudentProfile profile) onActivateProfile;
+  final Future<void> Function(UserProfile profile) onActivateProfile;
   final VoidCallback onProfileSaved;
   final VoidCallback onOpenProfileMenu;
   final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenPracticeTab;
+  final VoidCallback onOpenGamesTab;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final double bottomPadding;
   final bool showChildProfileDialogOnStart;
@@ -170,10 +170,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     _playedEntrances.clear();
   }
 
-  List<StudentProfile> get _children {
+  List<UserProfile> get _children {
     if (widget.useActiveStudentProfileData) {
       final profile = homeLayout?.profile ?? widget.activeProfile;
-      return profile == null ? const <StudentProfile>[] : [profile];
+      return profile == null ? const <UserProfile>[] : [profile];
     }
 
     final layoutChildren = homeLayout?.parent?.children;

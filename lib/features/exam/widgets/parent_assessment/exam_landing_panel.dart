@@ -3,35 +3,38 @@ import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';
 
-class ParentAssessmentEmptyPoster extends StatelessWidget {
-  const ParentAssessmentEmptyPoster({
+class ExamLandingPanel extends StatelessWidget {
+  const ExamLandingPanel({
     super.key,
-    required this.onTap,
-    this.onSecondaryTap,
+    required this.onOpenAssessment,
+    this.onOpenGradeRoadmap,
   });
 
-  final VoidCallback onTap;
-  final VoidCallback? onSecondaryTap;
+  final VoidCallback onOpenAssessment;
+  final VoidCallback? onOpenGradeRoadmap;
 
   @override
   Widget build(BuildContext context) {
-    final assessmentBanner = _AssessmentEmptyBanner(
+    final assessmentBanner = _ExamLandingBanner(
       assetPath: homeInitialAssessmentBannerAsset,
       aspectRatio: 1280 / 852,
-      onTap: onTap,
+      onTap: onOpenAssessment,
     );
-    final practiceBanner = _AssessmentEmptyBanner(
+    final gradeRoadmapBanner = _ExamLandingBanner(
       assetPath: parentHomeAfterReviewBannerAsset,
       aspectRatio: 1280 / 854,
-      onTap: onSecondaryTap,
+      onTap: onOpenGradeRoadmap,
     );
 
-    return Column(spacing: 12, children: [assessmentBanner, practiceBanner]);
+    return Column(
+      spacing: 12,
+      children: [assessmentBanner, gradeRoadmapBanner],
+    );
   }
 }
 
-class _AssessmentEmptyBanner extends StatelessWidget {
-  const _AssessmentEmptyBanner({
+class _ExamLandingBanner extends StatelessWidget {
+  const _ExamLandingBanner({
     required this.assetPath,
     required this.aspectRatio,
     this.onTap,

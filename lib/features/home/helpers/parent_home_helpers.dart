@@ -5,7 +5,7 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
 
-List<StudentProfile> studentProfiles(List<StudentProfile> profiles) {
+List<UserProfile> studentProfiles(List<UserProfile> profiles) {
   return profiles
       .where(
         (profile) => ProfileRole.fromProfile(profile) == ProfileRole.student,

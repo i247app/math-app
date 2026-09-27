@@ -3,7 +3,7 @@ part of '../parent_assessment_tab.dart';
 extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
   String _profileSourceKey(
     LoginUser? user,
-    StudentProfile? activeProfile,
+    UserProfile? activeProfile,
     bool useActiveStudentProfileData,
   ) {
     return '${user?.id}|'

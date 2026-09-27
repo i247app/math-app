@@ -18,7 +18,7 @@ class TeacherHomeSkeleton extends StatelessWidget {
     this.hasUnreadNotifications = false,
   });
 
-  final StudentProfile? profile;
+  final UserProfile? profile;
   final double bottomPadding;
   final VoidCallback onNotificationTap;
   final bool hasUnreadNotifications;

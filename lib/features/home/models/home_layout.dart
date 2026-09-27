@@ -10,19 +10,19 @@ class HomeLayout {
     this.student,
     this.teacher,
     this.rooms = const <HomeLayoutClassroom>[],
-    this.subProfiles = const <StudentProfile>[],
+    this.subProfiles = const <UserProfile>[],
     this.tasks = const <HomeLayoutTask>[],
     this.messages = const <HomeLayoutMessage>[],
     this.exams = const <HomeLayoutExam>[],
   });
 
   final String? role;
-  final StudentProfile? profile;
+  final UserProfile? profile;
   final ParentHomeLayout? parent;
   final StudentHomeLayout? student;
   final TeacherHomeLayout? teacher;
   final List<HomeLayoutClassroom> rooms;
-  final List<StudentProfile> subProfiles;
+  final List<UserProfile> subProfiles;
   final List<HomeLayoutTask> tasks;
   final List<HomeLayoutMessage> messages;
   final List<HomeLayoutExam> exams;
@@ -42,7 +42,7 @@ class HomeLayoutMessage {
   final String? title;
   final String? message;
   final String? createdAt;
-  final StudentProfile? sender;
+  final UserProfile? sender;
   final ClassroomModel? classroom;
 }
 
@@ -72,14 +72,14 @@ class HomeLayoutExam {
 
 class ParentHomeLayout {
   const ParentHomeLayout({
-    this.children = const <StudentProfile>[],
+    this.children = const <UserProfile>[],
     this.classrooms = const <HomeLayoutClassroom>[],
     this.pendingExercises = const <HomeLayoutPendingExercise>[],
     this.expiredExercises = const <HomeLayoutPendingExercise>[],
     this.recentCompletions = const <HomeLayoutRecentCompletion>[],
   });
 
-  final List<StudentProfile> children;
+  final List<UserProfile> children;
   final List<HomeLayoutClassroom> classrooms;
   final List<HomeLayoutPendingExercise> pendingExercises;
   final List<HomeLayoutPendingExercise> expiredExercises;
@@ -122,7 +122,7 @@ class HomeLayoutTask {
   });
 
   final String? taskType;
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final ClassroomExercise? exercise;
   final HomeLayoutTaskSubmission? submission;
@@ -175,7 +175,7 @@ class HomeLayoutPendingExercise {
     this.exercise,
   });
 
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final int? classroomExerciseId;
   final int? classroomId;
@@ -198,7 +198,7 @@ class HomeLayoutRecentCompletion {
     this.totalQuestions,
   });
 
-  final StudentProfile? child;
+  final UserProfile? child;
   final ClassroomModel? classroom;
   final int? classroomExerciseId;
   final int? classroomExerciseSubmissionId;

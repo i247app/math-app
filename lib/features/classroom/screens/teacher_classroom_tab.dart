@@ -31,7 +31,7 @@ class TeacherClassroomTab extends StatefulWidget {
   });
 
   final LoginUser? user;
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final double bottomPadding;
   final int activeRefreshTick;
   final bool isActive;

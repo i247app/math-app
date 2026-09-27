@@ -18,7 +18,7 @@ import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/screens/assessment_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/learning_progress_screen.dart';
@@ -27,7 +27,7 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_t
 import 'package:numi/features/exam/models/parent_assessment_entry.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_progress_chart.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_search_field.dart';
-import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_empty_poster.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/exam_landing_panel.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_state_card.dart';
@@ -53,7 +53,7 @@ class ParentAssessmentTab extends StatefulWidget {
   });
 
   final LoginUser? user;
-  final StudentProfile? activeProfile;
+  final UserProfile? activeProfile;
   final bool isActive;
   final int activeRefreshTick;
   final List<GradeModel> initialGrades;

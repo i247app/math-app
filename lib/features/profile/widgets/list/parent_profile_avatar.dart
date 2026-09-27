@@ -6,7 +6,7 @@ import 'package:numi/shared/widgets/profile_avatar_image.dart';
 class ParentProfileAvatar extends StatelessWidget {
   const ParentProfileAvatar({super.key, required this.profile});
 
-  final StudentProfile profile;
+  final UserProfile profile;
 
   @override
   Widget build(BuildContext context) {

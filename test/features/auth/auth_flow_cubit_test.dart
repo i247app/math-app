@@ -173,7 +173,7 @@ void main() {
       initialState: const AuthFlowState(screen: AuthScreen.login),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
 
     expect(authService.lookedUpLoginName, 'learner@example.com');
     expect(authService.sentOtpLoginName, 'learner@example.com');
@@ -199,7 +199,7 @@ void main() {
       initialState: const AuthFlowState(screen: AuthScreen.login),
     );
 
-    await cubit.submitLoginName('+84905666666');
+    await cubit.submitAuthIdentifier('+84905666666');
 
     expect(authService.listedDeviceUserId, 7);
     expect(authService.sentOtpLoginName, isNull);
@@ -230,7 +230,7 @@ void main() {
         initialState: const AuthFlowState(screen: AuthScreen.login),
       );
 
-      await cubit.submitLoginName('+84905666666');
+      await cubit.submitAuthIdentifier('+84905666666');
 
       expect(authService.listedDeviceUserId, 7);
       expect(authService.sentOtpLoginName, '+84905666666');
@@ -293,11 +293,11 @@ void main() {
       );
 
       expect(authService.checkedIdentifier, isNull);
-      await cubit.submitLoginName('learner@example.com');
+      await cubit.submitAuthIdentifier('learner@example.com');
 
       expect(authService.checkedIdentifier, 'learner@example.com');
       expect(authService.lookedUpLoginName, isNull);
-      expect(cubit.state.loginNameExists, isFalse);
+      expect(cubit.state.identifierExists, isFalse);
       expect(authService.sentOtpLoginName, isNull);
       expect(cubit.state.screen, AuthScreen.registrationProfile);
       await cubit.close();
@@ -317,13 +317,13 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
 
     expect(authService.checkedIdentifier, 'learner@example.com');
     expect(cubit.state.authError, isNull);
-    expect(cubit.state.loginLookupError, 'Service unavailable');
-    expect(cubit.state.loginLookupErrorStatus, 503);
-    expect(cubit.state.isCheckingLoginName, isFalse);
+    expect(cubit.state.identifierLookupError, 'Service unavailable');
+    expect(cubit.state.identifierLookupErrorStatus, 503);
+    expect(cubit.state.isCheckingIdentifier, isFalse);
     expect(cubit.state.screen, AuthScreen.signup);
     await cubit.close();
   });
@@ -340,11 +340,11 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
 
-    expect(cubit.state.loginNameExists, isNull);
-    expect(cubit.state.loginLookupError, isNotEmpty);
-    expect(cubit.state.isCheckingLoginName, isFalse);
+    expect(cubit.state.identifierExists, isNull);
+    expect(cubit.state.identifierLookupError, isNotEmpty);
+    expect(cubit.state.isCheckingIdentifier, isFalse);
     expect(cubit.state.screen, AuthScreen.signup);
     expect(authService.sentOtpLoginName, isNull);
     await cubit.close();
@@ -362,11 +362,11 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
 
     expect(cubit.state.authError, isNull);
-    expect(cubit.state.loginNameExists, isFalse);
-    expect(cubit.state.loginLookupErrorStatus, 4206);
+    expect(cubit.state.identifierExists, isFalse);
+    expect(cubit.state.identifierLookupErrorStatus, 4206);
     expect(cubit.state.screen, AuthScreen.registrationProfile);
     await cubit.close();
   });
@@ -383,11 +383,11 @@ void main() {
         ),
       );
 
-      await cubit.submitLoginName('learner@example.com');
+      await cubit.submitAuthIdentifier('learner@example.com');
 
       expect(authService.checkedIdentifier, 'learner@example.com');
       expect(authService.sentOtpLoginName, isNull);
-      expect(cubit.state.loginNameExists, isTrue);
+      expect(cubit.state.identifierExists, isTrue);
       expect(cubit.state.screen, AuthScreen.signup);
       await cubit.close();
     },
@@ -403,7 +403,7 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
     await cubit.submitSignup(
       const SignupFormData(
         name: 'Learner',
@@ -433,7 +433,7 @@ void main() {
         ),
       );
 
-      await cubit.submitLoginName('learner@example.com');
+      await cubit.submitAuthIdentifier('learner@example.com');
       await cubit.submitSignup(
         const SignupFormData(
           name: 'Learner',
@@ -469,7 +469,7 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
     await cubit.submitSignup(
       const SignupFormData(
         name: 'Learner',
@@ -498,7 +498,7 @@ void main() {
         ),
       );
 
-      await cubit.submitLoginName('learner@example.com');
+      await cubit.submitAuthIdentifier('learner@example.com');
 
       expect(authService.checkedIdentifier, 'learner@example.com');
       expect(authService.sentOtpLoginName, isNull);
@@ -517,7 +517,7 @@ void main() {
       ),
     );
 
-    await cubit.submitLoginName('learner@example.com');
+    await cubit.submitAuthIdentifier('learner@example.com');
     expect(cubit.state.screen, AuthScreen.registrationProfile);
 
     expect(cubit.handleSystemBack(), isTrue);
