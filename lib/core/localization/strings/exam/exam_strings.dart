@@ -27,6 +27,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.failed: 'Chưa đạt',
     AppKeys.examDetailLoadFailed: 'Tải chi tiết bài kiểm tra thất bại.',
     AppKeys.examDetailTitle: 'Chi Tiết',
+    AppKeys.assessmentReviewHeaderTitle: 'Đề-{id}',
     AppKeys.emptyExamQuestions: 'Bài kiểm tra chưa có câu hỏi.',
     AppKeys.totalQuestions: 'Tổng câu',
     AppKeys.correct: 'Đúng',
@@ -69,7 +70,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultGradeLevel: 'Cấp độ {level}',
     AppKeys.placementResultCorrectSummary:
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
-    AppKeys.placementResultViewDetails: 'Xem chi tiết',
+    AppKeys.placementResultViewDetails: 'CHI TIẾT',
     AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
     AppKeys.placementResultPractice: 'Luyện tập',
     AppKeys.placementResultWeaknessesTitle: 'Điểm con cần cải thiện',
@@ -118,6 +119,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.failed: 'Failed',
     AppKeys.examDetailLoadFailed: 'Failed to load test details.',
     AppKeys.examDetailTitle: 'Detail',
+    AppKeys.assessmentReviewHeaderTitle: 'Test-{id}',
     AppKeys.emptyExamQuestions: 'This test has no questions.',
     AppKeys.totalQuestions: 'Questions',
     AppKeys.correct: 'Correct',
@@ -161,7 +163,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultGradeLevel: 'Level {level}',
     AppKeys.placementResultCorrectSummary:
         'You answered {correct}/{total} questions correctly',
-    AppKeys.placementResultViewDetails: 'View details',
+    AppKeys.placementResultViewDetails: 'DETAILS',
     AppKeys.placementResultPracticeAgain: 'Practice again',
     AppKeys.placementResultPractice: 'Practice',
     AppKeys.placementResultWeaknessesTitle: 'Child Weaknesses',

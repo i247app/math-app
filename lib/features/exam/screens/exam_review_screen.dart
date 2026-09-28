@@ -23,6 +23,7 @@ class ReviewDetailScreen extends StatefulWidget {
     super.key,
     required this.detailId,
     required this.detailLoader,
+    this.headerTitle,
     this.initialDetail,
     this.allowRetry = true,
     this.cacheKey,
@@ -31,6 +32,7 @@ class ReviewDetailScreen extends StatefulWidget {
 
   final int detailId;
   final ExamDetailLoader detailLoader;
+  final String? headerTitle;
   final GeneratedExam? initialDetail;
   final bool allowRetry;
   final Object? cacheKey;
@@ -143,7 +145,10 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
         bottom: false,
         child: Column(
           children: [
-            ExamReviewHeader(onBack: () => Navigator.of(context).pop()),
+            ExamReviewHeader(
+              title: widget.headerTitle,
+              onBack: () => Navigator.of(context).pop(),
+            ),
             Expanded(
               child: AnimatedBuilder(
                 animation: _controller,

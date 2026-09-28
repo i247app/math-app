@@ -82,7 +82,7 @@ void main() {
     );
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
-    expect(find.text('Xem chi tiết'), findsOneWidget);
+    expect(find.text('CHI TIẾT'), findsOneWidget);
     expect(find.text('Luyện tập'), findsNothing);
     final levelRect = tester.getRect(find.text('Trình độ').first);
     final gradeRect = tester.getRect(
@@ -356,7 +356,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('LỚP 3'), findsOneWidget);
-    expect(find.text('Xem chi tiết'), findsOneWidget);
+    expect(find.text('CHI TIẾT'), findsOneWidget);
     expect(find.text('Luyện tập'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -497,6 +497,7 @@ void main() {
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
+
     expect(find.text('Child Weaknesses'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -628,6 +629,7 @@ void main() {
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
 
+    expect(find.text('DETAILS'), findsOneWidget);
     final englishRibbonImage = tester.widget<Image>(
       find.descendant(
         of: find.byKey(const ValueKey('placement-grade-ribbon')),

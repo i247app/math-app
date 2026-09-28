@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
@@ -41,6 +42,11 @@ class ExamReviewScreen extends StatelessWidget {
             .toUpperCase();
     return ReviewDetailScreen(
       detailId: detailId,
+      headerTitle: resolvedExamType == examTypeAssessment
+          ? context.formatText(AppKeys.assessmentReviewHeaderTitle, {
+              'id': detailId,
+            })
+          : null,
       detailLoader: (detailId) => examService.getExamDetail(
         detailId,
         profileId: profileId ?? initialExam?.profileId,

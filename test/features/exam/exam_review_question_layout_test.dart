@@ -206,6 +206,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.requestedUserExamId, 912345);
+    expect(find.text('Đề-912345'), findsOneWidget);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
     final tabs = find.byType(ExamReviewModeTabButton);
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Ôn Lại');
@@ -224,6 +225,7 @@ void main() {
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpAndSettle();
+    expect(find.text('Test-912345'), findsOneWidget);
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Review');
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
     expect(
@@ -261,6 +263,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.requestedUserExamId, 912346);
+    expect(find.text('Đề-912346'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),
       findsNothing,
@@ -268,6 +271,40 @@ void main() {
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
     expect(find.byType(ExamReviewStatsCard), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('single assessment uses exam ID; grade keeps detail title', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final service = _JourneyDetailService();
+    addTearDown(lingo.dispose);
+
+    Future<void> showReview(String examType) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            useMaterial3: true,
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: RepositoryProvider<ExamService>.value(
+            value: service,
+            child: LingoScope(
+              lingo: lingo,
+              child: ExamReviewScreen(examId: 123, examType: examType),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await showReview(examTypeAssessment);
+    expect(find.text('Đề-123'), findsOneWidget);
+
+    await showReview(examTypeGrade);
+    expect(find.text('Chi Tiết'), findsOneWidget);
+    expect(find.text('Đề-123'), findsNothing);
   });
 }
 

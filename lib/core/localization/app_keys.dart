@@ -436,6 +436,7 @@ class AppKeys {
   static const failed = 'failed';
   static const examDetailLoadFailed = 'exam_detail_load_failed';
   static const examDetailTitle = 'exam_detail_title';
+  static const assessmentReviewHeaderTitle = 'assessment_review_header_title';
   static const emptyExamQuestions = 'empty_exam_questions';
   static const totalQuestions = 'total_questions';
   static const correct = 'correct';

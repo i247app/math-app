@@ -6,15 +6,16 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 class ExamReviewHeader extends StatelessWidget {
-  const ExamReviewHeader({super.key, required this.onBack});
+  const ExamReviewHeader({super.key, this.title, required this.onBack});
 
+  final String? title;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     return PageHeader(
-      title: context.getText(AppKeys.examDetailTitle),
+      title: title ?? context.getText(AppKeys.examDetailTitle),
       topInset: 0,
       actionWidth: 52,
       horizontalPadding: 12,
