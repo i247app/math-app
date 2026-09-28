@@ -29,11 +29,6 @@ class ExamReviewAnswerTile extends StatelessWidget {
     final hasSelection = selectedLabel != null;
     final isWrongSelected = hasSelection && isSelected && !isCorrect;
     final isRevealedCorrect = isCorrect && (isSelected || showCorrectAnswer);
-    final borderColor = isWrongSelected
-        ? AppColors.red
-        : isRevealedCorrect
-        ? AppColors.teal600
-        : AppColors.borderSoft;
     final background = isWrongSelected
         ? AppColors.redSoft
         : isRevealedCorrect
@@ -55,7 +50,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderColor, width: isSelected ? 1.8 : 1),
+            border: Border.all(color: AppColors.borderSoft),
           ),
           child: Row(
             spacing: 14,

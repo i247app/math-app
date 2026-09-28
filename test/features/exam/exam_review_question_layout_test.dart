@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_list.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_tile.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_button.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_result_question_card.dart';
@@ -88,6 +93,67 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('review answers keep a neutral border in both modes', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    const reviewQuestion = ExamQuestion(
+      questionName: '1 + 1 = ?',
+      questionNumber: 1,
+      answers: <ExamAnswer>[
+        ExamAnswer(label: 'A', content: '2'),
+        ExamAnswer(label: 'B', content: '3'),
+        ExamAnswer(label: 'C', content: '4'),
+      ],
+      correctAnswer: 'A',
+    );
+
+    Future<void> showAnswers({required bool showCorrectAnswer}) async {
+      await tester.pumpWidget(
+        testApp(
+          ExamReviewAnswerList(
+            question: reviewQuestion,
+            selectedLabel: 'B',
+            showCorrectAnswer: showCorrectAnswer,
+          ),
+          lingo,
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    BoxDecoration decorationAt(int index) {
+      final tile = find.byType(ExamReviewAnswerTile).at(index);
+      final container = tester.widget<AnimatedContainer>(
+        find.descendant(of: tile, matching: find.byType(AnimatedContainer)),
+      );
+      return container.decoration! as BoxDecoration;
+    }
+
+    void expectNeutralBorders() {
+      for (var index = 0; index < 3; index++) {
+        expect(
+          decorationAt(index).border,
+          Border.all(color: AppColors.borderSoft),
+        );
+      }
+    }
+
+    await showAnswers(showCorrectAnswer: false);
+    expectNeutralBorders();
+    expect(decorationAt(1).color, AppColors.redSoft);
+    expect(decorationAt(2).color, Colors.white);
+
+    await showAnswers(showCorrectAnswer: true);
+    expectNeutralBorders();
+    expect(decorationAt(0).color, AppColors.tealLightSurface);
+    expect(decorationAt(1).color, AppColors.redSoft);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('stats ignore skipped questions outside the journey detail', (
     tester,
   ) async {
@@ -117,6 +183,7 @@ void main() {
   });
 
   testWidgets('journey detail shows retry and result modes', (tester) async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
     final service = _JourneyDetailService();
     addTearDown(lingo.dispose);
@@ -140,6 +207,25 @@ void main() {
 
     expect(service.requestedUserExamId, 912345);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
+    final tabs = find.byType(ExamReviewModeTabButton);
+    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Ôn Lại');
+    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Kết Quả');
+    expect(
+      tester.getCenter(tabs.at(0)).dx,
+      lessThan(tester.getCenter(tabs.at(1)).dx),
+    );
+    expect(find.byType(ExamReviewQuestionCard), findsOneWidget);
+    await tester.tap(tabs.at(1));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExamReviewResultQuestionCard), findsOneWidget);
+    await tester.tap(tabs.at(0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExamReviewQuestionCard), findsOneWidget);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
+    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Review');
+    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),
       findsOneWidget,

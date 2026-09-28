@@ -869,6 +869,8 @@ class AppKeys {
   static const placementResultKindergartenShort =
       'placement_result_kindergarten_short';
   static const placementResultActivity = 'placement_result_activity';
+  static const examReviewRetryTab = 'exam_review_retry_tab';
+  static const examReviewResultTab = 'exam_review_result_tab';
   static const examReviewPracticeBannerTitle =
       'exam_review_practice_banner_title';
   static const examReviewTopicConjunction = 'exam_review_topic_conjunction';

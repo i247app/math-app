@@ -28,14 +28,14 @@ class ExamReviewModeTabs extends StatelessWidget {
         children: [
           Expanded(
             child: ExamReviewModeTabButton(
-              label: context.getText(AppKeys.testAgain),
+              label: context.getText(AppKeys.examReviewRetryTab),
               selected: selectedMode == ExamReviewMode.retry,
               onTap: () => onSelected(ExamReviewMode.retry),
             ),
           ),
           Expanded(
             child: ExamReviewModeTabButton(
-              label: context.getText(AppKeys.viewResult),
+              label: context.getText(AppKeys.examReviewResultTab),
               selected: selectedMode == ExamReviewMode.result,
               onTap: () => onSelected(ExamReviewMode.result),
             ),
