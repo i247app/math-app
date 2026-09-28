@@ -15,7 +15,6 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/shared/layouts/page_header.dart';
-import 'package:numi/shared/widgets/app_back_button.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
@@ -27,7 +26,6 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_t
 import 'package:numi/features/exam/models/parent_assessment_entry.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_progress_chart.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_search_field.dart';
-import 'package:numi/features/exam/widgets/parent_assessment/exam_landing_panel.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_state_card.dart';
@@ -68,14 +66,6 @@ class ParentAssessmentTab extends StatefulWidget {
 
 class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   static const _pageSize = 5;
-  static const _assessmentViewTransitionDuration = Duration(milliseconds: 250);
-  static const _assessmentLandingViewKey = ValueKey<String>(
-    'assessment-landing-view',
-  );
-  static const _assessmentContentViewKey = ValueKey<String>(
-    'assessment-content-view',
-  );
-
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -88,7 +78,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   bool _hasPlayedInitialEntrance = false;
   String? _errorMessage;
   int _loadRequestId = 0;
-  bool _showAssessmentContent = false;
   String _contentExamType = examTypeAssessment;
   bool _isOpeningActiveAssessment = false;
   bool _isOpeningGradeRoadmap = false;
@@ -97,15 +86,20 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    _isLoading = widget.isActive;
+    if (widget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_loadAssessments(page: 1));
+      });
+    }
   }
 
   @override
   void didUpdateWidget(covariant ParentAssessmentTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isActive && widget.isActive) {
-      _showAssessmentContent = false;
-      _contentExamType = examTypeAssessment;
       _resetAssessmentScrollAfterBuild();
+      unawaited(_loadAssessments(page: 1));
       return;
     }
     if (!widget.isActive) {
@@ -127,15 +121,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       _activeEntry = null;
       _hasLoaded = false;
       _errorMessage = null;
-      _showAssessmentContent = false;
       _contentExamType = examTypeAssessment;
       _isLoading = false;
       _loadRequestId++;
       _resetAssessmentScrollAfterBuild();
+      unawaited(_loadAssessments(page: 1));
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
-      _showAssessmentContent = false;
-      _contentExamType = examTypeAssessment;
       _resetAssessmentScrollAfterBuild();
+      unawaited(_loadAssessments(page: 1));
     }
   }
 
@@ -158,7 +151,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
     final assessmentChildren = _buildAssessmentChildren(
       entries: entries,
       shouldShowFullSkeleton: shouldShowFullSkeleton,
-      showAssessmentLanding: !_showAssessmentContent,
     );
 
     final colors = context.themeColors;
@@ -172,38 +164,14 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
           child: PageHeader(
             title: context.getText(AppKeys.parentAssessmentTabTitle),
             topInset: topInset,
-            actionWidth: _showAssessmentContent ? 52 : 0,
-            horizontalPadding: _showAssessmentContent ? 12 : 0,
-            leading: _showAssessmentContent
-                ? AppBackButton(onPressed: _showAssessmentLanding)
-                : null,
           ),
         ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(16, 14, 16, widget.bottomPadding + 20),
           sliver: SliverToBoxAdapter(
-            child: AnimatedSwitcher(
-              duration: _assessmentViewTransitionDuration,
-              reverseDuration: _assessmentViewTransitionDuration,
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeOutCubic,
-              transitionBuilder: _buildAssessmentViewTransition,
-              layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  alignment: Alignment.topCenter,
-                  clipBehavior: Clip.none,
-                  children: [...previousChildren, ?currentChild],
-                );
-              },
-              child: KeyedSubtree(
-                key: _showAssessmentContent
-                    ? _assessmentContentViewKey
-                    : _assessmentLandingViewKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: assessmentChildren,
-                ),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: assessmentChildren,
             ),
           ),
         ),
@@ -214,7 +182,6 @@ class _ParentAssessmentTabState extends State<ParentAssessmentTab> {
       color: colors.pageBackground,
       child: RefreshIndicator(
         color: colors.brandStrong,
-        notificationPredicate: (_) => _showAssessmentContent,
         onRefresh: _loadAssessments,
         child: scrollView,
       ),

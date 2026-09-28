@@ -1,43 +1,6 @@
 part of '../parent_assessment_tab.dart';
 
 extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
-  void _showAssessmentContentAndLoad() {
-    if (_showAssessmentContent) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    _updateState(() {
-      _showAssessmentContent = true;
-      _contentExamType = examTypeAssessment;
-      _isLoading = true;
-      _hasLoaded = false;
-      _errorMessage = null;
-    });
-    _resetAssessmentScrollAfterBuild();
-    unawaited(_loadAssessments(page: 1, openExamWhenEmpty: true));
-  }
-
-  void _showGradeContentAndLoad() {
-    if (_isOpeningGradeRoadmap) {
-      return;
-    }
-    unawaited(_openGradeRoadmap());
-  }
-
-  void _showAssessmentLanding() {
-    if (!_showAssessmentContent) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    _updateState(() {
-      _showAssessmentContent = false;
-      _contentExamType = examTypeAssessment;
-      _isLoading = false;
-      _loadRequestId++;
-    });
-    _resetAssessmentScrollAfterBuild();
-  }
-
   void _resetAssessmentScrollAfterBuild() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) {
@@ -136,7 +99,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
-    if (mounted && _showAssessmentContent) {
+    if (mounted) {
       await _loadAssessments(page: 1);
     }
   }
@@ -190,7 +153,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
-    if (mounted && _showAssessmentContent) {
+    if (mounted) {
       await _loadAssessments(page: 1);
     }
   }
@@ -223,7 +186,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
         ),
       ),
     );
-    if (mounted && _showAssessmentContent) {
+    if (mounted) {
       await _loadAssessments(page: 1, openGradeRoadmapWhenAvailable: true);
     }
   }
@@ -267,7 +230,7 @@ extension _ParentAssessmentNavigationActions on _ParentAssessmentTabState {
     } finally {
       _isOpeningGradeRoadmap = false;
     }
-    if (mounted && _showAssessmentContent) {
+    if (mounted) {
       await _loadAssessments(page: 1);
     }
   }

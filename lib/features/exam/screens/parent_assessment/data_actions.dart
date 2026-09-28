@@ -13,7 +13,6 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
 
   Future<void> _loadAssessments({
     int? page,
-    bool openExamWhenEmpty = false,
     bool openGradeRoadmapWhenAvailable = false,
   }) async {
     final requestId = ++_loadRequestId;
@@ -93,17 +92,6 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
 
     final hasNoVisibleExam =
         loadedAllEntries.isEmpty && loadedActiveEntry == null;
-    if (openExamWhenEmpty && loadedStats && !failed) {
-      if (_contentExamType == examTypeGrade) {
-        if (hasNoVisibleExam) {
-          await _openAssessmentWithGradeSelection();
-        } else {
-          await _openGradeRoadmap();
-        }
-      } else if (hasNoVisibleExam) {
-        await _openAssessmentDirectly();
-      }
-    }
     if (openGradeRoadmapWhenAvailable &&
         loadedStats &&
         !failed &&

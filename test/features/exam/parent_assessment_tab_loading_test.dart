@@ -12,8 +12,6 @@ import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
-import 'package:numi/features/exam/screens/grade_selection_screen.dart';
-import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
@@ -22,7 +20,9 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_t
 import 'package:numi/shared/constants/app_visual_constants.dart';
 
 void main() {
-  testWidgets('second banner opens GRADE roadmap directly', (tester) async {
+  testWidgets('assessment tab shows the list without landing banners', (
+    tester,
+  ) async {
     final lingo = LingoProvider();
     final examService = _CountingExamService();
     addTearDown(lingo.dispose);
@@ -58,21 +58,18 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    final secondBanner = find.image(
-      const AssetImage(parentHomeAfterReviewBannerAsset),
-    );
-    await tester.ensureVisible(secondBanner);
-    await tester.pump();
-    await tester.tap(secondBanner);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
     expect(examService.statsCalls, 1);
-    expect(examService.requestedExamTypes, const <String>[examTypeGrade]);
-    expect(find.byType(ParentAssessmentTabBanner), findsNothing);
-    expect(find.byType(GradeSelectionScreen), findsNothing);
-    expect(find.byType(GradeRoadmapScreen), findsOneWidget);
-    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
+    expect(examService.requestedExamTypes, const <String>[examTypeAssessment]);
+    expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
+    expect(
+      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
+      findsNothing,
+    );
+    expect(
+      find.image(const AssetImage(parentHomeAfterReviewBannerAsset)),
+      findsNothing,
+    );
+    expect(find.byType(ExamAttemptScreen), findsNothing);
   });
 
   testWidgets('active assessment resumes from stats without loading detail', (
@@ -107,12 +104,6 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(
-      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
     expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
     expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
     expect(find.byType(ExamAttemptScreen), findsNothing);
@@ -189,12 +180,6 @@ void main() {
         ),
       );
       await tester.pump();
-      await tester.tap(
-        find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-
       expect(find.byType(ParentAssessmentActiveCard), findsNothing);
       expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
       expect(find.byType(ExamAttemptScreen), findsNothing);
@@ -233,12 +218,6 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(
-        find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-
       expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
       expect(find.byType(ExamAttemptScreen), findsNothing);
 
