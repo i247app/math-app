@@ -76,13 +76,13 @@ void main() {
     await showMode(AuthEntryMode.signup);
     expect(
       tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
-      lingo.lookup(AppKeys.signupEmailHint),
+      lingo.lookup(AppKeys.loginNameHint),
     );
     expect(
       tester
           .widget<AuthEntryActionButton>(find.byType(AuthEntryActionButton))
           .label,
-      lingo.lookup(AppKeys.signup),
+      lingo.lookup(AppKeys.continueLabel),
     );
     expect(find.text(lingo.lookup(AppKeys.loginWithPin)), findsNothing);
     await tester.tap(find.byType(ElevatedButton));

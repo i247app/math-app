@@ -55,9 +55,9 @@ extension AuthFlowOtp on AuthFlowCubit {
     await _sendLoginOtp(loginName);
   }
 
-  Future<void> _sendSignupOtp(String email) async {
+  Future<void> _sendSignupOtp(String identifier) async {
     final attemptId = _signupAttemptId;
-    _signupEmailReadyForCreation = null;
+    _signupIdentifierReadyForCreation = null;
     _emitState(
       state.copyWith(
         isSendingOtp: true,
@@ -68,23 +68,23 @@ extension AuthFlowOtp on AuthFlowCubit {
 
     try {
       final otp = await _authService.sendOtp(
-        loginName: email,
+        loginName: identifier,
         kind: AuthOtpKind.signup,
       );
       if (isClosed ||
           attemptId != _signupAttemptId ||
-          _pendingSignupEmail != email ||
-          state.loginName != email ||
+          _pendingSignupIdentifier != identifier ||
+          state.loginName != identifier ||
           state.otpFlow != OtpFlow.signup) {
         return;
       }
 
-      _emitOtpSent(loginName: email, otp: otp, flow: OtpFlow.signup);
+      _emitOtpSent(loginName: identifier, otp: otp, flow: OtpFlow.signup);
     } on AuthException catch (error) {
       if (isClosed ||
           attemptId != _signupAttemptId ||
-          _pendingSignupEmail != email ||
-          state.loginName != email ||
+          _pendingSignupIdentifier != identifier ||
+          state.loginName != identifier ||
           state.otpFlow != OtpFlow.signup) {
         return;
       }
@@ -92,8 +92,8 @@ extension AuthFlowOtp on AuthFlowCubit {
     } catch (_) {
       if (isClosed ||
           attemptId != _signupAttemptId ||
-          _pendingSignupEmail != email ||
-          state.loginName != email ||
+          _pendingSignupIdentifier != identifier ||
+          state.loginName != identifier ||
           state.otpFlow != OtpFlow.signup) {
         return;
       }
@@ -249,8 +249,8 @@ extension AuthFlowOtp on AuthFlowCubit {
       }
 
       if (otpFlow == OtpFlow.signup) {
-        final signupEmail = _pendingSignupEmail;
-        if (signupEmail == null || signupEmail != loginName) {
+        final signupIdentifier = _pendingSignupIdentifier;
+        if (signupIdentifier == null || signupIdentifier != loginName) {
           _emitState(
             state.copyWith(
               isVerifyingOtp: false,
@@ -262,7 +262,7 @@ extension AuthFlowOtp on AuthFlowCubit {
           return;
         }
 
-        _signupEmailReadyForCreation = signupEmail;
+        _signupIdentifierReadyForCreation = signupIdentifier;
         _emitState(
           state.copyWith(
             screen: AuthScreen.registrationProfile,

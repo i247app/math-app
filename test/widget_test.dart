@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
+import 'package:numi/features/auth/controllers/auth_cubit.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -78,8 +81,10 @@ class _SignupLookupAuthService implements AuthService {
   Future<dynamic> checkIdentifier(String identifier) async {
     lookedUpNames.add(identifier);
     return <String, dynamic>{
-      'mstatus': 200,
+      'mstatus': accountExists ? 409 : 200,
       'status': 'Success',
+      'email_otp_enable': true,
+      'phone_otp_enable': true,
       'user': accountExists
           ? <String, dynamic>{'id': 43, 'uid': 22, 'email': identifier}
           : null,
@@ -758,7 +763,7 @@ void main() {
         expect(find.text('🇻🇳'), findsNothing);
         expect(
           tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
-          contains('@'),
+          AppStrings.current(AppKeys.loginNameHint),
         );
 
         final input = find.byType(EditableText);
@@ -884,6 +889,29 @@ void main() {
       expect(errorText.data?.toLowerCase(), contains('email'));
     });
 
+    testWidgets('signup accepts phone input with a region selector', (
+      tester,
+    ) async {
+      final authService = _SignupLookupAuthService();
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      await tester.pumpWidget(NumiApp(authService: authService));
+
+      final signupButton = find.text('Đăng Ký');
+      await tester.ensureVisible(signupButton);
+      await tester.tap(signupButton);
+      await tester.pumpAndSettle();
+
+      final input = find.byType(EditableText);
+      expect(find.text('🇻🇳'), findsNothing);
+      await tester.enterText(input, '0905666666');
+      await tester.pumpAndSettle();
+      expect(find.text('🇻🇳'), findsOneWidget);
+
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+      expect(authService.lookedUpNames, <String>['+84905666666']);
+    });
+
     testWidgets('returns login to the welcome screen that opened it', (
       tester,
     ) async {
@@ -922,7 +950,10 @@ void main() {
         await tester.pump();
 
         expect(find.text('🇻🇳'), findsNothing);
-        expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
+        expect(
+          find.byKey(const ValueKey('auth-identifier-error')),
+          findsNothing,
+        );
 
         final submitButton = find.byType(ElevatedButton);
         expect(
@@ -933,13 +964,19 @@ void main() {
         await tester.tap(submitButton);
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('auth-identifier-error')),
+          findsOneWidget,
+        );
 
         await tester.enterText(input, '090');
         await tester.pumpAndSettle();
 
         expect(find.text('🇻🇳'), findsOneWidget);
-        expect(find.byKey(const ValueKey('login-name-error')), findsNothing);
+        expect(
+          find.byKey(const ValueKey('auth-identifier-error')),
+          findsNothing,
+        );
       },
     );
 
@@ -957,11 +994,26 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(EditableText), 'learner@example.com');
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('Service unavailable'), findsOneWidget);
-      expect(find.byKey(const ValueKey('login-name-error')), findsOneWidget);
+      final authState = tester
+          .element(find.byKey(const ValueKey('login')))
+          .read<AuthFlowCubit>()
+          .state;
+      expect(authState.checkedIdentifier, 'learner@example.com');
+      expect(authState.authError, 'Service unavailable');
+      expect(
+        find.byKey(const ValueKey('auth-identifier-error')),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('auth-identifier-error')))
+            .data,
+        'Service unavailable',
+      );
       expect(find.byType(AlertDialog), findsNothing);
     });
 

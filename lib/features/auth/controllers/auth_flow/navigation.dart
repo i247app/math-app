@@ -121,8 +121,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
 
-    final signupEmail = _pendingSignupEmail;
-    if (state.otpFlow == OtpFlow.signup && signupEmail != null) {
+    final signupIdentifier = _pendingSignupIdentifier;
+    if (state.otpFlow == OtpFlow.signup && signupIdentifier != null) {
       final otpIdentifier = state.loginName?.trim();
       if (otpIdentifier != null && otpIdentifier.isNotEmpty) {
         unawaited(_authService.clearPendingLogin(otpIdentifier));
@@ -131,7 +131,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       _emitState(
         state.copyWith(
           screen: AuthScreen.signup,
-          loginName: signupEmail,
+          loginName: signupIdentifier,
           isSendingOtp: false,
           isVerifyingOtp: false,
           isSigningUp: false,
@@ -232,8 +232,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void backFromRegistrationProfile() {
-    final email = _pendingSignupEmail;
-    if (state.screen != AuthScreen.registrationProfile || email == null) {
+    final identifier = _pendingSignupIdentifier;
+    if (state.screen != AuthScreen.registrationProfile || identifier == null) {
       return;
     }
     if (!_signupOtpRequired) {
@@ -241,7 +241,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       _emitState(
         state.copyWith(
           screen: AuthScreen.signup,
-          loginName: email,
+          loginName: identifier,
           isSendingOtp: false,
           isVerifyingOtp: false,
           isSigningUp: false,
@@ -253,12 +253,12 @@ extension AuthFlowNavigation on AuthFlowCubit {
       return;
     }
     _signupAttemptId++;
-    _signupEmailReadyForCreation = null;
+    _signupIdentifierReadyForCreation = null;
 
     _emitState(
       state.copyWith(
         screen: AuthScreen.otp,
-        loginName: email,
+        loginName: identifier,
         isSendingOtp: true,
         isVerifyingOtp: false,
         isSigningUp: false,
@@ -269,7 +269,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
       ),
     );
     // A verified code has already been consumed; request a fresh one on Back.
-    unawaited(_sendSignupOtp(email));
+    unawaited(_sendSignupOtp(identifier));
   }
 
   void selectPhoneRegion(PhoneRegion region) {

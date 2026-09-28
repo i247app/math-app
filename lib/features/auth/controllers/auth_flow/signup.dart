@@ -2,12 +2,12 @@ part of '../auth_cubit.dart';
 
 extension AuthFlowSignup on AuthFlowCubit {
   Future<void> submitSignup(SignupFormData form) async {
-    final email = _pendingSignupEmail;
+    final identifier = _pendingSignupIdentifier;
     final trimmedName = form.name.trim();
     if (state.screen != AuthScreen.registrationProfile ||
         state.isSigningUp ||
-        email == null ||
-        _signupEmailReadyForCreation != email) {
+        identifier == null ||
+        _signupIdentifierReadyForCreation != identifier) {
       return;
     }
 
@@ -20,25 +20,33 @@ extension AuthFlowSignup on AuthFlowCubit {
       return;
     }
 
-    if (!isValidEmailInput(email)) {
+    final kind = detectLoginNameKind(identifier);
+    if (kind == null ||
+        (kind == LoginNameKind.email && !isValidEmailInput(identifier))) {
       _emitState(
-        state.copyWith(authError: AppStrings.current(AppKeys.invalidEmail)),
+        state.copyWith(
+          authError: AppStrings.current(
+            kind == LoginNameKind.email
+                ? AppKeys.invalidEmail
+                : AppKeys.signupFailed,
+          ),
+        ),
       );
       return;
     }
 
     final normalizedForm = SignupFormData(
       name: trimmedName,
-      email: email,
+      email: kind == LoginNameKind.email ? identifier : null,
       role: form.role,
       gender: form.gender,
     );
-    _pendingSignupEmail = email;
+    _pendingSignupIdentifier = identifier;
     _pendingSignupForm = normalizedForm;
 
     _emitState(
       state.copyWith(
-        loginName: email,
+        loginName: identifier,
         isSigningUp: true,
         otpFlow: OtpFlow.signup,
         clearAuthError: true,
@@ -49,7 +57,7 @@ extension AuthFlowSignup on AuthFlowCubit {
     final attemptId = _signupAttemptId;
     try {
       await _completeSignup(
-        email: email,
+        identifier: identifier,
         form: normalizedForm,
         isSigningUp: false,
       );
@@ -65,17 +73,23 @@ extension AuthFlowSignup on AuthFlowCubit {
   }
 
   Future<void> _completeSignup({
-    required String email,
+    required String identifier,
     required SignupFormData form,
     bool? isVerifyingOtp,
     bool? isSigningUp,
   }) async {
     final attemptId = _signupAttemptId;
-    final user = await _authService.signupWithEmail(
-      email: email,
-      name: form.name,
-      role: form.role.apiValue,
-    );
+    final user = detectLoginNameKind(identifier) == LoginNameKind.phone
+        ? await _authService.signupWithPhone(
+            phone: identifier,
+            name: form.name,
+            role: form.role.apiValue,
+          )
+        : await _authService.signupWithEmail(
+            email: identifier,
+            name: form.name,
+            role: form.role.apiValue,
+          );
     if (isClosed || attemptId != _signupAttemptId) {
       return;
     }
@@ -89,11 +103,11 @@ extension AuthFlowSignup on AuthFlowCubit {
   }
 
   void _showSignupCreationError(String message) {
-    final signupEmail = _pendingSignupEmail;
+    final signupIdentifier = _pendingSignupIdentifier;
     _emitState(
       state.copyWith(
         screen: AuthScreen.registrationProfile,
-        loginName: signupEmail,
+        loginName: signupIdentifier,
         isVerifyingOtp: false,
         isSigningUp: false,
         authError: message,
@@ -105,9 +119,9 @@ extension AuthFlowSignup on AuthFlowCubit {
 
   void _clearPendingSignup() {
     _signupAttemptId++;
-    _pendingSignupEmail = null;
+    _pendingSignupIdentifier = null;
     _pendingSignupForm = null;
-    _signupEmailReadyForCreation = null;
+    _signupIdentifierReadyForCreation = null;
     _signupOtpRequired = true;
   }
 }

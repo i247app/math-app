@@ -1,7 +1,7 @@
 part of '../auth_cubit.dart';
 
 extension AuthFlowEntry on AuthFlowCubit {
-  Future<bool?> lookupSignupEmail(String email) async {
+  Future<bool?> lookupSignupIdentifier(String identifier) async {
     if (state.screen != AuthScreen.signup ||
         state.authEntryMode != AuthEntryMode.signup ||
         state.isCheckingIdentifier) {
@@ -10,8 +10,8 @@ extension AuthFlowEntry on AuthFlowCubit {
 
     _emitState(
       state.copyWith(
-        loginName: email,
-        checkedIdentifier: email,
+        loginName: identifier,
+        checkedIdentifier: identifier,
         isCheckingIdentifier: true,
         clearIdentifierExists: true,
         clearIdentifierLookupUser: true,
@@ -25,15 +25,18 @@ extension AuthFlowEntry on AuthFlowCubit {
     );
 
     try {
-      final response = await _authService.checkIdentifier(email);
+      final response = await _authService.checkIdentifier(identifier);
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedIdentifier != email) {
+          state.checkedIdentifier != identifier) {
         return null;
       }
 
-      final availability = IdentifierAvailability.fromResponse(response, email);
+      final availability = IdentifierAvailability.fromResponse(
+        response,
+        identifier,
+      );
       if (availability == null) {
         throw AuthException(
           AppStrings.current(AppKeys.authLoginNameCheckFailed),
@@ -45,8 +48,8 @@ extension AuthFlowEntry on AuthFlowCubit {
 
       _emitState(
         state.copyWith(
-          loginName: email,
-          checkedIdentifier: email,
+          loginName: identifier,
+          checkedIdentifier: identifier,
           isCheckingIdentifier: false,
           identifierExists: exists,
           identifierLookupErrorStatus: availability.mstatus == 200
@@ -65,14 +68,14 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedIdentifier != email) {
+          state.checkedIdentifier != identifier) {
         return null;
       }
 
       _emitState(
         state.copyWith(
-          loginName: email,
-          checkedIdentifier: email,
+          loginName: identifier,
+          checkedIdentifier: identifier,
           isCheckingIdentifier: false,
           identifierLookupError: error.message,
           identifierLookupErrorStatus: error.status,
@@ -84,14 +87,14 @@ extension AuthFlowEntry on AuthFlowCubit {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
-          state.checkedIdentifier != email) {
+          state.checkedIdentifier != identifier) {
         return null;
       }
 
       _emitState(
         state.copyWith(
-          loginName: email,
-          checkedIdentifier: email,
+          loginName: identifier,
+          checkedIdentifier: identifier,
           isCheckingIdentifier: false,
           identifierLookupError: AppStrings.current(
             AppKeys.authLoginNameCheckFailed,
@@ -110,7 +113,7 @@ extension AuthFlowEntry on AuthFlowCubit {
 
     final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
     if (isSignupEntry) {
-      final otpEnabled = await lookupSignupEmail(loginName);
+      final otpEnabled = await lookupSignupIdentifier(loginName);
       if (isClosed ||
           state.screen != AuthScreen.signup ||
           state.authEntryMode != AuthEntryMode.signup ||
@@ -121,10 +124,21 @@ extension AuthFlowEntry on AuthFlowCubit {
         return;
       }
       _clearPendingSignup();
-      _pendingSignupEmail = loginName;
+      _pendingSignupIdentifier = loginName;
       _signupOtpRequired = otpEnabled;
+      if (!otpEnabled &&
+          detectLoginNameKind(loginName) == LoginNameKind.phone) {
+        _emitState(
+          state.copyWith(
+            identifierLookupError: AppStrings.current(
+              AppKeys.signupOtpUnavailable,
+            ),
+          ),
+        );
+        return;
+      }
       if (!otpEnabled) {
-        _signupEmailReadyForCreation = loginName;
+        _signupIdentifierReadyForCreation = loginName;
         _emitState(
           state.copyWith(
             screen: AuthScreen.registrationProfile,

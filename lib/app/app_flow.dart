@@ -49,11 +49,7 @@ class _AppFlowState extends State<AppFlow> {
     PhoneRegion region,
     AuthEntryMode mode,
   ) {
-    return normalizeLoginNameInput(
-      region,
-      loginNameController.text,
-      emailOnly: mode == AuthEntryMode.signup,
-    );
+    return normalizeLoginNameInput(region, loginNameController.text);
   }
 
   @override
@@ -105,10 +101,7 @@ class _AppFlowState extends State<AppFlow> {
     String value,
   ) {
     final hasInput = value.trim().isNotEmpty;
-    final kind = detectLoginNameKind(
-      value,
-      emailOnly: mode == AuthEntryMode.signup,
-    );
+    final kind = detectLoginNameKind(value);
     if (_loginNameHasInput != hasInput ||
         _loginNameKind != kind ||
         _loginNameSubmitAttempted) {

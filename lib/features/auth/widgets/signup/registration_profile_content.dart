@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/auth/widgets/signup/signup_action_button.dart';
@@ -46,7 +45,6 @@ class RegistrationProfileContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
-    final tight = size.width < 370;
     final heroTopGap = compact ? 10.0 : 14.0;
     final frameHorizontalPadding = ScreenFrame.horizontalPaddingForWidth(
       size.width,
@@ -72,10 +70,6 @@ class RegistrationProfileContent extends StatelessWidget {
                 children: [
                   SizedBox(height: heroTopGap),
                   SignupHeroBanner(
-                    title: context.getText(AppKeys.signup),
-                    titleFontSize: tight
-                        ? FontSize.displaySmall
-                        : FontSize.displayMedium,
                     onBack: onBack,
                     frameHorizontalPadding: frameHorizontalPadding,
                     topGap: heroTopGap,
@@ -130,7 +124,7 @@ class RegistrationProfileContent extends StatelessWidget {
                         SignupActionButton(
                           label: isSigningUp
                               ? context.getText(AppKeys.signingUp)
-                              : context.getText(AppKeys.continueLabel),
+                              : context.getText(AppKeys.signup),
                           onPressed: isSigningUp || !isFormValid
                               ? null
                               : onContinue,

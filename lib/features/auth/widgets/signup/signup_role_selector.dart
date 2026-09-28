@@ -18,8 +18,8 @@ class SignupRoleSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const visibleRoles = <SignupRole>[
-      SignupRole.student,
       SignupRole.parent,
+      SignupRole.student,
       // TODO: Enable teacher role when the feature is ready
       // SignupRole.teacher,
     ];

@@ -71,7 +71,9 @@ class AuthEntryView extends StatelessWidget {
               onRegionChanged: entry.onRegionChanged,
               onSubmitIdentifier: entry.onSubmitIdentifier,
               actionLabel: context.getText(
-                mode == AuthEntryMode.signup ? AppKeys.signup : AppKeys.login,
+                mode == AuthEntryMode.signup
+                    ? AppKeys.continueLabel
+                    : AppKeys.login,
               ),
               isSubmitting: entry.isSubmitting,
               isCheckingIdentifier: entry.isCheckingIdentifier,

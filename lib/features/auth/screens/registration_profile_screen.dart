@@ -9,7 +9,7 @@ import 'package:numi/features/auth/models/signup_gender.dart';
 import 'package:numi/features/auth/models/signup_role.dart';
 import 'package:numi/features/auth/widgets/signup/registration_profile_content.dart';
 
-/// Collects profile details after email verification, then creates the account.
+/// Collects profile details after identifier verification, then creates the account.
 class RegistrationProfileScreen extends StatefulWidget {
   const RegistrationProfileScreen({
     super.key,
@@ -17,7 +17,7 @@ class RegistrationProfileScreen extends StatefulWidget {
     required this.onContinue,
     required this.isSigningUp,
     this.initialForm,
-    this.initialEmail,
+    this.initialIdentifier,
     this.authError,
   });
 
@@ -25,7 +25,7 @@ class RegistrationProfileScreen extends StatefulWidget {
   final ValueChanged<SignupFormData> onContinue;
   final bool isSigningUp;
   final SignupFormData? initialForm;
-  final String? initialEmail;
+  final String? initialIdentifier;
   final String? authError;
 
   @override
@@ -36,9 +36,8 @@ class RegistrationProfileScreen extends StatefulWidget {
 class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   final _usernameController = TextEditingController();
 
-  // Keep the verified email in the submission without displaying an input.
-  String get _signupEmail =>
-      (widget.initialEmail ?? widget.initialForm?.email ?? '').trim();
+  String get _signupIdentifier =>
+      (widget.initialIdentifier ?? widget.initialForm?.email ?? '').trim();
 
   SignupRole? _selectedRole;
   SignupGender? _selectedGender;
@@ -92,7 +91,9 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
     widget.onContinue(
       SignupFormData(
         name: _usernameController.text,
-        email: _signupEmail,
+        email: detectLoginNameKind(_signupIdentifier) == LoginNameKind.email
+            ? _signupIdentifier
+            : null,
         role: role,
         gender: gender,
       ),
@@ -103,10 +104,14 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   Widget build(BuildContext context) {
     final username = _usernameController.text.trim();
     final isUsernameValid = _isValidName(username);
-    final isEmailValid = isValidEmailInput(_signupEmail);
+    final identifierKind = detectLoginNameKind(_signupIdentifier);
+    final isIdentifierValid =
+        identifierKind == LoginNameKind.phone ||
+        (identifierKind == LoginNameKind.email &&
+            isValidEmailInput(_signupIdentifier));
     final isFormValid =
         isUsernameValid &&
-        isEmailValid &&
+        isIdentifierValid &&
         _selectedRole != null &&
         _selectedGender != null;
     final localUsernameError = username.isNotEmpty && !isUsernameValid

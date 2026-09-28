@@ -21,15 +21,16 @@ extension AuthUserDtoConversion on AuthUser {
 extension AuthResponseDtoConversion on AuthResponse {
   LoginUser toSignupModel({
     required String fallbackName,
-    required String fallbackEmail,
+    required String fallbackLoginName,
   }) {
     final dtoUser = user;
     final dtoProfile = profile;
+    final fallbackIsEmail = fallbackLoginName.contains('@');
     return LoginUser(
       id: dtoUser?.userId ?? dtoUser?.id ?? dtoProfile?.userId ?? 0,
-      email: dtoUser?.email ?? fallbackEmail,
+      email: dtoUser?.email ?? (fallbackIsEmail ? fallbackLoginName : null),
       name: dtoProfile?.name ?? dtoUser?.name ?? fallbackName,
-      phone: dtoUser?.phone,
+      phone: dtoUser?.phone ?? (fallbackIsEmail ? null : fallbackLoginName),
       avatarUrl: dtoProfile?.avatarUrl ?? dtoUser?.avatarUrl,
       role: dtoUser?.role,
       createDt: dtoUser?.createDt ?? dtoProfile?.createDt,

@@ -162,7 +162,6 @@ class AppScreenRouter extends StatelessWidget {
               controller: loginNameController,
               region: state.phoneRegion,
               showPhoneRegion:
-                  !isSignupEntry &&
                   normalizedLoginName.kind == LoginNameKind.phone &&
                   RegExp(r'\d').hasMatch(loginNameController.text),
               onRegionChanged: (region) {
@@ -325,11 +324,7 @@ class AppScreenRouter extends StatelessWidget {
                       onBack: cubit.backFromRegistrationProfile,
                       isSigningUp: state.isSigningUp,
                       initialForm: cubit.pendingSignupForm,
-                      initialEmail:
-                          state.loginName != null &&
-                              state.loginName!.contains('@')
-                          ? state.loginName
-                          : null,
+                      initialIdentifier: state.loginName,
                       authError: state.authError,
                       onContinue: (form) {
                         HapticFeedback.mediumImpact();

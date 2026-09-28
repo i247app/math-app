@@ -40,6 +40,7 @@ class _FakeAuthService implements AuthService {
   String? sentOtpLoginName;
   String? verifiedOtpLoginName;
   String? signupEmail;
+  String? signupPhone;
   AuthOtpKind? sentOtpKind;
   int? sentOtpUserId;
   int? sentOtpTargetDeviceId;
@@ -141,6 +142,17 @@ class _FakeAuthService implements AuthService {
     signupEmail = email;
     if (signupFailure != null) throw signupFailure!;
     return LoginUser(id: 0, email: email, name: name, role: role);
+  }
+
+  @override
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    required String role,
+  }) async {
+    signupPhone = phone;
+    if (signupFailure != null) throw signupFailure!;
+    return LoginUser(id: 0, phone: phone, name: name, role: role);
   }
 
   @override
@@ -330,6 +342,52 @@ void main() {
     expect(cubit.state.screen, AuthScreen.otp);
     expect(cubit.state.otpExpiresIn, 30);
     expect(cubit.pendingSignupForm, isNull);
+    await cubit.close();
+  });
+
+  test('phone signup verifies OTP and creates a phone account', () async {
+    final service = _FakeAuthService(
+      verifyOtpIsValid: true,
+      identifierResponse: const <String, dynamic>{
+        'mstatus': 200,
+        'phone_otp_enable': true,
+      },
+    );
+    final cubit = _buildSignupCubit(service);
+
+    await cubit.submitAuthIdentifier('+84905666666');
+
+    expect(service.checkedIdentifier, '+84905666666');
+    expect(service.sentOtpLoginName, '+84905666666');
+    expect(cubit.state.screen, AuthScreen.otp);
+
+    await cubit.verifyOtp('1234');
+    expect(service.verifiedOtpLoginName, '+84905666666');
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
+
+    await cubit.submitSignup(_studentSignupForm);
+    expect(service.signupPhone, '+84905666666');
+    expect(service.signupEmail, isNull);
+    expect(cubit.state.authenticationResult?.user.phone, '+84905666666');
+    await cubit.close();
+  });
+
+  test('phone signup stops when phone OTP is unavailable', () async {
+    final service = _FakeAuthService(
+      identifierResponse: const <String, dynamic>{
+        'mstatus': 200,
+        'phone_otp_enable': false,
+      },
+    );
+    final cubit = _buildSignupCubit(service);
+
+    await cubit.submitAuthIdentifier('+84905666666');
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.identifierLookupError, isNotEmpty);
+    expect(service.sentOtpCount, 0);
+
+    await cubit.submitSignup(_studentSignupForm);
+    expect(service.signupPhone, isNull);
     await cubit.close();
   });
 

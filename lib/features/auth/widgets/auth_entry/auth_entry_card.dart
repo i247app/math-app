@@ -62,7 +62,7 @@ class AuthEntryCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (mode == AuthEntryMode.login && showPhoneRegion) ...[
+              if (showPhoneRegion) ...[
                 PhoneRegionMenu(region: region, onChanged: onRegionChanged),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -80,16 +80,12 @@ class AuthEntryCard extends StatelessWidget {
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: mode == AuthEntryMode.signup
-                      ? <TextInputFormatter>[
-                          FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                        ]
-                      : <TextInputFormatter>[LoginNameInputFormatter(region)],
+                  inputFormatters: <TextInputFormatter>[
+                    LoginNameInputFormatter(region),
+                  ],
                   onChanged: onIdentifierChanged,
                   decoration: InputDecoration(
-                    hintText: mode == AuthEntryMode.signup
-                        ? context.getText(AppKeys.signupEmailHint)
-                        : context.getText(AppKeys.loginNameHint),
+                    hintText: context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
                       fontWeight: FontWeight.w500,

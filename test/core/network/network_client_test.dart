@@ -208,6 +208,44 @@ void main() {
     expect(user.phone, isNull);
   });
 
+  test('users/create sends phone and omits email', () async {
+    Map<String, String>? fields;
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            fields = Map<String, String>.fromEntries(
+              (options.data as FormData).fields,
+            );
+            handler.resolve(
+              Response<Object?>(
+                requestOptions: options,
+                statusCode: 200,
+                data: const <String, dynamic>{'mstatus': 200},
+              ),
+            );
+          },
+        ),
+      );
+    final api = AuthApi(
+      networkClient: NetworkClient(baseUrl: 'https://example.test', dio: dio),
+    );
+
+    final user = await api.signupWithPhone(
+      phone: '+84905666666',
+      name: 'Learner',
+      role: 'STUDENT',
+    );
+
+    expect(fields, <String, String>{
+      'phone': '+84905666666',
+      'name': 'Learner',
+      'role': 'STUDENT',
+    });
+    expect(user.phone, '+84905666666');
+    expect(user.email, isNull);
+  });
+
   test('listDevices posts the request and parses the response', () async {
     String? requestPath;
     Object? requestBody;

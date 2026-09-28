@@ -13,6 +13,12 @@ abstract interface class AuthService {
     required String role,
   });
 
+  Future<LoginUser> signupWithPhone({
+    required String phone,
+    required String name,
+    required String role,
+  });
+
   Future<LoginUser> updateUser({
     required int userId,
     required String name,
