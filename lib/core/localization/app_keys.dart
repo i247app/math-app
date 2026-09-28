@@ -109,6 +109,7 @@ class AppKeys {
   static const navMembers = 'nav_members';
   static const navReview = 'nav_review';
   static const navAssessment = 'nav_assessment';
+  static const navLearning = 'nav_learning';
   static const navRoom = 'nav_room';
   static const navProgram = 'nav_program';
   static const navGames = 'nav_games';

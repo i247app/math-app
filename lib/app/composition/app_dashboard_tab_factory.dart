@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
 import 'package:numi/features/classroom/screens/teacher_class_detail_screen.dart';
@@ -10,6 +12,7 @@ import 'package:numi/features/classroom/screens/parent_room_tab.dart';
 import 'package:numi/features/classroom/screens/student_classroom_tab.dart';
 import 'package:numi/features/classroom/screens/teacher_classroom_tab.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
+import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/games/screens/games_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
@@ -24,6 +27,7 @@ import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
@@ -44,16 +48,17 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     required DashboardTabArgs args,
   }) {
     return switch (role) {
-      ProfileRole.parent => _buildParent(args),
+      ProfileRole.parent => _buildParent(context, args),
       ProfileRole.student =>
         args.activeTab == 2
             ? _buildStudentClassroom(args)
-            : _buildParent(args, useActiveStudentProfileData: true),
+            : _buildParent(context, args, useActiveStudentProfileData: true),
       ProfileRole.teacher => _buildTeacher(args),
     };
   }
 
   Widget _buildParent(
+    BuildContext context,
     DashboardTabArgs args, {
     bool useActiveStudentProfileData = false,
   }) {
@@ -142,6 +147,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
           onOpenProfileMenu: args.onOpenProfileMenu,
           onOpenClassroomTab: args.onOpenClassroomTab,
           onOpenGamesTab: args.onOpenGamesTab,
+          onOpenLearningTab: args.onOpenLearningTab,
           onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
           bottomPadding: args.bottomPadding,
           homeHeader: args.homeHeader,
@@ -183,8 +189,25 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         bottomPadding: args.bottomPadding,
       ),
       4 => _buildSettings(args),
+      learningTabIndex => _buildLearning(context, args),
       _ => const SizedBox.shrink(),
     };
+  }
+
+  Widget _buildLearning(BuildContext context, DashboardTabArgs args) {
+    final profileId = profileStableId(args.activeProfile);
+    if (profileId == null || profileId <= 0) {
+      return Center(child: Text(context.getText(AppKeys.parentNoStudentTitle)));
+    }
+    return GradeRoadmapScreen(
+      profileId: profileId,
+      examService: args.examService,
+      user: args.user,
+      initialGrades: args.initialGrades,
+      gradeService: args.gradeService,
+      showCloseButton: false,
+      bottomPadding: args.bottomPadding,
+    );
   }
 
   Widget _buildStudentClassroom(DashboardTabArgs args) => StudentClassroomTab(

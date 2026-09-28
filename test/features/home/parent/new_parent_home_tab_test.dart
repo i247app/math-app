@@ -20,7 +20,6 @@ import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -42,7 +41,7 @@ void main() {
         lingo.dispose();
       });
       var assessmentOpens = 0;
-      var gameOpens = 0;
+      var learningOpens = 0;
       final examService = _ExamService(hasAssessment);
 
       await tester.pumpWidget(
@@ -67,7 +66,8 @@ void main() {
                   onProfileSaved: () {},
                   onOpenProfileMenu: () {},
                   onOpenClassroomTab: () {},
-                  onOpenGamesTab: () => gameOpens++,
+                  onOpenGamesTab: () {},
+                  onOpenLearningTab: () => learningOpens++,
                   onParentAssessmentStateChanged: (_) {},
                   onOpenInitialAssessment: (_) async => assessmentOpens++,
                   bottomPadding: 0,
@@ -105,30 +105,15 @@ void main() {
       expect(assessmentOpens, 1);
 
       await tester.ensureVisible(find.text('Learning & Practice'));
-      final practiceAction = tester.widget<ParentHomeActionButton>(
-        find.byKey(const ValueKey('parent-home-practice-action')),
-      );
       await tester.tap(find.text('Learning & Practice'));
-      practiceAction.onTap();
       await tester.pumpAndSettle();
-      expect(gameOpens, 0);
-      expect(find.byType(GradeRoadmapScreen), findsOneWidget);
-      final roadmap = tester.widget<GradeRoadmapScreen>(
-        find.byType(GradeRoadmapScreen),
-      );
-      expect(roadmap.profileId, 77);
-      expect(roadmap.examService, same(examService));
-      expect(examService.gradeStatsProfileIds, [77]);
-
-      await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
-      await tester.pumpAndSettle();
+      expect(learningOpens, 1);
       expect(find.byType(GradeRoadmapScreen), findsNothing);
       expect(find.text('Learning & Practice'), findsOneWidget);
 
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();
-      expect(find.byType(GradeRoadmapScreen), findsOneWidget);
-      expect(examService.gradeStatsProfileIds, [77, 77]);
+      expect(learningOpens, 2);
     });
   }
 
@@ -145,6 +130,7 @@ void main() {
       });
       final homeService = _RecordingStudentHomeService();
       final examService = _ExamService(false);
+      var activeTab = 0;
 
       await tester.pumpWidget(
         RepositoryProvider<HomeLayoutService>.value(
@@ -154,41 +140,44 @@ void main() {
             child: MaterialApp(
               theme: AppTheme.light(),
               home: Scaffold(
-                body: Builder(
-                  builder: (context) => const AppDashboardTabFactory().buildTab(
-                    context: context,
-                    role: ProfileRole.student,
-                    args: DashboardTabArgs(
-                      activeTab: 0,
-                      isActive: true,
-                      user: null,
-                      profiles: const [UserProfile(profileId: 77)],
-                      activeProfile: const UserProfile(profileId: 78),
-                      profileLoadError: null,
-                      onRefreshProfiles: _noopAsync,
-                      onActivateProfile: _noopActivate,
-                      initialGrades: const [],
-                      gradeService: _GradeService(),
-                      classroomService: _ClassroomService(),
-                      assignmentService: _ClassroomExerciseService(),
-                      examService: examService,
-                      onLogout: _noop,
-                      onAddProfileFromGames: _noop,
-                      onProfileSaved: _noop,
-                      openAddProfileRequestId: 0,
-                      onCompleteTeacherProfile: _noopAsync,
-                      onOpenClassroomTab: _noop,
-                      onOpenGamesTab: _noop,
-                      onOpenExercisesTab: _noop,
-                      onOpenProfileMenu: _noop,
-                      onParentAssessmentStateChanged: _noopAssessmentState,
-                      activeRefreshTick: 0,
-                      bottomPadding: 0,
-                      hasUnreadNotifications: false,
-                      onNotificationTap: _noop,
-                      showChildProfileDialogOnStart: true,
-                    ),
-                  ),
+                body: StatefulBuilder(
+                  builder: (context, setTabState) =>
+                      const AppDashboardTabFactory().buildTab(
+                        context: context,
+                        role: ProfileRole.student,
+                        args: DashboardTabArgs(
+                          activeTab: activeTab,
+                          isActive: true,
+                          user: null,
+                          profiles: const [UserProfile(profileId: 77)],
+                          activeProfile: const UserProfile(profileId: 78),
+                          profileLoadError: null,
+                          onRefreshProfiles: _noopAsync,
+                          onActivateProfile: _noopActivate,
+                          initialGrades: const [],
+                          gradeService: _GradeService(),
+                          classroomService: _ClassroomService(),
+                          assignmentService: _ClassroomExerciseService(),
+                          examService: examService,
+                          onLogout: _noop,
+                          onAddProfileFromGames: _noop,
+                          onProfileSaved: _noop,
+                          openAddProfileRequestId: 0,
+                          onCompleteTeacherProfile: _noopAsync,
+                          onOpenClassroomTab: _noop,
+                          onOpenGamesTab: _noop,
+                          onOpenLearningTab: () =>
+                              setTabState(() => activeTab = 5),
+                          onOpenExercisesTab: _noop,
+                          onOpenProfileMenu: _noop,
+                          onParentAssessmentStateChanged: _noopAssessmentState,
+                          activeRefreshTick: 0,
+                          bottomPadding: 0,
+                          hasUnreadNotifications: false,
+                          onNotificationTap: _noop,
+                          showChildProfileDialogOnStart: true,
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -213,10 +202,13 @@ void main() {
 
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();
+      expect(activeTab, 5);
       final roadmap = tester.widget<GradeRoadmapScreen>(
         find.byType(GradeRoadmapScreen),
       );
       expect(roadmap.profileId, 78);
+      expect(roadmap.showCloseButton, isFalse);
+      expect(find.byKey(const ValueKey('grade-roadmap-close')), findsNothing);
     },
   );
 }

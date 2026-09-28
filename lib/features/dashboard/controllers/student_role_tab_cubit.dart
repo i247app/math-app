@@ -1,5 +1,5 @@
 import 'package:numi/features/dashboard/controllers/role_tab_cubit.dart';
 
 class StudentRoleTabCubit extends RoleTabCubit {
-  StudentRoleTabCubit() : super(maxTabIndex: 4);
+  StudentRoleTabCubit() : super(maxTabIndex: 5);
 }

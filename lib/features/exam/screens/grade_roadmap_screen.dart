@@ -30,6 +30,8 @@ class GradeRoadmapScreen extends StatefulWidget {
     this.initialExams = const <GeneratedExam>[],
     this.initialGrade = 0,
     this.gradeProgressStore,
+    this.showCloseButton = true,
+    this.bottomPadding = 0,
   });
 
   final int profileId;
@@ -40,6 +42,8 @@ class GradeRoadmapScreen extends StatefulWidget {
   final List<GeneratedExam> initialExams;
   final int initialGrade;
   final ProfileGradeProgressStore? gradeProgressStore;
+  final bool showCloseButton;
+  final double bottomPadding;
 
   @override
   State<GradeRoadmapScreen> createState() => _GradeRoadmapScreenState();
@@ -474,7 +478,9 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
               (grade) => _gradeTitle(context, grade),
             ),
             onGradeTap: _openGradeSelection,
-            onBack: () => Navigator.pop(context),
+            onBack: widget.showCloseButton
+                ? () => Navigator.pop(context)
+                : null,
           ),
           if (_errorMessage != null)
             Padding(
@@ -504,7 +510,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
                         ),
-                        padding: const EdgeInsets.fromLTRB(18, 12, 18, 36),
+                        padding: EdgeInsets.fromLTRB(
+                          18,
+                          12,
+                          18,
+                          36 + widget.bottomPadding,
+                        ),
                         child: _GradeRoadmapPath(
                           currentLevel: _currentLevel,
                           isCurrentGrade:
@@ -543,7 +554,7 @@ class _GradeRoadmapHeader extends StatelessWidget {
   final int selectedGrade;
   final List<String> gradeTitles;
   final VoidCallback onGradeTap;
-  final VoidCallback onBack;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -608,19 +619,20 @@ class _GradeRoadmapHeader extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            IconButton(
-              key: const ValueKey('grade-roadmap-close'),
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              onPressed: onBack,
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF256B6B),
-                side: const BorderSide(color: Color(0xFFE4EEEE)),
-                minimumSize: const Size.square(38),
-                maximumSize: const Size.square(38),
+            if (onBack != null)
+              IconButton(
+                key: const ValueKey('grade-roadmap-close'),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: onBack,
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF256B6B),
+                  side: const BorderSide(color: Color(0xFFE4EEEE)),
+                  minimumSize: const Size.square(38),
+                  maximumSize: const Size.square(38),
+                ),
+                icon: const Icon(Icons.close_rounded, size: 20),
               ),
-              icon: const Icon(Icons.close_rounded, size: 20),
-            ),
           ],
         ),
       ),

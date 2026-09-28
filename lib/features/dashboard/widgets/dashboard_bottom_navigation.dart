@@ -8,6 +8,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/shared/constants/app_visual_constants.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/shared/widgets/profile_avatar_image.dart';
@@ -71,6 +72,7 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final visibleTabs = visibleDashboardTabs(widget.activeRole);
     final items = switch (widget.activeRole) {
       ProfileRole.teacher => [
         DashboardNavItemData(
@@ -113,16 +115,9 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           assetPath: parentHomeNavAssessmentAsset,
         ),
         DashboardNavItemData(
+          Icons.menu_book_rounded,
+          context.getText(AppKeys.navLearning),
           null,
-          context.getText(AppKeys.navRoom),
-          null,
-          assetPath: parentHomeNavRoomAsset,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navGames),
-          null,
-          assetPath: parentHomeNavGameAsset,
         ),
         DashboardNavItemData(
           null,
@@ -165,33 +160,35 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
                 return Expanded(
                   child: DashboardAnimatedNavItem(
                     data: items[index],
-                    active: _activeIndex == index,
-                    onTap: () => _selectTab(index),
+                    active: _activeIndex == visibleTabs[index],
+                    onTap: () => _selectTab(visibleTabs[index]),
                   ),
                 );
               }),
             ),
             builder: (context, swipePosition, navigationItems) {
-              final indicatorPosition = (swipePosition ?? _activeIndex)
+              final activePosition = visibleTabs.indexOf(_activeIndex);
+              final indicatorPosition = (swipePosition ?? activePosition)
                   .clamp(0.0, items.length - 1.0)
                   .toDouble();
               return Stack(
                 fit: StackFit.expand,
                 clipBehavior: Clip.none,
                 children: [
-                  AnimatedPositioned(
-                    duration: swipePosition == null
-                        ? _indicatorDuration
-                        : Duration.zero,
-                    curve: Curves.easeOutCubic,
-                    left: itemWidth * indicatorPosition,
-                    top: 0,
-                    bottom: 0,
-                    width: itemWidth,
-                    child: _DashboardActiveIndicator(
-                      teacherStyle: widget.activeRole == ProfileRole.teacher,
+                  if (activePosition >= 0 || swipePosition != null)
+                    AnimatedPositioned(
+                      duration: swipePosition == null
+                          ? _indicatorDuration
+                          : Duration.zero,
+                      curve: Curves.easeOutCubic,
+                      left: itemWidth * indicatorPosition,
+                      top: 0,
+                      bottom: 0,
+                      width: itemWidth,
+                      child: _DashboardActiveIndicator(
+                        teacherStyle: widget.activeRole == ProfileRole.teacher,
+                      ),
                     ),
-                  ),
                   navigationItems!,
                 ],
               );
@@ -283,8 +280,10 @@ class DashboardAnimatedNavItem extends StatelessWidget {
                     ),
                     SizedBox(
                       width: double.infinity,
+                      height: 16,
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomCenter,
                         child: Text(
                           data.label,
                           maxLines: 1,

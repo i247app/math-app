@@ -23,6 +23,7 @@ extension _RoleTabBuilder on RoleTabHostState {
       onCompleteTeacherProfile: widget.onCompleteTeacherProfile,
       onOpenClassroomTab: widget.onOpenClassroomTab,
       onOpenGamesTab: widget.onOpenGamesTab,
+      onOpenLearningTab: widget.onOpenLearningTab,
       onOpenExercisesTab: widget.onOpenExercisesTab,
       onOpenProfileMenu: widget.onOpenProfileMenu,
       onParentAssessmentStateChanged: widget.onParentAssessmentStateChanged,

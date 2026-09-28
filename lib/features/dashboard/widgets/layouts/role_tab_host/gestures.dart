@@ -2,7 +2,8 @@ part of '../role_tab_host.dart';
 
 extension _RoleTabHostGestures on RoleTabHostState {
   void _handleHorizontalDragStart(DragStartDetails details) {
-    if (_tabTransitionController.isAnimating) {
+    if (_tabTransitionController.isAnimating ||
+        !visibleDashboardTabs(widget.activeRole).contains(widget.activeTab)) {
       return;
     }
     _isDragging = true;
@@ -15,23 +16,25 @@ extension _RoleTabHostGestures on RoleTabHostState {
       return;
     }
 
+    final visibleTabs = visibleDashboardTabs(widget.activeRole);
+    final activePosition = visibleTabs.indexOf(widget.activeTab);
     var nextOffset = _dragOffset + details.delta.dx / _dragWidth;
-    final isAtStartBoundary = widget.activeTab == 0 && nextOffset > 0;
-    final isAtEndBoundary = widget.activeTab == 4 && nextOffset < 0;
+    final isAtStartBoundary = activePosition == 0 && nextOffset > 0;
+    final isAtEndBoundary =
+        activePosition == visibleTabs.length - 1 && nextOffset < 0;
     if (isAtStartBoundary || isAtEndBoundary) {
       nextOffset = 0;
     } else {
       nextOffset = nextOffset.clamp(-1.0, 1.0).toDouble();
     }
 
-    final neighbor = nextOffset < 0
-        ? widget.activeTab + 1
-        : nextOffset > 0
-        ? widget.activeTab - 1
-        : null;
-    final validNeighbor = neighbor != null && neighbor >= 0 && neighbor <= 4
-        ? neighbor
-        : null;
+    final validNeighbor = nextOffset == 0
+        ? null
+        : adjacentVisibleTab(
+            widget.activeRole,
+            widget.activeTab,
+            forward: nextOffset < 0,
+          );
 
     _updateState(() {
       _dragOffset = nextOffset;
@@ -40,7 +43,7 @@ extension _RoleTabHostGestures on RoleTabHostState {
         _visitedTabs.add(validNeighbor);
       }
     });
-    widget.onSwipePositionChanged(widget.activeTab - _dragOffset);
+    widget.onSwipePositionChanged(activePosition - _dragOffset);
   }
 
   void _handleHorizontalDragEnd(DragEndDetails details) {

@@ -58,6 +58,7 @@ class ParentHomeContent extends StatefulWidget {
     required this.onOpenProfileMenu,
     required this.onOpenClassroomTab,
     required this.onOpenGamesTab,
+    this.onOpenLearningTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
     this.showChildProfileDialogOnStart = false,
@@ -84,6 +85,7 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback onOpenProfileMenu;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenGamesTab;
+  final VoidCallback? onOpenLearningTab;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final double bottomPadding;
   final bool showChildProfileDialogOnStart;

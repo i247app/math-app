@@ -6,6 +6,7 @@ import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
+import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -39,6 +40,7 @@ class RoleTabHost extends StatefulWidget {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenGamesTab,
+    required this.onOpenLearningTab,
     required this.onOpenExercisesTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
@@ -76,6 +78,7 @@ class RoleTabHost extends StatefulWidget {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenGamesTab;
+  final VoidCallback onOpenLearningTab;
   final VoidCallback onOpenExercisesTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
@@ -142,8 +145,11 @@ class RoleTabHostState extends State<RoleTabHost>
       return;
     }
     final progress = _resolvedTransitionProgress();
+    final visibleTabs = visibleDashboardTabs(widget.activeRole);
+    final fromPosition = visibleTabs.indexOf(_transitionFromTab);
+    final toPosition = visibleTabs.indexOf(_transitionToTab);
     widget.onSwipePositionChanged(
-      _transitionFromTab + (_transitionToTab - _transitionFromTab) * progress,
+      fromPosition + (toPosition - fromPosition) * progress,
     );
   }
 
@@ -165,7 +171,10 @@ class RoleTabHostState extends State<RoleTabHost>
 
   Future<void> _prewarmTabs() async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
-    const tabOrder = <int>[1, 2, 3, 4, 0];
+    final tabOrder = [
+      ...visibleDashboardTabs(widget.activeRole).where((tab) => tab != 0),
+      0,
+    ];
     for (final tab in tabOrder) {
       if (!mounted) {
         return;
@@ -234,7 +243,7 @@ class RoleTabHostState extends State<RoleTabHost>
 
   @override
   Widget build(BuildContext context) {
-    const maxTabIndex = 4;
+    final maxTabIndex = widget.activeRole == ProfileRole.teacher ? 4 : 5;
     return LayoutBuilder(
       builder: (context, constraints) {
         _dragWidth = constraints.maxWidth;

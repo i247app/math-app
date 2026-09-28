@@ -20,6 +20,7 @@ import 'package:numi/features/home/widgets/parent/parent_home_skeleton.dart';
 import 'package:numi/features/dashboard/controllers/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_navigator.dart';
+import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/controllers/role_tab_cubit.dart';
 import 'package:numi/features/dashboard/widgets/layouts/role_tab_host.dart';
 import 'package:numi/features/dashboard/controllers/parent_role_tab_cubit.dart';
@@ -42,6 +43,7 @@ enum _RoleTabDestination {
   room,
   assessment,
   practice,
+  learning,
   study,
   members,
   settings,
@@ -169,6 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         1 => _RoleTabDestination.assessment,
         2 => _RoleTabDestination.room,
         3 => _RoleTabDestination.practice,
+        learningTabIndex => _RoleTabDestination.learning,
         4 => _RoleTabDestination.settings,
         _ => _RoleTabDestination.home,
       },
@@ -176,6 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         1 => _RoleTabDestination.assessment,
         2 => _RoleTabDestination.room,
         3 => _RoleTabDestination.practice,
+        learningTabIndex => _RoleTabDestination.learning,
         4 => _RoleTabDestination.settings,
         _ => _RoleTabDestination.home,
       },
@@ -193,6 +197,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _RoleTabDestination.assessment => 1,
         _RoleTabDestination.room || _RoleTabDestination.classroom => 2,
         _RoleTabDestination.practice => 3,
+        _RoleTabDestination.learning ||
+        _RoleTabDestination.study => learningTabIndex,
         _RoleTabDestination.settings => 4,
         _ => 0,
       },
@@ -200,12 +206,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _RoleTabDestination.assessment => 1,
         _RoleTabDestination.room || _RoleTabDestination.classroom => 2,
         _RoleTabDestination.practice => 3,
+        _RoleTabDestination.learning ||
+        _RoleTabDestination.study => learningTabIndex,
         _RoleTabDestination.settings => 4,
         _ => 0,
       },
       ProfileRole.teacher => switch (destination) {
         _RoleTabDestination.classroom || _RoleTabDestination.room => 1,
         _RoleTabDestination.study => 2,
+        _RoleTabDestination.learning => 2,
         _RoleTabDestination.members => 3,
         _RoleTabDestination.settings => 4,
         _ => 0,
@@ -365,6 +374,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onOpenGamesTab: () {
                             HapticFeedback.lightImpact();
                             _selectTab(roleTabCubit, 3);
+                          },
+                          onOpenLearningTab: () {
+                            HapticFeedback.lightImpact();
+                            _selectTab(roleTabCubit, learningTabIndex);
                           },
                           onOpenExercisesTab: () {
                             HapticFeedback.lightImpact();

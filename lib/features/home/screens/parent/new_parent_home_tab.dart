@@ -60,6 +60,7 @@ class NewParentHomeContent extends StatefulWidget {
     this.onOpenAssessment,
     this.onOpenInitialAssessment,
     this.onOpenExamReview,
+    this.onOpenLearningTab,
     this.onCreateStudentProfile,
   });
 
@@ -87,6 +88,7 @@ class NewParentHomeContent extends StatefulWidget {
   final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?
   onOpenExamReview;
+  final VoidCallback? onOpenLearningTab;
   final Future<void> Function(BuildContext context)? onCreateStudentProfile;
 
   @override
@@ -451,7 +453,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                           iconAsset: 'assets/icons/home-learning-book.png',
                           colors: const [Color(0xFFFFA18C), Color(0xFFFA796B)],
                           accentColor: const Color(0xFFFFB0AA),
-                          onTap: openGradeRoadmap,
+                          onTap: widget.onOpenLearningTab ?? openGradeRoadmap,
                         ),
                       ),
                     ],

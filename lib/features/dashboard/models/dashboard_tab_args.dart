@@ -30,6 +30,7 @@ class DashboardTabArgs {
     required this.onCompleteTeacherProfile,
     required this.onOpenClassroomTab,
     required this.onOpenGamesTab,
+    this.onOpenLearningTab,
     required this.onOpenExercisesTab,
     required this.onOpenProfileMenu,
     required this.onParentAssessmentStateChanged,
@@ -62,6 +63,7 @@ class DashboardTabArgs {
   final Future<void> Function() onCompleteTeacherProfile;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenGamesTab;
+  final VoidCallback? onOpenLearningTab;
   final VoidCallback onOpenExercisesTab;
   final VoidCallback onOpenProfileMenu;
   final ValueChanged<bool> onParentAssessmentStateChanged;
