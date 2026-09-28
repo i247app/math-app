@@ -12,7 +12,6 @@ void main() {
       final response = <String, dynamic>{
         'mstatus': 200,
         'status': 'Success',
-        'is_available': true,
         'email_otp_enable': true,
         'phone_otp_enable': false,
       };
@@ -47,7 +46,6 @@ void main() {
   test('check identifier sends a normalized phone number', () async {
     final response = <String, dynamic>{
       'mstatus': 200,
-      'is_available': true,
       'email_otp_enable': true,
       'phone_otp_enable': false,
     };

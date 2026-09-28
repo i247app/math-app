@@ -71,12 +71,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('phone signup ignores is_available and sends OTP when enabled', (
-    tester,
-  ) async {
+  testWidgets('phone signup sends OTP when enabled', (tester) async {
     final service = _PhoneAuthService(<String, dynamic>{
       'mstatus': 200,
-      'is_available': false,
       'email_otp_enable': false,
       'phone_otp_enable': true,
     });

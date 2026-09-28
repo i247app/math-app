@@ -405,7 +405,6 @@ void main() {
     final service = _FakeAuthService(
       identifierResponse: const <String, dynamic>{
         'mstatus': 200,
-        'is_available': true,
         'email_otp_enable': false,
         'phone_otp_enable': true,
       },
@@ -422,12 +421,11 @@ void main() {
   });
 
   test(
-    'is_available false is ignored when mstatus and email OTP allow signup',
+    'signup email uses mstatus and email OTP without an availability field',
     () async {
       final service = _FakeAuthService(
         identifierResponse: const <String, dynamic>{
           'mstatus': 200,
-          'is_available': false,
           'email_otp_enable': true,
         },
       );

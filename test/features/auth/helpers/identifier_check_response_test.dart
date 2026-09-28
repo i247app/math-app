@@ -5,7 +5,6 @@ void main() {
   test('selects the OTP flag that matches the identifier type', () {
     const response = <String, dynamic>{
       'mstatus': 200,
-      'is_available': true,
       'email_otp_enable': true,
       'phone_otp_enable': false,
     };
