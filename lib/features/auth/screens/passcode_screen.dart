@@ -10,7 +10,6 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_input_row.dart';
-import 'package:numi/shared/controllers/numeric_code_input_controller.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
 
@@ -46,15 +45,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     with SingleTickerProviderStateMixin {
   static const passcodeLength = 4;
 
-  late final NumericCodeInputController _codeInput;
+  late final TextEditingController _passcodeController;
+  late final FocusNode _passcodeFocusNode;
   late final AnimationController _shakeController;
-  late final ValueNotifier<int> _digitRevision;
   String? _firstPasscode;
   String? _localError;
   int _lastErrorId = 0;
-
-  List<TextEditingController> get _controllers => _codeInput.controllers;
-  List<FocusNode> get _focusNodes => _codeInput.focusNodes;
 
   bool get _isConfirmingSetup =>
       widget.mode == PasscodeScreenMode.setup && _firstPasscode != null;
@@ -62,12 +58,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   void initState() {
     super.initState();
-    _codeInput = NumericCodeInputController(length: passcodeLength);
+    _passcodeController = TextEditingController();
+    _passcodeFocusNode = FocusNode();
     _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
-    _digitRevision = ValueNotifier(0);
     _lastErrorId = widget.errorId;
     _requestPasscodeFocus();
   }
@@ -84,30 +80,15 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   @override
   void dispose() {
     _shakeController.dispose();
-    _digitRevision.dispose();
-    _codeInput.dispose();
+    _passcodeController.dispose();
+    _passcodeFocusNode.dispose();
     super.dispose();
   }
 
-  void _updateDigit(int index, String value) {
-    _codeInput.updateDigit(index, value);
-    _clearLocalErrorOrNotify();
-  }
-
-  void _handleEmptyBackspace(int index) {
-    if (index == 0) {
-      return;
-    }
-    _codeInput.clearPreviousAndFocus(index);
-    _clearLocalErrorOrNotify();
-  }
-
-  void _clearLocalErrorOrNotify() {
+  void _handlePasscodeChanged() {
     if (_localError != null) {
       setState(() => _localError = null);
-      return;
     }
-    _digitRevision.value++;
   }
 
   Future<void> _handleSubmit() async {
@@ -136,8 +117,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     }
   }
 
-  String get _enteredPasscode =>
-      _controllers.map((controller) => controller.text).join();
+  String get _enteredPasscode => _passcodeController.text;
 
   void _showError(String message) {
     HapticFeedback.mediumImpact();
@@ -147,7 +127,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   }
 
   void _clearDigits({bool focusFirst = false}) {
-    _codeInput.clear();
+    _passcodeController.clear();
     if (focusFirst) {
       _requestPasscodeFocus();
     }
@@ -156,7 +136,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   void _requestPasscodeFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _codeInput.requestFocusFirst();
+        _passcodeFocusNode.requestFocus();
       }
     });
   }
@@ -178,12 +158,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         title: _titleText(context),
         bodyGap: 54,
         bodyBuilder: (context) {
-          return ValueListenableBuilder<int>(
-            valueListenable: _digitRevision,
-            builder: (context, _, child) {
-              final isFull = _controllers.every(
-                (controller) => controller.text.isNotEmpty,
-              );
+          return ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _passcodeController,
+            builder: (context, value, child) {
+              final isFull = value.text.length == passcodeLength;
               return Padding(
                 padding: const EdgeInsets.fromLTRB(28, 0, 28, 44),
                 child: Column(
@@ -202,11 +180,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                         );
                       },
                       child: PasscodeInputRow(
-                        controllers: _controllers,
-                        focusNodes: _focusNodes,
+                        controller: _passcodeController,
+                        focusNode: _passcodeFocusNode,
                         hasError: errorText != null,
-                        onChanged: _updateDigit,
-                        onEmptyBackspace: _handleEmptyBackspace,
+                        onChanged: _handlePasscodeChanged,
                       ),
                     ),
                     const SizedBox(height: 16),
