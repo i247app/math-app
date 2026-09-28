@@ -29,7 +29,8 @@ class _NumiAssessmentMascotAnimationState
     extends State<NumiAssessmentMascotAnimation>
     with SingleTickerProviderStateMixin {
   static const _cycleDuration = Duration(milliseconds: 4000);
-  static const _sourceAsset = 'assets/images/numi-mascot.png';
+  static const _sourceAsset =
+      'assets/images/numi-assessment-animation-mascot.png';
   static const _thinkingHandAsset = 'assets/images/no-profile-mascot.png';
 
   late final AnimationController _controller;
@@ -169,7 +170,7 @@ class _NumiAssessmentMascotAnimationState
                               _leftGlassesShader == null ||
                               _rightGlassesShader == null
                           ? Image.asset(
-                              'assets/images/numi-mascot.png',
+                              _sourceAsset,
                               key: const ValueKey('numi-rig-loading-fallback'),
                               fit: BoxFit.contain,
                               filterQuality: FilterQuality.high,

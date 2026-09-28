@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/avatars/
     - assets/images/
+    - assets/images/numi-assessment-animation-mascot.png
     - assets/images/assessment_intro/
     - assets/icons/
     - assets/sounds/effects/

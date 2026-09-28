@@ -24,12 +24,37 @@ void main() {
 
     expect(find.byType(NumiAssessmentMascotAnimation), findsOneWidget);
     expect(find.text('Để Numi tạo bài kiểm tra cho bạn nhé'), findsOneWidget);
+    final fallback = tester.widget<Image>(
+      find.byKey(const ValueKey('numi-rig-loading-fallback')),
+    );
+    expect(
+      (fallback.image as AssetImage).assetName,
+      'assets/images/numi-assessment-animation-mascot.png',
+    );
 
     await tester.pump(const Duration(milliseconds: 500));
 
     // The original mascot is decoded once and masked body parts are painted
     // and transformed independently on each vsync.
     expect(find.byKey(const ValueKey('numi-rig-canvas')), findsOneWidget);
+    for (
+      var i = 0;
+      i < 50 &&
+          find
+              .byKey(const ValueKey('numi-rig-loading-fallback'))
+              .evaluate()
+              .isNotEmpty;
+      i++
+    ) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+    }
+    expect(
+      find.byKey(const ValueKey('numi-rig-loading-fallback')),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
 
     for (final duration in <Duration>[
