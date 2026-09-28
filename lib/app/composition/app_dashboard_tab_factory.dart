@@ -14,7 +14,7 @@ import 'package:numi/features/classroom/screens/teacher_classroom_tab.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
-import 'package:numi/features/games/screens/games_tab.dart';
+import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
@@ -180,14 +180,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         onOpenProfileMenu: args.onOpenProfileMenu,
         bottomPadding: args.bottomPadding,
       ),
-      3 => GamesTab(
-        userId: args.user?.id,
-        initialGrades: args.initialGrades,
-        gradeService: args.gradeService,
-        initialGradeId: profileGradeStableId(args.activeProfile),
-        initialGradeLabel: args.activeProfile?.grade?.label,
-        bottomPadding: args.bottomPadding,
-      ),
+      3 => GamesComingSoonTab(bottomPadding: args.bottomPadding),
       4 => _buildSettings(args),
       learningTabIndex => _buildLearning(context, args),
       _ => const SizedBox.shrink(),

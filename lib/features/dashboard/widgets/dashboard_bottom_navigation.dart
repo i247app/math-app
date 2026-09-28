@@ -120,6 +120,11 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           null,
         ),
         DashboardNavItemData(
+          Icons.sports_esports_rounded,
+          context.getText(AppKeys.navGames),
+          null,
+        ),
+        DashboardNavItemData(
           null,
           context.getText(AppKeys.navSettings),
           null,

@@ -12,7 +12,7 @@ class AuthActionButton extends StatelessWidget {
     required this.onPressed,
     this.layout = AuthActionButtonLayout.fullWidth,
     this.isBusy = false,
-    this.uppercase = false,
+    this.uppercase = true,
   });
 
   static const _compactWidth = 230.0;

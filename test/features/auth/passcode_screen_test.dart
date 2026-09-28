@@ -62,6 +62,7 @@ void main() {
           .onPressed,
       isNull,
     );
+    expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
 
     for (final code in ['123', '12', '1', '']) {
       await tester.enterText(field, code);

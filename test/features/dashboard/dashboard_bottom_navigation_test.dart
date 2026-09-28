@@ -7,6 +7,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_bottom_navigation.dart';
+import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
 void main() {
@@ -18,7 +19,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    const labels = ['HOME', 'ASSESSMENT', 'LEARNING', 'SETTINGS'];
+    const labels = ['HOME', 'ASSESSMENT', 'LEARNING', 'GAMES', 'SETTINGS'];
 
     for (final width in [320.0, 390.0]) {
       tester.view.physicalSize = Size(width, 800);
@@ -40,7 +41,7 @@ void main() {
                             labels[index],
                             null,
                           ),
-                          active: index == 3,
+                          active: index == 4,
                           onTap: () {},
                         ),
                       ),
@@ -64,28 +65,31 @@ void main() {
     }
   });
 
-  test('parent and student swipes skip hidden Room and Games tabs', () {
+  test('parent and student swipes skip hidden Room tab', () {
     for (final role in [ProfileRole.parent, ProfileRole.student]) {
       expect(adjacentVisibleTab(role, 1, forward: true), learningTabIndex);
       expect(adjacentVisibleTab(role, learningTabIndex, forward: false), 1);
-      expect(adjacentVisibleTab(role, learningTabIndex, forward: true), 4);
+      expect(adjacentVisibleTab(role, learningTabIndex, forward: true), 3);
+      expect(adjacentVisibleTab(role, 3, forward: false), learningTabIndex);
+      expect(adjacentVisibleTab(role, 3, forward: true), 4);
       expect(adjacentVisibleTab(role, 2, forward: true), isNull);
-      expect(adjacentVisibleTab(role, 3, forward: false), isNull);
     }
     expect(visibleDashboardTabs(ProfileRole.teacher), [0, 1, 2, 3, 4]);
   });
 
   test('slide direction follows visible tab order', () {
     for (final role in [ProfileRole.parent, ProfileRole.student]) {
-      expect(isForwardVisibleTabTransition(role, learningTabIndex, 4), isTrue);
-      expect(isForwardVisibleTabTransition(role, 4, learningTabIndex), isFalse);
+      expect(isForwardVisibleTabTransition(role, learningTabIndex, 3), isTrue);
+      expect(isForwardVisibleTabTransition(role, 3, learningTabIndex), isFalse);
+      expect(isForwardVisibleTabTransition(role, 3, 4), isTrue);
+      expect(isForwardVisibleTabTransition(role, 4, 3), isFalse);
       expect(isForwardVisibleTabTransition(role, 1, learningTabIndex), isTrue);
     }
     expect(isForwardVisibleTabTransition(ProfileRole.teacher, 3, 4), isTrue);
   });
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
-    testWidgets('$role shows Home, Thi, Learning, Settings only', (
+    testWidgets('$role shows Home, Thi, Learning, Games, Settings', (
       tester,
     ) async {
       final originalLanguage = AppLanguageState.current;
@@ -117,23 +121,56 @@ void main() {
         ),
       );
 
-      expect(visibleDashboardTabs(role), [0, 1, learningTabIndex, 4]);
+      expect(visibleDashboardTabs(role), [0, 1, learningTabIndex, 3, 4]);
       expect(find.text('THI'), findsOneWidget);
       expect(find.text('HỌC'), findsOneWidget);
       expect(find.text('PHÒNG'), findsNothing);
-      expect(find.text('GAMES'), findsNothing);
-      expect(find.byType(DashboardAnimatedNavItem), findsNWidgets(4));
+      expect(find.text('GAMES'), findsOneWidget);
+      expect(find.byType(DashboardAnimatedNavItem), findsNWidgets(5));
 
       await tester.tap(find.text('HỌC'));
       await tester.pump();
       expect(selectedTab, learningTabIndex);
+
+      await tester.tap(find.text('GAMES'));
+      await tester.pump();
+      expect(selectedTab, 3);
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pump();
       expect(find.text('ASSESSMENT'), findsOneWidget);
       expect(find.text('LEARNING'), findsOneWidget);
       expect(find.text('ROOM'), findsNothing);
-      expect(find.text('GAMES'), findsNothing);
+      expect(find.text('GAMES'), findsOneWidget);
     });
   }
+
+  testWidgets('Games placeholder shows only mascot and localized message', (
+    tester,
+  ) async {
+    final originalLanguage = AppLanguageState.current;
+    final lingo = LingoProvider();
+    addTearDown(() {
+      AppLanguageState.current = originalLanguage;
+      lingo.dispose();
+    });
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const Scaffold(body: GamesComingSoonTab(bottomPadding: 88)),
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.text('Sắp ra mắt'), findsOneWidget);
+    expect(find.byType(Text), findsOneWidget);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+    expect(find.text('Coming soon'), findsOneWidget);
+  });
 }

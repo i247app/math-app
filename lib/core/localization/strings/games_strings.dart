@@ -14,6 +14,7 @@ const gamesStrings = <String, Map<String, String>>{
     AppKeys.gamesLevelLabel: 'Màn {level}',
     AppKeys.gamesLevelComingSoon:
         'Màn {level} đã sẵn sàng cho game được chọn sau.',
+    AppKeys.gamesComingSoon: 'Sắp ra mắt',
     AppKeys.gamesJourneyOne: 'Nông trại Numi',
     AppKeys.gamesJourneyTwo: 'Hành trình Numi 02',
     AppKeys.gamesJourneyThree: 'Hành trình Numi 03',
@@ -90,6 +91,7 @@ const gamesStrings = <String, Map<String, String>>{
     AppKeys.gamesLevelLabel: 'Stage {level}',
     AppKeys.gamesLevelComingSoon:
         'Stage {level} is ready for the game we choose next.',
+    AppKeys.gamesComingSoon: 'Coming soon',
     AppKeys.gamesJourneyOne: 'Numi Farm',
     AppKeys.gamesJourneyTwo: 'Numi Journey 02',
     AppKeys.gamesJourneyThree: 'Numi Journey 03',

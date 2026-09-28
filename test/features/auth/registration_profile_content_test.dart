@@ -144,7 +144,10 @@ void main() {
       tester.widget<SignupActionButton>(find.byType(SignupActionButton)).label,
       lingo.lookup(AppKeys.signup),
     );
-    expect(find.text(lingo.lookup(AppKeys.signup)), findsOneWidget);
+    expect(
+      find.text(lingo.lookup(AppKeys.signup).toUpperCase()),
+      findsOneWidget,
+    );
     expect(
       find.text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.'),
       findsOneWidget,
@@ -169,6 +172,10 @@ void main() {
     expect(
       tester.widget<SignupActionButton>(find.byType(SignupActionButton)).label,
       lingo.lookup(AppKeys.signingUp),
+    );
+    expect(
+      find.text(lingo.lookup(AppKeys.signingUp).toUpperCase()),
+      findsOneWidget,
     );
   });
 }

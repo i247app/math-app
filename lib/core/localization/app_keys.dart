@@ -753,6 +753,7 @@ class AppKeys {
   static const gamesLevelCount = 'games_level_count';
   static const gamesLevelLabel = 'games_level_label';
   static const gamesLevelComingSoon = 'games_level_coming_soon';
+  static const gamesComingSoon = 'games_coming_soon';
   static const gamesJourneyOne = 'games_journey_one';
   static const gamesJourneyTwo = 'games_journey_two';
   static const gamesJourneyThree = 'games_journey_three';

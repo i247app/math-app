@@ -54,9 +54,9 @@ void main() {
     await tester.tap(find.text('iPad Pro'));
     expect(selectedDeviceId, 5);
 
-    await tester.ensureVisible(find.text('Gửi mã'));
+    await tester.ensureVisible(find.text('GỬI MÃ'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Gửi mã'));
+    await tester.tap(find.text('GỬI MÃ'));
     expect(didSend, isTrue);
   });
 }
