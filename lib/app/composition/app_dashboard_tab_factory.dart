@@ -32,6 +32,7 @@ import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
+import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
@@ -62,6 +63,10 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     DashboardTabArgs args, {
     bool useActiveStudentProfileData = false,
   }) {
+    final usesNewHome = useActiveStudentProfileData
+        ? _useNewStudentHome
+        : _useNewParentHome;
+    final profileId = profileStableId(args.activeProfile);
     return switch (args.activeTab) {
       0 =>
         (useActiveStudentProfileData
@@ -95,8 +100,23 @@ class AppDashboardTabFactory implements DashboardTabFactory {
           onOpenInitialAssessment: (context) => openInitialAssessmentFromHome(
             context: context,
             examService: args.examService,
-            profileId: profileStableId(args.activeProfile),
+            profileId: profileId,
             gradeLabel: args.activeProfile?.grade?.label,
+            onNoAssessment: usesNewHome && profileId != null && profileId > 0
+                ? () => Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) => WelcomeAssessmentIntroScreen(
+                        profileId: profileId,
+                        onAssessment: (_) => openInitialAssessmentFromHome(
+                          context: context,
+                          examService: args.examService,
+                          profileId: profileId,
+                          gradeLabel: args.activeProfile?.grade?.label,
+                        ),
+                      ),
+                    ),
+                  )
+                : null,
           ),
           onOpenExamReview: (context, exam) {
             final examId = exam.examId ?? exam.id;
