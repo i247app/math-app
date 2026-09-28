@@ -87,7 +87,8 @@ void main() {
       );
       expect(chart.chartHeight, 150);
       expect(find.text('Cấp độ'), findsOneWidget);
-      expect(find.text('Hoạt động'), findsOneWidget);
+      expect(find.text('Trend'), findsOneWidget);
+      expect(find.text('CẤP ĐỘ'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
       expect(find.text('Đánh giá trình độ'), findsOneWidget);
       expect(find.text('Học & Luyện tập'), findsOneWidget);
@@ -95,7 +96,8 @@ void main() {
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();
       expect(find.text('Level'), findsOneWidget);
-      expect(find.text('Activity'), findsOneWidget);
+      expect(find.text('Trend'), findsOneWidget);
+      expect(find.text('LEVEL'), findsOneWidget);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);
 
@@ -189,7 +191,8 @@ void main() {
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
       expect(find.text('Cấp độ'), findsOneWidget);
-      expect(find.text('Hoạt động'), findsOneWidget);
+      expect(find.text('Trend'), findsOneWidget);
+      expect(find.text('CẤP ĐỘ'), findsOneWidget);
       expect(find.text('Đánh giá trình độ'), findsOneWidget);
       expect(find.text('Học & Luyện tập'), findsOneWidget);
 

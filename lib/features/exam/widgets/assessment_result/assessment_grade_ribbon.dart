@@ -3,8 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/localization/app_language.dart';
-import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_colors.dart';
 
 class AssessmentGradeRibbon extends StatelessWidget {
@@ -25,9 +23,9 @@ class AssessmentGradeRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeIndex = currentGrade.clamp(0, _gradeCenters.length - 1);
-    final gradeLabel = LingoScope.of(context).language == AppLanguage.vi
-        ? 'LỚP'
-        : 'GRADE';
+    final levelLabel = context
+        .getText(AppKeys.placementResultChartGrade)
+        .toUpperCase();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -49,14 +47,22 @@ class AssessmentGradeRibbon extends StatelessWidget {
                     width: 52,
                     child: Column(
                       children: [
-                        Text(
-                          gradeLabel,
-                          key: const ValueKey('placement-current-grade-label'),
-                          style: GoogleFonts.nunito(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            height: 1,
+                        SizedBox(
+                          width: 52,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              levelLabel,
+                              key: const ValueKey(
+                                'placement-current-grade-label',
+                              ),
+                              style: GoogleFonts.nunito(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                height: 1,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 2),

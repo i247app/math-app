@@ -107,6 +107,21 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(
+                const ValueKey('placement-current-grade-label'),
+                skipOffstage: false,
+              ),
+            )
+            .data,
+        language == AppLanguage.vi ? 'CẤP ĐỘ' : 'LEVEL',
+      );
+      expect(
+        find.text(language == AppLanguage.vi ? 'Trend' : 'Trend'),
+        findsOneWidget,
+      );
 
       await tester.tap(_action);
       await tester.pump();
