@@ -39,6 +39,7 @@ class ExamAttemptScreen extends StatefulWidget {
     this.gradeLabel,
     this.level,
     this.profileId,
+    this.isGuest = false,
     this.startAtKindergarten = true,
     this.onResultBack,
     this.allowQuestionNavigation = true,
@@ -53,6 +54,7 @@ class ExamAttemptScreen extends StatefulWidget {
   final String? gradeLabel;
   final int? level;
   final int? profileId;
+  final bool isGuest;
 
   /// Direct placement starts at grade 0; explicit grade-selection can opt out.
   final bool startAtKindergarten;
@@ -367,6 +369,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
             examType: widget.examType,
             examService: examService,
             profileId: profileId ?? submittedExam.profileId,
+            isGuest: widget.isGuest,
             userExamId: submittedUserExamId,
             previousGrade: _controller.completedSets.isNotEmpty
                 ? _controller.completedSets.first.grade
@@ -403,6 +406,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                     examType: generatedExam.examType ?? examTypePractice,
                     gradeLabel: gradeLabel,
                     profileId: profileId,
+                    isGuest: widget.isGuest,
                     onResultBack: onResultBack,
                     allowQuestionNavigation: allowQuestionNavigation,
                     showQuestionNavigation: showQuestionNavigation,

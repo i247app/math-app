@@ -34,6 +34,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.examType = examTypeAssessment,
     this.examService,
     this.profileId,
+    this.isGuest = false,
     this.userExamId,
     this.previousGrade,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
@@ -49,6 +50,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final String examType;
   final ExamService? examService;
   final int? profileId;
+  final bool isGuest;
   final int? userExamId;
   final int? previousGrade;
   final List<ExamPracticeTopic> practiceWeakTopics;
@@ -476,29 +478,36 @@ class _AssessmentPlacementResultScreenState
                   child: Row(
                     children: [
                       Expanded(
-                        child: _PlacementActionButton(
-                          key: const ValueKey('placement-view-details'),
-                          label: context.getText(
-                            AppKeys.placementResultViewDetails,
+                        child: Center(
+                          child: SizedBox(
+                            width: widget.isGuest ? 220 : double.infinity,
+                            child: _PlacementActionButton(
+                              key: const ValueKey('placement-view-details'),
+                              label: context.getText(
+                                AppKeys.placementResultViewDetails,
+                              ),
+                              icon: Icons.assignment_outlined,
+                              color: AppColors.resultCoral,
+                              outlined: true,
+                              onTap: _viewDetails,
+                            ),
                           ),
-                          icon: Icons.assignment_outlined,
-                          color: AppColors.resultCoral,
-                          outlined: true,
-                          onTap: _viewDetails,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _PlacementActionButton(
-                          key: const ValueKey('placement-practice-again'),
-                          label: context.getText(
-                            AppKeys.placementResultPractice,
+                      if (!widget.isGuest) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _PlacementActionButton(
+                            key: const ValueKey('placement-practice-again'),
+                            label: context.getText(
+                              AppKeys.placementResultPractice,
+                            ),
+                            icon: Icons.sync_rounded,
+                            color: AppColors.teal500,
+                            onTap: () => _generateAgain(examTypePractice),
                           ),
-                          icon: Icons.sync_rounded,
-                          color: AppColors.teal500,
-                          onTap: () => _generateAgain(examTypePractice),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),

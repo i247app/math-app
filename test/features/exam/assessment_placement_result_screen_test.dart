@@ -392,6 +392,48 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('guest result hides practice and keeps details available', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    var didOpenDetails = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: AssessmentPlacementResultScreen(
+            grade: 1,
+            correctAnswers: 6,
+            totalQuestions: 10,
+            examService: const _UnusedExamService(),
+            isGuest: true,
+            onViewDetails: () => didOpenDetails = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final details = find.byKey(const ValueKey('placement-view-details'));
+    expect(details, findsOneWidget);
+    expect(tester.getSize(details).width, 220);
+    expect(
+      find.byKey(const ValueKey('placement-practice-again')),
+      findsNothing,
+    );
+    expect(find.text('Luyện tập'), findsNothing);
+
+    await tester.ensureVisible(details);
+    await tester.tap(details);
+    expect(didOpenDetails, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('expands distinct weak topics as bullet points', (tester) async {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
