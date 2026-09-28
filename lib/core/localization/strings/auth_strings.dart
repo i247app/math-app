@@ -21,7 +21,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.newAccountPrompt: 'Đây là tài khoản MỚI. Tiếp tục đăng ký?',
     AppKeys.signup: 'Đăng ký',
     AppKeys.login: 'Đăng nhập',
-    AppKeys.loginWithPin: 'Đăng nhập với PIN',
+    AppKeys.loginWithPin: 'Đăng nhập bằng PIN',
     AppKeys.authSwitchToSignupPrompt: 'Chưa có tài khoản?',
     AppKeys.authSwitchToLoginPrompt: 'Đã có tài khoản?',
     AppKeys.trustedDeviceTitle: 'Xác minh thiết bị mới',

@@ -184,6 +184,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                         focusNode: _passcodeFocusNode,
                         hasError: errorText != null,
                         onChanged: _handlePasscodeChanged,
+                        showDigits:
+                            widget.mode == PasscodeScreenMode.setup &&
+                            !_isConfirmingSetup,
                       ),
                     ),
                     const SizedBox(height: 16),

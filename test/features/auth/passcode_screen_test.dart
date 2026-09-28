@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
+import 'package:numi/core/localization/strings/auth_strings.dart';
+import 'package:numi/core/localization/strings/settings/settings_strings.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/screens/passcode_screen.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
 
 void main() {
+  test('Vietnamese PIN login copy uses the shorter wording', () {
+    expect(authStrings['vi']?[AppKeys.loginWithPin], 'Đăng nhập bằng PIN');
+    expect(settingsStrings['vi']?[AppKeys.unlockPasscodeTitle], 'Mã PIN');
+    expect(settingsStrings['vi']?[AppKeys.unlockPasscodeSubtitle], 'Mã PIN');
+  });
+
   Future<void> pumpPasscodeScreen(
     WidgetTester tester, {
     required PasscodeScreenMode mode,
@@ -92,6 +101,10 @@ void main() {
     final field = find.byType(TextField);
     await tester.enterText(field, '1234');
     await tester.pump();
+    for (final digit in ['1', '2', '3', '4']) {
+      expect(find.text(digit), findsOneWidget);
+    }
+    expect(find.text('•'), findsNothing);
     await tester.ensureVisible(find.byType(PasscodeActionButton));
     await tester.tap(find.byType(PasscodeActionButton));
     await tester.pump();
@@ -102,6 +115,10 @@ void main() {
 
     await tester.enterText(field, '1234');
     await tester.pump();
+    expect(find.text('•'), findsNWidgets(4));
+    for (final digit in ['1', '2', '3', '4']) {
+      expect(find.text(digit), findsNothing);
+    }
     await tester.tap(find.byType(PasscodeActionButton));
     await tester.pump();
     expect(submitted, '1234');

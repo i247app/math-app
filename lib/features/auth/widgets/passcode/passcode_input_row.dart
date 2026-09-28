@@ -11,12 +11,14 @@ class PasscodeInputRow extends StatelessWidget {
     required this.focusNode,
     required this.hasError,
     required this.onChanged,
+    this.showDigits = false,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool hasError;
   final VoidCallback onChanged;
+  final bool showDigits;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,7 @@ class PasscodeInputRow extends StatelessWidget {
                         ),
                         child: index < controller.text.length
                             ? Text(
-                                '•',
+                                showDigits ? controller.text[index] : '•',
                                 style: Theme.of(context).textTheme.bodyMedium!
                                     .copyWith(
                                       color: colors.textPrimary,
