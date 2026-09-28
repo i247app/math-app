@@ -8,10 +8,15 @@ import 'package:numi/core/localization/strings/settings/settings_strings.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/screens/passcode_screen.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
+import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 void main() {
   test('Vietnamese PIN login copy uses the shorter wording', () {
     expect(authStrings['vi']?[AppKeys.loginWithPin], 'Đăng nhập bằng PIN');
+    expect(
+      settingsStrings['vi']?[AppKeys.createPasscodeSubtitle],
+      'Dùng PIN để\nđăng nhập nhanh chóng',
+    );
     expect(settingsStrings['vi']?[AppKeys.unlockPasscodeTitle], 'Mã PIN');
     expect(settingsStrings['vi']?[AppKeys.unlockPasscodeSubtitle], 'Mã PIN');
   });
@@ -56,6 +61,9 @@ void main() {
 
     final field = find.byType(TextField);
     expect(field, findsOneWidget);
+    expect(find.byType(NumiBrandText), findsOneWidget);
+    expect(find.text('PIN'), findsNothing);
+    expect(find.text('Mã PIN'), findsOneWidget);
     expect(
       tester
           .widget<PasscodeActionButton>(find.byType(PasscodeActionButton))
@@ -100,6 +108,8 @@ void main() {
     );
 
     final field = find.byType(TextField);
+    expect(find.byType(NumiBrandText), findsNothing);
+    expect(find.text('Tạo Mã PIN'), findsOneWidget);
     await tester.enterText(field, '1234');
     await tester.pump();
     for (final digit in ['1', '2', '3', '4']) {

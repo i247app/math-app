@@ -21,7 +21,7 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.confirmPasscodeTitle: 'Nhập Lại Mã PIN',
     AppKeys.unlockPasscodeTitle: 'Mã PIN',
     AppKeys.verifyPasscodeTitle: 'Xác Minh Mã PIN',
-    AppKeys.createPasscodeSubtitle: 'Tạo mã PIN để\nđăng nhập nhanh chóng',
+    AppKeys.createPasscodeSubtitle: 'Dùng PIN để\nđăng nhập nhanh chóng',
     AppKeys.confirmPasscodeSubtitle: 'Nhập lại mã PIN để\nxác nhận',
     AppKeys.unlockPasscodeSubtitle: 'Mã PIN',
     AppKeys.verifyPasscodeSubtitle: 'Nhập mã PIN để\nxác nhận',

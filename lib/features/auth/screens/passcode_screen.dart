@@ -10,6 +10,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart';
 import 'package:numi/features/auth/widgets/passcode/passcode_input_row.dart';
+import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 enum PasscodeScreenMode { setup, unlock, verify }
 
@@ -155,7 +156,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       },
       child: AuthLayout(
         onBack: widget.onBack,
-        title: _titleText(context),
+        title: widget.mode == PasscodeScreenMode.unlock
+            ? null
+            : context.getText(_titleKey),
+        titleWidget: widget.mode == PasscodeScreenMode.unlock
+            ? const NumiBrandText(fontSize: FontSize.displayLarge)
+            : null,
         bodyGap: 54,
         bodyBuilder: (context) {
           return ValueListenableBuilder<TextEditingValue>(
@@ -258,13 +264,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       return AppKeys.passcodeLoginWithEmail;
     }
     return AppKeys.passcodeSkip;
-  }
-
-  String _titleText(BuildContext context) {
-    if (widget.mode == PasscodeScreenMode.unlock) {
-      return 'PIN';
-    }
-    return context.getText(_titleKey);
   }
 
   String get _titleKey {
