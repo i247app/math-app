@@ -79,7 +79,7 @@ void main() {
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
     expect(find.text('Xem chi tiết'), findsOneWidget);
-    expect(find.text('Luyện tập'), findsOneWidget);
+    expect(find.text('Luyện tập'), findsNothing);
     final levelRect = tester.getRect(find.text('Trình độ').first);
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
@@ -219,7 +219,7 @@ void main() {
       expect(position.maxScrollExtent, 0);
       expect(
         tester
-            .getRect(find.byKey(const ValueKey('placement-practice-again')))
+            .getRect(find.byKey(const ValueKey('placement-view-details')))
             .bottom,
         lessThanOrEqualTo(height),
       );
@@ -321,7 +321,7 @@ void main() {
       );
       expect(
         tester
-            .getRect(find.byKey(const ValueKey('placement-practice-again')))
+            .getRect(find.byKey(const ValueKey('placement-view-details')))
             .bottom,
         lessThanOrEqualTo(viewport.height - viewport.bottomInset),
       );
@@ -353,7 +353,7 @@ void main() {
 
     expect(find.text('LỚP 3'), findsOneWidget);
     expect(find.text('Xem chi tiết'), findsOneWidget);
-    expect(find.text('Luyện tập'), findsOneWidget);
+    expect(find.text('Luyện tập'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -392,7 +392,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('guest result hides practice and keeps details available', (
+  testWidgets('ASSESSMENT result hides practice and keeps details available', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -411,7 +411,6 @@ void main() {
             correctAnswers: 6,
             totalQuestions: 10,
             examService: const _UnusedExamService(),
-            isGuest: true,
             onViewDetails: () => didOpenDetails = true,
           ),
         ),
@@ -498,7 +497,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('practice again generates PRACTICE at the placement grade', (
+  testWidgets('GRADE result can generate PRACTICE at the placement grade', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -517,6 +516,7 @@ void main() {
             grade: 4,
             correctAnswers: 6,
             totalQuestions: 10,
+            examType: examTypeGrade,
             examService: service,
             profileId: 21,
             userExamId: 99,
@@ -581,7 +581,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('English grade and actions stay inside their bounds', (
+  testWidgets('English assessment grade and details stay inside bounds', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -620,9 +620,6 @@ void main() {
     final vietnameseDetailsButtonRect = tester.getRect(
       find.byKey(const ValueKey('placement-view-details')),
     );
-    final vietnamesePracticeButtonRect = tester.getRect(
-      find.byKey(const ValueKey('placement-practice-again')),
-    );
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
@@ -644,6 +641,7 @@ void main() {
     expect(find.text('GRADE'), findsOneWidget);
     expect(find.text('LỚP'), findsNothing);
     expect(find.text('Activity'), findsOneWidget);
+    expect(find.text('Practice'), findsNothing);
     expect(find.textContaining('Test '), findsNothing);
     expect(
       find.byKey(const ValueKey('placement-progression-submitted-time')),
@@ -658,12 +656,6 @@ void main() {
     expect(gradeRect.right, lessThanOrEqualTo(344));
     expect(gradeRect.height, lessThan(60));
 
-    final practiceButtonRect = tester.getRect(
-      find.byKey(const ValueKey('placement-practice-again')),
-    );
-    final practiceTextRect = tester.getRect(find.text('Practice'));
-    expect(practiceTextRect.left, greaterThan(practiceButtonRect.left + 32));
-    expect(practiceTextRect.right, lessThan(practiceButtonRect.right - 8));
     expect(
       tester.getRect(find.byKey(const ValueKey('placement-mascot'))),
       vietnameseMascotRect,
@@ -678,12 +670,6 @@ void main() {
     expect(detailsButtonRect.left, vietnameseDetailsButtonRect.left);
     expect(detailsButtonRect.size, vietnameseDetailsButtonRect.size);
     expect(detailsButtonRect.top, closeTo(vietnameseDetailsButtonRect.top, 5));
-    expect(practiceButtonRect.left, vietnamesePracticeButtonRect.left);
-    expect(practiceButtonRect.size, vietnamesePracticeButtonRect.size);
-    expect(
-      practiceButtonRect.top,
-      closeTo(vietnamesePracticeButtonRect.top, 5),
-    );
     expect(tester.takeException(), isNull);
   });
 
@@ -818,6 +804,10 @@ void main() {
     expect(find.byType(AssessmentProgressionChart), findsNothing);
     expect(
       find.byKey(const ValueKey('placement-view-details')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-practice-again')),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);

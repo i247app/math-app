@@ -34,7 +34,6 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.examType = examTypeAssessment,
     this.examService,
     this.profileId,
-    this.isGuest = false,
     this.userExamId,
     this.previousGrade,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
@@ -50,7 +49,6 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final String examType;
   final ExamService? examService;
   final int? profileId;
-  final bool isGuest;
   final int? userExamId;
   final int? previousGrade;
   final List<ExamPracticeTopic> practiceWeakTopics;
@@ -78,6 +76,8 @@ class _AssessmentPlacementResultScreenState
       AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
   bool get _showsAssessmentChart =>
       widget.examType.trim().toUpperCase() == examTypeAssessment;
+  bool get _showsPracticeAction =>
+      widget.examType.trim().toUpperCase() == examTypeGrade;
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
   int get _correctAnswers => widget.correctAnswers.clamp(0, _totalQuestions);
 
@@ -480,7 +480,7 @@ class _AssessmentPlacementResultScreenState
                       Expanded(
                         child: Center(
                           child: SizedBox(
-                            width: widget.isGuest ? 220 : double.infinity,
+                            width: _showsPracticeAction ? double.infinity : 220,
                             child: _PlacementActionButton(
                               key: const ValueKey('placement-view-details'),
                               label: context.getText(
@@ -494,7 +494,7 @@ class _AssessmentPlacementResultScreenState
                           ),
                         ),
                       ),
-                      if (!widget.isGuest) ...[
+                      if (_showsPracticeAction) ...[
                         const SizedBox(width: 12),
                         Expanded(
                           child: _PlacementActionButton(
