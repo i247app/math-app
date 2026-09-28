@@ -31,7 +31,7 @@ const welcomeStrings = <String, Map<String, String>>{
     AppKeys.welcomeTryIt: 'Try It Now!',
     AppKeys.start: 'START',
     AppKeys.welcomeTaglineMath: 'Math ',
-    AppKeys.welcomeTaglineStudyAssessment: 'Learn & Assess',
+    AppKeys.welcomeTaglineStudyAssessment: 'Learning & Assessment',
     AppKeys.welcomeAssessmentTitle: 'Assessments',
     AppKeys.welcomeAssessmentSubtitle: 'Skills assessment',
     AppKeys.welcomeLearnMathTitle: 'Learn Math',
