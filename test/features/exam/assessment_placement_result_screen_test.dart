@@ -1363,7 +1363,11 @@ void main() {
     final activityTitle = tester.widget<Text>(find.text('Activity'));
     expect(activityTitle.style, levelTitle.style);
     final lastLabel = tester.getRect(find.text('Activity'));
+    final plot = tester.getRect(
+      find.byKey(const ValueKey('placement-progression-plot')),
+    );
     expect(find.text('Test 1'), findsNothing);
+    expect(lastLabel.center.dx, closeTo(plot.center.dx, 1));
     expect(lastLabel.right, lessThan(chart.right));
     expect(tester.takeException(), isNull);
   });

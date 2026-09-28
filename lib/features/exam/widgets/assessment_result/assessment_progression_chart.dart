@@ -163,14 +163,11 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6 + 29 + 12),
                   Expanded(
-                    flex: 2,
-                    child: Align(
-                      alignment: Alignment.centerRight,
+                    child: Center(
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerRight,
                         child: Text(activityLabel, style: headerTextStyle),
                       ),
                     ),
