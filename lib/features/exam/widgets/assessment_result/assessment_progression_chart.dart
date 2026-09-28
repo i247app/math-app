@@ -23,6 +23,8 @@ class AssessmentProgressionChart extends StatefulWidget {
     this.firstTestNumber = 1,
     this.maxVisiblePoints = 7,
     this.chartHeight = 150,
+    this.gradeTitle,
+    this.activityTitle,
     this.lastSubmittedAt,
     this.animate = true,
     this.animationDuration = const Duration(milliseconds: 1400),
@@ -34,6 +36,8 @@ class AssessmentProgressionChart extends StatefulWidget {
   final int firstTestNumber;
   final int maxVisiblePoints;
   final double chartHeight;
+  final String? gradeTitle;
+  final String? activityTitle;
   final DateTime? lastSubmittedAt;
   final bool animate;
   final Duration animationDuration;
@@ -105,8 +109,11 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   @override
   Widget build(BuildContext context) {
     final grade = widget.finalGrade.clamp(0, 5);
-    final activityLabel = context.getText(AppKeys.placementResultActivity);
-    final gradeDescription = context.getText(AppKeys.placementResultChartGrade);
+    final activityLabel =
+        widget.activityTitle ??
+        context.getText(AppKeys.placementResultActivity);
+    final gradeDescription =
+        widget.gradeTitle ?? context.getText(AppKeys.placementResultChartGrade);
     final headerTextStyle = GoogleFonts.andika(
       color: const Color(0xFF1C3A43),
       fontSize: 22,

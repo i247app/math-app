@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/app/composition/app_dashboard_tab_factory.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
@@ -34,8 +35,12 @@ void main() {
         'when hasAssessment=$hasAssessment', (tester) async {
       HomeProfileCache.instance.invalidateProfile(77);
       addTearDown(() => HomeProfileCache.instance.invalidateProfile(77));
+      final originalLanguage = AppLanguageState.current;
       final lingo = LingoProvider();
-      addTearDown(lingo.dispose);
+      addTearDown(() {
+        AppLanguageState.current = originalLanguage;
+        lingo.dispose();
+      });
       var assessmentOpens = 0;
       var gameOpens = 0;
       final examService = _ExamService(hasAssessment);
@@ -81,8 +86,16 @@ void main() {
         find.byType(AssessmentProgressionChart),
       );
       expect(chart.chartHeight, 150);
-      expect(find.text('Activity'), findsOneWidget);
+      expect(find.text('Cấp độ'), findsOneWidget);
+      expect(find.text('Hoạt động'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
+      expect(find.text('Đánh giá trình độ'), findsOneWidget);
+      expect(find.text('Học & Luyện tập'), findsOneWidget);
+
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
+      expect(find.text('Level'), findsOneWidget);
+      expect(find.text('Activity'), findsOneWidget);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);
 
@@ -124,8 +137,12 @@ void main() {
     (tester) async {
       HomeProfileCache.instance.invalidateProfile(78);
       addTearDown(() => HomeProfileCache.instance.invalidateProfile(78));
+      final originalLanguage = AppLanguageState.current;
       final lingo = LingoProvider();
-      addTearDown(lingo.dispose);
+      addTearDown(() {
+        AppLanguageState.current = originalLanguage;
+        lingo.dispose();
+      });
       final homeService = _RecordingStudentHomeService();
       final examService = _ExamService(false);
 
@@ -182,6 +199,13 @@ void main() {
 
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+      expect(find.text('Cấp độ'), findsOneWidget);
+      expect(find.text('Hoạt động'), findsOneWidget);
+      expect(find.text('Đánh giá trình độ'), findsOneWidget);
+      expect(find.text('Học & Luyện tập'), findsOneWidget);
+
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);
       expect(homeService.profileIds, [78]);

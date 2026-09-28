@@ -417,6 +417,10 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                   AssessmentProgressionChart(
                     key: const ValueKey('parent-home-progress-chart'),
                     finalGrade: _currentGrade,
+                    gradeTitle: context.getText(AppKeys.newHomeChartLevel),
+                    activityTitle: context.getText(
+                      AppKeys.newHomeChartActivity,
+                    ),
                     previousGrades: _previousGrades,
                     testNumbers: _testNumbers,
                     lastSubmittedAt: _lastSubmittedAt,
@@ -429,7 +433,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                       Expanded(
                         child: ParentHomeActionButton(
                           key: const ValueKey('parent-home-assessment-action'),
-                          label: 'Assessment Test',
+                          label: context.getText(AppKeys.newHomeAssessmentTest),
                           iconAsset:
                               'assets/icons/home-assessment-stopwatch.png',
                           colors: const [Color(0xFFFFBE54), Color(0xFFFF993C)],
@@ -441,7 +445,9 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                       Expanded(
                         child: ParentHomeActionButton(
                           key: const ValueKey('parent-home-practice-action'),
-                          label: 'Learning & Practice',
+                          label: context.getText(
+                            AppKeys.newHomeLearningPractice,
+                          ),
                           iconAsset: 'assets/icons/home-learning-book.png',
                           colors: const [Color(0xFFFFA18C), Color(0xFFFA796B)],
                           accentColor: const Color(0xFFFFB0AA),
