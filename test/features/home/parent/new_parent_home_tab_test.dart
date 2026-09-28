@@ -98,8 +98,8 @@ void main() {
       expect(find.text('Trend'), findsOneWidget);
       expect(find.text('CẤP ĐỘ'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
-      expect(find.text('Đánh Giá Trình Độ'), findsOneWidget);
-      expect(find.text('Học & Luyện Tập'), findsOneWidget);
+      expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
+      expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();
@@ -319,8 +319,8 @@ void main() {
       expect(find.text('Cấp độ'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
       expect(find.text('CẤP ĐỘ'), findsOneWidget);
-      expect(find.text('Đánh Giá Trình Độ'), findsOneWidget);
-      expect(find.text('Học & Luyện Tập'), findsOneWidget);
+      expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
+      expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();

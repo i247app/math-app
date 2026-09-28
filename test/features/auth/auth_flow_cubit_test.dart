@@ -372,7 +372,30 @@ void main() {
     await cubit.close();
   });
 
-  test('phone signup stops when phone OTP is unavailable', () async {
+  test('phone signup skips disabled OTP and creates a phone account', () async {
+    final service = _FakeAuthService(
+      identifierResponse: const <String, dynamic>{
+        'mstatus': 200,
+        'phone_otp_enable': false,
+        'email_otp_enable': false,
+      },
+    );
+    final cubit = _buildSignupCubit(service);
+
+    await cubit.submitAuthIdentifier('+84905666666');
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
+    expect(cubit.state.identifierLookupError, isNull);
+    expect(service.sentOtpCount, 0);
+
+    await cubit.submitSignup(_studentSignupForm);
+    expect(service.signupPhone, '+84905666666');
+    expect(service.signupEmail, isNull);
+    expect(service.verifiedOtpLoginName, isNull);
+    expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
+    await cubit.close();
+  });
+
+  test('Back from profile without phone OTP returns to phone entry', () async {
     final service = _FakeAuthService(
       identifierResponse: const <String, dynamic>{
         'mstatus': 200,
@@ -382,8 +405,11 @@ void main() {
     final cubit = _buildSignupCubit(service);
 
     await cubit.submitAuthIdentifier('+84905666666');
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
+
+    expect(cubit.handleSystemBack(), isTrue);
     expect(cubit.state.screen, AuthScreen.signup);
-    expect(cubit.state.identifierLookupError, isNotEmpty);
+    expect(cubit.state.loginName, '+84905666666');
     expect(service.sentOtpCount, 0);
 
     await cubit.submitSignup(_studentSignupForm);

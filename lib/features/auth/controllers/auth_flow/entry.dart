@@ -126,17 +126,6 @@ extension AuthFlowEntry on AuthFlowCubit {
       _clearPendingSignup();
       _pendingSignupIdentifier = loginName;
       _signupOtpRequired = otpEnabled;
-      if (!otpEnabled &&
-          detectLoginNameKind(loginName) == LoginNameKind.phone) {
-        _emitState(
-          state.copyWith(
-            identifierLookupError: AppStrings.current(
-              AppKeys.signupOtpUnavailable,
-            ),
-          ),
-        );
-        return;
-      }
       if (!otpEnabled) {
         _signupIdentifierReadyForCreation = loginName;
         _emitState(

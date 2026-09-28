@@ -26,6 +26,31 @@ class ParentHomeActionButton extends StatelessWidget {
         final fontSize = ((constraints.maxWidth - 56) / 6.1).clamp(14.0, 18.0);
         final textScale =
             MediaQuery.textScalerOf(context).scale(fontSize) / fontSize;
+        final hasExplicitLines = label.contains('\n');
+        final labelStyle = GoogleFonts.nunito(
+          color: const Color(0xFFFFFDF5),
+          fontSize: fontSize,
+          height: 1.15,
+          fontWeight: FontWeight.w900,
+        );
+        final icon = Image.asset(
+          iconAsset,
+          width: 58,
+          height: 58,
+          fit: BoxFit.contain,
+          excludeFromSemantics: true,
+        );
+        final arrow = DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFFDF5),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.chevron_right_rounded,
+            color: colors.first,
+            size: 24,
+          ),
+        );
 
         return Semantics(
           button: true,
@@ -96,43 +121,41 @@ class ParentHomeActionButton extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset(
-                                iconAsset,
-                                width: 58,
-                                height: 58,
-                                fit: BoxFit.contain,
-                                excludeFromSemantics: true,
-                              ),
+                              if (hasExplicitLines)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [icon, arrow],
+                                )
+                              else
+                                icon,
                               const Spacer(),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      label,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.nunito(
-                                        color: const Color(0xFFFFFDF5),
-                                        fontSize: fontSize,
-                                        height: 1.15,
-                                        fontWeight: FontWeight.w900,
+                              if (hasExplicitLines)
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    label,
+                                    maxLines: 2,
+                                    softWrap: false,
+                                    style: labelStyle,
+                                  ),
+                                )
+                              else
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        label,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: labelStyle,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  DecoratedBox(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFFFFDF5),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: colors.first,
-                                      size: 24,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                    const SizedBox(width: 6),
+                                    arrow,
+                                  ],
+                                ),
                             ],
                           ),
                         ),
