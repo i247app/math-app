@@ -62,7 +62,6 @@ class SettingsPasscodeFlow {
           return PasscodeScreen(
             mode: PasscodeScreenMode.setup,
             titleKey: AppKeys.createPasscodeTitle,
-            primaryLabelKey: AppKeys.passcodeContinue,
             onBack: () => Navigator.of(routeContext).pop(false),
             onSubmit: (passcode) async {
               await controller.setPasscode(userId: userId, passcode: passcode);
@@ -99,7 +98,6 @@ class SettingsPasscodeFlow {
           return PasscodeScreen(
             mode: PasscodeScreenMode.setup,
             titleKey: AppKeys.changePasscodeTitle,
-            primaryLabelKey: AppKeys.passcodeContinue,
             onBack: () => Navigator.of(routeContext).pop(false),
             onSubmit: (passcode) async {
               await controller.setPasscode(userId: userId, passcode: passcode);

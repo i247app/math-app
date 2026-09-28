@@ -112,6 +112,7 @@ class AppKeys {
   static const navReview = 'nav_review';
   static const navAssessment = 'nav_assessment';
   static const navLearning = 'nav_learning';
+  static const learningTabTitle = 'learning_tab_title';
   static const navRoom = 'nav_room';
   static const navProgram = 'nav_program';
   static const navGames = 'nav_games';
@@ -486,6 +487,7 @@ class AppKeys {
   static const changePasscodeTitle = 'change_passcode_title';
   static const enterCurrentPasscodeTitle = 'enter_current_passcode_title';
   static const passcodeContinue = 'passcode_continue';
+  static const passcodeCreate = 'passcode_create';
   static const passcodeUnlock = 'passcode_unlock';
   static const passcodeLogin = 'passcode_login';
   static const passcodeLoginWithEmail = 'passcode_login_with_email';

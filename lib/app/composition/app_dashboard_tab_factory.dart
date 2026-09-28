@@ -33,6 +33,7 @@ import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
@@ -179,7 +180,16 @@ class AppDashboardTabFactory implements DashboardTabFactory {
   }) {
     final profileId = profileStableId(args.activeProfile);
     if (profileId == null || profileId <= 0) {
-      return Center(child: Text(context.getText(AppKeys.parentNoStudentTitle)));
+      return Column(
+        children: [
+          const _LearningPageHeader(),
+          Expanded(
+            child: Center(
+              child: Text(context.getText(AppKeys.parentNoStudentTitle)),
+            ),
+          ),
+        ],
+      );
     }
     final buildContent = useActiveStudentProfileData
         ? NewStudentHomeContent.new
@@ -201,7 +211,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
       onOpenGamesTab: args.onOpenGamesTab,
       onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
       bottomPadding: args.bottomPadding,
-      homeHeader: args.homeHeader,
+      homeHeader: const _LearningPageHeader(),
       showAssessmentList: true,
       onOpenInitialAssessment: (context) =>
           _openAssessmentFromHome(context, args, showIntro: true),
@@ -371,4 +381,12 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     bottomPadding: args.bottomPadding,
     isActive: args.isActive,
   );
+}
+
+class _LearningPageHeader extends StatelessWidget {
+  const _LearningPageHeader();
+
+  @override
+  Widget build(BuildContext context) =>
+      PageHeader(title: context.getText(AppKeys.learningTabTitle));
 }

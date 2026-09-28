@@ -31,6 +31,7 @@ import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
@@ -313,6 +314,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
+      expect(find.byType(PageHeader), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
       expect(find.text('Cấp độ'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
@@ -331,10 +333,21 @@ void main() {
       await tester.pumpAndSettle();
       expect(activeTab, 5);
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
+      expect(find.byType(PageHeader), findsOneWidget);
+      expect(
+        tester.widget<PageHeader>(find.byType(PageHeader)).title,
+        'Learning',
+      );
       expect(find.byType(NewHomeAssessmentList), findsOneWidget);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.byType(GradeRoadmapScreen), findsNothing);
+
+      await lingo.setLanguage(AppLanguage.vi);
+      await tester.pumpAndSettle();
+      expect(tester.widget<PageHeader>(find.byType(PageHeader)).title, 'Học');
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();

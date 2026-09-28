@@ -49,12 +49,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   late final TextEditingController _passcodeController;
   late final FocusNode _passcodeFocusNode;
   late final AnimationController _shakeController;
-  String? _firstPasscode;
   String? _localError;
   int _lastErrorId = 0;
-
-  bool get _isConfirmingSetup =>
-      widget.mode == PasscodeScreenMode.setup && _firstPasscode != null;
 
   @override
   void initState() {
@@ -100,18 +96,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     }
 
     FocusScope.of(context).unfocus();
-    if (widget.mode == PasscodeScreenMode.setup && !_isConfirmingSetup) {
-      setState(() => _firstPasscode = passcode);
-      _clearDigits(focusFirst: true);
-      return;
-    }
-
-    if (_isConfirmingSetup && passcode != _firstPasscode) {
-      _firstPasscode = null;
-      _showError(context.getText(AppKeys.passcodeMismatch));
-      return;
-    }
-
     final error = await widget.onSubmit(passcode);
     if (error != null && mounted) {
       _showError(error);
@@ -190,9 +174,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                         focusNode: _passcodeFocusNode,
                         hasError: errorText != null,
                         onChanged: _handlePasscodeChanged,
-                        showDigits:
-                            widget.mode == PasscodeScreenMode.setup &&
-                            !_isConfirmingSetup,
+                        showDigits: widget.mode == PasscodeScreenMode.setup,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -271,9 +253,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     if (explicit != null) {
       return explicit;
     }
-    if (_isConfirmingSetup) {
-      return AppKeys.confirmPasscodeTitle;
-    }
     return switch (widget.mode) {
       PasscodeScreenMode.setup => AppKeys.createPasscodeTitle,
       PasscodeScreenMode.unlock => AppKeys.unlockPasscodeTitle,
@@ -287,16 +266,13 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       return explicit;
     }
     return switch (widget.mode) {
-      PasscodeScreenMode.setup => AppKeys.passcodeContinue,
+      PasscodeScreenMode.setup => AppKeys.passcodeCreate,
       PasscodeScreenMode.unlock => AppKeys.passcodeLogin,
       PasscodeScreenMode.verify => AppKeys.passcodeContinue,
     };
   }
 
   String get _subtitleKey {
-    if (_isConfirmingSetup) {
-      return AppKeys.confirmPasscodeSubtitle;
-    }
     return switch (widget.mode) {
       PasscodeScreenMode.setup => AppKeys.createPasscodeSubtitle,
       PasscodeScreenMode.unlock => AppKeys.unlockPasscodeSubtitle,

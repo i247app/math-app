@@ -264,8 +264,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final headerHeight = 64 + topInset;
             final showHeader =
                 widget.activeRole != ProfileRole.teacher &&
-                (navigation.activeTab == 0 ||
-                    navigation.activeTab == learningTabIndex);
+                navigation.activeTab == 0;
             final switchableProfiles = widget.profiles
                 .where(
                   (profile) =>

@@ -87,7 +87,7 @@ class PasscodeInputRow extends StatelessWidget {
                     signed: false,
                   ),
                   textInputAction: TextInputAction.done,
-                  obscureText: true,
+                  obscureText: !showDigits,
                   maxLength: 4,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (_) => onChanged(),
