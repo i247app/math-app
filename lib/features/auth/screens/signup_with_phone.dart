@@ -6,6 +6,9 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/utils/phone/phone_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_number_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/helpers/identifier_check_response.dart';
+import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
 import 'package:numi/features/auth/widgets/auth_layout.dart';
 import 'package:numi/features/auth/widgets/signup/signup_phone_input.dart';
@@ -13,29 +16,24 @@ import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 /// Reserved signup screen for phone number entry.
 ///
-/// Owns phone input and validation, then passes a normalized phone number to
-/// [onSubmitPhone]. Account lookup, verification, and creation belong to the
-/// future phone signup flow. This screen is not registered in navigation.
+/// Checks availability and sends signup OTP before notifying [onOtpSent].
+/// This screen is not registered in app navigation yet.
 class SignupWithPhone extends StatefulWidget {
   const SignupWithPhone({
     super.key,
     required this.onBack,
-    required this.onSubmitPhone,
+    required this.authService,
+    required this.onOtpSent,
     this.isSubmitting = false,
   });
 
   final VoidCallback onBack;
-  final ValueChanged<String> onSubmitPhone;
+  final AuthService authService;
+  final ValueChanged<String> onOtpSent;
   final bool isSubmitting;
 
-  // TODO: Connect this screen only after restoring phone signup API support.
-  // Do not pass phone numbers to the current email signup controller.
-  // Reserved usage example (intentionally not added to the app router):
-  // SignupWithPhone(
-  //   onBack: onBack,
-  //   onSubmitPhone: onPhoneSignupRequested,
-  //   isSubmitting: isPhoneSignupPending,
-  // ),
+  // TODO: Wire this screen and onOtpSent to a complete phone registration flow
+  // when phone account creation is supported.
 
   @override
   State<SignupWithPhone> createState() => _SignupWithPhoneState();
@@ -45,6 +43,9 @@ class _SignupWithPhoneState extends State<SignupWithPhone> {
   final _phoneController = TextEditingController();
   PhoneRegion _region = PhoneRegion.vn;
   String? _errorKey;
+  bool _isSubmitting = false;
+
+  bool get _isBusy => widget.isSubmitting || _isSubmitting;
 
   @override
   void dispose() {
@@ -59,7 +60,7 @@ class _SignupWithPhoneState extends State<SignupWithPhone> {
   }
 
   void _selectRegion(PhoneRegion region) {
-    if (widget.isSubmitting || region == _region) {
+    if (_isBusy || region == _region) {
       return;
     }
     _phoneController.value = PhoneInputFormatter(
@@ -71,8 +72,8 @@ class _SignupWithPhoneState extends State<SignupWithPhone> {
     });
   }
 
-  void _submit() {
-    if (widget.isSubmitting) {
+  Future<void> _submit() async {
+    if (_isBusy) {
       return;
     }
     final result = normalizePhoneInput(_region, _phoneController.text);
@@ -81,7 +82,45 @@ class _SignupWithPhoneState extends State<SignupWithPhone> {
       return;
     }
     FocusManager.instance.primaryFocus?.unfocus();
-    widget.onSubmitPhone(result.phone!);
+    final phone = result.phone!;
+    setState(() {
+      _isSubmitting = true;
+      _errorKey = null;
+    });
+
+    String? errorKey;
+    var otpSent = false;
+    var checkingIdentifier = true;
+    try {
+      final response = await widget.authService.checkIdentifier(phone);
+      if (!mounted) return;
+      final availability = IdentifierAvailability.fromResponse(response, phone);
+      if (availability == null) {
+        errorKey = AppKeys.authPhoneCheckFailed;
+      } else if (availability.mstatus != 200) {
+        errorKey = AppKeys.signupPhoneAlreadyRegistered;
+      } else if (availability.otpEnabled != true) {
+        errorKey = AppKeys.signupOtpUnavailable;
+      } else {
+        checkingIdentifier = false;
+        await widget.authService.sendOtp(
+          loginName: phone,
+          kind: AuthOtpKind.signup,
+        );
+        otpSent = true;
+      }
+    } catch (_) {
+      errorKey = checkingIdentifier
+          ? AppKeys.authPhoneCheckFailed
+          : AppKeys.signupOtpFailed;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isSubmitting = false;
+      _errorKey = errorKey;
+    });
+    if (otpSent) widget.onOtpSent(phone);
   }
 
   @override
@@ -101,14 +140,14 @@ class _SignupWithPhoneState extends State<SignupWithPhone> {
               onRegionChanged: _selectRegion,
               onChanged: _clearError,
               onSubmitted: (_) => _submit(),
-              enabled: !widget.isSubmitting,
+              enabled: !_isBusy,
               errorText: _errorKey == null ? null : context.getText(_errorKey!),
             ),
             const SizedBox(height: 24),
             AuthEntryActionButton(
               label: context.getText(AppKeys.signup),
-              onPressed: widget.isSubmitting ? null : _submit,
-              isBusy: widget.isSubmitting,
+              onPressed: _isBusy ? null : _submit,
+              isBusy: _isBusy,
             ),
           ],
         ),

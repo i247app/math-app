@@ -1,11 +1,11 @@
 part of '../auth_cubit.dart';
 
 extension AuthFlowEntry on AuthFlowCubit {
-  Future<void> lookupSignupEmail(String email) async {
+  Future<bool?> lookupSignupEmail(String email) async {
     if (state.screen != AuthScreen.signup ||
         state.authEntryMode != AuthEntryMode.signup ||
         state.isCheckingIdentifier) {
-      return;
+      return null;
     }
 
     _emitState(
@@ -30,15 +30,21 @@ extension AuthFlowEntry on AuthFlowCubit {
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
           state.checkedIdentifier != email) {
-        return;
+        return null;
       }
 
-      final exists = identifierExistsFromResponse(response);
-      if (exists == null) {
+      final availability = IdentifierAvailability.fromResponse(response, email);
+      if (availability == null) {
         throw AuthException(
           AppStrings.current(AppKeys.authLoginNameCheckFailed),
         );
       }
+
+      final exists = availability.mstatus != 200;
+      final otpEnabled = availability.otpEnabled == true;
+      final otpError = !exists && !otpEnabled
+          ? AppStrings.current(AppKeys.signupOtpUnavailable)
+          : null;
 
       _emitState(
         state.copyWith(
@@ -46,35 +52,25 @@ extension AuthFlowEntry on AuthFlowCubit {
           checkedIdentifier: email,
           isCheckingIdentifier: false,
           identifierExists: exists,
+          identifierLookupError: otpError,
+          identifierLookupErrorStatus: availability.mstatus == 200
+              ? null
+              : availability.mstatus,
           otpFlow: OtpFlow.signup,
           clearAuthError: true,
-          clearIdentifierLookupError: true,
-          clearIdentifierLookupErrorStatus: true,
+          clearIdentifierLookupError: otpError == null,
+          clearIdentifierLookupErrorStatus: availability.mstatus == 200,
           clearOtpExpiry: true,
           clearOtpError: true,
         ),
       );
+      return !exists && otpEnabled;
     } on AuthException catch (error) {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
           state.checkedIdentifier != email) {
-        return;
-      }
-
-      if (isAuthUserNotFoundStatus(error.status)) {
-        _emitState(
-          state.copyWith(
-            loginName: email,
-            checkedIdentifier: email,
-            isCheckingIdentifier: false,
-            identifierExists: false,
-            identifierLookupError: error.message,
-            identifierLookupErrorStatus: error.status,
-            clearAuthError: true,
-          ),
-        );
-        return;
+        return null;
       }
 
       _emitState(
@@ -87,12 +83,13 @@ extension AuthFlowEntry on AuthFlowCubit {
           clearAuthError: true,
         ),
       );
+      return null;
     } catch (_) {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.screen != AuthScreen.signup ||
           state.checkedIdentifier != email) {
-        return;
+        return null;
       }
 
       _emitState(
@@ -106,6 +103,7 @@ extension AuthFlowEntry on AuthFlowCubit {
           clearAuthError: true,
         ),
       );
+      return null;
     }
   }
 
@@ -116,12 +114,13 @@ extension AuthFlowEntry on AuthFlowCubit {
 
     final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
     if (isSignupEntry) {
-      await lookupSignupEmail(loginName);
+      final canSendOtp = await lookupSignupEmail(loginName);
       if (isClosed ||
           state.screen != AuthScreen.signup ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.checkedIdentifier != loginName ||
           state.identifierExists != false ||
+          canSendOtp != true ||
           state.isCheckingIdentifier) {
         return;
       }

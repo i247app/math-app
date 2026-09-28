@@ -76,6 +76,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupEmailAlreadyRegistered:
         'Email này đã có tài khoản. Vui lòng đăng nhập.',
     AppKeys.signupOtpFailed: 'Không thể gửi OTP đăng ký. Vui lòng thử lại.',
+    AppKeys.signupOtpUnavailable:
+        'Xác thực OTP hiện không khả dụng cho email hoặc số điện thoại này.',
     AppKeys.loginOtpFailed: 'Không thể gửi OTP. Vui lòng thử lại.',
     AppKeys.pinLoginFailed:
         'Không thể đăng nhập bằng PIN. Vui lòng đăng nhập lại.',
@@ -161,6 +163,8 @@ const authStrings = <String, Map<String, String>>{
         'This phone number already has an account.',
     AppKeys.signupEmailAlreadyRegistered: 'This email already has an account.',
     AppKeys.signupOtpFailed: 'Could not send signup OTP. Please try again.',
+    AppKeys.signupOtpUnavailable:
+        'OTP verification is unavailable for this email or phone number.',
     AppKeys.loginOtpFailed: 'Could not send OTP. Please try again.',
     AppKeys.pinLoginFailed: 'Could not log in with PIN. Please log in again.',
     AppKeys.invalidOtp: 'The OTP is incorrect. Please try again.',

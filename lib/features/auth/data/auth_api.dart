@@ -25,10 +25,10 @@ class AuthApi implements AuthService {
   @override
   Future<dynamic> checkIdentifier(String identifier) => _request(() async {
     final json = await _networkClient.postJson(
-      '/users/check-identifier',
+      '/users/identifier-available',
       <String, dynamic>{'identifier': identifier.trim()},
+      returnApiErrorResponse: true,
     );
-    NetworkClient.throwForApiStatus(json);
     return json;
   });
 

@@ -151,6 +151,8 @@ class AppScreenRouter extends StatelessWidget {
                 : _loginLookupErrorText(
                     context: context,
                     isSignupEntry: isSignupEntry,
+                    isPhoneIdentifier:
+                        normalizedLoginName.kind == LoginNameKind.phone,
                     lookupMatchesLoginName: lookupMatchesLoginName,
                     identifierExists: state.identifierExists,
                     identifierLookupError: state.identifierLookupError,
@@ -456,6 +458,7 @@ class _AuthEntryViewWarmupState extends State<_AuthEntryViewWarmup> {
 String? _loginLookupErrorText({
   required BuildContext context,
   required bool isSignupEntry,
+  required bool isPhoneIdentifier,
   required bool lookupMatchesLoginName,
   required bool? identifierExists,
   required String? identifierLookupError,
@@ -465,11 +468,15 @@ String? _loginLookupErrorText({
   }
 
   if (isSignupEntry && identifierExists == true) {
-    return context.getText(AppKeys.signupEmailAlreadyRegistered);
+    return context.getText(
+      isPhoneIdentifier
+          ? AppKeys.signupPhoneAlreadyRegistered
+          : AppKeys.signupEmailAlreadyRegistered,
+    );
   }
 
   if (isSignupEntry && identifierExists == false) {
-    return null;
+    return identifierLookupError;
   }
 
   if (!isSignupEntry && identifierExists == false) {

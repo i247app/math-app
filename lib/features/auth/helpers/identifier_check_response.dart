@@ -1,10 +1,28 @@
-/// A returned user means the identifier is already registered.
-/// An unrecognized response must not be treated as an available identifier.
-bool? identifierExistsFromResponse(Object? response) {
-  if (response is! Map || !response.containsKey('user')) return null;
+/// Only mstatus and the OTP flag matching the identifier control signup.
+class IdentifierAvailability {
+  const IdentifierAvailability({
+    required this.mstatus,
+    required this.otpEnabled,
+  });
 
-  final user = response['user'];
-  if (user == null) return false;
-  if (user is Map && user.isNotEmpty) return true;
-  return null;
+  final int mstatus;
+  final bool? otpEnabled;
+
+  static IdentifierAvailability? fromResponse(
+    Object? response,
+    String identifier,
+  ) {
+    if (response is! Map || response['mstatus'] is! int) return null;
+    final status = response['mstatus'] as int;
+    if (status != 200) {
+      return IdentifierAvailability(mstatus: status, otpEnabled: null);
+    }
+
+    final otpEnabled =
+        response[identifier.contains('@')
+            ? 'email_otp_enable'
+            : 'phone_otp_enable'];
+    if (otpEnabled is! bool) return null;
+    return IdentifierAvailability(mstatus: status, otpEnabled: otpEnabled);
+  }
 }

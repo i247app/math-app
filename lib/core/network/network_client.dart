@@ -69,6 +69,7 @@ class NetworkClient {
     Map<String, dynamic> body, {
     Duration? receiveTimeout,
     bool useGuestToken = false,
+    bool returnApiErrorResponse = false,
   }) async {
     if (_baseUrl.trim().isEmpty) {
       throw NetworkException(AppStrings.current(AppKeys.apiBaseUrlMissing));
@@ -95,9 +96,14 @@ class NetworkClient {
       );
     }
 
-    _throwForHttpStatus(response);
+    if (!returnApiErrorResponse || !_hasApiStatus(response.data)) {
+      _throwForHttpStatus(response);
+    }
     return _jsonObjectFromResponse(response);
   }
+
+  static bool _hasApiStatus(Object? data) =>
+      data is Map && data['mstatus'] is int;
 
   Future<Map<String, dynamic>> getJson(String path) async {
     if (_baseUrl.trim().isEmpty) {

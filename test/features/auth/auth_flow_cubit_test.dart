@@ -51,11 +51,10 @@ class _FakeAuthService implements AuthService {
     if (lookupFailure != null) throw lookupFailure!;
     return identifierResponse ??
         <String, dynamic>{
-          'mstatus': 200,
+          'mstatus': accountExists ? 409 : 200,
           'status': 'Success',
-          'user': accountExists
-              ? <String, dynamic>{'id': 43, 'uid': 22, 'email': identifier}
-              : null,
+          'email_otp_enable': true,
+          'phone_otp_enable': false,
         };
   }
 
@@ -380,9 +379,9 @@ void main() {
     await cubit.close();
   });
 
-  test('treats a 4206 signup lookup response as an available email', () async {
+  test('non-200 signup availability keeps the email on signup', () async {
     final authService = _FakeAuthService(
-      lookupFailure: const AuthException('User not found', status: 4206),
+      identifierResponse: const <String, dynamic>{'mstatus': 4206},
     );
     final cubit = _buildCubit(
       authService: authService,
@@ -395,11 +394,53 @@ void main() {
     await cubit.submitAuthIdentifier('learner@example.com');
 
     expect(cubit.state.authError, isNull);
-    expect(cubit.state.identifierExists, isFalse);
+    expect(cubit.state.identifierExists, isTrue);
     expect(cubit.state.identifierLookupErrorStatus, 4206);
-    expect(cubit.state.screen, AuthScreen.otp);
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(authService.sentOtpLoginName, isNull);
     await cubit.close();
   });
+
+  test('available signup email without email OTP stays on signup', () async {
+    final service = _FakeAuthService(
+      identifierResponse: const <String, dynamic>{
+        'mstatus': 200,
+        'is_available': true,
+        'email_otp_enable': false,
+        'phone_otp_enable': true,
+      },
+    );
+    final cubit = _buildSignupCubit(service);
+
+    await cubit.submitAuthIdentifier('learner@example.com');
+
+    expect(cubit.state.identifierExists, isFalse);
+    expect(cubit.state.identifierLookupError, isNotEmpty);
+    expect(cubit.state.screen, AuthScreen.signup);
+    expect(service.sentOtpCount, 0);
+    await cubit.close();
+  });
+
+  test(
+    'is_available false is ignored when mstatus and email OTP allow signup',
+    () async {
+      final service = _FakeAuthService(
+        identifierResponse: const <String, dynamic>{
+          'mstatus': 200,
+          'is_available': false,
+          'email_otp_enable': true,
+        },
+      );
+      final cubit = _buildSignupCubit(service);
+
+      await cubit.submitAuthIdentifier('learner@example.com');
+
+      expect(cubit.state.identifierExists, isFalse);
+      expect(cubit.state.screen, AuthScreen.otp);
+      expect(service.sentOtpCount, 1);
+      await cubit.close();
+    },
+  );
 
   test(
     'returned user keeps existing email on signup without sending OTP',
