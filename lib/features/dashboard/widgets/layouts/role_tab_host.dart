@@ -231,13 +231,15 @@ class RoleTabHostState extends State<RoleTabHost>
 
     if (_requiresAllTabsRebuild(oldWidget, widget)) {
       _tabChildren.clear();
-    } else if ((!activeTabChanged || _transitionFromTab != 0) &&
-        (oldWidget.homeHeader != widget.homeHeader ||
-            oldWidget.hasUnreadNotifications !=
-                widget.hasUnreadNotifications)) {
-      // The header only belongs to the Home tab and can change when the
-      // profile menu opens or the unread notification state changes.
-      _tabChildren.remove(0);
+    } else if (oldWidget.homeHeader != widget.homeHeader ||
+        oldWidget.hasUnreadNotifications != widget.hasUnreadNotifications) {
+      // Keep the outgoing header intact until its slide completes.
+      if (!activeTabChanged || _transitionFromTab != 0) {
+        _tabChildren.remove(0);
+      }
+      if (!activeTabChanged || _transitionFromTab != learningTabIndex) {
+        _tabChildren.remove(learningTabIndex);
+      }
     }
   }
 

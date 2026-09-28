@@ -109,12 +109,6 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           assetPath: parentHomeNavHomeAsset,
         ),
         DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navAssessment),
-          null,
-          assetPath: parentHomeNavAssessmentAsset,
-        ),
-        DashboardNavItemData(
           Icons.menu_book_rounded,
           context.getText(AppKeys.navLearning),
           null,

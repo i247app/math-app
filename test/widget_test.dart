@@ -185,24 +185,24 @@ void main() {
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
       expect(find.text('Thử Ngay!'), findsOneWidget);
-      expect(find.text('Đăng Nhập'), findsOneWidget);
-      expect(find.text('Đăng Ký'), findsOneWidget);
+      expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
+      expect(find.text('ĐĂNG KÝ'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('Đăng Nhập')).dy,
-        lessThan(tester.getTopLeft(find.text('Đăng Ký')).dy),
+        tester.getTopLeft(find.text('ĐĂNG NHẬP')).dy,
+        lessThan(tester.getTopLeft(find.text('ĐĂNG KÝ')).dy),
       );
       expect(
         tester
             .widget<Material>(
               find
                   .ancestor(
-                    of: find.text('Đăng Nhập'),
+                    of: find.text('ĐĂNG NHẬP'),
                     matching: find.byType(Material),
                   )
                   .first,
             )
             .color,
-        tester.element(find.text('Đăng Nhập')).themeColors.accent,
+        tester.element(find.text('ĐĂNG NHẬP')).themeColors.accent,
       );
       expect(
         find.descendant(
@@ -231,7 +231,7 @@ void main() {
       );
       expect(
         tester.getBottomLeft(mascot).dy,
-        lessThan(tester.getTopLeft(find.text('Đăng Nhập')).dy),
+        lessThan(tester.getTopLeft(find.text('ĐĂNG NHẬP')).dy),
       );
     });
 
@@ -250,7 +250,7 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('Đăng Nhập')).style?.fontSize,
+        tester.widget<Text>(find.text('ĐĂNG NHẬP')).style?.fontSize,
         FontSize.large,
       );
       await tester.ensureVisible(find.text('Thử Ngay!'));
@@ -732,7 +732,7 @@ void main() {
     ) async {
       await tester.pumpWidget(const NumiApp());
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -753,7 +753,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(NumiApp(authService: authService));
 
-        final signupButton = find.text('Đăng Ký');
+        final signupButton = find.text('ĐĂNG KÝ');
         await tester.ensureVisible(signupButton);
         await tester.tap(signupButton);
         await tester.pumpAndSettle();
@@ -864,7 +864,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -895,7 +895,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -917,7 +917,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(const NumiApp());
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -936,7 +936,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(const NumiApp());
 
-        final welcomeLogin = find.text('Đăng Nhập');
+        final welcomeLogin = find.text('ĐĂNG NHẬP');
         await tester.ensureVisible(welcomeLogin);
         await tester.tap(welcomeLogin);
         await tester.pumpAndSettle();
@@ -987,7 +987,7 @@ void main() {
         NumiApp(authService: _FailingLoginLookupAuthService()),
       );
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -1020,7 +1020,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: _FakeAuthService()));
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();

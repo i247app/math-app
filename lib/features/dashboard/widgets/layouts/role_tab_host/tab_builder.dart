@@ -33,7 +33,9 @@ extension _RoleTabBuilder on RoleTabHostState {
       onNotificationTap: widget.onNotificationTap,
       showChildProfileDialogOnStart: widget.showChildProfileDialogOnStart,
       onChildProfileDialogShown: widget.onChildProfileDialogShown,
-      homeHeader: tab == 0 ? widget.homeHeader : null,
+      homeHeader: tab == 0 || tab == learningTabIndex
+          ? widget.homeHeader
+          : null,
     );
 
     return widget.tabFactory.buildTab(

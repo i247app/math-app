@@ -2,7 +2,7 @@ import 'package:numi/features/profile/models/profile_role.dart';
 
 const learningTabIndex = 5;
 
-const parentStudentVisibleTabs = <int>[0, 1, learningTabIndex, 3, 4];
+const parentStudentVisibleTabs = <int>[0, learningTabIndex, 3, 4];
 const teacherVisibleTabs = <int>[0, 1, 2, 3, 4];
 
 List<int> visibleDashboardTabs(ProfileRole role) => switch (role) {

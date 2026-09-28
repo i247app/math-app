@@ -17,11 +17,14 @@ import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
+import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -84,6 +87,7 @@ void main() {
 
       expect(find.byType(AssessmentGradeRibbon), findsOneWidget);
       expect(find.byType(HomeBanner), findsNothing);
+      expect(find.byType(NewHomeAssessmentList), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
@@ -121,6 +125,123 @@ void main() {
       expect(learningOpens, 2);
     });
   }
+
+  testWidgets('learning layout places assessment history below home actions', (
+    tester,
+  ) async {
+    HomeProfileCache.instance.invalidateProfile(80);
+    addTearDown(() => HomeProfileCache.instance.invalidateProfile(80));
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      RepositoryProvider<HomeLayoutService>.value(
+        value: const _HomeService(),
+        child: LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: NewParentHomeContent(
+                user: null,
+                profiles: const <UserProfile>[],
+                activeProfile: const UserProfile(profileId: 80),
+                isActive: true,
+                activeRefreshTick: 0,
+                initialGrades: const [],
+                gradeService: _GradeService(),
+                examService: _ExamService(true),
+                onRefreshProfiles: _noopAsync,
+                onActivateProfile: _noopActivate,
+                onProfileSaved: _noop,
+                onOpenProfileMenu: _noop,
+                onOpenClassroomTab: _noop,
+                onOpenGamesTab: _noop,
+                onParentAssessmentStateChanged: _noopAssessmentState,
+                bottomPadding: 0,
+                showAssessmentList: true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+    expect(find.byType(NewHomeAssessmentList), findsOneWidget);
+    expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    expect(
+      tester.getTopLeft(find.byType(NewHomeAssessmentList)).dy,
+      greaterThan(
+        tester
+            .getBottomLeft(
+              find.byKey(const ValueKey('parent-home-practice-action')),
+            )
+            .dy,
+      ),
+    );
+  });
+
+  testWidgets('learning tab resumes the active assessment from stats', (
+    tester,
+  ) async {
+    HomeProfileCache.instance.invalidateProfile(81);
+    addTearDown(() => HomeProfileCache.instance.invalidateProfile(81));
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      RepositoryProvider<HomeLayoutService>.value(
+        value: const _HomeService(),
+        child: LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: NewParentHomeContent(
+                user: null,
+                profiles: const <UserProfile>[],
+                activeProfile: const UserProfile(profileId: 81),
+                isActive: true,
+                activeRefreshTick: 0,
+                initialGrades: const [],
+                gradeService: _GradeService(),
+                examService: _ExamService(false, hasActiveAssessment: true),
+                onRefreshProfiles: _noopAsync,
+                onActivateProfile: _noopActivate,
+                onProfileSaved: _noop,
+                onOpenProfileMenu: _noop,
+                onOpenClassroomTab: _noop,
+                onOpenGamesTab: _noop,
+                onParentAssessmentStateChanged: _noopAssessmentState,
+                bottomPadding: 0,
+                showAssessmentList: true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
+    expect(find.byType(AssessmentResultListItemCard), findsNothing);
+    final continueButton = find.byKey(
+      const ValueKey('parent-assessment-active-continue'),
+    );
+    await tester.ensureVisible(continueButton);
+    await tester.tap(continueButton);
+    await tester.pumpAndSettle();
+
+    final attempt = tester.widget<ExamAttemptScreen>(
+      find.byType(ExamAttemptScreen),
+    );
+    expect(attempt.profileId, 81);
+    expect(attempt.isResumedAssessment, isTrue);
+    expect(find.text('Resume question'), findsOneWidget);
+  });
 
   testWidgets(
     'student dashboard uses new home with the active student profile',
@@ -209,12 +330,20 @@ void main() {
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();
       expect(activeTab, 5);
+      expect(find.byType(NewStudentHomeContent), findsOneWidget);
+      expect(find.byType(NewHomeAssessmentList), findsOneWidget);
+      expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+      expect(find.text('Assessment Test'), findsOneWidget);
+      expect(find.byType(GradeRoadmapScreen), findsNothing);
+
+      await tester.tap(find.text('Learning & Practice'));
+      await tester.pumpAndSettle();
       final roadmap = tester.widget<GradeRoadmapScreen>(
         find.byType(GradeRoadmapScreen),
       );
       expect(roadmap.profileId, 78);
-      expect(roadmap.showCloseButton, isFalse);
-      expect(find.byKey(const ValueKey('grade-roadmap-close')), findsNothing);
+      expect(roadmap.showCloseButton, isTrue);
+      expect(find.byKey(const ValueKey('grade-roadmap-close')), findsOneWidget);
     },
   );
 
@@ -350,9 +479,10 @@ class _HomeService implements HomeLayoutService {
 }
 
 class _ExamService implements ExamService {
-  _ExamService(this.hasAssessment);
+  _ExamService(this.hasAssessment, {this.hasActiveAssessment = false});
 
   final bool hasAssessment;
+  final bool hasActiveAssessment;
   final List<int> gradeStatsProfileIds = [];
   final List<int> progressProfileIds = [];
   final List<int?> generatedProfileIds = [];
@@ -391,18 +521,26 @@ class _ExamService implements ExamService {
       gradeStatsProfileIds.add(profileId);
       return const [];
     }
-    return hasAssessment
-        ? const [
-            ExamStats(
-              correctNumber: 8,
-              scorePercentage: 80,
-              skippedNumber: 0,
-              totalQuestions: 10,
-              status: 'COMPLETE',
-              grade: 2,
-            ),
-          ]
-        : const [];
+    return [
+      if (hasActiveAssessment)
+        const ExamStats(
+          correctNumber: 0,
+          scorePercentage: 0,
+          skippedNumber: 0,
+          totalQuestions: 1,
+          status: 'ACTIVE',
+          inProgressExams: [_resumableExam],
+        ),
+      if (hasAssessment)
+        const ExamStats(
+          correctNumber: 8,
+          scorePercentage: 80,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          status: 'COMPLETE',
+          grade: 2,
+        ),
+    ];
   }
 
   @override
@@ -436,6 +574,25 @@ class _ExamService implements ExamService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
+
+const _resumableExam = GeneratedExam(
+  examId: 8200,
+  userAiExamId: 8200,
+  userExamId: 8100,
+  examStatus: 'IN_PROGRESS',
+  examType: examTypeAssessment,
+  grade: 1,
+  questions: [
+    ExamQuestion(
+      questionName: 'Resume question',
+      questionNumber: 1,
+      answers: [
+        ExamAnswer(label: 'A', content: '1'),
+        ExamAnswer(label: 'B', content: '2'),
+      ],
+    ),
+  ],
+);
 
 class _GradeService implements GradeService {
   @override

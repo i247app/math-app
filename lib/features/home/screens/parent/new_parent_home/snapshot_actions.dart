@@ -23,10 +23,14 @@ extension _ParentHomeSnapshotActions on NewParentHomeContentState {
               )
               .toList(growable: false)
             ..sort((a, b) => examDate(b).compareTo(examDate(a)));
+      final resumableAssessment = latestActiveAssessmentExam(stats);
       final layout = homeLayout;
       _updateState(() {
         _lastAppliedAssessmentLoadRequestId = requestId;
         completedAssessments = assessments;
+        activeAssessment = resumableAssessment;
+        isLoadingAssessments = false;
+        assessmentLoadError = null;
         if (widget.useActiveStudentProfileData && layout != null) {
           childSummaries = _studentSummariesFromLayout(layout, assessments);
         }
@@ -43,7 +47,11 @@ extension _ParentHomeSnapshotActions on NewParentHomeContentState {
       }
       widget.onParentAssessmentStateChanged(assessments.isNotEmpty);
     } catch (_) {
-      // Home layout remains the fallback when the background refresh fails.
+      if (!mounted || requestId != _assessmentLoadRequestId) return;
+      _updateState(() {
+        isLoadingAssessments = false;
+        assessmentLoadError = context.readText(AppKeys.parentExamLoadFailed);
+      });
     }
   }
 
