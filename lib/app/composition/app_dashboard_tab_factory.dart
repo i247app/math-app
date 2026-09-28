@@ -14,6 +14,7 @@ import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/games/screens/games_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
+import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
 import 'package:numi/features/home/screens/teacher/teacher_home_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_study_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart';
@@ -33,6 +34,8 @@ class AppDashboardTabFactory implements DashboardTabFactory {
 
   // Set to false to restore the original Parent Home.
   static const bool _useNewParentHome = true;
+  // Set to false to restore the original Student Home.
+  static const bool _useNewStudentHome = true;
 
   @override
   Widget buildTab({
@@ -56,9 +59,13 @@ class AppDashboardTabFactory implements DashboardTabFactory {
   }) {
     return switch (args.activeTab) {
       0 =>
-        (useActiveStudentProfileData || !_useNewParentHome
-            ? ParentHomeContent.new
-            : NewParentHomeContent.new)(
+        (useActiveStudentProfileData
+            ? (_useNewStudentHome
+                  ? NewStudentHomeContent.new
+                  : ParentHomeContent.new)
+            : (_useNewParentHome
+                  ? NewParentHomeContent.new
+                  : ParentHomeContent.new))(
           user: args.user,
           profiles: args.profiles,
           activeProfile: args.activeProfile,
