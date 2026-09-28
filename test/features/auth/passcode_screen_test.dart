@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
@@ -11,17 +13,25 @@ import 'package:numi/features/auth/widgets/passcode/passcode_action_button.dart'
 import 'package:numi/features/welcome/widgets/numi_brand_text.dart';
 
 void main() {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+
   test('Vietnamese PIN login copy uses the shorter wording', () {
     expect(authStrings['vi']?[AppKeys.loginWithPin], 'Đăng nhập bằng PIN');
     expect(
       settingsStrings['vi']?[AppKeys.createPasscodeSubtitle],
-      'Dùng PIN để\nđăng nhập nhanh chóng',
+      'Mã PIN để đăng nhập',
     );
+    expect(settingsStrings['vi']?[AppKeys.passcodeCreate], 'Tạo');
+    expect(
+      settingsStrings['en']?[AppKeys.createPasscodeSubtitle],
+      'PIN for login',
+    );
+    expect(settingsStrings['en']?[AppKeys.passcodeCreate], 'Create');
     expect(settingsStrings['vi']?[AppKeys.unlockPasscodeTitle], 'Mã PIN');
     expect(settingsStrings['vi']?[AppKeys.unlockPasscodeSubtitle], 'Mã PIN');
   });
 
-  Future<void> pumpPasscodeScreen(
+  Future<LingoProvider> pumpPasscodeScreen(
     WidgetTester tester, {
     required PasscodeScreenMode mode,
     required Future<String?> Function(String) onSubmit,
@@ -44,7 +54,25 @@ void main() {
       ),
     );
     await tester.pump();
+    return lingo;
   }
+
+  testWidgets('setup action and description localize to English', (
+    tester,
+  ) async {
+    final originalLanguage = AppLanguageState.current;
+    addTearDown(() => AppLanguageState.current = originalLanguage);
+    final lingo = await pumpPasscodeScreen(
+      tester,
+      mode: PasscodeScreenMode.setup,
+      onSubmit: (_) async => null,
+    );
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+
+    expect(find.text('PIN for login'), findsOneWidget);
+    expect(find.text('CREATE'), findsOneWidget);
+  });
 
   testWidgets('deletes PIN digits without a hardware backspace event', (
     tester,
@@ -94,9 +122,7 @@ void main() {
     expect(submitted, '9876');
   });
 
-  testWidgets('clears and refocuses the single PIN field for confirmation', (
-    tester,
-  ) async {
+  testWidgets('creates a visible PIN with one submit', (tester) async {
     String? submitted;
     await pumpPasscodeScreen(
       tester,
@@ -110,6 +136,9 @@ void main() {
     final field = find.byType(TextField);
     expect(find.byType(NumiBrandText), findsNothing);
     expect(find.text('Tạo Mã PIN'), findsOneWidget);
+    expect(find.text('Mã PIN để đăng nhập'), findsOneWidget);
+    expect(find.text('TẠO'), findsOneWidget);
+    expect(tester.widget<TextField>(field).obscureText, isFalse);
     await tester.enterText(field, '1234');
     await tester.pump();
     for (final digit in ['1', '2', '3', '4']) {
@@ -120,18 +149,12 @@ void main() {
     await tester.tap(find.byType(PasscodeActionButton));
     await tester.pump();
 
-    expect(submitted, isNull);
-    expect(tester.widget<TextField>(field).controller!.text, isEmpty);
-    expect(tester.widget<TextField>(field).focusNode!.hasFocus, isTrue);
-
-    await tester.enterText(field, '1234');
-    await tester.pump();
-    expect(find.text('•'), findsNWidgets(4));
-    for (final digit in ['1', '2', '3', '4']) {
-      expect(find.text(digit), findsNothing);
-    }
-    await tester.tap(find.byType(PasscodeActionButton));
-    await tester.pump();
     expect(submitted, '1234');
+    expect(tester.widget<TextField>(field).controller!.text, '1234');
+    expect(find.text('Nhập Lại Mã PIN'), findsNothing);
+    expect(find.text('•'), findsNothing);
+    for (final digit in ['1', '2', '3', '4']) {
+      expect(find.text(digit), findsOneWidget);
+    }
   });
 }

@@ -235,8 +235,7 @@ class RoleTabHostState extends State<RoleTabHost>
         (oldWidget.homeHeader != widget.homeHeader ||
             oldWidget.hasUnreadNotifications !=
                 widget.hasUnreadNotifications)) {
-      // The header only belongs to the Home tab and can change when the
-      // profile menu opens or the unread notification state changes.
+      // Keep the outgoing Home header intact until its slide completes.
       _tabChildren.remove(0);
     }
   }

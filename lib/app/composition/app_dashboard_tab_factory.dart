@@ -26,12 +26,14 @@ import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
-import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
+import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
@@ -62,6 +64,9 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     DashboardTabArgs args, {
     bool useActiveStudentProfileData = false,
   }) {
+    final usesNewHome = useActiveStudentProfileData
+        ? _useNewStudentHome
+        : _useNewParentHome;
     return switch (args.activeTab) {
       0 =>
         (useActiveStudentProfileData
@@ -92,32 +97,9 @@ class AppDashboardTabFactory implements DashboardTabFactory {
               ),
             ),
           ),
-          onOpenInitialAssessment: (context) => openInitialAssessmentFromHome(
-            context: context,
-            examService: args.examService,
-            profileId: profileStableId(args.activeProfile),
-            gradeLabel: args.activeProfile?.grade?.label,
-          ),
-          onOpenExamReview: (context, exam) {
-            final examId = exam.examId ?? exam.id;
-            final userExamId = exam.userExamId;
-            final validUserExamId = userExamId != null && userExamId > 0
-                ? userExamId
-                : null;
-            if (validUserExamId == null && (examId == null || examId <= 0)) {
-              return Future<void>.value();
-            }
-            return Navigator.of(context).push<void>(
-              MaterialPageRoute<void>(
-                builder: (_) => ExamReviewScreen(
-                  examId: validUserExamId == null ? examId : null,
-                  userExamId: validUserExamId,
-                  examType: exam.examType,
-                  initialExam: exam,
-                ),
-              ),
-            );
-          },
+          onOpenInitialAssessment: (context) =>
+              _openAssessmentFromHome(context, args, showIntro: usesNewHome),
+          onOpenExamReview: _openHomeExamReview,
           onCreateStudentProfile: (context) => Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
               builder: (_) => Material(
@@ -182,24 +164,108 @@ class AppDashboardTabFactory implements DashboardTabFactory {
       ),
       3 => GamesComingSoonTab(bottomPadding: args.bottomPadding),
       4 => _buildSettings(args),
-      learningTabIndex => _buildLearning(context, args),
+      learningTabIndex => _buildLearning(
+        context,
+        args,
+        useActiveStudentProfileData: useActiveStudentProfileData,
+      ),
       _ => const SizedBox.shrink(),
     };
   }
 
-  Widget _buildLearning(BuildContext context, DashboardTabArgs args) {
+  Widget _buildLearning(
+    BuildContext context,
+    DashboardTabArgs args, {
+    required bool useActiveStudentProfileData,
+  }) {
     final profileId = profileStableId(args.activeProfile);
     if (profileId == null || profileId <= 0) {
-      return Center(child: Text(context.getText(AppKeys.parentNoStudentTitle)));
+      return Column(
+        children: [
+          const _LearningPageHeader(),
+          Expanded(
+            child: Center(
+              child: Text(context.getText(AppKeys.parentNoStudentTitle)),
+            ),
+          ),
+        ],
+      );
     }
-    return GradeRoadmapScreen(
-      profileId: profileId,
-      examService: args.examService,
+    final buildContent = useActiveStudentProfileData
+        ? NewStudentHomeContent.new
+        : NewParentHomeContent.new;
+    return buildContent(
       user: args.user,
+      profiles: args.profiles,
+      activeProfile: args.activeProfile,
+      isActive: args.isActive,
+      activeRefreshTick: args.activeRefreshTick,
       initialGrades: args.initialGrades,
       gradeService: args.gradeService,
-      showCloseButton: false,
+      examService: args.examService,
+      onRefreshProfiles: args.onRefreshProfiles,
+      onActivateProfile: args.onActivateProfile,
+      onProfileSaved: args.onProfileSaved,
+      onOpenProfileMenu: args.onOpenProfileMenu,
+      onOpenClassroomTab: args.onOpenClassroomTab,
+      onOpenGamesTab: args.onOpenGamesTab,
+      onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
       bottomPadding: args.bottomPadding,
+      homeHeader: const _LearningPageHeader(),
+      showAssessmentList: true,
+      onOpenInitialAssessment: (context) =>
+          _openAssessmentFromHome(context, args, showIntro: true),
+      onOpenExamReview: _openHomeExamReview,
+    );
+  }
+
+  Future<void> _openAssessmentFromHome(
+    BuildContext context,
+    DashboardTabArgs args, {
+    required bool showIntro,
+  }) {
+    final profileId = profileStableId(args.activeProfile);
+    return openInitialAssessmentFromHome(
+      context: context,
+      examService: args.examService,
+      profileId: profileId,
+      gradeLabel: args.activeProfile?.grade?.label,
+      onNoAssessment: showIntro && profileId != null && profileId > 0
+          ? () => Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => WelcomeAssessmentIntroScreen(
+                  profileId: profileId,
+                  onAssessment: (_) => openInitialAssessmentFromHome(
+                    context: context,
+                    examService: args.examService,
+                    profileId: profileId,
+                    gradeLabel: args.activeProfile?.grade?.label,
+                  ),
+                ),
+              ),
+            )
+          : null,
+    );
+  }
+
+  Future<void> _openHomeExamReview(BuildContext context, GeneratedExam exam) {
+    final examId = exam.examId ?? exam.userAiExamId ?? exam.id;
+    final userExamId = exam.userExamId;
+    final validUserExamId = userExamId != null && userExamId > 0
+        ? userExamId
+        : null;
+    if (validUserExamId == null && (examId == null || examId <= 0)) {
+      return Future<void>.value();
+    }
+    return Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ExamReviewScreen(
+          examId: validUserExamId == null ? examId : null,
+          userExamId: validUserExamId,
+          examType: exam.examType,
+          initialExam: exam,
+        ),
+      ),
     );
   }
 
@@ -315,4 +381,12 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     bottomPadding: args.bottomPadding,
     isActive: args.isActive,
   );
+}
+
+class _LearningPageHeader extends StatelessWidget {
+  const _LearningPageHeader();
+
+  @override
+  Widget build(BuildContext context) =>
+      PageHeader(title: context.getText(AppKeys.learningTabTitle));
 }

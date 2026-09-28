@@ -22,7 +22,11 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
 class WelcomeAssessmentIntroScreen extends StatefulWidget {
-  const WelcomeAssessmentIntroScreen({super.key, required this.onAssessment});
+  const WelcomeAssessmentIntroScreen({
+    super.key,
+    required this.onAssessment,
+    this.profileId,
+  });
 
   static const _backgroundAsset =
       'assets/images/assessment_intro/assessment-intro-background.png';
@@ -30,6 +34,7 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
 
   final Future<void> Function(BuildContext context) onAssessment;
+  final int? profileId;
 
   @override
   State<WelcomeAssessmentIntroScreen> createState() =>
@@ -59,10 +64,14 @@ class _WelcomeAssessmentIntroScreenState
     final requestId = ++_chartRequestId;
     if (!_isLoadingHistory) setState(() => _isLoadingHistory = true);
     try {
-      final guestAccounts = context.read<GuestAccountService>();
-      final guest = guestAccounts.current ?? await guestAccounts.ensureGuest();
-      if (!mounted || requestId != _chartRequestId) return;
-      final profileId = guest.profileId;
+      var profileId = widget.profileId;
+      if (profileId == null) {
+        final guestAccounts = context.read<GuestAccountService>();
+        final guest =
+            guestAccounts.current ?? await guestAccounts.ensureGuest();
+        if (!mounted || requestId != _chartRequestId) return;
+        profileId = guest.profileId;
+      }
       if (profileId == null) return;
 
       final examService = context.read<ExamService>();

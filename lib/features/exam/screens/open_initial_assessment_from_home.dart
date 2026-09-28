@@ -12,6 +12,7 @@ Future<void> openInitialAssessmentFromHome({
   required ExamService examService,
   required int? profileId,
   required String? gradeLabel,
+  Future<void> Function()? onNoAssessment,
 }) async {
   final homeRoute = ModalRoute.of(context);
   final navigator = Navigator.of(context);
@@ -35,6 +36,11 @@ Future<void> openInitialAssessmentFromHome({
     return;
   }
   if (!context.mounted) return;
+
+  if (stats != null && stats.isEmpty && onNoAssessment != null) {
+    await onNoAssessment();
+    return;
+  }
 
   final activeExam = stats == null ? null : latestActiveAssessmentExam(stats);
   await navigator.push<void>(

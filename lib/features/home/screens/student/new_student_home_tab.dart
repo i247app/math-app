@@ -28,6 +28,7 @@ class NewStudentHomeContent extends NewParentHomeContent {
     super.onOpenExamReview,
     super.onOpenLearningTab,
     super.onCreateStudentProfile,
+    super.showAssessmentList,
     bool useActiveStudentProfileData = true,
   }) : assert(useActiveStudentProfileData),
        super(useActiveStudentProfileData: true);

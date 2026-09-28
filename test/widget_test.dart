@@ -50,11 +50,16 @@ class _FailingLoginLookupAuthService implements AuthService {
 }
 
 class _SignupLookupAuthService implements AuthService {
-  _SignupLookupAuthService({this.accountExists = false});
+  _SignupLookupAuthService({
+    this.accountExists = false,
+    this.phoneOtpEnabled = true,
+  });
 
   final bool accountExists;
+  final bool phoneOtpEnabled;
   final List<String> lookedUpNames = <String>[];
   final List<String> verifiedCodes = <String>[];
+  int sentOtpCount = 0;
 
   @override
   Future<void> clearPendingLogin(String loginName) async {}
@@ -65,7 +70,10 @@ class _SignupLookupAuthService implements AuthService {
     required AuthOtpKind kind,
     int? userId,
     int? targetDeviceId,
-  }) async => const SendOtpResult(expiresIn: 30);
+  }) async {
+    sentOtpCount++;
+    return const SendOtpResult(expiresIn: 30);
+  }
 
   @override
   Future<VerifyOtpResult> verifyOtp({
@@ -84,7 +92,7 @@ class _SignupLookupAuthService implements AuthService {
       'mstatus': accountExists ? 409 : 200,
       'status': 'Success',
       'email_otp_enable': true,
-      'phone_otp_enable': true,
+      'phone_otp_enable': phoneOtpEnabled,
       'user': accountExists
           ? <String, dynamic>{'id': 43, 'uid': 22, 'email': identifier}
           : null,
@@ -185,24 +193,24 @@ void main() {
 
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
       expect(find.text('Thử Ngay!'), findsOneWidget);
-      expect(find.text('Đăng Nhập'), findsOneWidget);
-      expect(find.text('Đăng Ký'), findsOneWidget);
+      expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
+      expect(find.text('ĐĂNG KÝ'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('Đăng Nhập')).dy,
-        lessThan(tester.getTopLeft(find.text('Đăng Ký')).dy),
+        tester.getTopLeft(find.text('ĐĂNG NHẬP')).dy,
+        lessThan(tester.getTopLeft(find.text('ĐĂNG KÝ')).dy),
       );
       expect(
         tester
             .widget<Material>(
               find
                   .ancestor(
-                    of: find.text('Đăng Nhập'),
+                    of: find.text('ĐĂNG NHẬP'),
                     matching: find.byType(Material),
                   )
                   .first,
             )
             .color,
-        tester.element(find.text('Đăng Nhập')).themeColors.accent,
+        tester.element(find.text('ĐĂNG NHẬP')).themeColors.accent,
       );
       expect(
         find.descendant(
@@ -231,7 +239,7 @@ void main() {
       );
       expect(
         tester.getBottomLeft(mascot).dy,
-        lessThan(tester.getTopLeft(find.text('Đăng Nhập')).dy),
+        lessThan(tester.getTopLeft(find.text('ĐĂNG NHẬP')).dy),
       );
     });
 
@@ -250,7 +258,7 @@ void main() {
 
       expect(guestAccounts.ensureCalls, 0);
       expect(
-        tester.widget<Text>(find.text('Đăng Nhập')).style?.fontSize,
+        tester.widget<Text>(find.text('ĐĂNG NHẬP')).style?.fontSize,
         FontSize.large,
       );
       await tester.ensureVisible(find.text('Thử Ngay!'));
@@ -732,7 +740,7 @@ void main() {
     ) async {
       await tester.pumpWidget(const NumiApp());
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -753,7 +761,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(NumiApp(authService: authService));
 
-        final signupButton = find.text('Đăng Ký');
+        final signupButton = find.text('ĐĂNG KÝ');
         await tester.ensureVisible(signupButton);
         await tester.tap(signupButton);
         await tester.pumpAndSettle();
@@ -864,7 +872,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -895,7 +903,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: authService));
 
-      final signupButton = find.text('Đăng Ký');
+      final signupButton = find.text('ĐĂNG KÝ');
       await tester.ensureVisible(signupButton);
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
@@ -911,13 +919,39 @@ void main() {
       expect(authService.lookedUpNames, <String>['+84905666666']);
     });
 
+    testWidgets('signup with phone skips OTP when the API disables it', (
+      tester,
+    ) async {
+      final authService = _SignupLookupAuthService(phoneOtpEnabled: false);
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      await tester.pumpWidget(NumiApp(authService: authService));
+
+      final signupButton = find.text('ĐĂNG KÝ');
+      await tester.ensureVisible(signupButton);
+      await tester.tap(signupButton);
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(EditableText), '0488483883');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+
+      expect(authService.lookedUpNames, <String>['+84488483883']);
+      expect(authService.sentOtpCount, 0);
+      expect(
+        find.byKey(const ValueKey('registration-profile')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('auth-identifier-error')), findsNothing);
+    });
+
     testWidgets('returns login to the welcome screen that opened it', (
       tester,
     ) async {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(const NumiApp());
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -936,7 +970,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues(<String, String>{});
         await tester.pumpWidget(const NumiApp());
 
-        final welcomeLogin = find.text('Đăng Nhập');
+        final welcomeLogin = find.text('ĐĂNG NHẬP');
         await tester.ensureVisible(welcomeLogin);
         await tester.tap(welcomeLogin);
         await tester.pumpAndSettle();
@@ -987,7 +1021,7 @@ void main() {
         NumiApp(authService: _FailingLoginLookupAuthService()),
       );
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();
@@ -1020,7 +1054,7 @@ void main() {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
       await tester.pumpWidget(NumiApp(authService: _FakeAuthService()));
 
-      final welcomeLogin = find.text('Đăng Nhập');
+      final welcomeLogin = find.text('ĐĂNG NHẬP');
       await tester.ensureVisible(welcomeLogin);
       await tester.tap(welcomeLogin);
       await tester.pumpAndSettle();

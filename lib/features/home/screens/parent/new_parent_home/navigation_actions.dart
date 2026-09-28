@@ -53,6 +53,54 @@ extension ParentHomeNavigationActions on NewParentHomeContentState {
     }
   }
 
+  Future<void> openActiveAssessment() async {
+    final exam = activeAssessment;
+    final profileId = profileStableId(widget.activeProfile);
+    if (isOpeningActiveAssessment ||
+        exam == null ||
+        exam.questions.isEmpty ||
+        profileId == null ||
+        profileId <= 0) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    _updateState(() => isOpeningActiveAssessment = true);
+    final homeRoute = ModalRoute.of(context);
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => ExamAttemptScreen(
+            examService: widget.examService,
+            initialExam: exam,
+            examType: exam.examType ?? examTypeAssessment,
+            gradeLabel: AssessmentFlowPolicy.gradeLabel(exam.grade ?? 0),
+            profileId: profileId,
+            allowQuestionNavigation: false,
+            showQuestionNavigation: false,
+            isResumedAssessment: true,
+            onResultBack: () {
+              if (!mounted) return;
+              final navigator = Navigator.of(context);
+              if (homeRoute == null) {
+                navigator.popUntil((route) => route.isFirst);
+              } else {
+                navigator.popUntil((route) => identical(route, homeRoute));
+              }
+            },
+          ),
+        ),
+      );
+      if (mounted) {
+        await loadHome(forceRefresh: true);
+      }
+    } finally {
+      if (mounted) {
+        _updateState(() => isOpeningActiveAssessment = false);
+      }
+    }
+  }
+
   void openParentAssessmentResult(GeneratedExam exam) {
     _openExamReview(exam);
   }
@@ -62,7 +110,8 @@ extension ParentHomeNavigationActions on NewParentHomeContentState {
   }
 
   void _openExamReview(GeneratedExam exam) {
-    final examId = exam.userExamId ?? exam.examId ?? exam.id;
+    final examId =
+        exam.userExamId ?? exam.examId ?? exam.userAiExamId ?? exam.id;
     if (examId == null || examId <= 0) {
       return;
     }

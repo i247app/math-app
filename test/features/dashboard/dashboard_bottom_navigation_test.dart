@@ -19,59 +19,63 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    const labels = ['HOME', 'ASSESSMENT', 'LEARNING', 'GAMES', 'SETTINGS'];
-
-    for (final width in [320.0, 390.0]) {
-      tester.view.physicalSize = Size(width, 800);
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light(),
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: width - 40,
-                height: 60,
-                child: Row(
-                  children: [
-                    for (var index = 0; index < labels.length; index++)
-                      Expanded(
-                        child: DashboardAnimatedNavItem(
-                          data: DashboardNavItemData(
-                            Icons.home_rounded,
-                            labels[index],
-                            null,
+    for (final labels in const [
+      ['HOME', 'LEARNING', 'GAMES', 'SETTINGS'],
+      ['HOME', 'CLASSROOM', 'STUDY', 'MEMBERS', 'SETTINGS'],
+    ]) {
+      for (final width in [320.0, 390.0]) {
+        tester.view.physicalSize = Size(width, 800);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: width - 40,
+                  height: 60,
+                  child: Row(
+                    children: [
+                      for (var index = 0; index < labels.length; index++)
+                        Expanded(
+                          child: DashboardAnimatedNavItem(
+                            data: DashboardNavItemData(
+                              Icons.home_rounded,
+                              labels[index],
+                              null,
+                            ),
+                            active: index == labels.length - 1,
+                            onTap: () {},
                           ),
-                          active: index == 4,
-                          onTap: () {},
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      final bottoms = [
-        for (final label in labels) tester.getBottomLeft(find.text(label)).dy,
-      ];
-      expect(
-        bottoms.reduce((a, b) => a > b ? a : b) -
-            bottoms.reduce((a, b) => a < b ? a : b),
-        lessThan(0.5),
-      );
+        final bottoms = [
+          for (final label in labels) tester.getBottomLeft(find.text(label)).dy,
+        ];
+        expect(
+          bottoms.reduce((a, b) => a > b ? a : b) -
+              bottoms.reduce((a, b) => a < b ? a : b),
+          lessThan(0.5),
+        );
+      }
     }
   });
 
-  test('parent and student swipes skip hidden Room tab', () {
+  test('parent and student swipes skip hidden Assessment and Room tabs', () {
     for (final role in [ProfileRole.parent, ProfileRole.student]) {
-      expect(adjacentVisibleTab(role, 1, forward: true), learningTabIndex);
-      expect(adjacentVisibleTab(role, learningTabIndex, forward: false), 1);
+      expect(adjacentVisibleTab(role, 0, forward: true), learningTabIndex);
+      expect(adjacentVisibleTab(role, learningTabIndex, forward: false), 0);
       expect(adjacentVisibleTab(role, learningTabIndex, forward: true), 3);
       expect(adjacentVisibleTab(role, 3, forward: false), learningTabIndex);
       expect(adjacentVisibleTab(role, 3, forward: true), 4);
+      expect(adjacentVisibleTab(role, 1, forward: true), isNull);
       expect(adjacentVisibleTab(role, 2, forward: true), isNull);
     }
     expect(visibleDashboardTabs(ProfileRole.teacher), [0, 1, 2, 3, 4]);
@@ -83,15 +87,13 @@ void main() {
       expect(isForwardVisibleTabTransition(role, 3, learningTabIndex), isFalse);
       expect(isForwardVisibleTabTransition(role, 3, 4), isTrue);
       expect(isForwardVisibleTabTransition(role, 4, 3), isFalse);
-      expect(isForwardVisibleTabTransition(role, 1, learningTabIndex), isTrue);
+      expect(isForwardVisibleTabTransition(role, 0, learningTabIndex), isTrue);
     }
     expect(isForwardVisibleTabTransition(ProfileRole.teacher, 3, 4), isTrue);
   });
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
-    testWidgets('$role shows Home, Thi, Learning, Games, Settings', (
-      tester,
-    ) async {
+    testWidgets('$role shows Home, Learning, Games, Settings', (tester) async {
       final originalLanguage = AppLanguageState.current;
       final lingo = LingoProvider();
       final swipePosition = ValueNotifier<double?>(null);
@@ -121,12 +123,12 @@ void main() {
         ),
       );
 
-      expect(visibleDashboardTabs(role), [0, 1, learningTabIndex, 3, 4]);
-      expect(find.text('THI'), findsOneWidget);
+      expect(visibleDashboardTabs(role), [0, learningTabIndex, 3, 4]);
+      expect(find.text('THI'), findsNothing);
       expect(find.text('HỌC'), findsOneWidget);
       expect(find.text('PHÒNG'), findsNothing);
       expect(find.text('GAMES'), findsOneWidget);
-      expect(find.byType(DashboardAnimatedNavItem), findsNWidgets(5));
+      expect(find.byType(DashboardAnimatedNavItem), findsNWidgets(4));
 
       await tester.tap(find.text('HỌC'));
       await tester.pump();
@@ -138,7 +140,7 @@ void main() {
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pump();
-      expect(find.text('ASSESSMENT'), findsOneWidget);
+      expect(find.text('ASSESSMENT'), findsNothing);
       expect(find.text('LEARNING'), findsOneWidget);
       expect(find.text('ROOM'), findsNothing);
       expect(find.text('GAMES'), findsOneWidget);

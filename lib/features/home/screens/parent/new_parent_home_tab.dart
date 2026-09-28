@@ -20,6 +20,8 @@ import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
@@ -28,6 +30,7 @@ import 'package:numi/features/home/helpers/parent/parent_child_dashboard_helpers
 import 'package:numi/features/home/widgets/parent/parent_profile_dialog_action.dart';
 import 'package:numi/features/home/widgets/parent/parent_select_student_dialog.dart';
 import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
+import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 
@@ -62,6 +65,7 @@ class NewParentHomeContent extends StatefulWidget {
     this.onOpenExamReview,
     this.onOpenLearningTab,
     this.onCreateStudentProfile,
+    this.showAssessmentList = false,
   });
 
   final LoginUser? user;
@@ -90,6 +94,7 @@ class NewParentHomeContent extends StatefulWidget {
   onOpenExamReview;
   final VoidCallback? onOpenLearningTab;
   final Future<void> Function(BuildContext context)? onCreateStudentProfile;
+  final bool showAssessmentList;
 
   @override
   State<NewParentHomeContent> createState() => NewParentHomeContentState();
@@ -111,6 +116,10 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
   String? errorMessage;
   HomeLayout? homeLayout;
   List<GeneratedExam> completedAssessments = const <GeneratedExam>[];
+  GeneratedExam? activeAssessment;
+  bool isLoadingAssessments = false;
+  bool isOpeningActiveAssessment = false;
+  String? assessmentLoadError;
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
   int _assessmentLoadRequestId = 0;
@@ -155,6 +164,9 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
       _previousGrades = const <int>[];
       _testNumbers = const <int>[1];
       _lastSubmittedAt = null;
+      isLoadingAssessments = false;
+      activeAssessment = null;
+      assessmentLoadError = null;
       _resetModeEntrances();
       if (widget.isActive) {
         loadHome(forceRefresh: shouldForceRefresh);
@@ -209,6 +221,9 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedExam>[];
+        activeAssessment = null;
+        isLoadingAssessments = false;
+        assessmentLoadError = null;
         _currentGrade = 0;
         _previousGrades = const <int>[];
         _testNumbers = const <int>[1];
@@ -360,6 +375,8 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
 
   int _startAssessmentBackgroundRefresh({required int profileId}) {
     final requestId = ++_assessmentLoadRequestId;
+    isLoadingAssessments = true;
+    assessmentLoadError = null;
     unawaited(
       _refreshAssessmentsInBackground(
         requestId: requestId,
@@ -458,6 +475,19 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                       ),
                     ],
                   ),
+                  if (widget.showAssessmentList) ...[
+                    const SizedBox(height: 28),
+                    NewHomeAssessmentList(
+                      assessments: completedAssessments,
+                      activeAssessment: activeAssessment,
+                      isLoading: isLoadingAssessments,
+                      isOpeningActiveAssessment: isOpeningActiveAssessment,
+                      errorMessage: assessmentLoadError,
+                      onOpenExam: openParentAssessmentResult,
+                      onResumeExam: openActiveAssessment,
+                      onRetry: () => loadHome(forceRefresh: true),
+                    ),
+                  ],
                 ],
               ),
             ),

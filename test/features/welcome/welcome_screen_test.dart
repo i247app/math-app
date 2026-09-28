@@ -37,8 +37,8 @@ void main() {
           onAssessment: () => assessments++,
         );
         expect(tester.takeException(), isNull);
-        expect(find.text('Đăng Nhập'), findsOneWidget);
-        expect(find.text('Đăng Ký'), findsOneWidget);
+        expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
+        expect(find.text('ĐĂNG KÝ'), findsOneWidget);
         expect(find.text('Thử Ngay!'), findsOneWidget);
 
         final signup = find.byKey(const ValueKey('welcome-signup-action'));
@@ -107,8 +107,8 @@ void main() {
       textScale: 2,
     );
     expect(find.text('Thử Ngay!'), findsOneWidget);
-    expect(find.text('Đăng Nhập'), findsOneWidget);
-    expect(find.text('Đăng Ký'), findsOneWidget);
+    expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
+    expect(find.text('ĐĂNG KÝ'), findsOneWidget);
     expect(find.text('Học & Đánh Giá'), findsOneWidget);
 
     await lingo.setLanguage(AppLanguage.en);
@@ -123,8 +123,8 @@ void main() {
     await lingo.setLanguage(AppLanguage.vi);
     await tester.pumpAndSettle();
     expect(find.text('Thử Ngay!'), findsOneWidget);
-    expect(find.text('Đăng Nhập'), findsOneWidget);
-    expect(find.text('Đăng Ký'), findsOneWidget);
+    expect(find.text('ĐĂNG NHẬP'), findsOneWidget);
+    expect(find.text('ĐĂNG KÝ'), findsOneWidget);
     expect(find.text('Try It Now!'), findsNothing);
     expect(tester.takeException(), isNull);
   });
