@@ -146,6 +146,43 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('guest assessment review omits the practice banner', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    final service = _JourneyDetailService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: RepositoryProvider<ExamService>.value(
+          value: service,
+          child: LingoScope(
+            lingo: lingo,
+            child: const ExamReviewScreen(
+              userExamId: 912346,
+              allowPractice: false,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.requestedUserExamId, 912346);
+    expect(
+      find.byKey(const ValueKey('exam-review-practice-banner')),
+      findsNothing,
+    );
+    expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
+    expect(find.byType(ExamReviewStatsCard), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _JourneyDetailService implements ExamService {

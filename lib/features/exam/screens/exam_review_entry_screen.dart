@@ -20,6 +20,7 @@ class ExamReviewScreen extends StatelessWidget {
     this.profileId,
     this.examType,
     this.initialExam,
+    this.allowPractice = true,
   }) : assert(examId != null || userExamId != null);
 
   final int? examId;
@@ -27,6 +28,7 @@ class ExamReviewScreen extends StatelessWidget {
   final int? profileId;
   final String? examType;
   final GeneratedExam? initialExam;
+  final bool allowPractice;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,7 @@ class ExamReviewScreen extends StatelessWidget {
               userExamId: userExamId,
             )
           : null,
-      onPractice: isEntireJourney
+      onPractice: isEntireJourney && allowPractice
           ? (detail) async {
               final journeyId = detail.userExamId ?? userExamId;
               if (journeyId == null || journeyId <= 0) {

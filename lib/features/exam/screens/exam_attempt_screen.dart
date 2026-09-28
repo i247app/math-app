@@ -43,6 +43,7 @@ class ExamAttemptScreen extends StatefulWidget {
     this.onResultBack,
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
+    this.allowReviewPractice = true,
     this.isResumedAssessment = false,
     this.gradeProgressStore,
   });
@@ -59,6 +60,7 @@ class ExamAttemptScreen extends StatefulWidget {
   final VoidCallback? onResultBack;
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
+  final bool allowReviewPractice;
   final bool isResumedAssessment;
   final ProfileGradeProgressStore? gradeProgressStore;
 
@@ -389,6 +391,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                             initialExam: submittedUserExamId == null
                                 ? submittedExam
                                 : null,
+                            allowPractice: widget.allowReviewPractice,
                           ),
                         ),
                       ),

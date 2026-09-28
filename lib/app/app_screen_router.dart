@@ -213,6 +213,7 @@ class AppScreenRouter extends StatelessWidget {
                   builder: (_) => ExamAttemptScreen(
                     examType: examTypeAssessment,
                     profileId: guest.profileId,
+                    allowReviewPractice: false,
                     allowQuestionNavigation: false,
                     showQuestionNavigation: false,
                   ),
