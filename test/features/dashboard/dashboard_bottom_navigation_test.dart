@@ -75,6 +75,15 @@ void main() {
     expect(visibleDashboardTabs(ProfileRole.teacher), [0, 1, 2, 3, 4]);
   });
 
+  test('slide direction follows visible tab order', () {
+    for (final role in [ProfileRole.parent, ProfileRole.student]) {
+      expect(isForwardVisibleTabTransition(role, learningTabIndex, 4), isTrue);
+      expect(isForwardVisibleTabTransition(role, 4, learningTabIndex), isFalse);
+      expect(isForwardVisibleTabTransition(role, 1, learningTabIndex), isTrue);
+    }
+    expect(isForwardVisibleTabTransition(ProfileRole.teacher, 3, 4), isTrue);
+  });
+
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
     testWidgets('$role shows Home, Thi, Learning, Settings only', (
       tester,

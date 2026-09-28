@@ -10,6 +10,14 @@ List<int> visibleDashboardTabs(ProfileRole role) => switch (role) {
   ProfileRole.teacher => teacherVisibleTabs,
 };
 
+bool isForwardVisibleTabTransition(ProfileRole role, int fromTab, int toTab) {
+  final tabs = visibleDashboardTabs(role);
+  final fromPosition = tabs.indexOf(fromTab);
+  final toPosition = tabs.indexOf(toTab);
+  if (fromPosition < 0 || toPosition < 0) return toTab > fromTab;
+  return toPosition > fromPosition;
+}
+
 int? adjacentVisibleTab(
   ProfileRole role,
   int activeTab, {

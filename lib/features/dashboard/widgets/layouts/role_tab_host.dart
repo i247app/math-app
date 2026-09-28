@@ -324,7 +324,11 @@ class RoleTabHostState extends State<RoleTabHost>
     }
 
     final progress = _resolvedTransitionProgress();
-    final movesForward = _transitionToTab > _transitionFromTab;
+    final movesForward = isForwardVisibleTabTransition(
+      widget.activeRole,
+      _transitionFromTab,
+      _transitionToTab,
+    );
     if (tab == _transitionFromTab) {
       return movesForward ? -progress : progress;
     }
