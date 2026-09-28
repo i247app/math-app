@@ -7,7 +7,7 @@ extension AuthFlowSignup on AuthFlowCubit {
     if (state.screen != AuthScreen.registrationProfile ||
         state.isSigningUp ||
         email == null ||
-        _verifiedSignupEmail != email) {
+        _signupEmailReadyForCreation != email) {
       return;
     }
 
@@ -107,6 +107,7 @@ extension AuthFlowSignup on AuthFlowCubit {
     _signupAttemptId++;
     _pendingSignupEmail = null;
     _pendingSignupForm = null;
-    _verifiedSignupEmail = null;
+    _signupEmailReadyForCreation = null;
+    _signupOtpRequired = true;
   }
 }

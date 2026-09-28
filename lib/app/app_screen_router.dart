@@ -95,7 +95,8 @@ class AppScreenRouter extends StatelessWidget {
                 current.screen != AuthScreen.signup;
 
             final returnedToSignup =
-                previous.screen == AuthScreen.otp &&
+                (previous.screen == AuthScreen.otp ||
+                    previous.screen == AuthScreen.registrationProfile) &&
                 current.screen == AuthScreen.signup;
             return hasNewError || leftAuthEntryScreen || returnedToSignup;
           },

@@ -236,8 +236,24 @@ extension AuthFlowNavigation on AuthFlowCubit {
     if (state.screen != AuthScreen.registrationProfile || email == null) {
       return;
     }
+    if (!_signupOtpRequired) {
+      _clearPendingSignup();
+      _emitState(
+        state.copyWith(
+          screen: AuthScreen.signup,
+          loginName: email,
+          isSendingOtp: false,
+          isVerifyingOtp: false,
+          isSigningUp: false,
+          clearAuthError: true,
+          clearOtpExpiry: true,
+          clearOtpError: true,
+        ),
+      );
+      return;
+    }
     _signupAttemptId++;
-    _verifiedSignupEmail = null;
+    _signupEmailReadyForCreation = null;
 
     _emitState(
       state.copyWith(

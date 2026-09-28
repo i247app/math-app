@@ -401,22 +401,54 @@ void main() {
     await cubit.close();
   });
 
-  test('available signup email without email OTP stays on signup', () async {
+  test(
+    'signup skips disabled email OTP and creates the user from the profile',
+    () async {
+      final service = _FakeAuthService(
+        identifierResponse: const <String, dynamic>{
+          'mstatus': 200,
+          'email_otp_enable': false,
+          'phone_otp_enable': true,
+        },
+      );
+      final cubit = _buildSignupCubit(service);
+
+      await cubit.submitAuthIdentifier('learner@example.com');
+
+      expect(cubit.state.identifierExists, isFalse);
+      expect(cubit.state.identifierLookupError, isNull);
+      expect(cubit.state.screen, AuthScreen.registrationProfile);
+      expect(service.sentOtpCount, 0);
+      expect(service.signupEmail, isNull);
+
+      await cubit.submitSignup(_studentSignupForm);
+
+      expect(service.signupEmail, 'learner@example.com');
+      expect(service.verifiedOtpLoginName, isNull);
+      expect(cubit.state.authenticationResult?.isNewlyRegistered, isTrue);
+      await cubit.close();
+    },
+  );
+
+  test('Back from profile without OTP returns to email entry', () async {
     final service = _FakeAuthService(
       identifierResponse: const <String, dynamic>{
         'mstatus': 200,
         'email_otp_enable': false,
-        'phone_otp_enable': true,
       },
     );
     final cubit = _buildSignupCubit(service);
 
     await cubit.submitAuthIdentifier('learner@example.com');
+    expect(cubit.state.screen, AuthScreen.registrationProfile);
 
-    expect(cubit.state.identifierExists, isFalse);
-    expect(cubit.state.identifierLookupError, isNotEmpty);
+    expect(cubit.handleSystemBack(), isTrue);
     expect(cubit.state.screen, AuthScreen.signup);
+    expect(cubit.state.loginName, 'learner@example.com');
     expect(service.sentOtpCount, 0);
+
+    await cubit.submitSignup(_studentSignupForm);
+    expect(service.signupEmail, isNull);
     await cubit.close();
   });
 

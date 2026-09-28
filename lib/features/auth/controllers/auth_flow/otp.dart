@@ -57,7 +57,7 @@ extension AuthFlowOtp on AuthFlowCubit {
 
   Future<void> _sendSignupOtp(String email) async {
     final attemptId = _signupAttemptId;
-    _verifiedSignupEmail = null;
+    _signupEmailReadyForCreation = null;
     _emitState(
       state.copyWith(
         isSendingOtp: true,
@@ -262,7 +262,7 @@ extension AuthFlowOtp on AuthFlowCubit {
           return;
         }
 
-        _verifiedSignupEmail = signupEmail;
+        _signupEmailReadyForCreation = signupEmail;
         _emitState(
           state.copyWith(
             screen: AuthScreen.registrationProfile,

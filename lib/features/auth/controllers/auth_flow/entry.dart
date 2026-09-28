@@ -42,9 +42,6 @@ extension AuthFlowEntry on AuthFlowCubit {
 
       final exists = availability.mstatus != 200;
       final otpEnabled = availability.otpEnabled == true;
-      final otpError = !exists && !otpEnabled
-          ? AppStrings.current(AppKeys.signupOtpUnavailable)
-          : null;
 
       _emitState(
         state.copyWith(
@@ -52,19 +49,18 @@ extension AuthFlowEntry on AuthFlowCubit {
           checkedIdentifier: email,
           isCheckingIdentifier: false,
           identifierExists: exists,
-          identifierLookupError: otpError,
           identifierLookupErrorStatus: availability.mstatus == 200
               ? null
               : availability.mstatus,
           otpFlow: OtpFlow.signup,
           clearAuthError: true,
-          clearIdentifierLookupError: otpError == null,
+          clearIdentifierLookupError: true,
           clearIdentifierLookupErrorStatus: availability.mstatus == 200,
           clearOtpExpiry: true,
           clearOtpError: true,
         ),
       );
-      return !exists && otpEnabled;
+      return exists ? null : otpEnabled;
     } on AuthException catch (error) {
       if (isClosed ||
           state.authEntryMode != AuthEntryMode.signup ||
@@ -114,18 +110,35 @@ extension AuthFlowEntry on AuthFlowCubit {
 
     final isSignupEntry = state.authEntryMode == AuthEntryMode.signup;
     if (isSignupEntry) {
-      final canSendOtp = await lookupSignupEmail(loginName);
+      final otpEnabled = await lookupSignupEmail(loginName);
       if (isClosed ||
           state.screen != AuthScreen.signup ||
           state.authEntryMode != AuthEntryMode.signup ||
           state.checkedIdentifier != loginName ||
           state.identifierExists != false ||
-          canSendOtp != true ||
+          otpEnabled == null ||
           state.isCheckingIdentifier) {
         return;
       }
       _clearPendingSignup();
       _pendingSignupEmail = loginName;
+      _signupOtpRequired = otpEnabled;
+      if (!otpEnabled) {
+        _signupEmailReadyForCreation = loginName;
+        _emitState(
+          state.copyWith(
+            screen: AuthScreen.registrationProfile,
+            loginName: loginName,
+            isCheckingIdentifier: false,
+            isSendingOtp: false,
+            otpFlow: OtpFlow.signup,
+            clearAuthError: true,
+            clearOtpExpiry: true,
+            clearOtpError: true,
+          ),
+        );
+        return;
+      }
       _emitState(
         state.copyWith(
           loginName: loginName,
