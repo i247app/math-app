@@ -349,8 +349,8 @@ class _AssessmentPlacementResultScreenState
                   backgroundColor: Colors.white,
                   actionWidth: 44,
                   horizontalPadding: 16,
-                  leading: Align(
-                    alignment: Alignment.centerLeft,
+                  trailing: Align(
+                    alignment: Alignment.centerRight,
                     child: Container(
                       width: 38,
                       height: 38,

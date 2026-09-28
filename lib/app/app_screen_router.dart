@@ -255,11 +255,6 @@ class AppScreenRouter extends StatelessWidget {
                           MaterialPageRoute<void>(
                             builder: (_) => WelcomeAssessmentIntroScreen(
                               onAssessment: openGuestAssessment,
-                              onSkip: () {
-                                Navigator.of(context).pop();
-                                cubit.openSignupEntry();
-                                coordinator.showSignup();
-                              },
                             ),
                           ),
                         );

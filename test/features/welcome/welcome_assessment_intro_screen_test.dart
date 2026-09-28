@@ -77,10 +77,9 @@ void main() {
   }
 
   for (final language in AppLanguage.values) {
-    testWidgets('large text scrolls and actions still work in $language', (
+    testWidgets('large text scrolls and assessment starts in $language', (
       tester,
     ) async {
-      var skips = 0;
       var starts = 0;
       final start = Completer<void>();
       const size = Size(320, 568);
@@ -90,7 +89,6 @@ void main() {
         progress: Future.value(_progress(true)),
         language: language,
         textScale: 2,
-        onSkip: () => skips++,
         onAssessment: (_) {
           starts++;
           return start.future;
@@ -110,8 +108,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.byKey(const ValueKey('welcome-assessment-skip')));
-      expect(skips, 1);
       await tester.tap(_action);
       await tester.pump();
       expect(starts, 1);
@@ -137,10 +133,10 @@ void _expectVisibleActions(WidgetTester tester, Size size) {
     tester.getSize(_action).width,
     closeTo(math.min(size.width - 112, 240), 0.1),
   );
+  expect(find.byKey(const ValueKey('welcome-assessment-skip')), findsNothing);
   for (final finder in [
     _action,
     find.byKey(const ValueKey('welcome-assessment-back')),
-    find.byKey(const ValueKey('welcome-assessment-skip')),
   ]) {
     expect(finder.hitTestable(), findsOneWidget);
     final rect = tester.getRect(finder);
@@ -155,7 +151,6 @@ Future<void> _pumpIntro(
   required Future<ExamProgressResponse> progress,
   AppLanguage language = AppLanguage.vi,
   double textScale = 1,
-  VoidCallback? onSkip,
   Future<void> Function(BuildContext)? onAssessment,
 }) async {
   tester.view.physicalSize = size;
@@ -187,7 +182,6 @@ Future<void> _pumpIntro(
           ),
           home: WelcomeAssessmentIntroScreen(
             onAssessment: onAssessment ?? (_) async {},
-            onSkip: onSkip ?? () {},
           ),
         ),
       ),

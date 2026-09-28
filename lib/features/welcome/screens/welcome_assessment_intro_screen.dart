@@ -22,11 +22,7 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
 class WelcomeAssessmentIntroScreen extends StatefulWidget {
-  const WelcomeAssessmentIntroScreen({
-    super.key,
-    required this.onAssessment,
-    required this.onSkip,
-  });
+  const WelcomeAssessmentIntroScreen({super.key, required this.onAssessment});
 
   static const _backgroundAsset =
       'assets/images/assessment_intro/assessment-intro-background.png';
@@ -34,7 +30,6 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
 
   final Future<void> Function(BuildContext context) onAssessment;
-  final VoidCallback onSkip;
 
   @override
   State<WelcomeAssessmentIntroScreen> createState() =>
@@ -148,33 +143,13 @@ class _WelcomeAssessmentIntroScreenState
   Widget _buildToolbar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          AppBackButton(
-            key: const ValueKey('welcome-assessment-back'),
-            onPressed: () => Navigator.of(context).pop(),
-            color: AppColors.welcomeTeal,
-          ),
-          TextButton(
-            key: const ValueKey('welcome-assessment-skip'),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              widget.onSkip();
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.welcomeTeal,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            ),
-            child: Text(
-              context.getText(AppKeys.skipUpper),
-              style: GoogleFonts.nunito(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ],
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: AppBackButton(
+          key: const ValueKey('welcome-assessment-back'),
+          onPressed: () => Navigator.of(context).pop(),
+          color: AppColors.welcomeTeal,
+        ),
       ),
     );
   }

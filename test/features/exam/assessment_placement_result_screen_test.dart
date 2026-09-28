@@ -65,6 +65,10 @@ void main() {
     expect(find.byType(AssessmentPlacementResultScreen), findsOneWidget);
     expect(find.byType(AssessmentResultScreen), findsNothing);
     expect(find.byType(PageHeader), findsOneWidget);
+    expect(
+      tester.getCenter(find.byKey(const ValueKey('placement-result-close'))).dx,
+      greaterThan(180),
+    );
     expect(find.text('Kết Quả'), findsOneWidget);
     expect(find.text('Trình độ'), findsOneWidget);
     expect(find.text('MẪU GIÁO'), findsOneWidget);

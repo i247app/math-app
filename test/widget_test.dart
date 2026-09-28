@@ -596,7 +596,6 @@ void main() {
               theme: ThemeData(extensions: const [AppThemeColors.light]),
               home: WelcomeAssessmentIntroScreen(
                 onAssessment: (_) => assessmentCompleted.future,
-                onSkip: () {},
               ),
             ),
           ),
