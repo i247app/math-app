@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -15,6 +17,10 @@ void main() {
   testWidgets('Create User accepts a verified phone identifier', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     SignupFormData? submittedForm;
@@ -42,18 +48,62 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final action = tester.widget<SignupActionButton>(
-      find.byType(SignupActionButton),
+    final terms = find.byKey(const ValueKey('signup-terms-consent'));
+    final accuracy = find.byKey(const ValueKey('signup-accuracy-confirmation'));
+    expect(
+      find.text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.'),
+      findsOneWidget,
     );
-    expect(action.onPressed, isNotNull);
+    expect(
+      find.text('Tôi xác nhận thông tin đăng ký là chính xác.'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<SignupActionButton>(find.byType(SignupActionButton))
+          .onPressed,
+      isNull,
+    );
+    await tester.ensureVisible(terms);
+    await tester.tap(terms);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<SignupActionButton>(find.byType(SignupActionButton))
+          .onPressed,
+      isNull,
+    );
+    await tester.ensureVisible(accuracy);
+    await tester.tap(accuracy);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<SignupActionButton>(find.byType(SignupActionButton))
+          .onPressed,
+      isNotNull,
+    );
+    await tester.ensureVisible(terms);
+    await tester.tap(terms);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<SignupActionButton>(find.byType(SignupActionButton))
+          .onPressed,
+      isNull,
+    );
+    await tester.tap(terms);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(SignupActionButton));
     await tester.tap(find.byType(SignupActionButton));
     expect(submittedForm?.name, 'Learner');
     expect(submittedForm?.email, isNull);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Create User action says Sign up, then Signing up', (
     tester,
   ) async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
     final nameController = TextEditingController();
     addTearDown(lingo.dispose);
@@ -71,12 +121,16 @@ void main() {
               usernameController: nameController,
               role: null,
               gender: null,
+              agreedToTerms: false,
+              confirmedInformation: false,
               usernameErrorText: null,
               isFormValid: false,
               isSigningUp: isSigningUp,
               onBack: () {},
               onRoleChanged: (_) {},
               onGenderChanged: (_) {},
+              onTermsChanged: (_) {},
+              onInformationChanged: (_) {},
               onContinue: () {},
             ),
           ),
@@ -91,6 +145,25 @@ void main() {
       lingo.lookup(AppKeys.signup),
     );
     expect(find.text(lingo.lookup(AppKeys.signup)), findsOneWidget);
+    expect(
+      find.text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Tôi xác nhận thông tin đăng ký là chính xác.'),
+      findsOneWidget,
+    );
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('I agree to the Terms of Use and Privacy Policy.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('I confirm that my registration information is accurate.'),
+      findsOneWidget,
+    );
 
     await showContent(isSigningUp: true);
     expect(

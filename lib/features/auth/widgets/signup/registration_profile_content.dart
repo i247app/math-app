@@ -21,24 +21,32 @@ class RegistrationProfileContent extends StatelessWidget {
     required this.usernameController,
     required this.role,
     required this.gender,
+    required this.agreedToTerms,
+    required this.confirmedInformation,
     required this.usernameErrorText,
     required this.isFormValid,
     required this.isSigningUp,
     required this.onBack,
     required this.onRoleChanged,
     required this.onGenderChanged,
+    required this.onTermsChanged,
+    required this.onInformationChanged,
     required this.onContinue,
   });
 
   final TextEditingController usernameController;
   final SignupRole? role;
   final SignupGender? gender;
+  final bool agreedToTerms;
+  final bool confirmedInformation;
   final String? usernameErrorText;
   final bool isFormValid;
   final bool isSigningUp;
   final VoidCallback onBack;
   final ValueChanged<SignupRole> onRoleChanged;
   final ValueChanged<SignupGender?> onGenderChanged;
+  final ValueChanged<bool> onTermsChanged;
+  final ValueChanged<bool> onInformationChanged;
   final VoidCallback onContinue;
 
   @override
@@ -120,7 +128,57 @@ class RegistrationProfileContent extends StatelessWidget {
                           textInputAction: TextInputAction.done,
                           errorText: usernameErrorText,
                         ),
-                        SizedBox(height: compact ? 20 : 24),
+                        const SizedBox(height: 12),
+                        Material(
+                          type: MaterialType.transparency,
+                          child: CheckboxListTile(
+                            key: const ValueKey('signup-terms-consent'),
+                            value: agreedToTerms,
+                            onChanged: isSigningUp
+                                ? null
+                                : (value) => onTermsChanged(value ?? false),
+                            title: Text(
+                              context.getText(
+                                AppKeys.signupTermsPrivacyConsent,
+                              ),
+                              style: TextStyle(
+                                color: context.themeColors.textPrimary,
+                                fontSize: 14,
+                                height: 1.3,
+                              ),
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            activeColor: context.themeColors.brandStrong,
+                          ),
+                        ),
+                        Material(
+                          type: MaterialType.transparency,
+                          child: CheckboxListTile(
+                            key: const ValueKey('signup-accuracy-confirmation'),
+                            value: confirmedInformation,
+                            onChanged: isSigningUp
+                                ? null
+                                : (value) =>
+                                      onInformationChanged(value ?? false),
+                            title: Text(
+                              context.getText(
+                                AppKeys.signupInformationAccuracy,
+                              ),
+                              style: TextStyle(
+                                color: context.themeColors.textPrimary,
+                                fontSize: 14,
+                                height: 1.3,
+                              ),
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            activeColor: context.themeColors.brandStrong,
+                          ),
+                        ),
+                        SizedBox(height: compact ? 16 : 20),
                         SignupActionButton(
                           label: isSigningUp
                               ? context.getText(AppKeys.signingUp)

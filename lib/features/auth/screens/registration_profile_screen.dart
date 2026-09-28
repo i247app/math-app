@@ -41,6 +41,8 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
 
   SignupRole? _selectedRole;
   SignupGender? _selectedGender;
+  bool _agreedToTerms = false;
+  bool _confirmedInformation = false;
 
   static final RegExp _namePattern = RegExp(
     r'^[A-Za-z0-9À-ÖØ-öø-ỹ]+(?: +[A-Za-z0-9À-ÖØ-öø-ỹ]+)*$',
@@ -83,7 +85,10 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
   void _continue() {
     final role = _selectedRole;
     final gender = _selectedGender;
-    if (role == null || gender == null) {
+    if (role == null ||
+        gender == null ||
+        !_agreedToTerms ||
+        !_confirmedInformation) {
       return;
     }
 
@@ -113,7 +118,9 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
         isUsernameValid &&
         isIdentifierValid &&
         _selectedRole != null &&
-        _selectedGender != null;
+        _selectedGender != null &&
+        _agreedToTerms &&
+        _confirmedInformation;
     final localUsernameError = username.isNotEmpty && !isUsernameValid
         ? context.getText(AppKeys.signupNameInvalid)
         : null;
@@ -127,12 +134,17 @@ class _RegistrationProfileScreenState extends State<RegistrationProfileScreen> {
       usernameController: _usernameController,
       role: _selectedRole,
       gender: _selectedGender,
+      agreedToTerms: _agreedToTerms,
+      confirmedInformation: _confirmedInformation,
       usernameErrorText: usernameError,
       isFormValid: isFormValid,
       isSigningUp: widget.isSigningUp,
       onBack: widget.onBack,
       onRoleChanged: _selectRole,
       onGenderChanged: (gender) => setState(() => _selectedGender = gender),
+      onTermsChanged: (value) => setState(() => _agreedToTerms = value),
+      onInformationChanged: (value) =>
+          setState(() => _confirmedInformation = value),
       onContinue: _continue,
     );
   }

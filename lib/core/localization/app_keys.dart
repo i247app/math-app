@@ -98,6 +98,8 @@ class AppKeys {
   static const signupNameLabelTeacherFemale =
       'signup_name_label_teacher_female';
   static const signupEmailDescription = 'signup_email_description';
+  static const signupTermsPrivacyConsent = 'signup_terms_privacy_consent';
+  static const signupInformationAccuracy = 'signup_information_accuracy';
   static const avatarUpper = 'avatar_upper';
   static const chooseAvatar = 'choose_avatar';
   static const signingUp = 'signing_up';
