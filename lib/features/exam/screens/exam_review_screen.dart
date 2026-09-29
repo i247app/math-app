@@ -9,6 +9,7 @@ import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_loading_content.dart';
@@ -145,55 +146,58 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
       backgroundColor: colors.pageBackground,
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            ExamReviewHeader(
-              title: widget.headerTitle,
-              onBack: () => Navigator.of(context).pop(),
-            ),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  final exam = _controller.exam;
-                  if (exam == null) {
-                    return _controller.isLoading
-                        ? const ExamReviewLoadingContent()
-                        : ExamReviewStatePanel(
-                            isLoading: false,
-                            message: _controller.errorMessage,
-                            onRetry: () =>
-                                _controller.loadExamDetail(forceRefresh: true),
-                          );
-                  }
+        child: _isGeneratingPractice
+            ? const AssessmentTestAgainLoader()
+            : Column(
+                children: [
+                  ExamReviewHeader(
+                    title: widget.headerTitle,
+                    onBack: () => Navigator.of(context).pop(),
+                  ),
+                  Expanded(
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        final exam = _controller.exam;
+                        if (exam == null) {
+                          return _controller.isLoading
+                              ? const ExamReviewLoadingContent()
+                              : ExamReviewStatePanel(
+                                  isLoading: false,
+                                  message: _controller.errorMessage,
+                                  onRetry: () => _controller.loadExamDetail(
+                                    forceRefresh: true,
+                                  ),
+                                );
+                        }
 
-                  return ExamReviewContent(
-                    exam: exam,
-                    selectedIndex: _controller.selectedIndex,
-                    mode: _controller.mode,
-                    allowRetry: widget.allowRetry,
-                    showTime: widget.showTime,
-                    isLoading: _controller.isLoading,
-                    errorMessage: _controller.errorMessage,
-                    onRetry: () =>
-                        _controller.loadExamDetail(forceRefresh: true),
-                    onModeSelected: _selectMode,
-                    onQuestionSelected: _selectQuestion,
-                    submittedAnswers: _controller.submittedAnswers,
-                    retryAnswers: _controller.retryAnswers,
-                    onAnswerSelected: _selectAnswer,
-                    onPrevious: _goToPreviousQuestion,
-                    onNext: _goToNextQuestion,
-                    onPractice: widget.onPractice == null
-                        ? null
-                        : () => _startPractice(exam),
-                    isGeneratingPractice: _isGeneratingPractice,
-                  );
-                },
+                        return ExamReviewContent(
+                          exam: exam,
+                          selectedIndex: _controller.selectedIndex,
+                          mode: _controller.mode,
+                          allowRetry: widget.allowRetry,
+                          showTime: widget.showTime,
+                          isLoading: _controller.isLoading,
+                          errorMessage: _controller.errorMessage,
+                          onRetry: () =>
+                              _controller.loadExamDetail(forceRefresh: true),
+                          onModeSelected: _selectMode,
+                          onQuestionSelected: _selectQuestion,
+                          submittedAnswers: _controller.submittedAnswers,
+                          retryAnswers: _controller.retryAnswers,
+                          onAnswerSelected: _selectAnswer,
+                          onPrevious: _goToPreviousQuestion,
+                          onNext: _goToNextQuestion,
+                          onPractice: widget.onPractice == null
+                              ? null
+                              : () => _startPractice(exam),
+                          isGeneratingPractice: _isGeneratingPractice,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

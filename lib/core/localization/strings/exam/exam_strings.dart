@@ -83,7 +83,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examReviewResultTab: 'Kết Quả',
     AppKeys.examReviewPracticeBannerTitle: 'Luyện thêm',
     AppKeys.examReviewTopicConjunction: 'và',
-    AppKeys.examReviewPracticeBannerAction: 'Luyện tập ngay',
+    AppKeys.examReviewPracticeBannerAction: 'LUYỆN TẬP NGAY',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
     AppKeys.numiAiReview: 'Numi AI nhận xét',
     AppKeys.defaultAiReview:
@@ -172,11 +172,11 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultChartGrade: 'Level',
     AppKeys.placementResultKindergartenShort: 'Grade 0',
     AppKeys.placementResultActivity: 'Trend',
-    AppKeys.examReviewRetryTab: 'Practice',
+    AppKeys.examReviewRetryTab: 'Revise',
     AppKeys.examReviewResultTab: 'Results',
     AppKeys.examReviewPracticeBannerTitle: 'More practice recommended',
     AppKeys.examReviewTopicConjunction: 'and',
-    AppKeys.examReviewPracticeBannerAction: 'Practice now',
+    AppKeys.examReviewPracticeBannerAction: 'PRACTICE NOW',
     AppKeys.scoreUpper: 'SCORE',
     AppKeys.numiAiReview: 'Numi AI review',
     AppKeys.defaultAiReview:

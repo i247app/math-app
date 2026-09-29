@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +13,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_list.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_tile.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_button.dart';
@@ -250,10 +253,7 @@ void main() {
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpAndSettle();
     expect(find.text('Test-912345'), findsOneWidget);
-    expect(
-      tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label,
-      'Practice',
-    );
+    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Revise');
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),
@@ -292,6 +292,56 @@ void main() {
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('practice banner opens the full generate loader', (tester) async {
+    final lingo = LingoProvider();
+    final service = _PendingPracticeService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: RepositoryProvider<ExamService>.value(
+          value: service,
+          child: LingoScope(
+            lingo: lingo,
+            child: const ExamReviewScreen(
+              userExamId: 912347,
+              examType: examTypeGrade,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('LUYỆN TẬP NGAY'), findsOneWidget);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
+    expect(find.text('PRACTICE NOW'), findsOneWidget);
+    expect(
+      tester
+          .widget<ExamReviewModeTabButton>(
+            find.byType(ExamReviewModeTabButton).first,
+          )
+          .label,
+      'Revise',
+    );
+
+    await tester.tap(find.byKey(const ValueKey('exam-review-practice-banner')));
+    await tester.pump();
+    expect(service.requestedPracticeType, examTypePractice);
+    expect(service.requestedPracticeUserExamId, 912345);
+    expect(find.byType(AssessmentTestAgainLoader), findsOneWidget);
+    expect(find.byType(ExamReviewModeTabButton), findsNothing);
+
+    service.pendingPractice.completeError(StateError('generation failed'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AssessmentTestAgainLoader), findsNothing);
   });
 
   testWidgets('guest assessment review omits the practice banner', (
@@ -412,4 +462,23 @@ class _JourneyDetailService implements ExamService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _PendingPracticeService extends _JourneyDetailService {
+  final Completer<GeneratedExam> pendingPractice = Completer<GeneratedExam>();
+  String? requestedPracticeType;
+  int? requestedPracticeUserExamId;
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? level,
+    int? profileId,
+    int? userExamId,
+  }) {
+    requestedPracticeType = examType;
+    requestedPracticeUserExamId = userExamId;
+    return pendingPractice.future;
+  }
 }
