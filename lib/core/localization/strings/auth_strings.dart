@@ -64,8 +64,9 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabelTeacherFemale: 'Tên Cô',
     AppKeys.signupEmailDescription:
         'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
-    AppKeys.signupTermsPrivacyConsent:
-        'Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.',
+    AppKeys.signupTermsPrivacyPrefix: 'Tôi đồng ý với Điều khoản sử dụng và',
+    AppKeys.signupPrivacyPolicyLabel: 'Chính sách bảo mật',
+    AppKeys.signupPrivacyPolicyOpenFailed: 'Không thể mở Chính sách bảo mật.',
     AppKeys.signupInformationAccuracy:
         'Tôi xác nhận thông tin đăng ký là chính xác.',
     AppKeys.phoneNumber: 'Số Điện Thoại',
@@ -156,8 +157,9 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabelTeacherFemale: "Teacher's First Name",
     AppKeys.signupEmailDescription:
         "Enter an email to follow your child's assessment results\nand learning journey",
-    AppKeys.signupTermsPrivacyConsent:
-        'I agree to the Terms of Use and Privacy Policy.',
+    AppKeys.signupTermsPrivacyPrefix: 'I agree to the Terms of Use and',
+    AppKeys.signupPrivacyPolicyLabel: 'Privacy Policy',
+    AppKeys.signupPrivacyPolicyOpenFailed: 'Could not open the Privacy Policy.',
     AppKeys.signupInformationAccuracy:
         'I confirm that my registration information is accurate.',
     AppKeys.phoneNumber: 'Phone Number',

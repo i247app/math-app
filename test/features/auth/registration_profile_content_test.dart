@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
+import 'package:url_launcher_platform_interface/link.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -50,10 +52,8 @@ void main() {
 
     final terms = find.byKey(const ValueKey('signup-terms-consent'));
     final accuracy = find.byKey(const ValueKey('signup-accuracy-confirmation'));
-    expect(
-      find.text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.'),
-      findsOneWidget,
-    );
+    expect(find.text('Tôi đồng ý với Điều khoản sử dụng và'), findsOneWidget);
+    expect(find.text('Chính sách bảo mật.'), findsOneWidget);
     expect(
       find.text('Tôi xác nhận thông tin đăng ký là chính xác.'),
       findsOneWidget,
@@ -148,10 +148,8 @@ void main() {
       find.text(lingo.lookup(AppKeys.signup).toUpperCase()),
       findsOneWidget,
     );
-    expect(
-      find.text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật.'),
-      findsOneWidget,
-    );
+    expect(find.text('Tôi đồng ý với Điều khoản sử dụng và'), findsOneWidget);
+    expect(find.text('Chính sách bảo mật.'), findsOneWidget);
     expect(
       find.text('Tôi xác nhận thông tin đăng ký là chính xác.'),
       findsOneWidget,
@@ -159,10 +157,8 @@ void main() {
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpAndSettle();
-    expect(
-      find.text('I agree to the Terms of Use and Privacy Policy.'),
-      findsOneWidget,
-    );
+    expect(find.text('I agree to the Terms of Use and'), findsOneWidget);
+    expect(find.text('Privacy Policy.'), findsOneWidget);
     expect(
       find.text('I confirm that my registration information is accurate.'),
       findsOneWidget,
@@ -178,4 +174,71 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('Privacy Policy opens its URL without selecting consent', (
+    tester,
+  ) async {
+    final originalLauncher = UrlLauncherPlatform.instance;
+    final launcher = _RecordingUrlLauncher();
+    UrlLauncherPlatform.instance = launcher;
+    addTearDown(() => UrlLauncherPlatform.instance = originalLauncher);
+    final lingo = LingoProvider();
+    final nameController = TextEditingController();
+    addTearDown(lingo.dispose);
+    addTearDown(nameController.dispose);
+    var consentChanges = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: LingoScope(
+          lingo: lingo,
+          child: RegistrationProfileContent(
+            usernameController: nameController,
+            role: null,
+            gender: null,
+            agreedToTerms: false,
+            confirmedInformation: false,
+            usernameErrorText: null,
+            isFormValid: false,
+            isSigningUp: false,
+            onBack: () {},
+            onRoleChanged: (_) {},
+            onGenderChanged: (_) {},
+            onTermsChanged: (_) => consentChanges++,
+            onInformationChanged: (_) {},
+            onContinue: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final link = find.byKey(const ValueKey('signup-privacy-policy-link'));
+    await tester.ensureVisible(link);
+    await tester.tap(link);
+    await tester.pump();
+
+    expect(launcher.launchedUrl, 'https://numi.asia/legal/privacy.html');
+    expect(launcher.launchMode, PreferredLaunchMode.externalApplication);
+    expect(consentChanges, 0);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _RecordingUrlLauncher extends UrlLauncherPlatform {
+  String? launchedUrl;
+  PreferredLaunchMode? launchMode;
+
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> launchUrl(String url, LaunchOptions options) async {
+    launchedUrl = url;
+    launchMode = options.mode;
+    return true;
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -48,6 +49,30 @@ class RegistrationProfileContent extends StatelessWidget {
   final ValueChanged<bool> onTermsChanged;
   final ValueChanged<bool> onInformationChanged;
   final VoidCallback onContinue;
+
+  static final Uri _privacyPolicyUrl = Uri.parse(
+    'https://numi.asia/legal/privacy.html',
+  );
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    try {
+      if (await launchUrl(
+        _privacyPolicyUrl,
+        mode: LaunchMode.externalApplication,
+      )) {
+        return;
+      }
+    } catch (_) {
+      // The same localized message covers a missing browser and launch errors.
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.getText(AppKeys.signupPrivacyPolicyOpenFailed)),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,15 +162,39 @@ class RegistrationProfileContent extends StatelessWidget {
                             onChanged: isSigningUp
                                 ? null
                                 : (value) => onTermsChanged(value ?? false),
-                            title: Text(
-                              context.getText(
-                                AppKeys.signupTermsPrivacyConsent,
-                              ),
-                              style: TextStyle(
-                                color: context.themeColors.textPrimary,
-                                fontSize: 14,
-                                height: 1.3,
-                              ),
+                            title: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 4,
+                              children: [
+                                Text(
+                                  context.getText(
+                                    AppKeys.signupTermsPrivacyPrefix,
+                                  ),
+                                  style: TextStyle(
+                                    color: context.themeColors.textPrimary,
+                                    fontSize: 14,
+                                    height: 1.3,
+                                  ),
+                                ),
+                                Semantics(
+                                  link: true,
+                                  child: InkWell(
+                                    key: const ValueKey(
+                                      'signup-privacy-policy-link',
+                                    ),
+                                    onTap: () => _openPrivacyPolicy(context),
+                                    child: Text(
+                                      '${context.getText(AppKeys.signupPrivacyPolicyLabel)}.',
+                                      style: TextStyle(
+                                        color: context.themeColors.brandStrong,
+                                        fontSize: 14,
+                                        height: 1.3,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             controlAffinity: ListTileControlAffinity.leading,
                             contentPadding: EdgeInsets.zero,
