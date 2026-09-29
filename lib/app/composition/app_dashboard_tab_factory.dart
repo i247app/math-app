@@ -133,7 +133,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
           onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
           bottomPadding: args.bottomPadding,
           homeHeader: args.homeHeader,
-          showChildProfileDialogOnStart: args.showChildProfileDialogOnStart,
+          showChildProfileDialogOnStart: false,
           onChildProfileDialogShown: args.onChildProfileDialogShown,
           useActiveStudentProfileData: useActiveStudentProfileData,
         ),

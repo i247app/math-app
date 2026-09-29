@@ -201,7 +201,7 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
             children: [
               Expanded(
                 child: AssessmentResultActionButton(
-                  label: context.getText(AppKeys.placementResultViewDetails),
+                  label: context.getText(AppKeys.placementResultReview),
                   icon: Icons.assignment_outlined,
                   background: AppColors.resultCoral,
                   onTap: _viewDetails,

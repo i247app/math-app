@@ -24,6 +24,7 @@ import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
+import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
@@ -441,7 +442,8 @@ void main() {
                                 bottomPadding: 0,
                                 hasUnreadNotifications: false,
                                 onNotificationTap: _noop,
-                                showChildProfileDialogOnStart: false,
+                                showChildProfileDialogOnStart:
+                                    role == ProfileRole.parent && tabIndex == 0,
                               ),
                             ),
                       ),
@@ -451,6 +453,18 @@ void main() {
               ),
             );
             await tester.pumpAndSettle();
+
+            if (role == ProfileRole.parent && tabIndex == 0) {
+              expect(
+                tester
+                    .widget<NewParentHomeContent>(
+                      find.byType(NewParentHomeContent),
+                    )
+                    .showChildProfileDialogOnStart,
+                isFalse,
+              );
+              expect(find.byType(HomeMissingStudentDialog), findsNothing);
+            }
 
             final assessmentAction = find.byKey(
               const ValueKey('parent-home-assessment-action'),
@@ -465,9 +479,20 @@ void main() {
             expect(examService.generatedProfileIds, isEmpty);
             expect(examService.progressProfileIds.last, profileId);
 
-            await tester.tap(
-              find.byKey(const ValueKey('welcome-assessment-intro-action')),
+            final startAction = find.byKey(
+              const ValueKey('welcome-assessment-intro-action'),
             );
+            await tester.scrollUntilVisible(
+              startAction,
+              300,
+              scrollable: find.descendant(
+                of: find.byKey(
+                  const ValueKey('welcome-assessment-intro-scroll'),
+                ),
+                matching: find.byType(Scrollable),
+              ),
+            );
+            await tester.tap(startAction);
             await tester.pumpAndSettle();
             expect(find.byType(ExamAttemptScreen), findsOneWidget);
             expect(examService.generatedProfileIds, [profileId]);
