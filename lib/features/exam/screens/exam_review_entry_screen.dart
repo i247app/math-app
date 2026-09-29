@@ -60,7 +60,10 @@ class ExamReviewScreen extends StatelessWidget {
               userExamId: userExamId,
             )
           : null,
-      onPractice: isEntireJourney && allowPractice
+      onPractice:
+          isEntireJourney &&
+              allowPractice &&
+              resolvedExamType != examTypeAssessment
           ? (detail) async {
               final journeyId = detail.userExamId ?? userExamId;
               if (journeyId == null || journeyId <= 0) {

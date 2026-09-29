@@ -182,7 +182,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('journey detail shows retry and result modes', (tester) async {
+  testWidgets('assessment journey shows review modes without practice', (
+    tester,
+  ) async {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
     final service = _JourneyDetailService();
@@ -228,6 +230,38 @@ void main() {
     expect(find.text('Test-912345'), findsOneWidget);
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Review');
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
+    expect(
+      find.byKey(const ValueKey('exam-review-practice-banner')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('grade journey retains the practice banner', (tester) async {
+    final lingo = LingoProvider();
+    final service = _JourneyDetailService();
+    addTearDown(lingo.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: RepositoryProvider<ExamService>.value(
+          value: service,
+          child: LingoScope(
+            lingo: lingo,
+            child: const ExamReviewScreen(
+              userExamId: 912347,
+              examType: examTypeGrade,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),
       findsOneWidget,
