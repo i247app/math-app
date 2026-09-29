@@ -17,7 +17,7 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.appThemeMenuSubtitleSystem: 'Đang dùng giao diện theo hệ thống',
     AppKeys.appThemeMenuSubtitleLight: 'Đang dùng giao diện sáng',
     AppKeys.appThemeMenuSubtitleDark: 'Đang dùng giao diện tối',
-    AppKeys.createPasscodeTitle: 'Tạo Mã PIN',
+    AppKeys.createPasscodeTitle: 'PIN Đăng Nhập',
     AppKeys.confirmPasscodeTitle: 'Nhập Lại Mã PIN',
     AppKeys.unlockPasscodeTitle: 'Mã PIN',
     AppKeys.verifyPasscodeTitle: 'Xác Minh Mã PIN',

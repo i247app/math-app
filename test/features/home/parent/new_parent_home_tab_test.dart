@@ -272,6 +272,7 @@ void main() {
       final homeService = _RecordingStudentHomeService();
       final examService = _ExamService(false);
       var activeTab = 0;
+      late StateSetter setActiveTab;
 
       await tester.pumpWidget(
         RepositoryProvider<HomeLayoutService>.value(
@@ -282,43 +283,45 @@ void main() {
               theme: AppTheme.light(),
               home: Scaffold(
                 body: StatefulBuilder(
-                  builder: (context, setTabState) =>
-                      const AppDashboardTabFactory().buildTab(
-                        context: context,
-                        role: ProfileRole.student,
-                        args: DashboardTabArgs(
-                          activeTab: activeTab,
-                          isActive: true,
-                          user: null,
-                          profiles: const [UserProfile(profileId: 77)],
-                          activeProfile: const UserProfile(profileId: 78),
-                          profileLoadError: null,
-                          onRefreshProfiles: _noopAsync,
-                          onActivateProfile: _noopActivate,
-                          initialGrades: const [],
-                          gradeService: _GradeService(),
-                          classroomService: _ClassroomService(),
-                          assignmentService: _ClassroomExerciseService(),
-                          examService: examService,
-                          onLogout: _noop,
-                          onAddProfileFromGames: _noop,
-                          onProfileSaved: _noop,
-                          openAddProfileRequestId: 0,
-                          onCompleteTeacherProfile: _noopAsync,
-                          onOpenClassroomTab: _noop,
-                          onOpenGamesTab: _noop,
-                          onOpenLearningTab: () =>
-                              setTabState(() => activeTab = 5),
-                          onOpenExercisesTab: _noop,
-                          onOpenProfileMenu: _noop,
-                          onParentAssessmentStateChanged: _noopAssessmentState,
-                          activeRefreshTick: 0,
-                          bottomPadding: 0,
-                          hasUnreadNotifications: false,
-                          onNotificationTap: _noop,
-                          showChildProfileDialogOnStart: true,
-                        ),
+                  builder: (context, setTabState) {
+                    setActiveTab = setTabState;
+                    return const AppDashboardTabFactory().buildTab(
+                      context: context,
+                      role: ProfileRole.student,
+                      args: DashboardTabArgs(
+                        activeTab: activeTab,
+                        isActive: true,
+                        user: null,
+                        profiles: const [UserProfile(profileId: 77)],
+                        activeProfile: const UserProfile(profileId: 78),
+                        profileLoadError: null,
+                        onRefreshProfiles: _noopAsync,
+                        onActivateProfile: _noopActivate,
+                        initialGrades: const [],
+                        gradeService: _GradeService(),
+                        classroomService: _ClassroomService(),
+                        assignmentService: _ClassroomExerciseService(),
+                        examService: examService,
+                        onLogout: _noop,
+                        onAddProfileFromGames: _noop,
+                        onProfileSaved: _noop,
+                        openAddProfileRequestId: 0,
+                        onCompleteTeacherProfile: _noopAsync,
+                        onOpenClassroomTab: _noop,
+                        onOpenGamesTab: _noop,
+                        onOpenLearningTab: () =>
+                            setTabState(() => activeTab = 5),
+                        onOpenExercisesTab: _noop,
+                        onOpenProfileMenu: _noop,
+                        onParentAssessmentStateChanged: _noopAssessmentState,
+                        activeRefreshTick: 0,
+                        bottomPadding: 0,
+                        hasUnreadNotifications: false,
+                        onNotificationTap: _noop,
+                        showChildProfileDialogOnStart: true,
                       ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -345,7 +348,16 @@ void main() {
 
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();
-      expect(activeTab, 5);
+      expect(activeTab, 0);
+      final homeRoadmap = tester.widget<GradeRoadmapScreen>(
+        find.byType(GradeRoadmapScreen),
+      );
+      expect(homeRoadmap.profileId, 78);
+      await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
+      await tester.pumpAndSettle();
+
+      setActiveTab(() => activeTab = 5);
+      await tester.pumpAndSettle();
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(PageHeader), findsOneWidget);
       expect(
@@ -462,6 +474,14 @@ void main() {
                     )
                     .showChildProfileDialogOnStart,
                 isFalse,
+              );
+              expect(
+                tester
+                    .widget<NewParentHomeContent>(
+                      find.byType(NewParentHomeContent),
+                    )
+                    .onOpenLearningTab,
+                isNull,
               );
               expect(find.byType(HomeMissingStudentDialog), findsNothing);
             }

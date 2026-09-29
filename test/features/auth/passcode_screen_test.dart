@@ -135,7 +135,7 @@ void main() {
 
     final field = find.byType(TextField);
     expect(find.byType(NumiBrandText), findsNothing);
-    expect(find.text('Tạo Mã PIN'), findsOneWidget);
+    expect(find.text('PIN Đăng Nhập'), findsOneWidget);
     expect(find.text('Mã PIN để đăng nhập'), findsOneWidget);
     expect(find.text('TẠO'), findsOneWidget);
     expect(tester.widget<TextField>(field).obscureText, isFalse);

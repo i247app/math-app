@@ -129,7 +129,6 @@ class AppDashboardTabFactory implements DashboardTabFactory {
           onOpenProfileMenu: args.onOpenProfileMenu,
           onOpenClassroomTab: args.onOpenClassroomTab,
           onOpenGamesTab: args.onOpenGamesTab,
-          onOpenLearningTab: args.onOpenLearningTab,
           onParentAssessmentStateChanged: args.onParentAssessmentStateChanged,
           bottomPadding: args.bottomPadding,
           homeHeader: args.homeHeader,
