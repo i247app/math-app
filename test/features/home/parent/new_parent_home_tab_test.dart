@@ -375,108 +375,105 @@ void main() {
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
     for (final hasAssessment in [false, true]) {
-      testWidgets('$role home routes assessment with history=$hasAssessment', (
-        tester,
-      ) async {
-        const profileId = 79;
-        HomeProfileCache.instance.invalidateProfile(profileId);
-        addTearDown(
-          () => HomeProfileCache.instance.invalidateProfile(profileId),
-        );
-        final lingo = LingoProvider();
-        addTearDown(lingo.dispose);
-        final examService = _ExamService(hasAssessment);
+      for (final tabIndex in [0, 5]) {
+        testWidgets(
+          '$role tab $tabIndex opens intro with history=$hasAssessment',
+          (tester) async {
+            const profileId = 79;
+            HomeProfileCache.instance.invalidateProfile(profileId);
+            addTearDown(
+              () => HomeProfileCache.instance.invalidateProfile(profileId),
+            );
+            final lingo = LingoProvider();
+            addTearDown(lingo.dispose);
+            final examService = _ExamService(hasAssessment);
 
-        await tester.pumpWidget(
-          MultiRepositoryProvider(
-            providers: [
-              RepositoryProvider<HomeLayoutService>.value(
-                value: const _HomeService(),
-              ),
-              RepositoryProvider<ExamService>.value(value: examService),
-            ],
-            child: LingoScope(
-              lingo: lingo,
-              child: MaterialApp(
-                theme: AppTheme.light(),
-                home: Scaffold(
-                  body: Builder(
-                    builder: (context) =>
-                        const AppDashboardTabFactory().buildTab(
-                          context: context,
-                          role: role,
-                          args: DashboardTabArgs(
-                            activeTab: 0,
-                            isActive: true,
-                            user: const LoginUser(id: 271),
-                            profiles: const [],
-                            activeProfile: UserProfile(
-                              profileId: profileId,
-                              role: role == ProfileRole.parent
-                                  ? 'PARENT'
-                                  : 'STUDENT',
+            await tester.pumpWidget(
+              MultiRepositoryProvider(
+                providers: [
+                  RepositoryProvider<HomeLayoutService>.value(
+                    value: const _HomeService(),
+                  ),
+                  RepositoryProvider<ExamService>.value(value: examService),
+                ],
+                child: LingoScope(
+                  lingo: lingo,
+                  child: MaterialApp(
+                    theme: AppTheme.light(),
+                    home: Scaffold(
+                      body: Builder(
+                        builder: (context) =>
+                            const AppDashboardTabFactory().buildTab(
+                              context: context,
+                              role: role,
+                              args: DashboardTabArgs(
+                                activeTab: tabIndex,
+                                isActive: true,
+                                user: const LoginUser(id: 271),
+                                profiles: const [],
+                                activeProfile: UserProfile(
+                                  profileId: profileId,
+                                  role: role == ProfileRole.parent
+                                      ? 'PARENT'
+                                      : 'STUDENT',
+                                ),
+                                profileLoadError: null,
+                                onRefreshProfiles: _noopAsync,
+                                onActivateProfile: _noopActivate,
+                                initialGrades: const [],
+                                gradeService: _GradeService(),
+                                classroomService: _ClassroomService(),
+                                assignmentService: _ClassroomExerciseService(),
+                                examService: examService,
+                                onLogout: _noop,
+                                onAddProfileFromGames: _noop,
+                                onProfileSaved: _noop,
+                                openAddProfileRequestId: 0,
+                                onCompleteTeacherProfile: _noopAsync,
+                                onOpenClassroomTab: _noop,
+                                onOpenGamesTab: _noop,
+                                onOpenLearningTab: _noop,
+                                onOpenExercisesTab: _noop,
+                                onOpenProfileMenu: _noop,
+                                onParentAssessmentStateChanged:
+                                    _noopAssessmentState,
+                                activeRefreshTick: 0,
+                                bottomPadding: 0,
+                                hasUnreadNotifications: false,
+                                onNotificationTap: _noop,
+                                showChildProfileDialogOnStart: false,
+                              ),
                             ),
-                            profileLoadError: null,
-                            onRefreshProfiles: _noopAsync,
-                            onActivateProfile: _noopActivate,
-                            initialGrades: const [],
-                            gradeService: _GradeService(),
-                            classroomService: _ClassroomService(),
-                            assignmentService: _ClassroomExerciseService(),
-                            examService: examService,
-                            onLogout: _noop,
-                            onAddProfileFromGames: _noop,
-                            onProfileSaved: _noop,
-                            openAddProfileRequestId: 0,
-                            onCompleteTeacherProfile: _noopAsync,
-                            onOpenClassroomTab: _noop,
-                            onOpenGamesTab: _noop,
-                            onOpenLearningTab: _noop,
-                            onOpenExercisesTab: _noop,
-                            onOpenProfileMenu: _noop,
-                            onParentAssessmentStateChanged:
-                                _noopAssessmentState,
-                            activeRefreshTick: 0,
-                            bottomPadding: 0,
-                            hasUnreadNotifications: false,
-                            onNotificationTap: _noop,
-                            showChildProfileDialogOnStart: false,
-                          ),
-                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+            await tester.pumpAndSettle();
+
+            final assessmentAction = find.byKey(
+              const ValueKey('parent-home-assessment-action'),
+            );
+            await tester.ensureVisible(assessmentAction);
+            await tester.tap(assessmentAction);
+            await tester.pumpAndSettle();
+
+            expect(examService.gradeStatsProfileIds, isEmpty);
+            expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
+            expect(find.byType(ExamAttemptScreen), findsNothing);
+            expect(examService.generatedProfileIds, isEmpty);
+            expect(examService.progressProfileIds.last, profileId);
+
+            await tester.tap(
+              find.byKey(const ValueKey('welcome-assessment-intro-action')),
+            );
+            await tester.pumpAndSettle();
+            expect(find.byType(ExamAttemptScreen), findsOneWidget);
+            expect(examService.generatedProfileIds, [profileId]);
+          },
         );
-        await tester.pumpAndSettle();
-
-        final assessmentAction = find.byKey(
-          const ValueKey('parent-home-assessment-action'),
-        );
-        await tester.ensureVisible(assessmentAction);
-        await tester.tap(assessmentAction);
-        await tester.pumpAndSettle();
-
-        expect(examService.gradeStatsProfileIds, isEmpty);
-        if (hasAssessment) {
-          expect(find.byType(WelcomeAssessmentIntroScreen), findsNothing);
-          expect(find.byType(ExamAttemptScreen), findsOneWidget);
-          expect(examService.generatedProfileIds, [profileId]);
-        } else {
-          expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
-          expect(find.byType(ExamAttemptScreen), findsNothing);
-          expect(examService.generatedProfileIds, isEmpty);
-          expect(examService.progressProfileIds.last, profileId);
-
-          await tester.tap(
-            find.byKey(const ValueKey('welcome-assessment-intro-action')),
-          );
-          await tester.pumpAndSettle();
-          expect(find.byType(ExamAttemptScreen), findsOneWidget);
-          expect(examService.generatedProfileIds, [profileId]);
-        }
-      });
+      }
     }
   }
 }

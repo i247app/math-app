@@ -225,26 +225,26 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     required bool showIntro,
   }) {
     final profileId = profileStableId(args.activeProfile);
+    if (showIntro && profileId != null && profileId > 0) {
+      return Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => WelcomeAssessmentIntroScreen(
+            profileId: profileId,
+            onAssessment: (_) => openInitialAssessmentFromHome(
+              context: context,
+              examService: args.examService,
+              profileId: profileId,
+              gradeLabel: args.activeProfile?.grade?.label,
+            ),
+          ),
+        ),
+      );
+    }
     return openInitialAssessmentFromHome(
       context: context,
       examService: args.examService,
       profileId: profileId,
       gradeLabel: args.activeProfile?.grade?.label,
-      onNoAssessment: showIntro && profileId != null && profileId > 0
-          ? () => Navigator.of(context).push<void>(
-              MaterialPageRoute<void>(
-                builder: (_) => WelcomeAssessmentIntroScreen(
-                  profileId: profileId,
-                  onAssessment: (_) => openInitialAssessmentFromHome(
-                    context: context,
-                    examService: args.examService,
-                    profileId: profileId,
-                    gradeLabel: args.activeProfile?.grade?.label,
-                  ),
-                ),
-              ),
-            )
-          : null,
     );
   }
 
