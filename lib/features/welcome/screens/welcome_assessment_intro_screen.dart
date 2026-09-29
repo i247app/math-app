@@ -254,6 +254,8 @@ class _WelcomeAssessmentIntroScreenState
     required bool isTablet,
     required double contentWidth,
     required double mascotWidth,
+    required double viewportWidth,
+    required double viewportHeight,
   }) {
     final content = CustomScrollView(
       key: const ValueKey('welcome-assessment-intro-scroll'),
@@ -261,6 +263,7 @@ class _WelcomeAssessmentIntroScreenState
         SliverToBoxAdapter(
           child: Column(
             children: [
+              _buildToolbar(context),
               SizedBox(height: isTablet ? 32 : 24),
               _buildTitle(context, isTablet: isTablet),
               SizedBox(height: isTablet ? 48 : 32),
@@ -269,21 +272,23 @@ class _WelcomeAssessmentIntroScreenState
             ],
           ),
         ),
-        SliverLayoutBuilder(
-          builder: (context, constraints) => SliverToBoxAdapter(
-            // Fill spare space on tall screens, but let the visual keep its
-            // natural height and scroll on short screens or with larger text.
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: math.max(0.0, constraints.remainingPaintExtent),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Center(
-                  child: _buildHistoryVisual(contentWidth, mascotWidth),
-                ),
-              ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Center(
+              child: _buildHistoryVisual(contentWidth, mascotWidth),
             ),
+          ),
+        ),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const SizedBox(height: 24),
+              _buildStartButton(viewportWidth),
+              SizedBox(height: viewportHeight < 700 ? 32 : 96),
+            ],
           ),
         ),
       ],
@@ -345,6 +350,7 @@ class _WelcomeAssessmentIntroScreenState
           children: [
             Image.asset(
               WelcomeAssessmentIntroScreen._backgroundAsset,
+              key: const ValueKey('welcome-assessment-intro-background'),
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
             ),
@@ -360,21 +366,13 @@ class _WelcomeAssessmentIntroScreenState
                   );
                   final contentWidth = math.min(width - 32, 430.0);
 
-                  return Column(
-                    children: [
-                      _buildToolbar(context),
-                      Expanded(
-                        child: _buildContent(
-                          context,
-                          isTablet: isTablet,
-                          contentWidth: contentWidth,
-                          mascotWidth: mascotWidth,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      _buildStartButton(width),
-                      SizedBox(height: constraints.maxHeight < 700 ? 32 : 96),
-                    ],
+                  return _buildContent(
+                    context,
+                    isTablet: isTablet,
+                    contentWidth: contentWidth,
+                    mascotWidth: mascotWidth,
+                    viewportWidth: width,
+                    viewportHeight: constraints.maxHeight,
                   );
                 },
               ),

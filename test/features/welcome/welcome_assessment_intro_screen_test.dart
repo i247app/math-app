@@ -39,14 +39,20 @@ void main() {
           ),
           findsOneWidget,
         );
-        _expectVisibleActions(tester, size);
-        expect(tester.getSize(_action).height, closeTo(66.4, 0.5));
+        _expectBackVisible(tester);
         expect(tester.takeException(), isNull);
 
         progress.complete(_progress(hasHistory));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        _expectVisibleActions(tester, size);
+        _expectBackVisible(tester);
+        final background = find.byKey(
+          const ValueKey('welcome-assessment-intro-background'),
+        );
+        final backgroundRect = tester.getRect(background);
+        final backTop = tester
+            .getTopLeft(find.byKey(const ValueKey('welcome-assessment-back')))
+            .dy;
 
         final visual = find.byKey(
           ValueKey(
@@ -65,13 +71,28 @@ void main() {
           ),
         );
         final visualRect = tester.getRect(visual);
-        final actionRect = tester.getRect(_action);
         expect(visualRect.top, greaterThanOrEqualTo(ribbon.bottom));
         final viewportRect = tester.getRect(
           find.byKey(const ValueKey('welcome-assessment-intro-scroll')),
         );
         expect(visualRect.overlaps(viewportRect), isTrue);
-        expect(viewportRect.bottom, lessThanOrEqualTo(actionRect.top));
+        await tester.scrollUntilVisible(_action, 120, scrollable: _scrollable);
+        await tester.pumpAndSettle();
+        _expectStartVisible(tester, size);
+        expect(tester.getRect(background), backgroundRect);
+        if (tester.state<ScrollableState>(_scrollable).position.pixels > 0) {
+          expect(
+            tester
+                .getTopLeft(
+                  find.byKey(
+                    const ValueKey('welcome-assessment-back'),
+                    skipOffstage: false,
+                  ),
+                )
+                .dy,
+            lessThan(backTop),
+          );
+        }
       });
     }
   }
@@ -96,7 +117,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      _expectVisibleActions(tester, size);
+      _expectBackVisible(tester);
 
       final scroll = tester.state<ScrollableState>(_scrollable);
       expect(scroll.position.maxScrollExtent, greaterThan(0));
@@ -123,6 +144,9 @@ void main() {
         findsOneWidget,
       );
 
+      await tester.scrollUntilVisible(_action, 120, scrollable: _scrollable);
+      await tester.pumpAndSettle();
+      _expectStartVisible(tester, size);
       await tester.tap(_action);
       await tester.pump();
       expect(starts, 1);
@@ -143,21 +167,23 @@ final _scrollable = find.descendant(
   matching: find.byType(Scrollable),
 );
 
-void _expectVisibleActions(WidgetTester tester, Size size) {
+void _expectBackVisible(WidgetTester tester) {
+  final back = find.byKey(const ValueKey('welcome-assessment-back'));
+  expect(back.hitTestable(), findsOneWidget);
+  expect(tester.getRect(back).top, greaterThanOrEqualTo(24));
+  expect(find.byKey(const ValueKey('welcome-assessment-skip')), findsNothing);
+}
+
+void _expectStartVisible(WidgetTester tester, Size size) {
   expect(
     tester.getSize(_action).width,
     closeTo(math.min(size.width - 112, 240), 0.1),
   );
-  expect(find.byKey(const ValueKey('welcome-assessment-skip')), findsNothing);
-  for (final finder in [
-    _action,
-    find.byKey(const ValueKey('welcome-assessment-back')),
-  ]) {
-    expect(finder.hitTestable(), findsOneWidget);
-    final rect = tester.getRect(finder);
-    expect(rect.top, greaterThanOrEqualTo(24));
-    expect(rect.bottom, lessThanOrEqualTo(size.height - 32));
-  }
+  expect(tester.getSize(_action).height, greaterThanOrEqualTo(66));
+  expect(_action.hitTestable(), findsOneWidget);
+  final rect = tester.getRect(_action);
+  expect(rect.top, greaterThanOrEqualTo(24));
+  expect(rect.bottom, lessThanOrEqualTo(size.height - 32));
 }
 
 Future<void> _pumpIntro(
