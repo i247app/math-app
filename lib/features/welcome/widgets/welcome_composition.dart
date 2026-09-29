@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 
 import 'numi_brand_text.dart';
 import 'welcome_background.dart';
@@ -83,12 +84,12 @@ class WelcomeComposition extends StatelessWidget {
                               ],
                             ),
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.nunito(
-                              color: colors.brand,
-                              fontSize: 18,
-                              height: 1.25,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium!
+                                .copyWith(
+                                  color: colors.brand,
+                                  fontSize: FontSize.headlineLarge,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           Text(
                             context.getText(
