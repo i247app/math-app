@@ -109,12 +109,15 @@ void main() {
       correctAnswer: 'A',
     );
 
-    Future<void> showAnswers({required bool showCorrectAnswer}) async {
+    Future<void> showAnswers({
+      required bool showCorrectAnswer,
+      String selectedLabel = 'B',
+    }) async {
       await tester.pumpWidget(
         testApp(
           ExamReviewAnswerList(
             question: reviewQuestion,
-            selectedLabel: 'B',
+            selectedLabel: selectedLabel,
             showCorrectAnswer: showCorrectAnswer,
           ),
           lingo,
@@ -129,6 +132,14 @@ void main() {
         find.descendant(of: tile, matching: find.byType(AnimatedContainer)),
       );
       return container.decoration! as BoxDecoration;
+    }
+
+    Color? labelCircleColorAt(int index) {
+      final label = reviewQuestion.answers[index].label;
+      final circle = tester.widget<Container>(
+        find.byKey(ValueKey('exam-review-answer-circle-$label')),
+      );
+      return (circle.decoration! as BoxDecoration).color;
     }
 
     void expectNeutralBorders() {
@@ -147,10 +158,19 @@ void main() {
 
     await showAnswers(showCorrectAnswer: true);
     expectNeutralBorders();
-    expect(decorationAt(0).color, AppColors.tealLightSurface);
+    expect(decorationAt(0).color, Colors.white);
+    expect(labelCircleColorAt(0), Colors.white);
     expect(decorationAt(1).color, AppColors.redSoft);
+    expect(labelCircleColorAt(1), AppColors.red);
+    expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
+    expect(find.byIcon(Icons.close_rounded), findsNothing);
+
+    await showAnswers(showCorrectAnswer: true, selectedLabel: 'A');
+    expectNeutralBorders();
+    expect(decorationAt(0).color, AppColors.tealLightSurface);
+    expect(labelCircleColorAt(0), AppColors.tealAccent);
+    expect(decorationAt(1).color, Colors.white);
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -179,6 +199,7 @@ void main() {
     expect(find.text('5'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
     expect(find.text('4'), findsOneWidget);
+    expect(find.byIcon(Icons.schedule_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -218,6 +239,7 @@ void main() {
       lessThan(tester.getCenter(tabs.at(1)).dx),
     );
     expect(find.byType(ExamReviewQuestionCard), findsOneWidget);
+    expect(find.byIcon(Icons.schedule_rounded), findsNothing);
     await tester.tap(tabs.at(1));
     await tester.pumpAndSettle();
     expect(find.byType(ExamReviewResultQuestionCard), findsOneWidget);
@@ -228,7 +250,10 @@ void main() {
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpAndSettle();
     expect(find.text('Test-912345'), findsOneWidget);
-    expect(tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label, 'Review');
+    expect(
+      tester.widget<ExamReviewModeTabButton>(tabs.at(0)).label,
+      'Practice',
+    );
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),

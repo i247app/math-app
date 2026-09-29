@@ -484,7 +484,7 @@ class _AssessmentPlacementResultScreenState
                             child: _PlacementActionButton(
                               key: const ValueKey('placement-view-details'),
                               label: context.getText(
-                                AppKeys.placementResultViewDetails,
+                                AppKeys.placementResultReview,
                               ),
                               icon: Icons.assignment_outlined,
                               color: AppColors.resultCoral,

@@ -865,7 +865,7 @@ class AppKeys {
   static const placementResultGradeLevel = 'placement_result_grade_level';
   static const placementResultCorrectSummary =
       'placement_result_correct_summary';
-  static const placementResultViewDetails = 'placement_result_view_details';
+  static const placementResultReview = 'placement_result_review';
   static const placementResultPracticeAgain = 'placement_result_practice_again';
   static const placementResultPractice = 'placement_result_practice';
   static const placementResultWeaknessesTitle =

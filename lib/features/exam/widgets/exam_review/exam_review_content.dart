@@ -22,6 +22,7 @@ class ExamReviewContent extends StatelessWidget {
     required this.selectedIndex,
     required this.mode,
     required this.allowRetry,
+    this.showTime = true,
     required this.isLoading,
     required this.errorMessage,
     required this.onRetry,
@@ -40,6 +41,7 @@ class ExamReviewContent extends StatelessWidget {
   final int selectedIndex;
   final ExamReviewMode mode;
   final bool allowRetry;
+  final bool showTime;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onRetry;
@@ -104,7 +106,7 @@ class ExamReviewContent extends StatelessWidget {
           ],
           Padding(
             padding: const EdgeInsets.only(bottom: 11),
-            child: ExamReviewStatsCard(exam: exam),
+            child: ExamReviewStatsCard(exam: exam, showTime: showTime),
           ),
           if (isLoading && question == null)
             const ExamReviewQuestionLoadingSection()

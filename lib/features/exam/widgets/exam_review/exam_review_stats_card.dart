@@ -10,9 +10,14 @@ import 'package:numi/features/exam/widgets/exam_review/exam_review_stat_item.dar
 import 'package:numi/features/exam/widgets/exam_review/exam_review_time_label.dart';
 
 class ExamReviewStatsCard extends StatelessWidget {
-  const ExamReviewStatsCard({super.key, required this.exam});
+  const ExamReviewStatsCard({
+    super.key,
+    required this.exam,
+    this.showTime = true,
+  });
 
   final GeneratedExam exam;
+  final bool showTime;
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +56,15 @@ class ExamReviewStatsCard extends StatelessWidget {
             value: '$wrong',
             label: context.getText(AppKeys.incorrect),
           ),
-          ExamReviewStatItem(
-            icon: Icons.schedule_rounded,
-            iconColor: AppColors.orange,
-            iconBackground: const Color(0xFFFFEAD6),
-            valueColor: AppColors.orange,
-            value: time,
-            label: context.getText(AppKeys.time),
-          ),
+          if (showTime)
+            ExamReviewStatItem(
+              icon: Icons.schedule_rounded,
+              iconColor: AppColors.orange,
+              iconBackground: const Color(0xFFFFEAD6),
+              valueColor: AppColors.orange,
+              value: time,
+              label: context.getText(AppKeys.time),
+            ),
         ],
       ),
     );

@@ -26,6 +26,7 @@ class ReviewDetailScreen extends StatefulWidget {
     this.headerTitle,
     this.initialDetail,
     this.allowRetry = true,
+    this.showTime = true,
     this.cacheKey,
     this.onPractice,
   });
@@ -35,6 +36,7 @@ class ReviewDetailScreen extends StatefulWidget {
   final String? headerTitle;
   final GeneratedExam? initialDetail;
   final bool allowRetry;
+  final bool showTime;
   final Object? cacheKey;
   final ExamReviewPracticeStarter? onPractice;
 
@@ -170,6 +172,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                     selectedIndex: _controller.selectedIndex,
                     mode: _controller.mode,
                     allowRetry: widget.allowRetry,
+                    showTime: widget.showTime,
                     isLoading: _controller.isLoading,
                     errorMessage: _controller.errorMessage,
                     onRetry: () =>

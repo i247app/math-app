@@ -73,7 +73,7 @@ const settingsStrings = <String, Map<String, String>>{
     AppKeys.appThemeMenuSubtitleSystem: 'Following your system theme',
     AppKeys.appThemeMenuSubtitleLight: 'Using light theme',
     AppKeys.appThemeMenuSubtitleDark: 'Using dark theme',
-    AppKeys.createPasscodeTitle: 'Create PIN',
+    AppKeys.createPasscodeTitle: 'LOGIN PIN',
     AppKeys.confirmPasscodeTitle: 'Confirm PIN',
     AppKeys.unlockPasscodeTitle: 'Enter PIN',
     AppKeys.verifyPasscodeTitle: 'Verify PIN',

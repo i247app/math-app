@@ -29,12 +29,13 @@ class ExamReviewAnswerTile extends StatelessWidget {
     final hasSelection = selectedLabel != null;
     final isWrongSelected = hasSelection && isSelected && !isCorrect;
     final isRevealedCorrect = isCorrect && (isSelected || showCorrectAnswer);
+    final isHighlightedCorrect = isCorrect && isSelected;
     final background = isWrongSelected
         ? AppColors.redSoft
-        : isRevealedCorrect
+        : isHighlightedCorrect
         ? AppColors.tealLightSurface
         : Colors.white;
-    final foreground = isWrongSelected || isRevealedCorrect
+    final foreground = isWrongSelected || isHighlightedCorrect
         ? (isWrongSelected ? AppColors.red : AppColors.teal600)
         : AppColors.textInk;
 
@@ -56,24 +57,25 @@ class ExamReviewAnswerTile extends StatelessWidget {
             spacing: 14,
             children: [
               Container(
+                key: ValueKey('exam-review-answer-circle-$label'),
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
                   color: isWrongSelected
                       ? AppColors.red
-                      : isRevealedCorrect
+                      : isHighlightedCorrect
                       ? AppColors.tealAccent
                       : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isWrongSelected || isRevealedCorrect
+                    color: isWrongSelected || isHighlightedCorrect
                         ? Colors.transparent
                         : const Color(0xFF9BB0B3),
                   ),
                 ),
                 child: ExamReviewCenteredText(
                   label,
-                  color: isWrongSelected || isRevealedCorrect
+                  color: isWrongSelected || isHighlightedCorrect
                       ? Colors.white
                       : AppColors.textInk,
                   fontSize: FontSize.xs,
@@ -89,7 +91,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
                   style: TextStyle(
                     color: foreground,
                     fontSize: FontSize.large,
-                    fontWeight: isWrongSelected || isRevealedCorrect
+                    fontWeight: isWrongSelected || isHighlightedCorrect
                         ? FontWeight.w900
                         : FontWeight.w600,
                     letterSpacing: 0,
@@ -105,7 +107,9 @@ class ExamReviewAnswerTile extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isWrongSelected ? Icons.close_rounded : Icons.check_rounded,
+                    isWrongSelected && !showCorrectAnswer
+                        ? Icons.close_rounded
+                        : Icons.check_rounded,
                     color: Colors.white,
                     size: 15,
                   ),

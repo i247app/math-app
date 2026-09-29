@@ -42,6 +42,7 @@ class ExamReviewScreen extends StatelessWidget {
             .toUpperCase();
     return ReviewDetailScreen(
       detailId: detailId,
+      showTime: false,
       headerTitle: resolvedExamType == examTypeAssessment
           ? context.formatText(AppKeys.assessmentReviewHeaderTitle, {
               'id': detailId,

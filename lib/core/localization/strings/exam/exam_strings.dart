@@ -70,7 +70,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultGradeLevel: 'Cấp độ {level}',
     AppKeys.placementResultCorrectSummary:
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
-    AppKeys.placementResultViewDetails: 'CHI TIẾT',
+    AppKeys.placementResultReview: 'ĐÁNH GIÁ',
     AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
     AppKeys.placementResultPractice: 'Luyện tập',
     AppKeys.placementResultWeaknessesTitle: 'Điểm con cần cải thiện',
@@ -163,7 +163,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultGradeLevel: 'Level {level}',
     AppKeys.placementResultCorrectSummary:
         'You answered {correct}/{total} questions correctly',
-    AppKeys.placementResultViewDetails: 'DETAILS',
+    AppKeys.placementResultReview: 'REVIEW',
     AppKeys.placementResultPracticeAgain: 'Practice again',
     AppKeys.placementResultPractice: 'Practice',
     AppKeys.placementResultWeaknessesTitle: 'Child Weaknesses',
@@ -172,7 +172,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultChartGrade: 'Level',
     AppKeys.placementResultKindergartenShort: 'Grade 0',
     AppKeys.placementResultActivity: 'Trend',
-    AppKeys.examReviewRetryTab: 'Review',
+    AppKeys.examReviewRetryTab: 'Practice',
     AppKeys.examReviewResultTab: 'Results',
     AppKeys.examReviewPracticeBannerTitle: 'More practice recommended',
     AppKeys.examReviewTopicConjunction: 'and',
