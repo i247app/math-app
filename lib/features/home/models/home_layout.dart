@@ -49,9 +49,13 @@ class HomeLayoutMessage {
 class HomeLayoutExam {
   const HomeLayoutExam({
     this.examId,
+    this.aiExamId,
+    this.userExamId,
     this.createDt,
     this.examType,
     this.examStatus,
+    this.elinkStatus,
+    this.esessStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
@@ -60,9 +64,13 @@ class HomeLayoutExam {
   });
 
   final int? examId;
+  final int? aiExamId;
+  final int? userExamId;
   final String? createDt;
   final String? examType;
   final String? examStatus;
+  final String? elinkStatus;
+  final String? esessStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;

@@ -134,9 +134,13 @@ class HomeLayoutMessageDto {
 class HomeLayoutExamDto {
   const HomeLayoutExamDto({
     this.examId,
+    this.aiExamId,
+    this.userExamId,
     this.createDt,
     this.examType,
     this.examStatus,
+    this.elinkStatus,
+    this.esessStatus,
     this.scorePercentage,
     this.shortText,
     this.title,
@@ -145,9 +149,13 @@ class HomeLayoutExamDto {
   });
 
   final int? examId;
+  final int? aiExamId;
+  final int? userExamId;
   final String? createDt;
   final String? examType;
   final String? examStatus;
+  final String? elinkStatus;
+  final String? esessStatus;
   final int? scorePercentage;
   final String? shortText;
   final String? title;
@@ -156,10 +164,14 @@ class HomeLayoutExamDto {
 
   factory HomeLayoutExamDto.fromJson(Map<String, dynamic> json) {
     return HomeLayoutExamDto(
-      examId: _intFromJson(json['exam_id']),
+      examId: _intFromJson(json['elink_id']),
+      aiExamId: _intFromJson(json['exam_id']),
+      userExamId: _intFromJson(json['esess_id']),
       createDt: _stringFromJson(json['create_dt']),
       examType: _stringFromJson(json['exam_type']),
       examStatus: _stringFromJson(json['exam_status']),
+      elinkStatus: _stringFromJson(json['elink_status']),
+      esessStatus: _stringFromJson(json['esess_status']),
       scorePercentage: _intFromJson(json['score_percentage']),
       shortText: _stringFromJson(json['short_text']),
       title: _stringFromJson(json['title']),

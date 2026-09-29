@@ -55,7 +55,7 @@ void main() {
     expect(body, isNot(contains('purpose')));
     expect(body, isNot(contains('type_of_exam')));
     expect(body, isNot(contains('previous_exam_id')));
-    expect(body, isNot(contains('user_exam_id')));
+    expect(body, isNot(contains('esess_id')));
     expect(body, isNot(contains('chapters')));
     expect(exam.examId, 2);
     expect(exam.aiExamId, 7);
@@ -96,7 +96,7 @@ void main() {
     expect(captured.path, '/exams/generate');
     expect(body, containsPair('exam_type', examTypePractice));
     expect(body, containsPair('grade', 2));
-    expect(body, containsPair('user_exam_id', 99));
+    expect(body, containsPair('esess_id', 99));
     expect(exam.userExamId, 99);
   });
 
@@ -118,7 +118,7 @@ void main() {
     expect(body, containsPair('exam_type', examTypeGrade));
     expect(body, containsPair('grade', 5));
     expect(body, containsPair('level', 7));
-    expect(body, isNot(contains('user_exam_id')));
+    expect(body, isNot(contains('esess_id')));
   });
 
   test('defaults an omitted assessment grade to kindergarten', () async {
@@ -145,7 +145,7 @@ void main() {
     expect(_body(captured), containsPair('grade', 0));
   });
 
-  test('submits answers by user_ai_exam_id and maps result stats', () async {
+  test('submits answers by elink_id and maps result stats', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {
       captured = options;
@@ -153,6 +153,7 @@ void main() {
         ..._examResponse(),
         'exam': <String, dynamic>{
           ...(_examResponse()['exam']! as Map<String, dynamic>),
+          'esess_id': null,
           'status': 'SUBMITTED',
           'result': <String, dynamic>{
             'correct_number': 1,
@@ -162,7 +163,6 @@ void main() {
           },
         },
         'stats': <String, dynamic>{
-          'user_exam_id': 99,
           'correct_number': 13,
           'score_percentage': 65,
           'skipped_number': 0,
@@ -183,7 +183,7 @@ void main() {
     final body = _body(captured);
     expect(captured.path, '/exams/submit');
     expect(body, containsPair('profile_id', 21));
-    expect(body, containsPair('user_ai_exam_id', 2));
+    expect(body, containsPair('elink_id', 2));
     expect(body, isNot(contains('exam_id')));
     expect(exam.grading?.scorePercentage, 100);
     expect(exam.grading?.aiReview, 'Tiến bộ tốt.');
@@ -207,7 +207,7 @@ void main() {
     final body = _body(captured);
     expect(captured.path, '/exams/update-user-exam-status');
     expect(body, containsPair('profile_id', 21));
-    expect(body, containsPair('user_exam_id', 99));
+    expect(body, containsPair('esess_id', 99));
     expect(body, containsPair('status', 'COMPLETE'));
     expect(captured.extra['useGuestToken'], isNull);
   });
@@ -252,8 +252,8 @@ void main() {
     expect(captured.path, '/exams/detail');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('exam_type', examTypeAssessment));
-    expect(body, containsPair('user_ai_exam_id', 2));
-    expect(body, isNot(contains('user_exam_id')));
+    expect(body, containsPair('elink_id', 2));
+    expect(body, isNot(contains('esess_id')));
     expect(exam.answers.single.questionNumber, 1);
     expect(exam.answers.single.label, 'A');
   });
@@ -272,7 +272,7 @@ void main() {
     expect(body, containsPair('exam_type', examTypeGrade));
   });
 
-  test('loads an entire assessment journey by user_exam_id', () async {
+  test('loads an entire assessment journey by esess_id', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {
       captured = options;
@@ -281,8 +281,8 @@ void main() {
         'status': 'Success',
         'exams': <Map<String, dynamic>>[
           <String, dynamic>{
-            'ai_exam_id': 7,
-            'user_ai_exam_id': 2,
+            'exam_id': 7,
+            'elink_id': 2,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 1,
@@ -294,8 +294,8 @@ void main() {
             'submitted_dt': '2026-09-12T08:02:00Z',
           },
           <String, dynamic>{
-            'ai_exam_id': 8,
-            'user_ai_exam_id': 3,
+            'exam_id': 8,
+            'elink_id': 3,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 3,
@@ -315,13 +315,13 @@ void main() {
           'total_questions': 2,
           'exam_type': 'ASSESSMENT',
           'status': 'COMPLETE',
-          'user_exam_id': 99,
+          'esess_id': 99,
           'grade': 1,
           'last_submitted_dt': '2026-09-12T08:02:00Z',
           'review': 'Journey review',
         },
         'practice_preview': <String, dynamic>{
-          'base_user_ai_exam_id': 3,
+          'base_elink_id': 3,
           'mode': 'RETRY_WEAK',
           'strong_topics': <Map<String, dynamic>>[],
           'weak_topics': <Map<String, dynamic>>[
@@ -378,8 +378,8 @@ void main() {
     expect(captured.path, '/exams/detail');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('exam_type', examTypeAssessment));
-    expect(body, containsPair('user_exam_id', 99));
-    expect(body, isNot(contains('user_ai_exam_id')));
+    expect(body, containsPair('esess_id', 99));
+    expect(body, isNot(contains('elink_id')));
     expect(exam.userExamId, 99);
     expect(
       exam.questions.map((question) => question.questionNumber),
@@ -414,7 +414,7 @@ void main() {
         'status': 'Success',
         'exams': <Map<String, dynamic>>[
           <String, dynamic>{
-            'user_ai_exam_id': 40,
+            'elink_id': 40,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 0,
@@ -422,7 +422,7 @@ void main() {
             'questions': <Map<String, dynamic>>[],
           },
           <String, dynamic>{
-            'user_ai_exam_id': 41,
+            'elink_id': 41,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 1,
@@ -450,22 +450,22 @@ void main() {
           'total_questions': 3,
           'exam_type': 'ASSESSMENT',
           'status': 'ACTIVE',
-          'user_exam_id': 99,
+          'esess_id': 99,
           'grade': 1,
         },
         'details': <Map<String, dynamic>>[
           <String, dynamic>{
-            'user_ai_exam_id': 40,
+            'elink_id': 40,
             'question_number': 1,
             'selected_label': 'A',
           },
           <String, dynamic>{
-            'user_ai_exam_id': 41,
+            'elink_id': 41,
             'question_number': 1,
             'selected_label': 'A',
           },
           <String, dynamic>{
-            'user_ai_exam_id': 41,
+            'elink_id': 41,
             'question_number': 2,
             'selected_label': 'B',
           },
@@ -476,7 +476,7 @@ void main() {
     final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
 
     final body = _body(captured);
-    expect(body, containsPair('user_exam_id', 99));
+    expect(body, containsPair('esess_id', 99));
     expect(exam.examId, 41);
     expect(exam.userExamId, 99);
     expect(exam.examStatus, 'ACTIVE');
@@ -497,7 +497,7 @@ void main() {
         'status': 'Success',
         'exams': <Map<String, dynamic>>[
           <String, dynamic>{
-            'user_ai_exam_id': 41,
+            'elink_id': 41,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 0,
@@ -525,12 +525,12 @@ void main() {
           'total_questions': 1,
           'exam_type': 'ASSESSMENT',
           'status': 'ACTIVE',
-          'user_exam_id': 99,
+          'esess_id': 99,
           'grade': 0,
         },
         'details': <Map<String, dynamic>>[
           <String, dynamic>{
-            'user_ai_exam_id': 41,
+            'elink_id': 41,
             'question_number': 1,
             'selected_label': 'A',
           },
@@ -552,14 +552,14 @@ void main() {
       final api = _apiReturning((options) {
         requests.add(options);
         final body = _body(options);
-        if (body['user_exam_id'] == 99) {
+        if (body['esess_id'] == 99) {
           return <String, dynamic>{
             'mstatus': 200,
             'status': 'Success',
             'exams': <Map<String, dynamic>>[
               <String, dynamic>{
-                'ai_exam_id': 7,
-                'user_ai_exam_id': 41,
+                'exam_id': 7,
+                'elink_id': 41,
                 'profile_id': 21,
                 'exam_type': 'ASSESSMENT',
                 'grade': 0,
@@ -575,12 +575,12 @@ void main() {
               'total_questions': 1,
               'exam_type': 'ASSESSMENT',
               'status': 'ACTIVE',
-              'user_exam_id': 99,
+              'esess_id': 99,
               'grade': 0,
             },
             'details': <Map<String, dynamic>>[
               <String, dynamic>{
-                'user_ai_exam_id': 41,
+                'elink_id': 41,
                 'question_number': 1,
                 'selected_label': 'A',
               },
@@ -588,14 +588,14 @@ void main() {
           };
         }
 
-        expect(body, containsPair('user_ai_exam_id', 41));
-        expect(body, isNot(contains('user_exam_id')));
+        expect(body, containsPair('elink_id', 41));
+        expect(body, isNot(contains('esess_id')));
         return <String, dynamic>{
           'mstatus': 200,
           'status': 'Success',
           'exam': <String, dynamic>{
-            'ai_exam_id': 7,
-            'user_ai_exam_id': 41,
+            'exam_id': 7,
+            'elink_id': 41,
             'profile_id': 21,
             'exam_type': 'ASSESSMENT',
             'grade': 0,
@@ -653,8 +653,8 @@ void main() {
           <String, dynamic>{
             'correct_number': 13,
             'exam_type': 'ASSESSMENT',
-            'status': 'COMPLETE',
-            'user_exam_id': 99,
+            'esess_status': 'COMPLETE',
+            'esess_id': 99,
             'grade': 1,
             'level': 5,
             'score_percentage': 65,
@@ -662,13 +662,13 @@ void main() {
             'total_questions': 20,
             'in_progress_exams': <Map<String, dynamic>>[
               <String, dynamic>{
-                'ai_exam_id': 14,
-                'user_ai_exam_id': 27,
+                'exam_id': 14,
+                'elink_id': 27,
                 'profile_id': 21,
                 'exam_type': 'ASSESSMENT',
                 'grade': 2,
                 'num_questions': 1,
-                'status': 'IN_PROGRESS',
+                'elink_status': 'IN_PROGRESS',
                 'title': 'Lớp 2',
                 'questions': <Map<String, dynamic>>[
                   <String, dynamic>{
@@ -768,11 +768,11 @@ Map<String, dynamic> _body(RequestOptions options) =>
 Map<String, dynamic> _examResponse() => <String, dynamic>{
   'mstatus': 200,
   'status': 'Success',
-  'user_exam_id': 99,
+  'esess_id': 99,
   'exam': <String, dynamic>{
-    'ai_exam_id': 7,
-    'user_ai_exam_id': 2,
-    'user_exam_id': 99,
+    'exam_id': 7,
+    'elink_id': 2,
+    'esess_id': 99,
     'profile_id': 21,
     'exam_type': 'ASSESSMENT',
     'grade': 2,

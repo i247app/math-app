@@ -30,9 +30,13 @@ extension HomeLayoutMessageDtoConversion on HomeLayoutMessageDto {
 extension HomeLayoutExamDtoConversion on HomeLayoutExamDto {
   HomeLayoutExam toModel() => HomeLayoutExam(
     examId: examId,
+    aiExamId: aiExamId,
+    userExamId: userExamId,
     createDt: createDt,
     examType: examType,
     examStatus: examStatus,
+    elinkStatus: elinkStatus,
+    esessStatus: esessStatus,
     scorePercentage: scorePercentage,
     shortText: shortText,
     title: title,

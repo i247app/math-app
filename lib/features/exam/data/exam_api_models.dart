@@ -19,6 +19,7 @@ class GenerateExamRequest {
   final String examType;
   final int grade;
   final int level;
+  @JsonKey(name: 'esess_id')
   final int? userExamId;
   @JsonKey(name: 'uid')
   final int? guestUid;
@@ -42,6 +43,7 @@ class SubmitExamRequest {
   });
 
   final int profileId;
+  @JsonKey(name: 'elink_id')
   final int userAiExamId;
   final List<SubmitExamAnswerDto> answers;
 
@@ -115,7 +117,7 @@ class GenerateExamResponseDto {
 
   final int mstatus;
   final GeneratedExamDto? exam;
-  @JsonKey(name: 'user_exam_id', fromJson: _intFromJson)
+  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
   final int? userExamId;
   final String? status;
   final String? mmessage;
@@ -133,6 +135,7 @@ class SubmitExamResponseDto {
     required this.mstatus,
     this.exam,
     this.stats,
+    this.userExamId,
     this.status,
     this.mmessage,
     this.debug,
@@ -141,6 +144,8 @@ class SubmitExamResponseDto {
   final int mstatus;
   final GeneratedExamDto? exam;
   final ExamStatsDto? stats;
+  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
+  final int? userExamId;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -220,7 +225,7 @@ class ExamPracticePreviewDto {
 
   factory ExamPracticePreviewDto.fromJson(Map<String, dynamic> json) {
     return ExamPracticePreviewDto(
-      baseUserAiExamId: _intFromJson(json['base_user_ai_exam_id']),
+      baseUserAiExamId: _intFromJson(json['base_elink_id']),
       mode: json['mode']?.toString(),
       strongTopics: _practiceTopicsFromJson(json['strong_topics']),
       weakTopics: _practiceTopicsFromJson(json['weak_topics']),
@@ -228,7 +233,7 @@ class ExamPracticePreviewDto {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'base_user_ai_exam_id': baseUserAiExamId,
+    'base_elink_id': baseUserAiExamId,
     'mode': mode,
     'strong_topics': strongTopics.map((topic) => topic.toJson()).toList(),
     'weak_topics': weakTopics.map((topic) => topic.toJson()).toList(),
@@ -281,6 +286,8 @@ class ExamDetailAnswerDto {
     required this.questionNumber,
     this.answers = const <ExamAnswerDto>[],
     this.userAiExamId,
+    this.userExamDetailId,
+    this.detailStatus,
     this.questionGrade,
     this.questionLevel,
     this.questionName,
@@ -295,8 +302,12 @@ class ExamDetailAnswerDto {
 
   final int questionNumber;
   final List<ExamAnswerDto> answers;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'elink_id', fromJson: _intFromJson)
   final int? userAiExamId;
+  @JsonKey(name: 'esess_ln_id', fromJson: _intFromJson)
+  final int? userExamDetailId;
+  @JsonKey(name: 'esess_ln_status')
+  final String? detailStatus;
   @JsonKey(fromJson: _intFromJson)
   final int? questionGrade;
   @JsonKey(fromJson: _intFromJson)
@@ -362,8 +373,9 @@ class ExamStatsDto {
   final int skippedNumber;
   final int totalQuestions;
   final String? examType;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
   final int? userExamId;
+  @JsonKey(name: 'esess_status', readValue: _readEsessStatus)
   final String? status;
   final int? grade;
   final int? level;
@@ -432,6 +444,7 @@ class ExamProgressPointDto {
 
   final DateTime lastSubmittedDt;
   final int correctNumber;
+  @JsonKey(name: 'esess_id')
   final int userExamId;
   @JsonKey(fromJson: _doubleFromJson)
   final double score;
@@ -471,6 +484,7 @@ class ExamProgressSummaryDto {
   @JsonKey(fromJson: _doubleFromJson)
   final double averageScorePct;
   final int count;
+  @JsonKey(name: 'highest_esess_id')
   final int? highestUserExamId;
   @JsonKey(fromJson: _doubleFromJson)
   final double highestScore;
@@ -535,14 +549,15 @@ class GeneratedExamDto {
     required this.questions,
   });
 
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'exam_id', fromJson: _intFromJson)
   final int? aiExamId;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'elink_id', fromJson: _intFromJson)
   final int? userAiExamId;
-  @JsonKey(fromJson: _intFromJson)
+  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
   final int? userExamId;
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
+  @JsonKey(name: 'elink_status', readValue: _readElinkStatus)
   final String? status;
   final String? examType;
   @JsonKey(fromJson: _intFromJson)
@@ -652,3 +667,9 @@ double? _nullableDoubleFromJson(Object? value) {
   if (value is num) return value.toDouble();
   return double.tryParse(value.toString());
 }
+
+Object? _readEsessStatus(Map<dynamic, dynamic> json, String key) =>
+    json[key] ?? json['status'];
+
+Object? _readElinkStatus(Map<dynamic, dynamic> json, String key) =>
+    json[key] ?? json['exam_status'] ?? json['status'];

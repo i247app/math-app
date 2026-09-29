@@ -9,7 +9,10 @@ List<GeneratedExam> examsFromLayoutExams(List<HomeLayoutExam> exams) {
       GeneratedExam(
         id: exam.examId,
         examId: exam.examId,
-        examStatus: exam.examStatus,
+        aiExamId: exam.aiExamId,
+        userAiExamId: exam.examId,
+        userExamId: exam.userExamId,
+        examStatus: exam.elinkStatus ?? exam.esessStatus ?? exam.examStatus,
         examType: exam.examType,
         title: exam.title,
         shortText: exam.shortText,

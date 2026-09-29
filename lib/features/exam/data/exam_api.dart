@@ -92,6 +92,7 @@ class ExamApi implements ExamService {
     return exam.toModel(
       submittedAnswers: submittedAnswers,
       stats: response.stats,
+      userExamId: response.userExamId,
     );
   }
 
@@ -108,7 +109,7 @@ class ExamApi implements ExamService {
       final json = await _networkClient
           .postJson('/exams/update-user-exam-status', <String, dynamic>{
             'profile_id': _requireProfileId(profileId),
-            'user_exam_id': userExamId,
+            'esess_id': userExamId,
             'status': status,
           }, useGuestToken: _guestAccountService?.current != null);
       NetworkClient.throwForApiStatus(json);
@@ -334,8 +335,8 @@ class ExamApi implements ExamService {
     return _postResponse('/exams/detail', <String, dynamic>{
       'profile_id': profileId,
       'exam_type': examType,
-      'user_ai_exam_id': ?userAiExamId,
-      'user_exam_id': ?userExamId,
+      'elink_id': ?userAiExamId,
+      'esess_id': ?userExamId,
     }, ExamDetailResponseDto.fromJson);
   }
 
