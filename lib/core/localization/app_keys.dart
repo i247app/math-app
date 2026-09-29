@@ -868,7 +868,7 @@ class AppKeys {
       'placement_result_correct_summary';
   static const placementResultReview = 'placement_result_review';
   static const placementResultPracticeAgain = 'placement_result_practice_again';
-  static const placementResultContinue = 'placement_result_continue';
+  static const placementResultNext = 'placement_result_next';
   static const placementResultWeaknessesTitle =
       'placement_result_weaknesses_title';
   static const placementResultYouAreHere = 'placement_result_you_are_here';

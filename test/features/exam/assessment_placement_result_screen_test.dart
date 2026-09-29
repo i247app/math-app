@@ -534,11 +534,11 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('TIẾP TỤC'), findsOneWidget);
+    expect(find.text('TIẾP THEO'), findsOneWidget);
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
-    expect(find.text('CONTINUE'), findsOneWidget);
+    expect(find.text('NEXT'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(const ValueKey('placement-continue-grade')),
@@ -845,11 +845,11 @@ void main() {
       find.byKey(const ValueKey('placement-continue-grade')),
       findsOneWidget,
     );
-    expect(find.text('TIẾP TỤC'), findsOneWidget);
+    expect(find.text('TIẾP THEO'), findsOneWidget);
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
     expect(find.text('REVIEW'), findsOneWidget);
-    expect(find.text('CONTINUE'), findsOneWidget);
+    expect(find.text('NEXT'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

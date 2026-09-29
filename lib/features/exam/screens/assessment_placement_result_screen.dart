@@ -508,7 +508,7 @@ class _AssessmentPlacementResultScreenState
                           child: _PlacementActionButton(
                             key: const ValueKey('placement-continue-grade'),
                             label: context.getText(
-                              AppKeys.placementResultContinue,
+                              AppKeys.placementResultNext,
                             ),
                             icon: Icons.arrow_forward_rounded,
                             color: AppColors.teal500,
