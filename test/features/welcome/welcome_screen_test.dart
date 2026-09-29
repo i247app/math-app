@@ -84,9 +84,15 @@ void main() {
   ) async {
     await _pumpWelcome(tester, size: const Size(360, 800));
     final mascot = find.byKey(const ValueKey('welcome-thinking-mascot'));
+    final cloud = find.byKey(const ValueKey('welcome-thinking-cloud'));
     final login = find.byKey(const ValueKey('welcome-login-action'));
     final signup = find.byKey(const ValueKey('welcome-signup-action'));
     expect(tester.getRect(mascot).bottom, lessThan(tester.getRect(login).top));
+    expect(
+      (tester.widget<Image>(cloud).image as AssetImage).assetName,
+      'assets/images/welcome-thinking.png',
+    );
+    expect(tester.getRect(cloud).overlaps(tester.getRect(mascot)), isTrue);
     expect(tester.getRect(login).bottom, lessThan(tester.getRect(signup).top));
     expect(login.hitTestable(), findsOneWidget);
     expect(signup.hitTestable(), findsOneWidget);
