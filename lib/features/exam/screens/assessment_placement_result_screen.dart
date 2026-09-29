@@ -17,6 +17,7 @@ import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
+import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
@@ -76,7 +77,7 @@ class _AssessmentPlacementResultScreenState
       AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
   bool get _showsAssessmentChart =>
       widget.examType.trim().toUpperCase() == examTypeAssessment;
-  bool get _showsPracticeAction =>
+  bool get _showsContinueAction =>
       widget.examType.trim().toUpperCase() == examTypeGrade;
   int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
   int get _correctAnswers => widget.correctAnswers.clamp(0, _totalQuestions);
@@ -184,17 +185,16 @@ class _AssessmentPlacementResultScreenState
     return true;
   }
 
-  Future<void> _generateAgain(String examType) async {
+  Future<void> _continueGrade() async {
     HapticFeedback.mediumImpact();
     setState(() => _isGeneratingAgain = true);
 
     try {
       final generatedExam = await _examService.generateAssessmentExam(
-        examType: examType,
+        examType: examTypeGrade,
         gradeLabel: AssessmentFlowPolicy.gradeLabel(_grade),
-        level: widget.level,
+        level: (widget.level ?? 1).clamp(1, 10),
         profileId: widget.profileId,
-        userExamId: examType == examTypePractice ? widget.userExamId : null,
       );
       if (!mounted) {
         return;
@@ -392,7 +392,11 @@ class _AssessmentPlacementResultScreenState
                 ),
                 SizedBox(height: isCompact ? 2.0 : 6.0),
                 Text(
-                  context.getText(AppKeys.placementResultLevel),
+                  context.getText(
+                    _showsContinueAction
+                        ? AppKeys.placementResultGradeHeading
+                        : AppKeys.placementResultLevel,
+                  ),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.nunito(
                     color: const Color(0xFF04A8B3),
@@ -438,7 +442,11 @@ class _AssessmentPlacementResultScreenState
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: AssessmentGradeRibbon(currentGrade: _grade),
+                        child: _showsContinueAction
+                            ? GradeExamLevelRibbon(
+                                currentLevel: widget.level ?? 0,
+                              )
+                            : AssessmentGradeRibbon(currentGrade: _grade),
                       ),
                       if (_showsAssessmentChart) ...[
                         SizedBox(height: sectionSpacing),
@@ -480,7 +488,7 @@ class _AssessmentPlacementResultScreenState
                       Expanded(
                         child: Center(
                           child: SizedBox(
-                            width: _showsPracticeAction ? double.infinity : 220,
+                            width: _showsContinueAction ? double.infinity : 220,
                             child: _PlacementActionButton(
                               key: const ValueKey('placement-view-details'),
                               label: context.getText(
@@ -494,17 +502,17 @@ class _AssessmentPlacementResultScreenState
                           ),
                         ),
                       ),
-                      if (_showsPracticeAction) ...[
+                      if (_showsContinueAction) ...[
                         const SizedBox(width: 12),
                         Expanded(
                           child: _PlacementActionButton(
-                            key: const ValueKey('placement-practice-again'),
+                            key: const ValueKey('placement-continue-grade'),
                             label: context.getText(
-                              AppKeys.placementResultPractice,
+                              AppKeys.placementResultContinue,
                             ),
-                            icon: Icons.sync_rounded,
+                            icon: Icons.arrow_forward_rounded,
                             color: AppColors.teal500,
-                            onTap: () => _generateAgain(examTypePractice),
+                            onTap: _continueGrade,
                           ),
                         ),
                       ],

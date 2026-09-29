@@ -403,8 +403,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                   builder: (_) => ExamAttemptScreen(
                     examService: examService,
                     initialExam: generatedExam,
-                    examType: generatedExam.examType ?? examTypePractice,
+                    examType: widget.examType,
                     gradeLabel: gradeLabel,
+                    level: finalLevel,
                     profileId: profileId,
                     onResultBack: onResultBack,
                     allowQuestionNavigation: allowQuestionNavigation,

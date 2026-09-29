@@ -7,7 +7,6 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -96,10 +95,7 @@ void main() {
 
     tester.state<ScrollableState>(find.byType(Scrollable)).position.jumpTo(0);
     await tester.pump();
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, 400),
-    );
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, 400));
     await tester.pumpAndSettle();
 
     expect(examService.statsRequests, 2);
@@ -172,7 +168,207 @@ void main() {
     expect(find.text('LỚP 3'), findsOneWidget);
   });
 
-  testWidgets('shows completed badge only for a passed attempt', (
+  testWidgets('selected grade shows its highest level from GRADE stats', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final service = _FakeExamService(
+      stats: const <ExamStats>[
+        ExamStats(
+          correctNumber: 8,
+          scorePercentage: 80,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          examType: examTypeGrade,
+          status: 'COMPLETE',
+          grade: 1,
+          level: 4,
+        ),
+        ExamStats(
+          correctNumber: 8,
+          scorePercentage: 80,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          examType: examTypeGrade,
+          status: 'COMPLETE',
+          grade: 1,
+          level: 7,
+        ),
+        ExamStats(
+          correctNumber: 8,
+          scorePercentage: 80,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          examType: examTypeGrade,
+          status: 'COMPLETE',
+          grade: 2,
+          level: 3,
+        ),
+        ExamStats(
+          correctNumber: 0,
+          scorePercentage: 0,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          examType: examTypeGrade,
+          status: 'CANCEL',
+          grade: 3,
+          level: 8,
+        ),
+        ExamStats(
+          correctNumber: 10,
+          scorePercentage: 100,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          examType: examTypePractice,
+          status: 'COMPLETE',
+          grade: 2,
+          level: 10,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            initialGrade: 1,
+            examService: service,
+            initialGrades: const <GradeModel>[
+              GradeModel(id: 1, label: 'Lớp 1'),
+              GradeModel(id: 2, label: 'Lớp 2'),
+              GradeModel(id: 3, label: 'Lớp 3'),
+            ],
+            gradeService: _UnusedGradeService(),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 1, level: 2),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(service.requestedStatsExamType, examTypeGrade);
+    expect(
+      tester
+          .widget<AnimatedScale>(
+            find.descendant(
+              of: find.byKey(const ValueKey('grade-roadmap-level-7')),
+              matching: find.byType(AnimatedScale),
+            ),
+          )
+          .scale,
+      1.04,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-8-locked')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-6-completed')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-7-completed')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('grade-card-assets/icons/2.svg')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<AnimatedScale>(
+            find.descendant(
+              of: find.byKey(const ValueKey('grade-roadmap-level-3')),
+              matching: find.byType(AnimatedScale),
+            ),
+          )
+          .scale,
+      1.04,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-4-locked')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-2-completed')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-1-locked')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+      findsOneWidget,
+    );
+  });
+
+  for (var grade = 0; grade <= 5; grade++) {
+    testWidgets('grade $grade starts with level 1 unlocked', (tester) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final service = _FakeExamService();
+
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: GradeRoadmapScreen(
+              profileId: 11,
+              initialGrade: grade,
+              examService: service,
+              gradeProgressStore: const _FakeProgressStore(
+                ProfileGradeProgress.initial,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(service.requestedStatsExamType, examTypeGrade);
+      expect(
+        find.byKey(ValueKey('grade-roadmap-grade-title-$grade')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-1-locked')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+        findsOneWidget,
+      );
+    });
+  }
+
+  testWidgets('ticks earlier levels even without a passing attempt', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -223,6 +419,10 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-2-completed')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-3-completed')),
       findsNothing,
     );
     expect(
@@ -275,11 +475,12 @@ void main() {
     expect(assessment.level, 1);
   });
 
-  testWidgets('a completed historical level opens review instead of generate', (
+  testWidgets('a completed historical level generates that level again', (
     tester,
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
+    final service = _FakeExamService();
 
     await tester.pumpWidget(
       LingoScope(
@@ -290,7 +491,7 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: service,
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(grade: 2, level: 3),
             ),
@@ -317,15 +518,17 @@ void main() {
     await tester.tap(completedLevel);
     await tester.pumpAndSettle();
 
-    expect(find.byType(ExamReviewScreen), findsOneWidget);
-    expect(find.byType(ExamAttemptScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(service.generatedLevels, <int?>[1]);
+    expect(service.generatedExamTypes, <String>[examTypeGrade]);
   });
 
-  testWidgets('a skipped jump level opens the jump source review', (
+  testWidgets('a skipped unlocked level generates its own grade exam', (
     tester,
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
+    final service = _FakeExamService();
 
     await tester.pumpWidget(
       LingoScope(
@@ -336,7 +539,7 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: service,
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(grade: 2, level: 3),
             ),
@@ -363,12 +566,9 @@ void main() {
     await tester.tap(skippedLevel);
     await tester.pumpAndSettle();
 
-    expect(find.byType(ExamReviewScreen), findsOneWidget);
-    final review = tester.widget<ExamReviewScreen>(
-      find.byType(ExamReviewScreen),
-    );
-    expect(review.userExamId, 600);
-    expect(find.byType(ExamAttemptScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(service.generatedLevels, <int?>[2]);
+    expect(service.generatedExamTypes, <String>[examTypeGrade]);
   });
 }
 
@@ -398,7 +598,13 @@ class _FakeProgressStore implements ProfileGradeProgressStore {
 }
 
 class _FakeExamService implements ExamService {
+  _FakeExamService({this.stats = const <ExamStats>[]});
+
+  final List<ExamStats> stats;
   int statsRequests = 0;
+  String? requestedStatsExamType;
+  final List<int?> generatedLevels = <int?>[];
+  final List<String> generatedExamTypes = <String>[];
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -407,25 +613,29 @@ class _FakeExamService implements ExamService {
     int? level,
     int? profileId,
     int? userExamId,
-  }) async => const GeneratedExam(
-    examId: 500,
-    userAiExamId: 500,
-    userExamId: 600,
-    examType: examTypeGrade,
-    grade: 2,
-    level: 1,
-    questions: <ExamQuestion>[
-      ExamQuestion(
-        questionName: '1 + 1 = ?',
-        questionNumber: 1,
-        rightAnswer: 'A',
-        answers: <ExamAnswer>[
-          ExamAnswer(label: 'A', content: '2'),
-          ExamAnswer(label: 'B', content: '3'),
-        ],
-      ),
-    ],
-  );
+  }) async {
+    generatedLevels.add(level);
+    generatedExamTypes.add(examType);
+    return GeneratedExam(
+      examId: 500,
+      userAiExamId: 500,
+      userExamId: 600,
+      examType: examType,
+      grade: 2,
+      level: level,
+      questions: const <ExamQuestion>[
+        ExamQuestion(
+          questionName: '1 + 1 = ?',
+          questionNumber: 1,
+          rightAnswer: 'A',
+          answers: <ExamAnswer>[
+            ExamAnswer(label: 'A', content: '2'),
+            ExamAnswer(label: 'B', content: '3'),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Future<GeneratedExam> getExamDetail(
@@ -463,7 +673,8 @@ class _FakeExamService implements ExamService {
     String examType = examTypeAssessment,
   }) async {
     statsRequests++;
-    return const <ExamStats>[];
+    requestedStatsExamType = examType;
+    return stats;
   }
 
   @override

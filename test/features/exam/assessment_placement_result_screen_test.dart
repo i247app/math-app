@@ -15,6 +15,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
+import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -27,6 +28,7 @@ void main() {
       'assets/images/assessment-result-checklist.png',
       'assets/images/assessment-result-pencil.png',
       'assets/images/grade-ribbon-numbers.png',
+      'assets/images/grade-ribbon-levels-1-10.png',
     ];
 
     for (final asset in assets) {
@@ -426,7 +428,7 @@ void main() {
     expect(details, findsOneWidget);
     expect(tester.getSize(details).width, 220);
     expect(
-      find.byKey(const ValueKey('placement-practice-again')),
+      find.byKey(const ValueKey('placement-continue-grade')),
       findsNothing,
     );
     expect(find.text('Luyện tập'), findsNothing);
@@ -502,11 +504,11 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('GRADE result can generate PRACTICE at the placement grade', (
+  testWidgets('GRADE result continues at the achieved grade and level', (
     tester,
   ) async {
     final lingo = LingoProvider();
-    final service = _RecordingPracticeService();
+    final service = _RecordingGenerateService();
     GeneratedExam? generatedExam;
     addTearDown(lingo.dispose);
 
@@ -519,6 +521,7 @@ void main() {
           lingo: lingo,
           child: AssessmentPlacementResultScreen(
             grade: 4,
+            level: 7,
             correctAnswers: 6,
             totalQuestions: 10,
             examType: examTypeGrade,
@@ -531,20 +534,27 @@ void main() {
       ),
     );
     await tester.pump();
+    expect(find.text('TIẾP TỤC'), findsOneWidget);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+    expect(find.text('CONTINUE'), findsOneWidget);
 
     await tester.ensureVisible(
-      find.byKey(const ValueKey('placement-practice-again')),
+      find.byKey(const ValueKey('placement-continue-grade')),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('placement-practice-again')));
+    await tester.tap(find.byKey(const ValueKey('placement-continue-grade')));
     await tester.pump();
 
-    expect(service.requestedExamType, examTypePractice);
+    expect(service.requestedExamType, examTypeGrade);
     expect(service.requestedGradeLabel, 'Lớp 4');
+    expect(service.requestedLevel, 7);
     expect(service.requestedProfileId, 21);
-    expect(service.requestedUserExamId, 99);
-    expect(generatedExam?.examType, examTypePractice);
+    expect(service.requestedUserExamId, isNull);
+    expect(generatedExam?.examType, examTypeGrade);
     expect(generatedExam?.grade, 4);
+    expect(generatedExam?.level, 7);
     expect(tester.takeException(), isNull);
   });
 
@@ -552,7 +562,7 @@ void main() {
     tester,
   ) async {
     final lingo = LingoProvider();
-    final service = _RecordingPracticeService();
+    final service = _RecordingGenerateService();
     var didClose = false;
     addTearDown(lingo.dispose);
 
@@ -770,7 +780,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('GRADE result keeps ribbon but does not load or show chart', (
+  testWidgets('GRADE result uses its level ribbon without loading a chart', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -786,6 +796,7 @@ void main() {
           lingo: lingo,
           child: AssessmentPlacementResultScreen(
             grade: 3,
+            level: 7,
             correctAnswers: 5,
             totalQuestions: 5,
             examType: examTypeGrade,
@@ -803,10 +814,27 @@ void main() {
       find.byKey(const ValueKey('assessment-placement-progress-loading')),
       findsNothing,
     );
-    expect(
-      find.byKey(const ValueKey('placement-grade-ribbon')),
-      findsOneWidget,
+    expect(find.byKey(const ValueKey('placement-grade-ribbon')), findsNothing);
+    final ribbon = find.byKey(const ValueKey('grade-exam-level-ribbon'));
+    final marker = find.byKey(
+      const ValueKey('grade-exam-current-level-marker'),
     );
+    expect(ribbon, findsOneWidget);
+    final ribbonImage = tester.widget<Image>(
+      find.descendant(of: ribbon, matching: find.byType(Image)),
+    );
+    expect(
+      (ribbonImage.image as AssetImage).assetName,
+      'assets/images/grade-ribbon-levels-1-10.png',
+    );
+    expect(
+      tester.getCenter(marker).dx,
+      closeTo(
+        tester.getRect(ribbon).left + tester.getSize(ribbon).width * 0.6409,
+        1,
+      ),
+    );
+    expect(find.text('GRADE'), findsOneWidget);
     expect(find.byType(AssessmentProgressionChart), findsNothing);
     expect(
       find.byKey(const ValueKey('placement-view-details')),
@@ -814,12 +842,98 @@ void main() {
     );
     expect(find.text('ĐÁNH GIÁ'), findsOneWidget);
     expect(
-      find.byKey(const ValueKey('placement-practice-again')),
+      find.byKey(const ValueKey('placement-continue-grade')),
       findsOneWidget,
     );
+    expect(find.text('TIẾP TỤC'), findsOneWidget);
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
     expect(find.text('REVIEW'), findsOneWidget);
+    expect(find.text('CONTINUE'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final level in [1, 10]) {
+    testWidgets('GRADE ribbon keeps level $level aligned on a narrow screen', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LingoScope(
+            lingo: lingo,
+            child: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GradeExamLevelRibbon(currentLevel: level),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final ribbon = find.byKey(const ValueKey('grade-exam-level-ribbon'));
+      final marker = find.byKey(
+        const ValueKey('grade-exam-current-level-marker'),
+      );
+      final ribbonRect = tester.getRect(ribbon);
+      expect(
+        tester.getCenter(marker).dx,
+        closeTo(
+          ribbonRect.left + ribbonRect.width * (level == 1 ? 0.0734 : 0.9180),
+          1,
+        ),
+      );
+      expect(
+        find.descendant(of: ribbon, matching: find.byType(Image)),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('GRADE marker moves from the ribbon start to its level', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LingoScope(
+          lingo: lingo,
+          child: const Scaffold(body: GradeExamLevelRibbon(currentLevel: 7)),
+        ),
+      ),
+    );
+
+    final ribbon = find.byKey(const ValueKey('grade-exam-level-ribbon'));
+    final marker = find.byKey(
+      const ValueKey('grade-exam-current-level-marker'),
+    );
+    final ribbonRect = tester.getRect(ribbon);
+    final startX = tester.getCenter(marker).dx;
+    final destinationX = ribbonRect.left + ribbonRect.width * 0.6409;
+    expect(startX, closeTo(ribbonRect.left + 21, 1));
+
+    await tester.pump(const Duration(milliseconds: 300));
+    final movingX = tester.getCenter(marker).dx;
+    expect(movingX, greaterThan(startX));
+    expect(movingX, lessThan(destinationX));
+
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(marker).dx, closeTo(destinationX, 1));
     expect(tester.takeException(), isNull);
   });
 
@@ -1384,9 +1498,10 @@ class _UnusedExamService implements ExamService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _RecordingPracticeService implements ExamService {
+class _RecordingGenerateService implements ExamService {
   String? requestedExamType;
   String? requestedGradeLabel;
+  int? requestedLevel;
   int? requestedProfileId;
   int? requestedUserExamId;
   int? completedUserExamId;
@@ -1402,13 +1517,15 @@ class _RecordingPracticeService implements ExamService {
   }) async {
     requestedExamType = examType;
     requestedGradeLabel = gradeLabel;
+    requestedLevel = level;
     requestedProfileId = profileId;
     requestedUserExamId = userExamId;
-    return const GeneratedExam(
+    return GeneratedExam(
       examId: 401,
-      examType: examTypePractice,
+      examType: examType,
       grade: 4,
-      questions: <ExamQuestion>[
+      level: level,
+      questions: const <ExamQuestion>[
         ExamQuestion(
           questionName: '10 + 5 = ?',
           questionNumber: 1,

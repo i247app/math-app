@@ -642,7 +642,6 @@ void main() {
       expect(service.completedProfileId, 21);
       expect(service.completedStatus, 'COMPLETE');
       expect(service.events, <String>['submit', 'status:COMPLETE']);
-      expect(find.text('Luyện Phép trừ có nhớ và Toán đố'), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('placement-view-details')));
       await tester.pumpAndSettle();

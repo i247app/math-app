@@ -860,6 +860,7 @@ class AppKeys {
   static const placementResultCongratulations =
       'placement_result_congratulations';
   static const placementResultLevel = 'placement_result_level';
+  static const placementResultGradeHeading = 'placement_result_grade_heading';
   static const placementResultKindergarten = 'placement_result_kindergarten';
   static const placementResultGrade = 'placement_result_grade';
   static const placementResultGradeLevel = 'placement_result_grade_level';
@@ -867,7 +868,7 @@ class AppKeys {
       'placement_result_correct_summary';
   static const placementResultReview = 'placement_result_review';
   static const placementResultPracticeAgain = 'placement_result_practice_again';
-  static const placementResultPractice = 'placement_result_practice';
+  static const placementResultContinue = 'placement_result_continue';
   static const placementResultWeaknessesTitle =
       'placement_result_weaknesses_title';
   static const placementResultYouAreHere = 'placement_result_you_are_here';
