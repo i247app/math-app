@@ -116,6 +116,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
   String? errorMessage;
   HomeLayout? homeLayout;
   List<GeneratedExam> completedAssessments = const <GeneratedExam>[];
+  List<GeneratedExam> learningListExams = const <GeneratedExam>[];
   GeneratedExam? activeAssessment;
   bool isLoadingAssessments = false;
   bool isOpeningActiveAssessment = false;
@@ -155,6 +156,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||
+        oldWidget.showAssessmentList != widget.showAssessmentList ||
         oldWidget.useActiveStudentProfileData !=
             widget.useActiveStudentProfileData;
     if (oldProfileId != profileId || shouldForceRefresh) {
@@ -166,6 +168,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
       _lastSubmittedAt = null;
       isLoadingAssessments = false;
       activeAssessment = null;
+      learningListExams = const <GeneratedExam>[];
       assessmentLoadError = null;
       _resetModeEntrances();
       if (widget.isActive) {
@@ -221,6 +224,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedExam>[];
+        learningListExams = const <GeneratedExam>[];
         activeAssessment = null;
         isLoadingAssessments = false;
         assessmentLoadError = null;
@@ -256,6 +260,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
       if (!hadRenderableContent) {
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedExam>[];
+        learningListExams = const <GeneratedExam>[];
       }
     });
     if (!hadRenderableContent) {
@@ -478,7 +483,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                   if (widget.showAssessmentList) ...[
                     const SizedBox(height: 28),
                     NewHomeAssessmentList(
-                      assessments: completedAssessments,
+                      assessments: learningListExams,
                       activeAssessment: activeAssessment,
                       isLoading: isLoadingAssessments,
                       isOpeningActiveAssessment: isOpeningActiveAssessment,

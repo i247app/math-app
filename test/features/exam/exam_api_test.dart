@@ -704,6 +704,23 @@ void main() {
       'Resume from stats',
     );
   });
+
+  test('omits exam_type when requesting stats for all exam types', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return const <String, dynamic>{
+        'mstatus': 200,
+        'stats': <Map<String, dynamic>>[],
+      };
+    });
+
+    await api.getExamStats(profileId: 21, examType: examTypeAll);
+
+    expect(captured.path, '/exams/stats');
+    expect(_body(captured), containsPair('profile_id', 21));
+    expect(_body(captured), isNot(contains('exam_type')));
+  });
 }
 
 ExamApi _apiReturning(

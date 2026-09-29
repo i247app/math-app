@@ -134,6 +134,7 @@ void main() {
     addTearDown(() => HomeProfileCache.instance.invalidateProfile(80));
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
+    final examService = _ExamService(true, includeGradeStats: true);
 
     await tester.pumpWidget(
       RepositoryProvider<HomeLayoutService>.value(
@@ -151,7 +152,7 @@ void main() {
                 activeRefreshTick: 0,
                 initialGrades: const [],
                 gradeService: _GradeService(),
-                examService: _ExamService(true),
+                examService: examService,
                 onRefreshProfiles: _noopAsync,
                 onActivateProfile: _noopActivate,
                 onProfileSaved: _noop,
@@ -171,7 +172,19 @@ void main() {
 
     expect(find.byType(AssessmentProgressionChart), findsOneWidget);
     expect(find.byType(NewHomeAssessmentList), findsOneWidget);
-    expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
+    expect(examService.requestedStatsExamTypes, [examTypeAll]);
+    expect(find.byType(AssessmentResultListItemCard), findsNWidgets(2));
+    final listedExamTypes = tester
+        .widgetList<AssessmentResultListItemCard>(
+          find.byType(AssessmentResultListItemCard),
+        )
+        .map((card) => card.exam.examType)
+        .toSet();
+    expect(listedExamTypes, {examTypeAssessment, examTypeGrade});
+    expect(
+      HomeProfileCache.instance.getParent(80)?.completedAssessments.length,
+      1,
+    );
     expect(find.byType(TextField), findsNothing);
     expect(
       tester.getTopLeft(find.byType(NewHomeAssessmentList)).dy,
@@ -492,11 +505,17 @@ class _HomeService implements HomeLayoutService {
 }
 
 class _ExamService implements ExamService {
-  _ExamService(this.hasAssessment, {this.hasActiveAssessment = false});
+  _ExamService(
+    this.hasAssessment, {
+    this.hasActiveAssessment = false,
+    this.includeGradeStats = false,
+  });
 
   final bool hasAssessment;
   final bool hasActiveAssessment;
+  final bool includeGradeStats;
   final List<int> gradeStatsProfileIds = [];
+  final List<String> requestedStatsExamTypes = [];
   final List<int> progressProfileIds = [];
   final List<int?> generatedProfileIds = [];
 
@@ -530,6 +549,7 @@ class _ExamService implements ExamService {
     required int profileId,
     String examType = examTypeAssessment,
   }) async {
+    requestedStatsExamTypes.add(examType);
     if (examType == examTypeGrade) {
       gradeStatsProfileIds.add(profileId);
       return const [];
@@ -551,7 +571,18 @@ class _ExamService implements ExamService {
           skippedNumber: 0,
           totalQuestions: 10,
           status: 'COMPLETE',
+          examType: examTypeAssessment,
           grade: 2,
+        ),
+      if (includeGradeStats && examType == examTypeAll)
+        const ExamStats(
+          correctNumber: 7,
+          scorePercentage: 70,
+          skippedNumber: 0,
+          totalQuestions: 10,
+          status: 'COMPLETE',
+          examType: examTypeGrade,
+          grade: 3,
         ),
     ];
   }

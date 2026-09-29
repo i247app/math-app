@@ -8,13 +8,13 @@ extension _ParentHomeSnapshotActions on NewParentHomeContentState {
     try {
       final stats = await widget.examService.getExamStats(
         profileId: profileId,
-        examType: examTypeAssessment,
+        examType: widget.showAssessmentList ? examTypeAll : examTypeAssessment,
       );
       if (!mounted || requestId != _assessmentLoadRequestId) {
         return;
       }
 
-      final assessments =
+      final listExams =
           stats
               .where(isCompletedAssessmentStats)
               .map(
@@ -23,11 +23,24 @@ extension _ParentHomeSnapshotActions on NewParentHomeContentState {
               )
               .toList(growable: false)
             ..sort((a, b) => examDate(b).compareTo(examDate(a)));
-      final resumableAssessment = latestActiveAssessmentExam(stats);
+      final assessmentStats = stats.where(
+        (entry) =>
+            (entry.examType ?? examTypeAssessment).trim().toUpperCase() ==
+            examTypeAssessment,
+      );
+      final assessments = listExams
+          .where(
+            (exam) =>
+                (exam.examType ?? '').trim().toUpperCase() ==
+                examTypeAssessment,
+          )
+          .toList(growable: false);
+      final resumableAssessment = latestActiveAssessmentExam(assessmentStats);
       final layout = homeLayout;
       _updateState(() {
         _lastAppliedAssessmentLoadRequestId = requestId;
         completedAssessments = assessments;
+        learningListExams = listExams;
         activeAssessment = resumableAssessment;
         isLoadingAssessments = false;
         assessmentLoadError = null;

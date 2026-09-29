@@ -340,11 +340,11 @@ class ExamApi implements ExamService {
   }
 
   Future<ExamStatsResponseDto> _getExamStatsResponse(ExamStatsRequest request) {
-    return _postResponse(
-      '/exams/stats',
-      request.toJson(),
-      ExamStatsResponseDto.fromJson,
-    );
+    final body = request.toJson();
+    if (request.examType.trim().isEmpty) {
+      body.remove('exam_type');
+    }
+    return _postResponse('/exams/stats', body, ExamStatsResponseDto.fromJson);
   }
 
   Future<T> _postResponse<T>(
