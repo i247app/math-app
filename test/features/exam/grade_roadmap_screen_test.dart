@@ -68,6 +68,45 @@ void main() {
     expect(levelColors, hasLength(10));
   });
 
+  testWidgets('refresh scrolls without sharing a controller position', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final examService = _FakeExamService();
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: examService,
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 3),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    tester.state<ScrollableState>(find.byType(Scrollable)).position.jumpTo(0);
+    await tester.pump();
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, 400),
+    );
+    await tester.pumpAndSettle();
+
+    expect(examService.statsRequests, 2);
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const ValueKey('grade-roadmap-level-3')), findsOneWidget);
+  });
+
   testWidgets('grade pill opens grade selection and swipes stay disabled', (
     tester,
   ) async {
@@ -359,6 +398,8 @@ class _FakeProgressStore implements ProfileGradeProgressStore {
 }
 
 class _FakeExamService implements ExamService {
+  int statsRequests = 0;
+
   @override
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
@@ -420,7 +461,10 @@ class _FakeExamService implements ExamService {
   Future<List<ExamStats>> getExamStats({
     required int profileId,
     String examType = examTypeAssessment,
-  }) async => const <ExamStats>[];
+  }) async {
+    statsRequests++;
+    return const <ExamStats>[];
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -448,12 +448,14 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   void _scrollToCurrentLevel() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
+      // AnimatedSwitcher can keep the outgoing scroll view attached briefly.
+      final position = _scrollController.positions.last;
       final index = 10 - _currentLevel;
       final target = (index * 152.0 - 90).clamp(
         0.0,
-        _scrollController.position.maxScrollExtent,
+        position.maxScrollExtent,
       );
-      _scrollController.jumpTo(target);
+      position.jumpTo(target);
     });
   }
 
