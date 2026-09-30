@@ -12,6 +12,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -53,8 +54,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
 
   late final ProfileGradeProgressStore _progressStore;
   late List<GeneratedExam> _exams;
-  ProfileGradeProgress _progress = ProfileGradeProgress.initial;
+  GradeLevels? _gradeLevels;
   late int _selectedGrade;
+  int _levelRequestId = 0;
+  final Set<int> _dismissedResumeGrades = <int>{};
   bool _isLoading = true;
   bool _isOpeningExam = false;
   int? _openingLevel;
@@ -87,32 +90,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   Future<void> _loadProgress() async {
-    final shouldLoadStats = _exams.isEmpty;
-    final savedProgress = _readSavedProgress();
-    final stats = shouldLoadStats ? await _readInitialStats() : null;
+    final saved = await _readSavedProgress();
     if (!mounted) return;
-
-    if (stats != null) {
-      _exams = _examsFromStats(stats);
+    if (saved.level > 0) {
+      setState(() => _selectedGrade = saved.grade);
     }
-    final fallback = _fallbackProgressFromExams();
-    setState(() {
-      _progress = fallback;
-      _selectedGrade = fallback.grade;
-      _isLoading = false;
-      _errorMessage = shouldLoadStats && stats == null
-          ? context.readText(AppKeys.gradeRoadmapLoadFailed)
-          : null;
-    });
-    _scrollToCurrentLevel();
-
-    final saved = await savedProgress;
-    if (!mounted || saved.level <= 0) return;
-    setState(() {
-      _progress = saved;
-      _selectedGrade = saved.grade;
-    });
-    _scrollToCurrentLevel();
+    await _loadGradeLevels(_selectedGrade);
   }
 
   Future<ProfileGradeProgress> _readSavedProgress() async {
@@ -123,68 +106,27 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     }
   }
 
-  Future<List<ExamStats>?> _readInitialStats() async {
-    try {
-      return await widget.examService.getExamStats(
-        profileId: widget.profileId,
-        examType: examTypeGrade,
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
-  ProfileGradeProgress _fallbackProgressFromExams() {
-    final gradeExams = _exams.where(_isGradeExam).toList(growable: false);
-    final active = gradeExams.where(_isActiveExam).toList(growable: false);
-    final candidates = active.isNotEmpty ? active : gradeExams;
-    if (candidates.isEmpty) {
-      return ProfileGradeProgress(grade: _selectedGrade, level: 1);
-    }
-    final exam = candidates.reduce((latest, candidate) {
-      final latestDate = DateTime.tryParse(
-        latest.modifyDt ?? latest.submittedDt ?? latest.createDt ?? '',
-      );
-      final candidateDate = DateTime.tryParse(
-        candidate.modifyDt ?? candidate.submittedDt ?? candidate.createDt ?? '',
-      );
-      if (latestDate == null) return candidate;
-      if (candidateDate == null) return latest;
-      return candidateDate.isAfter(latestDate) ? candidate : latest;
-    });
-    return ProfileGradeProgress(
-      grade: (exam.grade ?? _selectedGrade).clamp(0, 5),
-      level: (exam.level ?? 1).clamp(1, _maxLevel),
-    );
-  }
-
-  Future<void> _reload() async {
+  Future<void> _loadGradeLevels(int grade) async {
     if (!mounted) return;
+    final requestId = ++_levelRequestId;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _gradeLevels = null;
     });
     try {
-      final results = await Future.wait<Object>([
-        widget.examService.getExamStats(
-          profileId: widget.profileId,
-          examType: examTypeGrade,
-        ),
-        _progressStore.read(widget.profileId),
-      ]);
-      if (!mounted) return;
-      final stats = results[0] as List<ExamStats>;
-      final progress = results[1] as ProfileGradeProgress;
+      final levels = await widget.examService.getGradeLevels(
+        profileId: widget.profileId,
+        grade: grade,
+      );
+      if (!mounted || requestId != _levelRequestId) return;
       setState(() {
-        _exams = _examsFromStats(stats);
-        _progress = progress.level > 0
-            ? progress
-            : _fallbackProgressFromExams();
+        _gradeLevels = levels;
         _isLoading = false;
       });
       _scrollToCurrentLevel();
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted || requestId != _levelRequestId) return;
       setState(() {
         _isLoading = false;
         _errorMessage = context.readText(AppKeys.gradeRoadmapLoadFailed);
@@ -192,47 +134,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     }
   }
 
-  List<GeneratedExam> _examsFromStats(List<ExamStats> stats) {
-    final exams = <GeneratedExam>[];
-    for (final item in stats) {
-      if (item.examType != null &&
-          item.examType!.trim().toUpperCase() != examTypeGrade) {
-        continue;
-      }
-      final active = item.inProgressExams
-          .where((exam) => _isGradeExam(exam) && _isActiveExam(exam))
-          .toList();
-      if (active.isNotEmpty && !_isTerminalStatus(item.status)) {
-        exams.addAll(active);
-        continue;
-      }
-      if ((item.status ?? '').trim().toUpperCase() == 'CANCEL') continue;
-      exams.add(
-        GeneratedExam(
-          userExamId: item.userExamId,
-          profileId: widget.profileId,
-          examStatus: item.status,
-          examType: item.examType ?? examTypeGrade,
-          grade: item.grade,
-          level: item.level,
-          submittedDt: item.lastSubmittedDt?.toIso8601String(),
-          grading: ExamGrading(
-            correctNumber: item.correctNumber,
-            scorePercentage: item.scorePercentage.round(),
-            skippedNumber: item.skippedNumber,
-            totalQuestions: item.totalQuestions,
-          ),
-          questions: const <ExamQuestion>[],
-        ),
-      );
-    }
-    return exams;
-  }
-
-  bool _isTerminalStatus(String? value) {
-    final status = value?.trim().toUpperCase();
-    return status == 'COMPLETE' || status == 'SUBMITTED' || status == 'CANCEL';
-  }
+  Future<void> _reload() => _loadGradeLevels(_selectedGrade);
 
   bool _isActiveExam(GeneratedExam exam) {
     final status = exam.examStatus?.trim().toUpperCase();
@@ -282,25 +184,17 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   int get _currentLevel {
-    var highestLevel = 1;
-    for (final exam in _exams) {
-      if (!_isGradeExam(exam) ||
-          exam.grade != _selectedGrade ||
-          exam.examStatus?.trim().toUpperCase() == 'CANCEL') {
-        continue;
-      }
-      highestLevel = math.max(highestLevel, exam.level ?? 1);
+    return (_gradeLevels?.maxLevel ?? 1).clamp(1, _maxLevel);
+  }
+
+  int? get _resumeLevel {
+    final levels = _gradeLevels;
+    if (levels == null) return null;
+    final latest = levels.latestLevel;
+    if (latest < 1 || latest >= levels.maxLevel || latest > _currentLevel) {
+      return null;
     }
-    if (_selectedGrade == _progress.grade) {
-      highestLevel = math.max(highestLevel, _progress.level);
-    }
-    if (_selectedGrade == _progress.highestUnlockedGrade) {
-      highestLevel = math.max(
-        highestLevel,
-        _progress.highestUnlockedLevel ?? 1,
-      );
-    }
-    return highestLevel.clamp(1, _maxLevel);
+    return latest;
   }
 
   bool _isLevelUnlocked(int level) {
@@ -348,6 +242,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             isResumedAssessment: activeExam != null,
             onResultBack: () {
               if (!mounted) return;
+              if (activeExam != null) _exams.remove(activeExam);
               final navigator = Navigator.of(context);
               if (roadmapRoute == null) {
                 navigator.popUntil((route) => route.isFirst);
@@ -393,7 +288,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       setState(() {
         _selectedGrade = AssessmentFlowPolicy.clampGrade(selectedGrade);
       });
-      _scrollToCurrentLevel();
+      await _loadGradeLevels(_selectedGrade);
     } finally {
       _isOpeningGradeSelection = false;
     }
@@ -420,6 +315,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final resumeLevel = _resumeLevel;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -435,6 +331,15 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                 ? () => Navigator.pop(context)
                 : null,
           ),
+          if (!_isLoading &&
+              resumeLevel != null &&
+              !_dismissedResumeGrades.contains(_selectedGrade))
+            _RoadmapResumePrompt(
+              level: resumeLevel,
+              onResume: () => _handleLevelTap(resumeLevel),
+              onDismiss: () =>
+                  setState(() => _dismissedResumeGrades.add(_selectedGrade)),
+            ),
           if (_errorMessage != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -453,6 +358,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                       child: CircularProgressIndicator(
                         color: colors.brandStrong,
                       ),
+                    )
+                  : _gradeLevels == null
+                  ? const SizedBox.expand(
+                      key: ValueKey('grade-roadmap-unavailable'),
                     )
                   : RefreshIndicator(
                       key: ValueKey('grade-roadmap-$_selectedGrade'),
@@ -505,82 +414,135 @@ class _GradeRoadmapHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
-    return ColoredBox(
-      color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(16, topInset + 12, 12, 12),
-        child: Row(
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                key: const ValueKey('grade-roadmap-grade-selector'),
-                onTap: onGradeTap,
-                borderRadius: BorderRadius.circular(21),
-                child: Container(
-                  key: const ValueKey('grade-roadmap-grade-pill'),
-                  height: 38,
-                  width: 132,
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(21),
-                    border: Border.all(color: const Color(0xFFE4EEEE)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x120F5E64),
-                        offset: Offset(0, 2),
-                        blurRadius: 7,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          gradeTitles[selectedGrade].toUpperCase(),
-                          key: ValueKey(
-                            'grade-roadmap-grade-title-$selectedGrade',
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF256B6B),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.35,
-                          ),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, topInset + 12, 12, 12),
+      child: Row(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              key: const ValueKey('grade-roadmap-grade-selector'),
+              onTap: onGradeTap,
+              borderRadius: BorderRadius.circular(21),
+              child: Container(
+                key: const ValueKey('grade-roadmap-grade-pill'),
+                height: 38,
+                width: 132,
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(21),
+                  border: Border.all(color: const Color(0xFFE4EEEE)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x120F5E64),
+                      offset: Offset(0, 2),
+                      blurRadius: 7,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        gradeTitles[selectedGrade].toUpperCase(),
+                        key: ValueKey(
+                          'grade-roadmap-grade-title-$selectedGrade',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF256B6B),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.35,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: Color(0xFF6B9393),
-                        size: 18,
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Color(0xFF6B9393),
+                      size: 18,
+                    ),
+                  ],
                 ),
               ),
             ),
-            const Spacer(),
-            if (onBack != null)
-              IconButton(
-                key: const ValueKey('grade-roadmap-close'),
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                onPressed: onBack,
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF256B6B),
-                  side: const BorderSide(color: Color(0xFFE4EEEE)),
-                  minimumSize: const Size.square(38),
-                  maximumSize: const Size.square(38),
-                ),
-                icon: const Icon(Icons.close_rounded, size: 20),
+          ),
+          const Spacer(),
+          if (onBack != null)
+            IconButton(
+              key: const ValueKey('grade-roadmap-close'),
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+              onPressed: onBack,
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF256B6B),
+                side: const BorderSide(color: Color(0xFFE4EEEE)),
+                minimumSize: const Size.square(38),
+                maximumSize: const Size.square(38),
               ),
-          ],
+              icon: const Icon(Icons.close_rounded, size: 20),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoadmapResumePrompt extends StatelessWidget {
+  const _RoadmapResumePrompt({
+    required this.level,
+    required this.onResume,
+    required this.onDismiss,
+  });
+
+  final int level;
+  final VoidCallback onResume;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('grade-roadmap-resume-prompt'),
+      padding: const EdgeInsets.fromLTRB(18, 4, 10, 4),
+      decoration: const BoxDecoration(
+        color: Color(0xFFEAF7F5),
+        border: Border.symmetric(
+          horizontal: BorderSide(color: Color(0xFFD5EAE6)),
         ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.history_rounded, color: Color(0xFF287F7D), size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              context.formatText(AppKeys.gradeRoadmapResumePrompt, {
+                'level': level,
+              }),
+              style: const TextStyle(
+                color: Color(0xFF285653),
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          TextButton(
+            key: const ValueKey('grade-roadmap-resume-action'),
+            onPressed: onResume,
+            child: Text(context.getText(AppKeys.gradeRoadmapResumeAction)),
+          ),
+          IconButton(
+            key: const ValueKey('grade-roadmap-resume-dismiss'),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            onPressed: onDismiss,
+            icon: const Icon(Icons.close_rounded, size: 18),
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 
 const examTypeAssessment = 'ASSESSMENT';
 const examTypePractice = 'PRACTICE';
@@ -35,6 +36,11 @@ abstract interface class ExamService {
   Future<List<ExamStats>> getExamStats({
     required int profileId,
     String examType = examTypeAssessment,
+  });
+
+  Future<GradeLevels> getGradeLevels({
+    required int profileId,
+    required int grade,
   });
 
   Future<GeneratedExam> submitExam({

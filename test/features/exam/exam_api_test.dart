@@ -721,6 +721,28 @@ void main() {
     expect(_body(captured), containsPair('profile_id', 21));
     expect(_body(captured), isNot(contains('exam_type')));
   });
+
+  test('reads grade levels for a profile and grade', () async {
+    late RequestOptions captured;
+    final api = _apiReturning((options) {
+      captured = options;
+      return const <String, dynamic>{
+        'latest_level': 1,
+        'max_level': 3,
+        'mstatus': 200,
+        'status': 'Success',
+      };
+    });
+
+    final levels = await api.getGradeLevels(profileId: 21, grade: 2);
+
+    expect(captured.path, '/exams/grade/levels');
+    expect(_body(captured), containsPair('profile_id', 21));
+    expect(_body(captured), containsPair('grade', 2));
+    expect(_body(captured), isNot(contains('exam_type')));
+    expect(levels.latestLevel, 1);
+    expect(levels.maxLevel, 3);
+  });
 }
 
 ExamApi _apiReturning(

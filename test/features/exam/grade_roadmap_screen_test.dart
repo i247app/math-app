@@ -6,6 +6,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
@@ -28,7 +29,11 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: _FakeExamService(
+              levelsByGrade: const {
+                2: GradeLevels(latestLevel: 3, maxLevel: 4),
+              },
+            ),
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(
                 grade: 2,
@@ -72,7 +77,9 @@ void main() {
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
-    final examService = _FakeExamService();
+    final examService = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 2, maxLevel: 3)},
+    );
 
     await tester.pumpWidget(
       LingoScope(
@@ -98,7 +105,8 @@ void main() {
     await tester.drag(find.byType(SingleChildScrollView), const Offset(0, 400));
     await tester.pumpAndSettle();
 
-    expect(examService.statsRequests, 2);
+    expect(examService.levelRequests, <int>[2, 2]);
+    expect(examService.statsRequests, 0);
     expect(tester.takeException(), isNull);
     expect(find.byKey(const ValueKey('grade-roadmap-level-3')), findsOneWidget);
   });
@@ -118,7 +126,11 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: _FakeExamService(
+              levelsByGrade: const {
+                2: GradeLevels(latestLevel: 3, maxLevel: 4),
+              },
+            ),
             initialGrades: const <GradeModel>[
               GradeModel(id: 1, label: 'Lớp 1'),
               GradeModel(id: 2, label: 'Lớp 2'),
@@ -168,64 +180,16 @@ void main() {
     expect(find.text('LỚP 3'), findsOneWidget);
   });
 
-  testWidgets('selected grade shows its highest level from GRADE stats', (
+  testWidgets('selected grade uses max_level from the grade levels API', (
     tester,
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     final service = _FakeExamService(
-      stats: const <ExamStats>[
-        ExamStats(
-          correctNumber: 8,
-          scorePercentage: 80,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypeGrade,
-          status: 'COMPLETE',
-          grade: 1,
-          level: 4,
-        ),
-        ExamStats(
-          correctNumber: 8,
-          scorePercentage: 80,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypeGrade,
-          status: 'COMPLETE',
-          grade: 1,
-          level: 7,
-        ),
-        ExamStats(
-          correctNumber: 8,
-          scorePercentage: 80,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypeGrade,
-          status: 'COMPLETE',
-          grade: 2,
-          level: 3,
-        ),
-        ExamStats(
-          correctNumber: 0,
-          scorePercentage: 0,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypeGrade,
-          status: 'CANCEL',
-          grade: 3,
-          level: 8,
-        ),
-        ExamStats(
-          correctNumber: 10,
-          scorePercentage: 100,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypePractice,
-          status: 'COMPLETE',
-          grade: 2,
-          level: 10,
-        ),
-      ],
+      levelsByGrade: const {
+        1: GradeLevels(latestLevel: 4, maxLevel: 7),
+        2: GradeLevels(latestLevel: 1, maxLevel: 3),
+      },
     );
 
     await tester.pumpWidget(
@@ -254,7 +218,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(service.requestedStatsExamType, examTypeGrade);
+    expect(service.levelRequests, <int>[1]);
+    expect(service.statsRequests, 0);
+    expect(find.text('Tiếp tục ở Level 4?'), findsOneWidget);
     expect(
       tester
           .widget<AnimatedScale>(
@@ -276,7 +242,7 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-7-completed')),
-      findsOneWidget,
+      findsNothing,
     );
 
     await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
@@ -309,6 +275,8 @@ void main() {
       find.byKey(const ValueKey('grade-roadmap-level-2-completed')),
       findsOneWidget,
     );
+    expect(service.levelRequests, <int>[1, 2]);
+    expect(find.text('Tiếp tục ở Level 1?'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
     await tester.pumpAndSettle();
@@ -323,6 +291,10 @@ void main() {
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
       findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
+      findsNothing,
     );
   });
 
@@ -352,7 +324,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(service.requestedStatsExamType, examTypeGrade);
+      expect(service.levelRequests, <int>[grade]);
+      expect(service.statsRequests, 0);
       expect(
         find.byKey(ValueKey('grade-roadmap-grade-title-$grade')),
         findsOneWidget,
@@ -383,7 +356,11 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: _FakeExamService(
+              levelsByGrade: const {
+                1: GradeLevels(latestLevel: 2, maxLevel: 3),
+              },
+            ),
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(grade: 1, level: 3),
             ),
@@ -446,7 +423,11 @@ void main() {
           ),
           home: GradeRoadmapScreen(
             profileId: 11,
-            examService: _FakeExamService(),
+            examService: _FakeExamService(
+              levelsByGrade: const {
+                2: GradeLevels(latestLevel: 2, maxLevel: 3),
+              },
+            ),
             gradeProgressStore: const _FakeProgressStore(
               ProfileGradeProgress(
                 grade: 2,
@@ -480,7 +461,9 @@ void main() {
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
-    final service = _FakeExamService();
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 2, maxLevel: 3)},
+    );
 
     await tester.pumpWidget(
       LingoScope(
@@ -528,7 +511,9 @@ void main() {
   ) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
-    final service = _FakeExamService();
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 2, maxLevel: 3)},
+    );
 
     await tester.pumpWidget(
       LingoScope(
@@ -570,6 +555,176 @@ void main() {
     expect(service.generatedLevels, <int?>[2]);
     expect(service.generatedExamTypes, <String>[examTypeGrade]);
   });
+
+  testWidgets('resume prompt opens latest_level from the API', (tester) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
+    );
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: service,
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 2),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tiếp tục ở Level 1?'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-4-locked')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('grade-roadmap-resume-action')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(
+      tester.widget<ExamAttemptScreen>(find.byType(ExamAttemptScreen)).level,
+      1,
+    );
+    expect(service.generatedLevels, <int?>[1]);
+  });
+
+  testWidgets('hides resume prompt when latest_level equals max_level', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 3, maxLevel: 3)},
+    );
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: service,
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 2),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
+      findsNothing,
+    );
+    expect(service.levelRequests, <int>[2]);
+  });
+
+  testWidgets('dismissing resume prompt leaves level selection available', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
+    );
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: service,
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(grade: 2, level: 2),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('grade-roadmap-resume-dismiss')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
+      findsNothing,
+    );
+
+    final chosenLevel = find.byKey(const ValueKey('grade-roadmap-level-3'));
+    await tester.ensureVisible(chosenLevel);
+    await tester.pumpAndSettle();
+    await tester.tap(chosenLevel);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<ExamAttemptScreen>(find.byType(ExamAttemptScreen)).level,
+      3,
+    );
+    expect(service.generatedLevels, <int?>[3]);
+  });
+
+  testWidgets('API failure keeps roadmap unavailable until retry succeeds', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    final service = _FakeExamService(failLevels: true);
+
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: service,
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress.initial,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-unavailable')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsNothing);
+
+    service.failLevels = false;
+    await tester.tap(find.text('Không tải được lộ trình level.'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
+    expect(service.levelRequests, <int>[0, 0]);
+  });
 }
 
 class _UnusedGradeService implements GradeService {
@@ -598,11 +753,15 @@ class _FakeProgressStore implements ProfileGradeProgressStore {
 }
 
 class _FakeExamService implements ExamService {
-  _FakeExamService({this.stats = const <ExamStats>[]});
+  _FakeExamService({
+    this.levelsByGrade = const <int, GradeLevels>{},
+    this.failLevels = false,
+  });
 
-  final List<ExamStats> stats;
+  final Map<int, GradeLevels> levelsByGrade;
+  bool failLevels;
+  final List<int> levelRequests = <int>[];
   int statsRequests = 0;
-  String? requestedStatsExamType;
   final List<int?> generatedLevels = <int?>[];
   final List<String> generatedExamTypes = <String>[];
 
@@ -673,8 +832,18 @@ class _FakeExamService implements ExamService {
     String examType = examTypeAssessment,
   }) async {
     statsRequests++;
-    requestedStatsExamType = examType;
-    return stats;
+    throw StateError('Roadmap must use /exams/grade/levels.');
+  }
+
+  @override
+  Future<GradeLevels> getGradeLevels({
+    required int profileId,
+    required int grade,
+  }) async {
+    levelRequests.add(grade);
+    if (failLevels) throw StateError('Grade levels unavailable');
+    return levelsByGrade[grade] ??
+        const GradeLevels(latestLevel: 0, maxLevel: 1);
   }
 
   @override

@@ -432,6 +432,8 @@ class AppKeys {
   static const gradeRoadmapCompleted = 'grade_roadmap_completed';
   static const gradeRoadmapLocked = 'grade_roadmap_locked';
   static const gradeRoadmapLoadFailed = 'grade_roadmap_load_failed';
+  static const gradeRoadmapResumePrompt = 'grade_roadmap_resume_prompt';
+  static const gradeRoadmapResumeAction = 'grade_roadmap_resume_action';
   static const mathPractice = 'math_practice';
   static const mathReview = 'math_review';
   static const excellent = 'excellent';

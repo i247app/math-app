@@ -7,6 +7,7 @@ import 'package:numi/features/exam/data/exam_conversion.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 
@@ -298,6 +299,19 @@ class ExamApi implements ExamService {
       ),
     );
     return response.stats.map((stats) => stats.toModel()).toList();
+  }
+
+  @override
+  Future<GradeLevels> getGradeLevels({
+    required int profileId,
+    required int grade,
+  }) {
+    return _runExamRequest(
+      () => _postResponse('/exams/grade/levels', <String, dynamic>{
+        'profile_id': _requireProfileId(profileId),
+        'grade': grade,
+      }, GradeLevels.fromJson),
+    );
   }
 
   Future<GenerateExamResponseDto> _generateExam(GenerateExamRequest request) {
