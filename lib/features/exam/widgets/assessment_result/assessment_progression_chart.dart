@@ -398,7 +398,7 @@ class _AssessmentChartPainter extends CustomPainter {
       canvas.drawLine(offsets[i - 1], endpoint, linePaint);
     }
 
-    void drawDot(Offset center, Color border, {bool finalPoint = false}) {
+    void drawDot(Offset center, Color color, {bool finalPoint = false}) {
       if (finalPoint) {
         canvas.drawCircle(
           center,
@@ -406,14 +406,10 @@ class _AssessmentChartPainter extends CustomPainter {
           Paint()..color = const Color(0xFFD9EED5),
         );
       }
-      canvas.drawCircle(center, 10.0 / 3, Paint()..color = Colors.white);
       canvas.drawCircle(
         center,
-        10.0 / 3,
-        Paint()
-          ..color = border
-          ..strokeWidth = 2.2 * 2 / 3
-          ..style = PaintingStyle.stroke,
+        12.2 / 3,
+        Paint()..color = color,
       );
     }
 
