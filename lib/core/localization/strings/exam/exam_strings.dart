@@ -71,7 +71,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.placementResultGradeLevel: 'Cấp độ {level}',
     AppKeys.placementResultCorrectSummary:
         'Bạn đã trả lời đúng {correct}/{total} câu hỏi',
-    AppKeys.placementResultReview: 'ĐÁNH GIÁ',
+    AppKeys.placementResultReview: 'CHI TIẾT',
     AppKeys.placementResultPracticeAgain: 'Luyện tập lại',
     AppKeys.placementResultNext: 'TIẾP THEO',
     AppKeys.placementResultWeaknessesTitle: 'Điểm con cần cải thiện',

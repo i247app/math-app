@@ -84,7 +84,7 @@ void main() {
     );
     expect(find.text('Chúc mừng!'), findsNothing);
     expect(find.text('Bạn đã trả lời đúng 5/8 câu hỏi'), findsNothing);
-    expect(find.text('ĐÁNH GIÁ'), findsOneWidget);
+    expect(find.text('CHI TIẾT'), findsOneWidget);
     expect(find.text('Luyện tập'), findsNothing);
     final levelRect = tester.getRect(find.text('Trình độ').first);
     final gradeRect = tester.getRect(
@@ -358,7 +358,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('LỚP 3'), findsOneWidget);
-    expect(find.text('ĐÁNH GIÁ'), findsOneWidget);
+    expect(find.text('CHI TIẾT'), findsOneWidget);
     expect(find.text('Luyện tập'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -840,7 +840,7 @@ void main() {
       find.byKey(const ValueKey('placement-view-details')),
       findsOneWidget,
     );
-    expect(find.text('ĐÁNH GIÁ'), findsOneWidget);
+    expect(find.text('CHI TIẾT'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('placement-continue-grade')),
       findsOneWidget,

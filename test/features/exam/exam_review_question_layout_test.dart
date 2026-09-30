@@ -158,6 +158,8 @@ void main() {
     expectNeutralBorders();
     expect(decorationAt(1).color, AppColors.redSoft);
     expect(decorationAt(2).color, Colors.white);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.check_rounded), findsNothing);
 
     await showAnswers(showCorrectAnswer: true);
     expectNeutralBorders();
@@ -165,8 +167,8 @@ void main() {
     expect(labelCircleColorAt(0), Colors.white);
     expect(decorationAt(1).color, AppColors.redSoft);
     expect(labelCircleColorAt(1), AppColors.red);
-    expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
-    expect(find.byIcon(Icons.close_rounded), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
 
     await showAnswers(showCorrectAnswer: true, selectedLabel: 'A');
     expectNeutralBorders();

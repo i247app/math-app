@@ -107,9 +107,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isWrongSelected && !showCorrectAnswer
-                        ? Icons.close_rounded
-                        : Icons.check_rounded,
+                    isWrongSelected ? Icons.close_rounded : Icons.check_rounded,
                     color: Colors.white,
                     size: 15,
                   ),
