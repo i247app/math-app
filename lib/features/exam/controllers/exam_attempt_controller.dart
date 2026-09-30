@@ -87,7 +87,10 @@ class ExamAttemptController extends ChangeNotifier {
             ),
       ),
     );
-    _currentLevel = (initialExam?.level ?? level ?? 1).clamp(1, 10);
+    _currentLevel = (initialExam?.level ?? level ?? 1).clamp(
+      _isGrade ? GradeExamFlowPolicy.minimumLevel : 1,
+      GradeExamFlowPolicy.maximumLevel,
+    );
     _restoreInitialAttempt(initialExam);
   }
 
@@ -347,7 +350,10 @@ class ExamAttemptController extends ChangeNotifier {
             fallback: _isAssessment ? 0 : 1,
           );
     _flowState = AssessmentFlowState(grade: initialGrade);
-    _currentLevel = (level ?? 1).clamp(1, 10);
+    _currentLevel = (level ?? 1).clamp(
+      _isGrade ? GradeExamFlowPolicy.minimumLevel : 1,
+      GradeExamFlowPolicy.maximumLevel,
+    );
     _exam = null;
     _questionIndex = 0;
     _questionNumberOffset = 0;

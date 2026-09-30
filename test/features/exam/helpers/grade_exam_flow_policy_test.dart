@@ -10,7 +10,31 @@ void main() {
     correctQuestionIndexes: correct,
   );
 
-  test('first six correct advances two levels', () {
+  test('level zero pass advances to level one, not level two', () {
+    final outcome = GradeExamFlowPolicy.evaluate(
+      attemptedGrade: 2,
+      attemptedLevel: 0,
+      score: score({0, 1, 2, 3, 4, 5}),
+      savedProgress: const ProfileGradeProgress(grade: 2, level: 0),
+    );
+    expect(outcome.passed, isTrue);
+    expect(outcome.levelIncrease, 1);
+    expect(outcome.progress.grade, 2);
+    expect(outcome.progress.level, 1);
+  });
+
+  test('level zero failure stays at level zero', () {
+    final outcome = GradeExamFlowPolicy.evaluate(
+      attemptedGrade: 2,
+      attemptedLevel: 0,
+      score: score({0}),
+      savedProgress: const ProfileGradeProgress(grade: 2, level: 0),
+    );
+    expect(outcome.passed, isFalse);
+    expect(outcome.progress.level, 0);
+  });
+
+  test('first six correct advances only one level', () {
     final outcome = GradeExamFlowPolicy.evaluate(
       attemptedGrade: 5,
       attemptedLevel: 1,
@@ -19,9 +43,9 @@ void main() {
     );
 
     expect(outcome.passed, isTrue);
-    expect(outcome.levelIncrease, 2);
+    expect(outcome.levelIncrease, 1);
     expect(outcome.progress.grade, 5);
-    expect(outcome.progress.level, 3);
+    expect(outcome.progress.level, 2);
   });
 
   test('first six correct advances before the remaining questions', () {
@@ -37,9 +61,9 @@ void main() {
     );
 
     expect(outcome.passed, isTrue);
-    expect(outcome.levelIncrease, 2);
+    expect(outcome.levelIncrease, 1);
     expect(outcome.progress.grade, 1);
-    expect(outcome.progress.level, 4);
+    expect(outcome.progress.level, 3);
   });
 
   test('at least fifty percent with question 3 advances one level', () {
@@ -65,7 +89,7 @@ void main() {
     );
 
     expect(outcome.progress.grade, 4);
-    expect(outcome.progress.level, 2);
+    expect(outcome.progress.level, 1);
   });
 
   test('failure keeps the higher saved profile progress', () {
@@ -82,7 +106,7 @@ void main() {
     expect(outcome.progress.level, saved.level);
   });
 
-  test('failure on the current grade drops one level', () {
+  test('failure on the current grade leaves progress unchanged', () {
     final outcome = GradeExamFlowPolicy.evaluate(
       attemptedGrade: 2,
       attemptedLevel: 6,
@@ -91,9 +115,9 @@ void main() {
     );
 
     expect(outcome.passed, isFalse);
-    expect(outcome.levelIncrease, -1);
+    expect(outcome.levelIncrease, 0);
     expect(outcome.progress.grade, 2);
-    expect(outcome.progress.level, 5);
+    expect(outcome.progress.level, 6);
   });
 
   test('failure at level one stays at level one', () {
@@ -132,12 +156,12 @@ void main() {
     );
 
     expect(outcome.passed, isTrue);
-    expect(outcome.levelIncrease, 2);
+    expect(outcome.levelIncrease, 1);
     expect(outcome.progress.grade, saved.grade);
     expect(outcome.progress.level, saved.level);
   });
 
-  test('pass without anchor keeps the attempted level', () {
+  test('pass without anchor also advances one level', () {
     final outcome = GradeExamFlowPolicy.evaluate(
       attemptedGrade: 4,
       attemptedLevel: 6,
@@ -146,9 +170,9 @@ void main() {
     );
 
     expect(outcome.passed, isTrue);
-    expect(outcome.levelIncrease, 0);
+    expect(outcome.levelIncrease, 1);
     expect(outcome.progress.grade, 4);
-    expect(outcome.progress.level, 6);
+    expect(outcome.progress.level, 7);
   });
 
   test('five wrong first answers always fails the single set', () {
@@ -160,7 +184,29 @@ void main() {
     );
 
     expect(outcome.passed, isFalse);
-    expect(outcome.levelIncrease, -1);
+    expect(outcome.levelIncrease, 0);
     expect(outcome.progress.level, 2);
+  });
+
+  test('five early wrong answers preserve the full saved checkpoint', () {
+    const saved = ProfileGradeProgress(
+      grade: 2,
+      level: 6,
+      highestUnlockedGrade: 2,
+      highestUnlockedLevel: 8,
+    );
+    final outcome = GradeExamFlowPolicy.evaluate(
+      attemptedGrade: 2,
+      attemptedLevel: 6,
+      score: AssessmentSetScore(
+        totalQuestions: 10,
+        answeredQuestionIndexes: {0, 1, 2, 3, 4},
+        correctQuestionIndexes: {},
+      ),
+      savedProgress: saved,
+    );
+    expect(outcome.passed, isFalse);
+    expect(outcome.levelIncrease, 0);
+    expect(outcome.progress, same(saved));
   });
 }

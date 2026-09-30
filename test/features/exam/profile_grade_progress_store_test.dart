@@ -10,6 +10,20 @@ void main() {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
   });
 
+  test('next grade level zero sorts above previous grade level ten', () async {
+    await store.saveIfHigher(
+      11,
+      const ProfileGradeProgress(grade: 2, level: 10),
+    );
+    final progress = await store.saveIfHigher(
+      11,
+      const ProfileGradeProgress(grade: 3, level: 0),
+    );
+    expect(progress.grade, 3);
+    expect(progress.level, 0);
+    expect((await store.read(11)).grade, 3);
+  });
+
   test('stores progress independently for each profile', () async {
     await store.saveIfHigher(
       11,

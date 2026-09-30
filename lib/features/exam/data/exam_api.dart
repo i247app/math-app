@@ -49,7 +49,10 @@ class ExamApi implements ExamService {
           numQuestions: AssessmentFlowPolicy.generatedQuestionCount,
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),
-          level: (level ?? 1).clamp(1, 10),
+          level: (level ?? 1).clamp(
+            normalizedExamType == examTypeGrade ? 0 : 1,
+            10,
+          ),
           userExamId: normalizedExamType == examTypePractice
               ? validUserExamId
               : null,

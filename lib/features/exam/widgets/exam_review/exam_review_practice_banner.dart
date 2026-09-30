@@ -123,16 +123,21 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                                   ),
                                 )
                               else
-                                Text(
-                                  context.getText(
-                                    AppKeys.examReviewPracticeBannerAction,
-                                  ),
-                                  maxLines: 1,
-                                  style: GoogleFonts.andika(
-                                    color: colors.onBrand,
-                                    fontSize: FontSize.xs,
-                                    fontWeight: FontWeight.w800,
-                                    height: 1,
+                                Flexible(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      context.getText(
+                                        AppKeys.examReviewPracticeBannerAction,
+                                      ),
+                                      maxLines: 1,
+                                      style: GoogleFonts.andika(
+                                        color: colors.onBrand,
+                                        fontSize: FontSize.xs,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               const SizedBox(width: 4),

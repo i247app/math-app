@@ -17,9 +17,9 @@ class ProfileGradeProgress {
   final int? highestUnlockedGrade;
   final int? highestUnlockedLevel;
 
-  int get sortValue => (grade * 10) + level;
+  int get sortValue => (grade * 11) + level;
   int get highestUnlockedSortValue =>
-      ((highestUnlockedGrade ?? grade) * 10) + (highestUnlockedLevel ?? level);
+      ((highestUnlockedGrade ?? grade) * 11) + (highestUnlockedLevel ?? level);
 
   bool isHigherThan(ProfileGradeProgress other) {
     return sortValue > other.sortValue;

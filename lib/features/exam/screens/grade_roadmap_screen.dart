@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -11,9 +12,12 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
+import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/grade.dart';
@@ -28,6 +32,7 @@ class GradeRoadmapScreen extends StatefulWidget {
     this.gradeService,
     this.initialExams = const <GeneratedExam>[],
     this.initialGrade = 0,
+    this.initialCompletion,
     this.gradeProgressStore,
     this.showCloseButton = true,
     this.bottomPadding = 0,
@@ -40,6 +45,7 @@ class GradeRoadmapScreen extends StatefulWidget {
   final GradeService? gradeService;
   final List<GeneratedExam> initialExams;
   final int initialGrade;
+  final GradeExamCompletion? initialCompletion;
   final ProfileGradeProgressStore? gradeProgressStore;
   final bool showCloseButton;
   final double bottomPadding;
@@ -58,6 +64,9 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   late int _selectedGrade;
   int _levelRequestId = 0;
   final Set<int> _dismissedResumeGrades = <int>{};
+  final Map<int, int> _locallyUnlockedLevels = <int, int>{};
+  final Set<int> _gradesWithKnownUnlockBaseline = <int>{};
+  final Set<(int, int)> _passedLevels = <(int, int)>{};
   bool _isLoading = true;
   bool _isOpeningExam = false;
   int? _openingLevel;
@@ -78,6 +87,11 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
     _exams = List<GeneratedExam>.of(widget.initialExams);
     _selectedGrade = widget.initialGrade.clamp(0, 5);
+    final completion = widget.initialCompletion;
+    if (completion != null) {
+      _selectedGrade = completion.grade;
+      _recordCompletion(completion);
+    }
     unawaited(_loadProgress());
   }
 
@@ -92,7 +106,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   Future<void> _loadProgress() async {
     final saved = await _readSavedProgress();
     if (!mounted) return;
-    if (saved.level > 0) {
+    if ((saved.grade > 0 || saved.level > 0) &&
+        widget.initialCompletion == null) {
       setState(() => _selectedGrade = saved.grade);
     }
     await _loadGradeLevels(_selectedGrade);
@@ -115,13 +130,38 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       _gradeLevels = null;
     });
     try {
-      final levels = await widget.examService.getGradeLevels(
-        profileId: widget.profileId,
-        grade: grade,
-      );
+      final (levels, stats) = await (
+        widget.examService.getGradeLevels(
+          profileId: widget.profileId,
+          grade: grade,
+        ),
+        widget.examService.getExamStats(
+          profileId: widget.profileId,
+          examType: examTypeGrade,
+        ),
+      ).wait;
       if (!mounted || requestId != _levelRequestId) return;
       setState(() {
         _gradeLevels = levels;
+        for (final stat in stats) {
+          if (stat.examType != null &&
+              stat.examType!.trim().toUpperCase() != examTypeGrade) {
+            continue;
+          }
+          final active = activeInProgressAssessmentExam(stat);
+          if (active != null && active.grade == grade && _isGradeExam(active)) {
+            _mergeExam(active);
+          }
+          if (stat.grade == grade && isCompletedAssessmentStats(stat)) {
+            _mergeExam(
+              completedAssessmentFromStats(
+                stat,
+                profileId: widget.profileId,
+                fallbackExamType: examTypeGrade,
+              ),
+            );
+          }
+        }
         _isLoading = false;
       });
       _scrollToCurrentLevel();
@@ -135,6 +175,58 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   Future<void> _reload() => _loadGradeLevels(_selectedGrade);
+
+  void _mergeExam(GeneratedExam exam) {
+    final index = _exams.indexWhere(
+      (existing) =>
+          exam.userExamId != null && existing.userExamId == exam.userExamId,
+    );
+    if (index < 0) {
+      _exams.add(exam);
+    } else if (!_isActiveExam(_exams[index]) && _isActiveExam(exam)) {
+      return;
+    } else if (_isActiveExam(_exams[index]) ||
+        !_examDate(exam).isBefore(_examDate(_exams[index]))) {
+      _exams[index] = exam;
+    }
+  }
+
+  void _recordCompletion(GradeExamCompletion completion) {
+    final grade = completion.grade;
+    final level = completion.level;
+    final exam = completion.exam;
+    if (grade == _selectedGrade && _gradeLevels != null) {
+      _gradesWithKnownUnlockBaseline.add(grade);
+    }
+    _mergeExam(
+      GeneratedExam(
+        examId: exam.examId,
+        userAiExamId: exam.userAiExamId,
+        userExamId: exam.userExamId,
+        profileId: widget.profileId,
+        examStatus: 'COMPLETE',
+        examType: examTypeGrade,
+        grade: grade,
+        level: level,
+        submittedDt: DateTime.now().toIso8601String(),
+        grading: exam.grading,
+        questions: const <ExamQuestion>[],
+      ),
+    );
+    final unlocked = (level + (completion.outcome.passed ? 1 : 0)).clamp(
+      0,
+      _maxLevel,
+    );
+    _locallyUnlockedLevels[grade] = math.max(
+      _locallyUnlockedLevels[grade] ??
+          (grade == _selectedGrade && _gradeLevels != null
+              ? _currentLevel
+              : level),
+      unlocked,
+    );
+    if (completion.outcome.passed) _passedLevels.add((grade, level));
+    _dismissedResumeGrades.add(grade);
+  }
 
   bool _isActiveExam(GeneratedExam exam) {
     final status = exam.examStatus?.trim().toUpperCase();
@@ -165,7 +257,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     GeneratedExam? latest;
     for (final exam in _exams) {
       if (_isGradeExam(exam) &&
-          !_isActiveExam(exam) &&
+          (const {
+                'COMPLETE',
+                'SUBMITTED',
+              }.contains(exam.examStatus?.trim().toUpperCase()) ||
+              (exam.examStatus?.trim().isEmpty != false &&
+                  exam.grading != null)) &&
           exam.grade == grade &&
           exam.level == level) {
         if (latest == null || _examDate(exam).isAfter(_examDate(latest))) {
@@ -184,24 +281,37 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   int get _currentLevel {
-    return (_gradeLevels?.maxLevel ?? 1).clamp(1, _maxLevel);
+    // Keep the single-step outcome while the server catches up after submission.
+    final local = _locallyUnlockedLevels[_selectedGrade];
+    final remote = _gradeLevels?.maxLevel ?? 1;
+    return (_gradesWithKnownUnlockBaseline.contains(_selectedGrade)
+            ? local ?? remote
+            : math.max(remote, local ?? 0))
+        .clamp(0, _maxLevel);
   }
 
   int? get _resumeLevel {
     final levels = _gradeLevels;
     if (levels == null) return null;
     final latest = levels.latestLevel;
-    if (latest < 1 || latest >= levels.maxLevel || latest > _currentLevel) {
+    if (latest < 0 || latest >= levels.maxLevel || latest > _currentLevel) {
+      return null;
+    }
+    if (latest == 0 &&
+        _activeExamFor(_selectedGrade, 0) == null &&
+        _completedExamFor(_selectedGrade, 0) == null) {
       return null;
     }
     return latest;
   }
 
   bool _isLevelUnlocked(int level) {
-    return level <= _currentLevel;
+    return level <= _currentLevel ||
+        _completedExamFor(_selectedGrade, level) != null;
   }
 
   bool _isLevelCompleted(int level) {
+    if (_passedLevels.contains((_selectedGrade, level))) return true;
     if (level < _currentLevel) return true;
     final exam = _completedExamFor(_selectedGrade, level);
     final score = exam?.grading?.scorePercentage;
@@ -209,7 +319,32 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   Future<void> _handleLevelTap(int level) async {
-    if (!_isLevelUnlocked(level)) return;
+    if (_isOpeningExam || !_isLevelUnlocked(level)) return;
+    final completed = _completedExamFor(_selectedGrade, level);
+    if (completed != null &&
+        (completed.userExamId != null ||
+            completed.examId != null ||
+            completed.userAiExamId != null)) {
+      setState(() => _isOpeningExam = true);
+      try {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => RepositoryProvider<ExamService>.value(
+              value: widget.examService,
+              child: ExamReviewScreen(
+                userExamId: completed.userExamId,
+                examId: completed.examId ?? completed.userAiExamId,
+                profileId: widget.profileId,
+                examType: examTypeGrade,
+              ),
+            ),
+          ),
+        );
+      } finally {
+        if (mounted) setState(() => _isOpeningExam = false);
+      }
+      return;
+    }
     final active = _activeExamFor(_selectedGrade, level);
     await _openAssessment(level: level, activeExam: active);
   }
@@ -240,6 +375,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             allowQuestionNavigation: false,
             showQuestionNavigation: false,
             isResumedAssessment: activeExam != null,
+            onGradeCompleted: (completion) {
+              if (!mounted) return;
+              setState(() => _recordCompletion(completion));
+            },
             onResultBack: () {
               if (!mounted) return;
               if (activeExam != null) _exams.remove(activeExam);
@@ -336,7 +475,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
               !_dismissedResumeGrades.contains(_selectedGrade))
             _RoadmapResumePrompt(
               level: resumeLevel,
-              onResume: () => _handleLevelTap(resumeLevel),
+              onResume: () => _openAssessment(
+                level: resumeLevel,
+                activeExam: _activeExamFor(_selectedGrade, resumeLevel),
+              ),
               onDismiss: () =>
                   setState(() => _dismissedResumeGrades.add(_selectedGrade)),
             ),
@@ -604,11 +746,11 @@ class _GradeRoadmapPath extends StatelessWidget {
         final width = constraints.maxWidth;
         final horizontalTravel = math.max(0.0, width - _nodeSize - 18);
         return SizedBox(
-          height: 10 * _rowHeight + 22,
+          height: 11 * _rowHeight + 22,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              for (var index = 0; index < 10; index++)
+              for (var index = 0; index < 11; index++)
                 _buildLevel(
                   context,
                   level: 10 - index,
@@ -714,6 +856,7 @@ class _RoadmapLevelNode extends StatelessWidget {
   final VoidCallback? onTap;
 
   static const _levelColors = <Color>[
+    Color(0xFF2E949A),
     Color(0xFFFF6B43),
     Color(0xFF5DDB72),
     Color(0xFFE85BD4),
@@ -727,7 +870,7 @@ class _RoadmapLevelNode extends StatelessWidget {
   ];
 
   static Color colorForLevel(int level) {
-    return _levelColors[(level - 1) % _levelColors.length];
+    return _levelColors[level % _levelColors.length];
   }
 
   @override

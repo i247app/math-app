@@ -100,26 +100,28 @@ void main() {
     expect(exam.userExamId, 99);
   });
 
-  test('generates GRADE with the requested level', () async {
-    late RequestOptions captured;
-    final api = _apiReturning((options) {
-      captured = options;
-      return _examResponse();
+  for (final level in [0, 7]) {
+    test('generates GRADE with requested level $level', () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return _examResponse();
+      });
+
+      await api.generateAssessmentExam(
+        examType: examTypeGrade,
+        profileId: 21,
+        gradeLabel: 'Lớp 5',
+        level: level,
+      );
+
+      final body = _body(captured);
+      expect(body, containsPair('exam_type', examTypeGrade));
+      expect(body, containsPair('grade', 5));
+      expect(body, containsPair('level', level));
+      expect(body, isNot(contains('esess_id')));
     });
-
-    await api.generateAssessmentExam(
-      examType: examTypeGrade,
-      profileId: 21,
-      gradeLabel: 'Lớp 5',
-      level: 7,
-    );
-
-    final body = _body(captured);
-    expect(body, containsPair('exam_type', examTypeGrade));
-    expect(body, containsPair('grade', 5));
-    expect(body, containsPair('level', 7));
-    expect(body, isNot(contains('esess_id')));
-  });
+  }
 
   test('defaults an omitted assessment grade to kindergarten', () async {
     late RequestOptions captured;

@@ -145,6 +145,22 @@ void main() {
     expect(controller.shouldAutoSubmitAssessment, isTrue);
   });
 
+  test('resumed GRADE Level 0 is not clamped to Level 1', () {
+    final controller = ExamAttemptController(
+      examService: _UnusedExamService(),
+      examType: examTypeGrade,
+      initialExam: GeneratedExam(
+        examId: 7,
+        examType: examTypeGrade,
+        grade: 2,
+        level: 0,
+        questions: exam.questions,
+      ),
+    );
+    addTearDown(controller.dispose);
+    expect(controller.currentLevel, 0);
+  });
+
   test('GRADE is ready to submit immediately after five wrong answers', () {
     const wrongAnswer = ExamAnswer(label: 'B', content: '2');
     final controller = ExamAttemptController(

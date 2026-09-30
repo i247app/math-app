@@ -70,15 +70,20 @@ class AssessmentBottomActionButton extends StatelessWidget {
             spacing: 8,
             children: [
               Icon(icon, color: effectiveForeground, size: 16),
-              Text(
-                label,
-                maxLines: 1,
-                style: context.textStyles.labelSmall?.copyWith(
-                  color: effectiveForeground,
-                  fontSize: labelFontSize,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                  letterSpacing: 0,
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    style: context.textStyles.labelSmall?.copyWith(
+                      color: effectiveForeground,
+                      fontSize: labelFontSize,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
+                      letterSpacing: 0,
+                    ),
+                  ),
                 ),
               ),
             ],

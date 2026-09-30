@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
@@ -16,6 +17,7 @@ import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_error_state.dart';
@@ -41,6 +43,7 @@ class ExamAttemptScreen extends StatefulWidget {
     this.profileId,
     this.startAtKindergarten = true,
     this.onResultBack,
+    this.onGradeCompleted,
     this.allowQuestionNavigation = true,
     this.showQuestionNavigation = true,
     this.allowReviewPractice = true,
@@ -58,6 +61,7 @@ class ExamAttemptScreen extends StatefulWidget {
   /// Direct placement starts at grade 0; explicit grade-selection can opt out.
   final bool startAtKindergarten;
   final VoidCallback? onResultBack;
+  final ValueChanged<GradeExamCompletion>? onGradeCompleted;
   final bool allowQuestionNavigation;
   final bool showQuestionNavigation;
   final bool allowReviewPractice;
@@ -276,6 +280,51 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
         return;
       }
       if (!mounted) return;
+      if (_controller.isGrade && gradeOutcome != null) {
+        final resolvedProfileId =
+            profileId ?? submittedExam.profileId ?? _controller.exam?.profileId;
+        if (gradeOutcome.passed) {
+          try {
+            await _gradeProgressStore.save(
+              resolvedProfileId ?? 0,
+              gradeOutcome.progress,
+            );
+          } catch (_) {
+            // Server completion remains authoritative if local persistence fails.
+          }
+        }
+        if (!mounted) return;
+        final completion = GradeExamCompletion(
+          exam: GeneratedExam(
+            examId: submittedExamId ?? _controller.exam?.examId,
+            userAiExamId: submittedExam.userAiExamId,
+            userExamId: submittedUserExamId,
+            profileId: resolvedProfileId,
+            grading: submittedExam.grading,
+            questions: const <ExamQuestion>[],
+          ),
+          grade: _controller.currentGrade,
+          level: _controller.currentLevel,
+          outcome: gradeOutcome,
+        );
+        final onGradeCompleted = widget.onGradeCompleted;
+        if (onGradeCompleted != null) {
+          onGradeCompleted(completion);
+          await _exitController.exit();
+        } else {
+          navigator.pushReplacement(
+            MaterialPageRoute<void>(
+              builder: (_) => GradeRoadmapScreen(
+                profileId: resolvedProfileId ?? 0,
+                examService: examService,
+                gradeProgressStore: _gradeProgressStore,
+                initialCompletion: completion,
+              ),
+            ),
+          );
+        }
+        return;
+      }
       if (submittedUserExamId != null && submittedUserExamId > 0) {
         try {
           final journeyDetail = await examService.getExamDetail(
@@ -292,18 +341,6 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
         }
       }
       if (!mounted) return;
-      if (_controller.isGrade) {
-        try {
-          await _gradeProgressStore.save(
-            profileId ?? submittedExam.profileId ?? 0,
-            gradeOutcome?.progress ??
-                ProfileGradeProgress(grade: finalGrade, level: finalLevel),
-          );
-        } catch (_) {
-          // The server journey is already complete; the next GRADE result can
-          // safely repair local progress with another monotonic write.
-        }
-      }
     }
 
     if (_controller.isPractice) {
