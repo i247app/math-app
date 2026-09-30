@@ -362,6 +362,10 @@ class ExamStatsDto {
     this.grade,
     this.level,
     this.lastSubmittedDt,
+    this.endedDt,
+    this.createDt,
+    this.passed,
+    this.isLatest,
     this.review,
     this.inProgressExam,
     this.inProgressExams = const <GeneratedExamDto>[],
@@ -380,6 +384,11 @@ class ExamStatsDto {
   final int? grade;
   final int? level;
   final DateTime? lastSubmittedDt;
+  final DateTime? endedDt;
+  final DateTime? createDt;
+  @JsonKey(name: 'esess_flag')
+  final bool? passed;
+  final bool? isLatest;
   final String? review;
   final GeneratedExamDto? inProgressExam;
   final List<GeneratedExamDto> inProgressExams;

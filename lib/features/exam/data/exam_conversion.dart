@@ -221,6 +221,10 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       grade: grade,
       level: level,
       lastSubmittedDt: lastSubmittedDt,
+      endedDt: endedDt,
+      createDt: createDt,
+      passed: passed,
+      isLatest: isLatest,
       review: review,
       inProgressExams: activeExams,
     );

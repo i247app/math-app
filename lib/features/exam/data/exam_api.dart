@@ -317,6 +317,28 @@ class ExamApi implements ExamService {
     );
   }
 
+  @override
+  Future<List<ExamStats>> getGradeLadder({
+    required int profileId,
+    required int grade,
+  }) async {
+    final response = await _runExamRequest(
+      () => _postResponse(
+        '/exams/grade/ladder',
+        <String, dynamic>{
+          'profile_id': _requireProfileId(profileId),
+          'exam_type': examTypeGrade,
+          'grade': grade,
+        },
+        (json) => ExamStatsResponseDto.fromJson({
+          ...json,
+          'stats': json['exam_sessions'],
+        }),
+      ),
+    );
+    return response.stats.map((session) => session.toModel()).toList();
+  }
+
   Future<GenerateExamResponseDto> _generateExam(GenerateExamRequest request) {
     return _postResponse(
       '/exams/generate',

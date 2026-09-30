@@ -66,7 +66,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   int _levelRequestId = 0;
   final Map<int, int> _locallyUnlockedLevels = <int, int>{};
   final Set<int> _gradesWithKnownUnlockBaseline = <int>{};
-  final Set<(int, int)> _passedLevels = <(int, int)>{};
+  final Map<(int, int), ExamStats> _ladderSessions = {};
+  final Map<(int, int), ExamStats> _pendingSessions = {};
   bool _isLoading = true;
   bool _isOpeningExam = false;
   int? _openingLevel;
@@ -130,36 +131,36 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       _gradeLevels = null;
     });
     try {
-      final (levels, stats) = await (
+      final (levels, sessions) = await (
         widget.examService.getGradeLevels(
           profileId: widget.profileId,
           grade: grade,
         ),
-        widget.examService.getExamStats(
+        widget.examService.getGradeLadder(
           profileId: widget.profileId,
-          examType: examTypeGrade,
+          grade: grade,
         ),
       ).wait;
       if (!mounted || requestId != _levelRequestId) return;
       setState(() {
         _gradeLevels = levels;
-        for (final stat in stats) {
-          if (stat.examType != null &&
-              stat.examType!.trim().toUpperCase() != examTypeGrade) {
+        _ladderSessions.removeWhere((key, _) => key.$1 == grade);
+        for (final session in sessions) {
+          final level = session.level;
+          if (session.isLatest != true ||
+              session.grade != grade ||
+              level == null ||
+              level < 1 ||
+              level > _maxLevel ||
+              (session.userExamId ?? 0) <= 0 ||
+              (session.examType != null &&
+                  session.examType!.trim().toUpperCase() != examTypeGrade)) {
             continue;
           }
-          final active = activeInProgressAssessmentExam(stat);
-          if (active != null && active.grade == grade && _isGradeExam(active)) {
-            _mergeExam(active);
-          }
-          if (stat.grade == grade && isCompletedAssessmentStats(stat)) {
-            _mergeExam(
-              completedAssessmentFromStats(
-                stat,
-                profileId: widget.profileId,
-                fallbackExamType: examTypeGrade,
-              ),
-            );
+          final key = (grade, level);
+          _ladderSessions[key] = session;
+          if (_pendingSessions[key]?.userExamId == session.userExamId) {
+            _pendingSessions.remove(key);
           }
         }
         _isLoading = false;
@@ -213,6 +214,21 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         questions: const <ExamQuestion>[],
       ),
     );
+    // Keep the completed attempt visible until ladder returns its session ID.
+    _pendingSessions[(grade, level)] = ExamStats(
+      userExamId: exam.userExamId,
+      examType: examTypeGrade,
+      status: 'COMPLETE',
+      grade: grade,
+      level: level,
+      passed: completion.outcome.passed,
+      isLatest: true,
+      lastSubmittedDt: DateTime.now(),
+      correctNumber: exam.grading?.correctNumber ?? 0,
+      scorePercentage: (exam.grading?.scorePercentage ?? 0).toDouble(),
+      skippedNumber: exam.grading?.skippedNumber ?? 0,
+      totalQuestions: exam.grading?.totalQuestions ?? 0,
+    );
     final unlocked = (level + (completion.outcome.passed ? 1 : 0)).clamp(
       0,
       _maxLevel,
@@ -224,8 +240,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
               : level),
       unlocked,
     );
-    if (completion.outcome.passed) _passedLevels.add((grade, level));
   }
+
+  ExamStats? _latestSessionFor(int grade, int level) =>
+      _pendingSessions[(grade, level)] ?? _ladderSessions[(grade, level)];
 
   bool _isActiveExam(GeneratedExam exam) {
     final status = exam.examStatus?.trim().toUpperCase();
@@ -238,6 +256,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   GeneratedExam? _activeExamFor(int grade, int level) {
+    final session = _latestSessionFor(grade, level);
+    if (session != null) return activeInProgressAssessmentExam(session);
     GeneratedExam? latest;
     for (final exam in _exams) {
       if (_isGradeExam(exam) &&
@@ -253,6 +273,16 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   GeneratedExam? _completedExamFor(int grade, int level) {
+    final session = _latestSessionFor(grade, level);
+    if (session != null) {
+      return session.passed == true && isCompletedAssessmentStats(session)
+          ? completedAssessmentFromStats(
+              session,
+              profileId: widget.profileId,
+              fallbackExamType: examTypeGrade,
+            )
+          : null;
+    }
     GeneratedExam? latest;
     for (final exam in _exams) {
       if (_isGradeExam(exam) &&
@@ -282,12 +312,11 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   int get _currentLevel {
     // Keep the single-step outcome while the server catches up after submission.
     final local = _locallyUnlockedLevels[_selectedGrade];
-    // The API reports 0-9; roadmap progress is the next level, 1-10.
-    final remote = ((_gradeLevels?.maxLevel ?? 0) + 1).clamp(1, _maxLevel);
+    final remote = (_gradeLevels?.maxLevel ?? 1).clamp(1, _maxLevel);
     return (_gradesWithKnownUnlockBaseline.contains(_selectedGrade)
             ? local ?? remote
             : math.max(remote, local ?? 0))
-        .clamp(0, _maxLevel);
+        .clamp(1, _maxLevel);
   }
 
   bool _isLevelUnlocked(int level) {
@@ -296,8 +325,11 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   bool _isLevelCompleted(int level) {
-    if (_passedLevels.contains((_selectedGrade, level))) return true;
     if (level < _currentLevel) return true;
+    final session = _latestSessionFor(_selectedGrade, level);
+    if (session != null) {
+      return isCompletedAssessmentStats(session) && session.passed == true;
+    }
     final exam = _completedExamFor(_selectedGrade, level);
     final score = exam?.grading?.scorePercentage;
     return exam != null && score != null && score >= 50;
@@ -690,7 +722,7 @@ class _GradeRoadmapPath extends StatelessWidget {
                   excludeFromSemantics: true,
                 ),
               ),
-              for (var level = 10; level >= 0; level--)
+              for (var level = 10; level >= 1; level--)
                 _buildLevel(
                   context,
                   level: level,

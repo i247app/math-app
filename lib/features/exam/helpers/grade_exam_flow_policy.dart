@@ -58,7 +58,7 @@ class GradeExamFlowPolicy {
     final reachedFiftyPercent =
         score.isComplete && score.correctCount * 2 >= score.totalQuestions;
     if (failedFirstFive || !reachedFiftyPercent) {
-      // TODO: Apply the future API policy for downgrade-rule outcomes here.
+      // TODO: Apply the future API policy for failed attempts here.
       return GradeExamOutcome(
         progress: savedProgress,
         passed: false,

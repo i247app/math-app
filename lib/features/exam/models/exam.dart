@@ -211,6 +211,10 @@ class ExamStats {
     this.grade,
     this.level,
     this.lastSubmittedDt,
+    this.endedDt,
+    this.createDt,
+    this.passed,
+    this.isLatest,
     this.review,
     this.inProgressExams = const <GeneratedExam>[],
   });
@@ -225,6 +229,10 @@ class ExamStats {
   final int? grade;
   final int? level;
   final DateTime? lastSubmittedDt;
+  final DateTime? endedDt;
+  final DateTime? createDt;
+  final bool? passed;
+  final bool? isLatest;
   final String? review;
   final List<GeneratedExam> inProgressExams;
 }

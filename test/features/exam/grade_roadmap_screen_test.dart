@@ -11,8 +11,10 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
+import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
@@ -89,50 +91,57 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  for (final maxLevel in [0, 3, 9]) {
-    testWidgets('API max_level $maxLevel opens roadmap Level ${maxLevel + 1}', (
-      tester,
-    ) async {
-      final service = _FakeExamService(
-        levelsByGrade: {
-          2: GradeLevels(latestLevel: maxLevel, maxLevel: maxLevel),
-        },
-      );
-      await pumpRoadmap(tester, service);
-      final currentLevel = maxLevel + 1;
-      final current = find.byKey(ValueKey('grade-roadmap-level-$currentLevel'));
-      expect(
-        tester
-            .widget<AnimatedScale>(
-              find.descendant(
-                of: current,
-                matching: find.byType(AnimatedScale),
-              ),
-            )
-            .scale,
-        1.04,
-      );
-      for (var level = 0; level <= 10; level++) {
-        expect(
-          find.byKey(ValueKey('grade-roadmap-level-$level-locked')),
-          level > currentLevel ? findsOneWidget : findsNothing,
+  for (final maxLevel in [0, 1, 3, 9, 10]) {
+    testWidgets(
+      'roadmap uses max_level $maxLevel directly with a minimum of 1',
+      (tester) async {
+        final service = _FakeExamService(
+          levelsByGrade: {
+            2: GradeLevels(latestLevel: maxLevel, maxLevel: maxLevel),
+          },
+        );
+        await pumpRoadmap(tester, service);
+        final currentLevel = maxLevel.clamp(1, 10);
+        final current = find.byKey(
+          ValueKey('grade-roadmap-level-$currentLevel'),
         );
         expect(
-          find.byKey(ValueKey('grade-roadmap-level-$level-completed')),
-          level < currentLevel ? findsOneWidget : findsNothing,
+          tester
+              .widget<AnimatedScale>(
+                find.descendant(
+                  of: current,
+                  matching: find.byType(AnimatedScale),
+                ),
+              )
+              .scale,
+          1.04,
         );
-      }
-      expect(
-        find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
-        findsNothing,
-      );
-      await tester.ensureVisible(current);
-      await tester.pumpAndSettle();
-      await tester.tap(current);
-      await tester.pumpAndSettle();
-      expect(service.generatedLevels, [currentLevel]);
-      expect(tester.takeException(), isNull);
-    });
+        expect(
+          find.byKey(const ValueKey('grade-roadmap-level-0')),
+          findsNothing,
+        );
+        for (var level = 1; level <= 10; level++) {
+          expect(
+            find.byKey(ValueKey('grade-roadmap-level-$level-locked')),
+            level > currentLevel ? findsOneWidget : findsNothing,
+          );
+          expect(
+            find.byKey(ValueKey('grade-roadmap-level-$level-completed')),
+            level < currentLevel ? findsOneWidget : findsNothing,
+          );
+        }
+        expect(
+          find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
+          findsNothing,
+        );
+        await tester.ensureVisible(current);
+        await tester.pumpAndSettle();
+        await tester.tap(current);
+        await tester.pumpAndSettle();
+        expect(service.generatedLevels, [currentLevel]);
+        expect(tester.takeException(), isNull);
+      },
+    );
   }
 
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -185,7 +194,14 @@ void main() {
       final rect = tester.getRect(background);
       expect(rect.width, size.width);
       expect(rect.height / rect.width, closeTo(4988 / 672, 0.001));
-      for (var level = 0; level <= 10; level++) {
+      final firstLevel = tester.getRect(
+        find.byKey(const ValueKey('grade-roadmap-level-1')),
+      );
+      final firstLevelCenter =
+          rect.topLeft + const Offset(187.5, 4760) * (rect.width / 672);
+      expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
+      expect(firstLevel.center.dy, closeTo(firstLevelCenter.dy, 0.01));
+      for (var level = 1; level <= 10; level++) {
         final checkpoint = tester.getRect(
           find.byKey(ValueKey('grade-roadmap-level-$level')),
         );
@@ -229,11 +245,11 @@ void main() {
     });
   }
 
-  testWidgets('GRADE stats open the matching grade and latest level detail', (
+  testWidgets('GRADE ladder opens the matching grade and latest level detail', (
     tester,
   ) async {
     final service = _FakeExamService(
-      stats: [
+      ladder: [
         const ExamStats(
           correctNumber: 7,
           scorePercentage: 70,
@@ -241,6 +257,8 @@ void main() {
           totalQuestions: 10,
           examType: examTypeGrade,
           userExamId: 700,
+          isLatest: true,
+          passed: true,
           status: 'COMPLETE',
           grade: 1,
           level: 1,
@@ -252,10 +270,12 @@ void main() {
           totalQuestions: 10,
           examType: examTypeGrade,
           userExamId: 601,
+          isLatest: false,
+          passed: false,
           status: 'COMPLETE',
           grade: 2,
           level: 1,
-          lastSubmittedDt: DateTime(2026, 9, 28),
+          lastSubmittedDt: DateTime(2026, 9, 30),
         ),
         ExamStats(
           correctNumber: 8,
@@ -264,6 +284,8 @@ void main() {
           totalQuestions: 10,
           examType: examTypeGrade,
           userExamId: 602,
+          isLatest: true,
+          passed: true,
           status: 'SUBMITTED',
           grade: 2,
           level: 1,
@@ -276,6 +298,8 @@ void main() {
           totalQuestions: 10,
           examType: examTypeAssessment,
           userExamId: 800,
+          isLatest: true,
+          passed: true,
           status: 'COMPLETE',
           grade: 2,
           level: 1,
@@ -288,19 +312,209 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
-    expect(service.statsTypes, [examTypeGrade]);
+    expect(service.ladderRequests, [2]);
+    expect(service.statsRequests, 0);
     expect(service.detailRequests, [602]);
     expect(find.byType(ExamReviewScreen), findsOneWidget);
     expect(service.generatedLevels, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Level 0 opens its completed exam detail from stats', (
+  for (final passed in [false, true]) {
+    testWidgets(
+      'ladder uses pass flag $passed instead of score for the current level',
+      (tester) async {
+        final service = _FakeExamService(
+          ladder: [
+            _ladderSession(101, passed: false, isLatest: false),
+            _ladderSession(102, passed: false, isLatest: false),
+            _ladderSession(
+              passed ? 104 : 103,
+              passed: passed,
+              score: passed ? 0 : 100,
+            ),
+          ],
+        );
+        await pumpRoadmap(tester, service);
+        expect(
+          find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
+          passed ? findsOneWidget : findsNothing,
+        );
+        expect(
+          find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+          findsOneWidget,
+        );
+        final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+        await tester.ensureVisible(level);
+        await tester.pumpAndSettle();
+        await tester.tap(level);
+        await tester.pumpAndSettle();
+        expect(service.detailRequests, passed ? [104] : isEmpty);
+        expect(service.generatedLevels, passed ? isEmpty : [1]);
+        expect(
+          find.byType(ExamReviewScreen),
+          passed ? findsOneWidget : findsNothing,
+        );
+        expect(
+          find.byType(ExamAttemptScreen),
+          passed ? findsNothing : findsOneWidget,
+        );
+        expect(service.statsRequests, 0);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('latest fail does not fall back to an older passing review', (
+    tester,
+  ) async {
+    final service = _FakeExamService(
+      levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
+      ladder: [
+        _ladderSession(8050, passed: true, isLatest: false),
+        _ladderSession(8051, passed: false),
+      ],
+    );
+    await pumpRoadmap(
+      tester,
+      service,
+      home: GradeRoadmapScreen(
+        profileId: 11,
+        initialGrade: 2,
+        examService: service,
+        gradeProgressStore: const _FakeProgressStore(
+          ProfileGradeProgress.initial,
+        ),
+        initialExams: const [
+          GeneratedExam(
+            userExamId: 8050,
+            examType: examTypeGrade,
+            examStatus: 'COMPLETE',
+            grade: 2,
+            level: 1,
+            grading: ExamGrading(scorePercentage: 90),
+            questions: [],
+          ),
+        ],
+      ),
+    );
+    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+    await tester.ensureVisible(level);
+    await tester.pumpAndSettle();
+    await tester.tap(level);
+    await tester.pumpAndSettle();
+    expect(find.byType(ExamReviewScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(service.detailRequests, isEmpty);
+    expect(service.generatedLevels, [1]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('new completion stays visible until ladder catches up', (
+    tester,
+  ) async {
+    final ladder = [_ladderSession(8010, passed: false)];
+    final service = _FakeExamService(ladder: ladder);
+    await pumpRoadmap(
+      tester,
+      service,
+      home: GradeRoadmapScreen(
+        profileId: 11,
+        initialGrade: 2,
+        examService: service,
+        gradeProgressStore: const _FakeProgressStore(
+          ProfileGradeProgress.initial,
+        ),
+        initialCompletion: const GradeExamCompletion(
+          grade: 2,
+          level: 1,
+          exam: GeneratedExam(
+            userExamId: 8011,
+            grading: ExamGrading(scorePercentage: 90),
+            questions: [],
+          ),
+          outcome: GradeExamOutcome(
+            progress: ProfileGradeProgress(grade: 2, level: 2),
+            passed: true,
+            levelIncrease: 1,
+          ),
+        ),
+      ),
+    );
+    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+    await tester.ensureVisible(level);
+    await tester.pumpAndSettle();
+    await tester.tap(level);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<ExamReviewScreen>(find.byType(ExamReviewScreen)).userExamId,
+      8011,
+    );
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+
+    ladder[0] = _ladderSession(8011, passed: true);
+    await tester
+        .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+        .onRefresh();
+    await tester.pumpAndSettle();
+    ladder[0] = _ladderSession(8012, passed: false);
+    await tester
+        .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+        .onRefresh();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(level);
+    await tester.pumpAndSettle();
+    await tester.tap(level);
+    await tester.pumpAndSettle();
+    expect(find.byType(ExamReviewScreen), findsNothing);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(service.detailRequests, [8011]);
+    expect(service.generatedLevels, [1]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('non-latest ladder sessions do not become the level review', (
+    tester,
+  ) async {
+    final service = _FakeExamService(
+      ladder: [_ladderSession(101, passed: true, isLatest: false)],
+    );
+    await pumpRoadmap(tester, service);
+    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+    await tester.ensureVisible(level);
+    await tester.pumpAndSettle();
+    await tester.tap(level);
+    await tester.pumpAndSettle();
+    expect(service.detailRequests, isEmpty);
+    expect(service.generatedLevels, [1]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('ladder failure keeps roadmap unavailable until retry succeeds', (
+    tester,
+  ) async {
+    final service = _FakeExamService(failLadder: true);
+    await pumpRoadmap(tester, service);
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-unavailable')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsNothing);
+    service.failLadder = false;
+    await tester.tap(find.text('Không tải được lộ trình level.'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
+    expect(service.ladderRequests, [2, 2]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Level 0 ladder history does not appear on the roadmap', (
     tester,
   ) async {
     final service = _FakeExamService(
       levelsByGrade: const {2: GradeLevels(latestLevel: 0, maxLevel: 0)},
-      stats: const [
+      ladder: const [
         ExamStats(
           correctNumber: 8,
           scorePercentage: 80,
@@ -308,6 +522,8 @@ void main() {
           totalQuestions: 10,
           examType: examTypeGrade,
           userExamId: 900,
+          isLatest: true,
+          passed: true,
           status: 'COMPLETE',
           grade: 2,
           level: 0,
@@ -315,7 +531,8 @@ void main() {
       ],
     );
     await pumpRoadmap(tester, service);
-    final level = find.byKey(const ValueKey('grade-roadmap-level-0'));
+    expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
+    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-1-locked')),
       findsNothing,
@@ -326,32 +543,32 @@ void main() {
             find.descendant(of: level, matching: find.byType(AnimatedScale)),
           )
           .scale,
-      1.0,
+      1.04,
     );
     await tester.ensureVisible(level);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
-    expect(find.byType(ExamReviewScreen), findsOneWidget);
-    expect(service.detailRequests, [900]);
-    expect(service.generatedLevels, isEmpty);
+    expect(find.byType(ExamAttemptScreen), findsOneWidget);
+    expect(service.detailRequests, isEmpty);
+    expect(service.generatedLevels, [1]);
     expect(tester.takeException(), isNull);
   });
 
   for (final passed in [true, false]) {
     testWidgets(
-      'Level 0 ${passed ? "pass" : "fail"} preserves the unlocked Level 1',
+      'Level 1 ${passed ? "pass" : "fail"} handles a zero max_level baseline',
       (tester) async {
         final service = _FakeExamService(
           levelsByGrade: const {2: GradeLevels(latestLevel: 0, maxLevel: 0)},
         );
         await pumpRoadmap(tester, service);
-        final level = find.byKey(const ValueKey('grade-roadmap-level-0'));
+        final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
         await tester.ensureVisible(level);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
-        expect(service.generatedLevels, [0]);
+        expect(service.generatedLevels, [1]);
         final answers = find.byType(AssessmentAnswerButton);
         await tester.tap(passed ? answers.first : answers.last);
         await tester.pump();
@@ -360,8 +577,8 @@ void main() {
         expect(find.byType(GradeRoadmapScreen), findsOneWidget);
         expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
         expect(
-          find.byKey(const ValueKey('grade-roadmap-level-0-completed')),
-          findsOneWidget,
+          find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
+          passed ? findsOneWidget : findsNothing,
         );
         expect(
           find.byKey(const ValueKey('grade-roadmap-level-1-locked')),
@@ -369,29 +586,41 @@ void main() {
         );
         expect(
           find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+          passed ? findsNothing : findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
           findsOneWidget,
         );
         await tester.ensureVisible(level);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
-        expect(
-          tester
-              .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
-              .userExamId,
-          600,
-        );
+        if (passed) {
+          expect(
+            tester
+                .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
+                .userExamId,
+            600,
+          );
+          expect(service.generatedLevels, [1]);
+        } else {
+          expect(find.byType(ExamReviewScreen), findsNothing);
+          expect(find.byType(ExamAttemptScreen), findsOneWidget);
+          expect(service.detailRequests, isEmpty);
+          expect(service.generatedLevels, [1, 1]);
+        }
         expect(tester.takeException(), isNull);
       },
     );
   }
 
   testWidgets(
-    'Level 0 history is opened from its node without a resume banner',
+    'Level 0 history does not add a resume banner or a roadmap node',
     (tester) async {
       final service = _FakeExamService(
         levelsByGrade: const {2: GradeLevels(latestLevel: 0, maxLevel: 1)},
-        stats: const [
+        ladder: const [
           ExamStats(
             correctNumber: 8,
             scorePercentage: 80,
@@ -399,6 +628,8 @@ void main() {
             totalQuestions: 10,
             examType: examTypeGrade,
             userExamId: 901,
+            isLatest: true,
+            passed: true,
             status: 'COMPLETE',
             grade: 2,
             level: 0,
@@ -410,13 +641,14 @@ void main() {
         find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
         findsNothing,
       );
-      final level = find.byKey(const ValueKey('grade-roadmap-level-0'));
+      expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
+      final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
       await tester.ensureVisible(level);
       await tester.pumpAndSettle();
       await tester.tap(level);
       await tester.pumpAndSettle();
-      expect(service.detailRequests, [901]);
-      expect(service.generatedLevels, isEmpty);
+      expect(service.detailRequests, isEmpty);
+      expect(service.generatedLevels, [1]);
       expect(tester.takeException(), isNull);
     },
   );
@@ -443,7 +675,8 @@ void main() {
         expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
         expect(service.updatedStatuses, ['COMPLETE']);
         expect(service.levelRequests, [2, 2]);
-        expect(service.statsTypes, [examTypeGrade, examTypeGrade]);
+        expect(service.ladderRequests, [2, 2]);
+        expect(service.statsRequests, 0);
         expect(
           find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
           passed ? findsOneWidget : findsNothing,
@@ -460,14 +693,21 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
-        expect(find.byType(ExamReviewScreen), findsOneWidget);
-        expect(
-          tester
-              .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
-              .userExamId,
-          600,
-        );
-        expect(service.generatedLevels, [1]);
+        if (passed) {
+          expect(find.byType(ExamReviewScreen), findsOneWidget);
+          expect(
+            tester
+                .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
+                .userExamId,
+            600,
+          );
+          expect(service.generatedLevels, [1]);
+        } else {
+          expect(find.byType(ExamReviewScreen), findsNothing);
+          expect(find.byType(ExamAttemptScreen), findsOneWidget);
+          expect(service.detailRequests, isEmpty);
+          expect(service.generatedLevels, [1, 1]);
+        }
         expect(tester.takeException(), isNull);
       },
     );
@@ -525,7 +765,7 @@ void main() {
     await tester.tap(level);
     await tester.pumpAndSettle();
     // Even a response calculated with the old +2 rule cannot jump this attempt.
-    levels[2] = const GradeLevels(latestLevel: 1, maxLevel: 2);
+    levels[2] = const GradeLevels(latestLevel: 1, maxLevel: 3);
     for (var question = 0; question < 6; question++) {
       await tester.tap(find.byType(AssessmentAnswerButton).first);
       await tester.pump();
@@ -554,7 +794,7 @@ void main() {
     'standalone historical completion preserves unlocked API levels',
     (tester) async {
       final service = _FakeExamService(
-        levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 6)},
+        levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 7)},
       );
       await pumpRoadmap(
         tester,
@@ -613,7 +853,7 @@ void main() {
     tester,
   ) async {
     final levels = <int, GradeLevels>{
-      2: const GradeLevels(latestLevel: 6, maxLevel: 5),
+      2: const GradeLevels(latestLevel: 6, maxLevel: 6),
     };
     final service = _FakeExamService(levelsByGrade: levels);
     final store = _RecordingProgressStore(
@@ -633,7 +873,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
-    levels[2] = const GradeLevels(latestLevel: 6, maxLevel: 4);
+    levels[2] = const GradeLevels(latestLevel: 6, maxLevel: 5);
     await tester.tap(find.byType(AssessmentAnswerButton).last);
     await tester.pump();
     await tester.tap(find.byType(AssessmentBottomActionButton).last);
@@ -664,64 +904,64 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'shows eleven levels and places the mascot at the current level',
-    (tester) async {
-      final lingo = LingoProvider();
-      addTearDown(lingo.dispose);
+  testWidgets('shows ten levels and places the mascot at the current level', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
 
-      await tester.pumpWidget(
-        LingoScope(
-          lingo: lingo,
-          child: MaterialApp(
-            theme: ThemeData(
-              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: ThemeData(
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: _FakeExamService(
+              levelsByGrade: const {
+                2: GradeLevels(latestLevel: 3, maxLevel: 4),
+              },
             ),
-            home: GradeRoadmapScreen(
-              profileId: 11,
-              examService: _FakeExamService(
-                levelsByGrade: const {
-                  2: GradeLevels(latestLevel: 3, maxLevel: 4),
-                },
-              ),
-              gradeProgressStore: const _FakeProgressStore(
-                ProfileGradeProgress(
-                  grade: 2,
-                  level: 3,
-                  highestUnlockedGrade: 2,
-                  highestUnlockedLevel: 4,
-                ),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress(
+                grade: 2,
+                level: 3,
+                highestUnlockedGrade: 2,
+                highestUnlockedLevel: 4,
               ),
             ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.text('LỚP 2'), findsOneWidget);
-      for (var level = 0; level <= 10; level++) {
-        expect(
-          find.byKey(ValueKey('grade-roadmap-level-$level')),
-          findsOneWidget,
-        );
-      }
+    expect(find.text('LỚP 2'), findsOneWidget);
+    expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
+    for (var level = 1; level <= 10; level++) {
       expect(
-        find.image(const AssetImage('assets/images/grade-roadmap-mascot.png')),
+        find.byKey(ValueKey('grade-roadmap-level-$level')),
         findsOneWidget,
       );
+    }
+    expect(
+      find.image(const AssetImage('assets/images/grade-roadmap-mascot.png')),
+      findsOneWidget,
+    );
 
-      final levelColors = <Color>{};
-      for (var level = 0; level <= 10; level++) {
-        final button = tester.widget<DecoratedBox>(
-          find.byKey(ValueKey('grade-roadmap-level-$level-button')),
-        );
-        final decoration = button.decoration as BoxDecoration;
-        final gradient = decoration.gradient! as LinearGradient;
-        levelColors.add(gradient.colors.last);
-      }
-      expect(levelColors, hasLength(11));
-    },
-  );
+    final levelColors = <Color>{};
+    for (var level = 1; level <= 10; level++) {
+      final button = tester.widget<DecoratedBox>(
+        find.byKey(ValueKey('grade-roadmap-level-$level-button')),
+      );
+      final decoration = button.decoration as BoxDecoration;
+      final gradient = decoration.gradient! as LinearGradient;
+      levelColors.add(gradient.colors.last);
+    }
+    expect(levelColors, hasLength(10));
+  });
 
   testWidgets('refresh scrolls without sharing a controller position', (
     tester,
@@ -757,7 +997,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(examService.levelRequests, <int>[2, 2]);
-    expect(examService.statsRequests, 2);
+    expect(examService.ladderRequests, [2, 2]);
+    expect(examService.statsRequests, 0);
     expect(tester.takeException(), isNull);
     expect(find.byKey(const ValueKey('grade-roadmap-level-3')), findsOneWidget);
   });
@@ -831,7 +1072,7 @@ void main() {
     expect(find.text('LỚP 3'), findsOneWidget);
   });
 
-  testWidgets('selected grade uses API max_level + 1', (tester) async {
+  testWidgets('selected grade uses API max_level directly', (tester) async {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     final service = _FakeExamService(
@@ -868,13 +1109,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.levelRequests, <int>[1]);
-    expect(service.statsRequests, 1);
+    expect(service.ladderRequests, [1]);
+    expect(service.statsRequests, 0);
     expect(find.text('Tiếp tục ở Level 4?'), findsNothing);
     expect(
       tester
           .widget<AnimatedScale>(
             find.descendant(
-              of: find.byKey(const ValueKey('grade-roadmap-level-8')),
+              of: find.byKey(const ValueKey('grade-roadmap-level-7')),
               matching: find.byType(AnimatedScale),
             ),
           )
@@ -882,7 +1124,7 @@ void main() {
       1.04,
     );
     expect(
-      find.byKey(const ValueKey('grade-roadmap-level-9-locked')),
+      find.byKey(const ValueKey('grade-roadmap-level-8-locked')),
       findsOneWidget,
     );
     expect(
@@ -890,7 +1132,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('grade-roadmap-level-8-completed')),
+      find.byKey(const ValueKey('grade-roadmap-level-7-completed')),
       findsNothing,
     );
 
@@ -905,7 +1147,7 @@ void main() {
       tester
           .widget<AnimatedScale>(
             find.descendant(
-              of: find.byKey(const ValueKey('grade-roadmap-level-4')),
+              of: find.byKey(const ValueKey('grade-roadmap-level-3')),
               matching: find.byType(AnimatedScale),
             ),
           )
@@ -913,7 +1155,7 @@ void main() {
       1.04,
     );
     expect(
-      find.byKey(const ValueKey('grade-roadmap-level-5-locked')),
+      find.byKey(const ValueKey('grade-roadmap-level-4-locked')),
       findsOneWidget,
     );
     expect(
@@ -974,8 +1216,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(service.levelRequests, <int>[grade]);
-      expect(service.statsRequests, 1);
-      for (var level = 0; level <= 10; level++) {
+      expect(service.ladderRequests, [grade]);
+      expect(service.statsRequests, 0);
+      expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
+      for (var level = 1; level <= 10; level++) {
         expect(
           find.byKey(ValueKey('grade-roadmap-level-$level')),
           findsOneWidget,
@@ -1059,7 +1303,7 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-3-completed')),
-      findsOneWidget,
+      findsNothing,
     );
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-2-button')),
@@ -1403,6 +1647,25 @@ void main() {
   });
 }
 
+ExamStats _ladderSession(
+  int id, {
+  required bool passed,
+  bool isLatest = true,
+  double score = 90,
+}) => ExamStats(
+  userExamId: id,
+  examType: examTypeGrade,
+  grade: 2,
+  level: 1,
+  status: 'COMPLETE',
+  isLatest: isLatest,
+  passed: passed,
+  correctNumber: 9,
+  scorePercentage: score,
+  skippedNumber: 0,
+  totalQuestions: 10,
+);
+
 Future<void> _saveRoadmapPreview(WidgetTester tester, String name) async {
   await tester.runAsync(() async {
     final boundary = tester.renderObject<RenderRepaintBoundary>(
@@ -1472,19 +1735,21 @@ class _FakeExamService implements ExamService {
   _FakeExamService({
     this.levelsByGrade = const <int, GradeLevels>{},
     this.failLevels = false,
-    this.stats = const <ExamStats>[],
+    this.ladder = const <ExamStats>[],
+    this.failLadder = false,
     this.questionCount = 1,
     this.failCompletion = false,
   });
 
   final Map<int, GradeLevels> levelsByGrade;
   bool failLevels;
-  final List<ExamStats> stats;
+  final List<ExamStats> ladder;
+  bool failLadder;
   final int questionCount;
   final bool failCompletion;
   final List<int> levelRequests = <int>[];
   final List<int> detailRequests = <int>[];
-  final List<String> statsTypes = <String>[];
+  final List<int> ladderRequests = <int>[];
   final List<String> updatedStatuses = <String>[];
   final List<int> submittedAnswerCounts = <int>[];
   int statsRequests = 0;
@@ -1562,8 +1827,17 @@ class _FakeExamService implements ExamService {
     String examType = examTypeAssessment,
   }) async {
     statsRequests++;
-    statsTypes.add(examType);
-    return stats;
+    throw StateError('Roadmap must use ladder, not stats');
+  }
+
+  @override
+  Future<List<ExamStats>> getGradeLadder({
+    required int profileId,
+    required int grade,
+  }) async {
+    ladderRequests.add(grade);
+    if (failLadder) throw StateError('Grade ladder unavailable');
+    return ladder;
   }
 
   @override

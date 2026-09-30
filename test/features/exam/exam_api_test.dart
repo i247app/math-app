@@ -726,6 +726,82 @@ void main() {
     expect(_body(captured), isNot(contains('exam_type')));
   });
 
+  test(
+    'reads grade ladder sessions and pass flags for a selected grade',
+    () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return {
+          'mstatus': 200,
+          'status': 'Success',
+          'profile_id': 21,
+          'grade': 2,
+          'exam_sessions': [
+            for (final passed in [false, true])
+              {
+                'esess_id': passed ? 104 : 103,
+                'exam_type': 'GRADE',
+                'status': 'COMPLETE',
+                'grade': 2,
+                'level': 1,
+                'correct_number': passed ? 9 : 4,
+                'score_percentage': passed ? 90 : 40,
+                'skipped_number': 0,
+                'total_questions': 10,
+                'review': 'Session review',
+                'esess_flag': passed,
+                'is_latest': passed,
+                'last_submitted_dt': '2026-09-30T16:51:57.395796Z',
+                'ended_dt': '2026-09-30T17:06:45.875089Z',
+                'create_dt': '2026-09-30T16:50:20.962157Z',
+              },
+          ],
+        };
+      });
+
+      final sessions = await api.getGradeLadder(profileId: 21, grade: 2);
+
+      expect(captured.path, '/exams/grade/ladder');
+      expect(_body(captured), containsPair('profile_id', 21));
+      expect(_body(captured), containsPair('exam_type', 'GRADE'));
+      expect(_body(captured), containsPair('grade', 2));
+      expect(sessions, hasLength(2));
+      expect(sessions.first.userExamId, 103);
+      expect(sessions.first.passed, isFalse);
+      expect(sessions.first.isLatest, isFalse);
+      final latest = sessions.last;
+      expect(latest.userExamId, 104);
+      expect(latest.examType, 'GRADE');
+      expect(latest.status, 'COMPLETE');
+      expect(latest.grade, 2);
+      expect(latest.level, 1);
+      expect(latest.passed, isTrue);
+      expect(latest.isLatest, isTrue);
+      expect(latest.scorePercentage, 90);
+      expect(latest.review, 'Session review');
+      expect(
+        latest.lastSubmittedDt,
+        DateTime.parse('2026-09-30T16:51:57.395796Z'),
+      );
+      expect(latest.endedDt, DateTime.parse('2026-09-30T17:06:45.875089Z'));
+      expect(latest.createDt, DateTime.parse('2026-09-30T16:50:20.962157Z'));
+    },
+  );
+
+  test('grade ladder accepts an empty session history', () async {
+    final api = _apiReturning((_) => {'mstatus': 200, 'exam_sessions': []});
+    expect(await api.getGradeLadder(profileId: 21, grade: 0), isEmpty);
+  });
+
+  test('grade ladder propagates API failure', () async {
+    final api = _apiReturning((_) => {'mstatus': 500, 'status': 'Failed'});
+    await expectLater(
+      api.getGradeLadder(profileId: 21, grade: 2),
+      throwsException,
+    );
+  });
+
   test('reads grade levels for a profile and grade', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {

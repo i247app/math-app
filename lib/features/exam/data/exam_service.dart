@@ -43,6 +43,11 @@ abstract interface class ExamService {
     required int grade,
   });
 
+  Future<List<ExamStats>> getGradeLadder({
+    required int profileId,
+    required int grade,
+  });
+
   Future<GeneratedExam> submitExam({
     required int examId,
     required List<SubmitExamAnswer> answers,
