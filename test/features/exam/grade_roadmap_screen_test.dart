@@ -1,10 +1,16 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
+import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
@@ -18,12 +24,27 @@ import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/grade.dart';
 
 void main() {
+  setUpAll(() async {
+    if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
+      final font = File('C:/Windows/Fonts/segoeui.ttf');
+      if (await font.exists()) {
+        final loader = FontLoader('RoadmapPreview')
+          ..addFont(font.readAsBytes().then(ByteData.sublistView));
+        await loader.load();
+      }
+      await (FontLoader(
+        'MaterialIcons',
+      )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
+    }
+  });
+
   Future<void> pumpRoadmap(
     WidgetTester tester,
     _FakeExamService service, {
     Widget? home,
+    Size size = const Size(390, 844),
   }) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
+    await tester.binding.setSurfaceSize(size);
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
@@ -32,22 +53,92 @@ void main() {
         lingo: lingo,
         child: MaterialApp(
           theme: ThemeData(
+            fontFamily: const bool.fromEnvironment('ROADMAP_PREVIEW')
+                ? 'RoadmapPreview'
+                : null,
             extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
           ),
-          home:
-              home ??
-              GradeRoadmapScreen(
-                profileId: 11,
-                initialGrade: 2,
-                examService: service,
-                gradeProgressStore: const _FakeProgressStore(
-                  ProfileGradeProgress.initial,
+          home: RepaintBoundary(
+            key: const ValueKey('grade-roadmap-preview'),
+            child:
+                home ??
+                GradeRoadmapScreen(
+                  profileId: 11,
+                  initialGrade: 2,
+                  examService: service,
+                  gradeProgressStore: const _FakeProgressStore(
+                    ProfileGradeProgress.initial,
+                  ),
                 ),
-              ),
+          ),
         ),
       ),
     );
     await tester.pumpAndSettle();
+  }
+
+  for (final size in [
+    const Size(320, 700),
+    const Size(390, 844),
+    const Size(600, 960),
+  ]) {
+    testWidgets('background and checkpoints align at width ${size.width}', (
+      tester,
+    ) async {
+      final service = _FakeExamService(
+        levelsByGrade: const {2: GradeLevels(latestLevel: 5, maxLevel: 5)},
+      );
+      await pumpRoadmap(tester, service, size: size);
+      final background = find.byKey(const ValueKey('grade-roadmap-background'));
+      expect(
+        find.image(const AssetImage(GradeRoadmapLayout.backgroundAsset)),
+        findsOneWidget,
+      );
+      final rect = tester.getRect(background);
+      expect(rect.width, size.width);
+      expect(rect.height / rect.width, closeTo(4988 / 672, 0.001));
+      for (var level = 0; level <= 10; level++) {
+        final checkpoint = tester.getRect(
+          find.byKey(ValueKey('grade-roadmap-level-$level')),
+        );
+        final expected =
+            rect.topLeft + GradeRoadmapLayout.centerForLevel(level, rect.width);
+        expect(checkpoint.center.dx, closeTo(expected.dx, 0.01));
+        expect(checkpoint.center.dy, closeTo(expected.dy, 0.01));
+        expect(checkpoint.left, greaterThanOrEqualTo(0));
+        expect(checkpoint.right, lessThanOrEqualTo(size.width));
+      }
+      final mascot = tester.getRect(
+        find.image(const AssetImage('assets/images/grade-roadmap-mascot.png')),
+      );
+      expect(mascot.left, greaterThanOrEqualTo(0));
+      expect(mascot.right, lessThanOrEqualTo(size.width));
+      expect(tester.takeException(), isNull);
+      if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
+        await _saveRoadmapPreview(
+          tester,
+          'roadmap-${size.width.toInt()}-middle.png',
+        );
+        tester
+            .state<ScrollableState>(find.byType(Scrollable))
+            .position
+            .jumpTo(0);
+        await tester.pumpAndSettle();
+        await _saveRoadmapPreview(
+          tester,
+          'roadmap-${size.width.toInt()}-top.png',
+        );
+        final position = tester
+            .state<ScrollableState>(find.byType(Scrollable))
+            .position;
+        position.jumpTo(position.maxScrollExtent);
+        await tester.pumpAndSettle();
+        await _saveRoadmapPreview(
+          tester,
+          'roadmap-${size.width.toInt()}-bottom.png',
+        );
+      }
+    });
   }
 
   testWidgets('GRADE stats open the matching grade and latest level detail', (
@@ -1202,6 +1293,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
     expect(service.levelRequests, <int>[0, 0]);
+  });
+}
+
+Future<void> _saveRoadmapPreview(WidgetTester tester, String name) async {
+  await tester.runAsync(() async {
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byKey(const ValueKey('grade-roadmap-preview')),
+    );
+    final image = await boundary.toImage(pixelRatio: 2);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    await Directory('build/roadmap-preview').create(recursive: true);
+    await File(
+      'build/roadmap-preview/$name',
+    ).writeAsBytes(bytes!.buffer.asUint8List());
+    image.dispose();
   });
 }
 

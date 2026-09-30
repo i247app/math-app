@@ -12,6 +12,7 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
@@ -438,8 +439,16 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       if (!mounted || !_scrollController.hasClients) return;
       // AnimatedSwitcher can keep the outgoing scroll view attached briefly.
       final position = _scrollController.positions.last;
-      final index = 10 - _currentLevel;
-      final target = (index * 152.0 - 90).clamp(0.0, position.maxScrollExtent);
+      final viewport = position.context.notificationContext?.findRenderObject();
+      if (viewport is! RenderBox || !viewport.hasSize) return;
+      final center = GradeRoadmapLayout.centerForLevel(
+        _currentLevel,
+        viewport.size.width,
+      );
+      final target = (center.dy - position.viewportDimension * 0.55).clamp(
+        0.0,
+        position.maxScrollExtent,
+      );
       position.jumpTo(target);
     });
   }
@@ -456,38 +465,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     final colors = context.themeColors;
     final resumeLevel = _resumeLevel;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
+      backgroundColor: const Color(0xFFD8EFB6),
+      body: Stack(
         children: [
-          _GradeRoadmapHeader(
-            selectedGrade: _selectedGrade,
-            gradeTitles: List<String>.generate(
-              6,
-              (grade) => _gradeTitle(context, grade),
-            ),
-            onGradeTap: _openGradeSelection,
-            onBack: widget.showCloseButton
-                ? () => Navigator.pop(context)
-                : null,
-          ),
-          if (!_isLoading &&
-              resumeLevel != null &&
-              !_dismissedResumeGrades.contains(_selectedGrade))
-            _RoadmapResumePrompt(
-              level: resumeLevel,
-              onResume: () => _openAssessment(
-                level: resumeLevel,
-                activeExam: _activeExamFor(_selectedGrade, resumeLevel),
-              ),
-              onDismiss: () =>
-                  setState(() => _dismissedResumeGrades.add(_selectedGrade)),
-            ),
-          if (_errorMessage != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: _RoadmapError(message: _errorMessage!, onRetry: _reload),
-            ),
-          Expanded(
+          Positioned.fill(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 240),
               switchInCurve: Curves.easeOut,
@@ -514,11 +495,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
                         ),
-                        padding: EdgeInsets.fromLTRB(
-                          18,
-                          12,
-                          18,
-                          36 + widget.bottomPadding,
+                        padding: EdgeInsets.only(
+                          bottom:
+                              widget.bottomPadding +
+                              MediaQuery.paddingOf(context).bottom,
                         ),
                         child: _GradeRoadmapPath(
                           currentLevel: _currentLevel,
@@ -532,6 +512,47 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                         ),
                       ),
                     ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Column(
+              children: [
+                _GradeRoadmapHeader(
+                  selectedGrade: _selectedGrade,
+                  gradeTitles: List<String>.generate(
+                    6,
+                    (grade) => _gradeTitle(context, grade),
+                  ),
+                  onGradeTap: _openGradeSelection,
+                  onBack: widget.showCloseButton
+                      ? () => Navigator.pop(context)
+                      : null,
+                ),
+                if (!_isLoading &&
+                    resumeLevel != null &&
+                    !_dismissedResumeGrades.contains(_selectedGrade))
+                  _RoadmapResumePrompt(
+                    level: resumeLevel,
+                    onResume: () => _openAssessment(
+                      level: resumeLevel,
+                      activeExam: _activeExamFor(_selectedGrade, resumeLevel),
+                    ),
+                    onDismiss: () => setState(
+                      () => _dismissedResumeGrades.add(_selectedGrade),
+                    ),
+                  ),
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: _RoadmapError(
+                      message: _errorMessage!,
+                      onRetry: _reload,
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -728,8 +749,8 @@ class _GradeRoadmapPath extends StatelessWidget {
     required this.mascotAsset,
   });
 
-  static const double _rowHeight = 152;
   static const double _nodeSize = 112;
+  static const double _mascotSize = 104;
 
   final int currentLevel;
   final int? openingLevel;
@@ -744,23 +765,27 @@ class _GradeRoadmapPath extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final horizontalTravel = math.max(0.0, width - _nodeSize - 18);
+        final height = GradeRoadmapLayout.heightForWidth(width);
         return SizedBox(
-          height: 11 * _rowHeight + 22,
+          height: height,
           child: Stack(
-            clipBehavior: Clip.none,
+            clipBehavior: Clip.hardEdge,
             children: [
-              for (var index = 0; index < 11; index++)
+              Positioned.fill(
+                child: Image.asset(
+                  GradeRoadmapLayout.backgroundAsset,
+                  key: const ValueKey('grade-roadmap-background'),
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                  excludeFromSemantics: true,
+                ),
+              ),
+              for (var level = 10; level >= 0; level--)
                 _buildLevel(
                   context,
-                  level: 10 - index,
-                  index: index,
-                  x:
-                      9 +
-                      horizontalTravel *
-                          ((math.sin(index * math.pi / 3 - math.pi / 2) + 1) /
-                              2),
-                  isOnLeft: math.sin(index * math.pi / 3 - math.pi / 2) <= 0,
+                  level: level,
+                  center: GradeRoadmapLayout.centerForLevel(level, width),
+                  width: width,
                 ),
             ],
           ),
@@ -772,17 +797,23 @@ class _GradeRoadmapPath extends StatelessWidget {
   Widget _buildLevel(
     BuildContext context, {
     required int level,
-    required int index,
-    required double x,
-    required bool isOnLeft,
+    required Offset center,
+    required double width,
   }) {
     final completed = isCompleted(level);
     final active = hasActiveExam(level);
     final current = level == currentLevel;
     final unlocked = isUnlocked(level) || current || active;
+    final isOnLeft = center.dx <= width / 2;
+    final nodeLeft = center.dx - _nodeSize / 2;
+    final mascotLeft =
+        (isOnLeft ? center.dx + _nodeSize / 2 - 3 : nodeLeft - _mascotSize)
+            .clamp(8.0, math.max(8.0, width - _mascotSize - 8));
+    final raysLeft = (isOnLeft ? nodeLeft - 25 : nodeLeft + _nodeSize - 1)
+        .clamp(6.0, math.max(6.0, width - 32));
     return Positioned(
-      left: x,
-      top: index * _rowHeight + 8,
+      left: nodeLeft,
+      top: center.dy - _nodeSize / 2,
       child: SizedBox(
         width: _nodeSize,
         height: _nodeSize + 28,
@@ -800,7 +831,7 @@ class _GradeRoadmapPath extends StatelessWidget {
             ),
             if (current || completed)
               Positioned(
-                left: isOnLeft ? -25 : _nodeSize - 1,
+                left: raysLeft - nodeLeft,
                 top: -4,
                 child: _RoadmapNodeRays(
                   mirrored: isOnLeft,
@@ -815,7 +846,7 @@ class _GradeRoadmapPath extends StatelessWidget {
               ),
             if (current)
               Positioned(
-                left: isOnLeft ? _nodeSize - 3 : -118,
+                left: mascotLeft - nodeLeft,
                 top: 7,
                 child: IgnorePointer(
                   child: TweenAnimationBuilder<double>(
@@ -827,7 +858,11 @@ class _GradeRoadmapPath extends StatelessWidget {
                       alignment: Alignment.bottomCenter,
                       child: child,
                     ),
-                    child: Image.asset(mascotAsset, width: 118, height: 118),
+                    child: Image.asset(
+                      mascotAsset,
+                      width: _mascotSize,
+                      height: _mascotSize,
+                    ),
                   ),
                 ),
               ),
