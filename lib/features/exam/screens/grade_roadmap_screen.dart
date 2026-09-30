@@ -64,7 +64,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   GradeLevels? _gradeLevels;
   late int _selectedGrade;
   int _levelRequestId = 0;
-  final Set<int> _dismissedResumeGrades = <int>{};
   final Map<int, int> _locallyUnlockedLevels = <int, int>{};
   final Set<int> _gradesWithKnownUnlockBaseline = <int>{};
   final Set<(int, int)> _passedLevels = <(int, int)>{};
@@ -226,7 +225,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       unlocked,
     );
     if (completion.outcome.passed) _passedLevels.add((grade, level));
-    _dismissedResumeGrades.add(grade);
   }
 
   bool _isActiveExam(GeneratedExam exam) {
@@ -284,26 +282,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   int get _currentLevel {
     // Keep the single-step outcome while the server catches up after submission.
     final local = _locallyUnlockedLevels[_selectedGrade];
-    final remote = _gradeLevels?.maxLevel ?? 1;
+    // The API reports 0-9; roadmap progress is the next level, 1-10.
+    final remote = ((_gradeLevels?.maxLevel ?? 0) + 1).clamp(1, _maxLevel);
     return (_gradesWithKnownUnlockBaseline.contains(_selectedGrade)
             ? local ?? remote
             : math.max(remote, local ?? 0))
         .clamp(0, _maxLevel);
-  }
-
-  int? get _resumeLevel {
-    final levels = _gradeLevels;
-    if (levels == null) return null;
-    final latest = levels.latestLevel;
-    if (latest < 0 || latest >= levels.maxLevel || latest > _currentLevel) {
-      return null;
-    }
-    if (latest == 0 &&
-        _activeExamFor(_selectedGrade, 0) == null &&
-        _completedExamFor(_selectedGrade, 0) == null) {
-      return null;
-    }
-    return latest;
   }
 
   bool _isLevelUnlocked(int level) {
@@ -463,7 +447,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final resumeLevel = _resumeLevel;
     return Scaffold(
       backgroundColor: const Color(0xFFD8EFB6),
       body: Stack(
@@ -493,13 +476,9 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                       child: SingleChildScrollView(
                         controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
+                          parent: ClampingScrollPhysics(),
                         ),
-                        padding: EdgeInsets.only(
-                          bottom:
-                              widget.bottomPadding +
-                              MediaQuery.paddingOf(context).bottom,
-                        ),
+                        padding: EdgeInsets.only(bottom: widget.bottomPadding),
                         child: _GradeRoadmapPath(
                           currentLevel: _currentLevel,
                           openingLevel: _openingLevel,
@@ -531,19 +510,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                       ? () => Navigator.pop(context)
                       : null,
                 ),
-                if (!_isLoading &&
-                    resumeLevel != null &&
-                    !_dismissedResumeGrades.contains(_selectedGrade))
-                  _RoadmapResumePrompt(
-                    level: resumeLevel,
-                    onResume: () => _openAssessment(
-                      level: resumeLevel,
-                      activeExam: _activeExamFor(_selectedGrade, resumeLevel),
-                    ),
-                    onDismiss: () => setState(
-                      () => _dismissedResumeGrades.add(_selectedGrade),
-                    ),
-                  ),
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -649,62 +615,6 @@ class _GradeRoadmapHeader extends StatelessWidget {
               ),
               icon: const Icon(Icons.close_rounded, size: 20),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RoadmapResumePrompt extends StatelessWidget {
-  const _RoadmapResumePrompt({
-    required this.level,
-    required this.onResume,
-    required this.onDismiss,
-  });
-
-  final int level;
-  final VoidCallback onResume;
-  final VoidCallback onDismiss;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: const ValueKey('grade-roadmap-resume-prompt'),
-      padding: const EdgeInsets.fromLTRB(18, 4, 10, 4),
-      decoration: const BoxDecoration(
-        color: Color(0xFFEAF7F5),
-        border: Border.symmetric(
-          horizontal: BorderSide(color: Color(0xFFD5EAE6)),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.history_rounded, color: Color(0xFF287F7D), size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              context.formatText(AppKeys.gradeRoadmapResumePrompt, {
-                'level': level,
-              }),
-              style: const TextStyle(
-                color: Color(0xFF285653),
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          TextButton(
-            key: const ValueKey('grade-roadmap-resume-action'),
-            onPressed: onResume,
-            child: Text(context.getText(AppKeys.gradeRoadmapResumeAction)),
-          ),
-          IconButton(
-            key: const ValueKey('grade-roadmap-resume-dismiss'),
-            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-            onPressed: onDismiss,
-            icon: const Icon(Icons.close_rounded, size: 18),
-            visualDensity: VisualDensity.compact,
-          ),
         ],
       ),
     );
