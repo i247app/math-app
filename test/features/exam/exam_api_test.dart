@@ -207,7 +207,8 @@ void main() {
     );
 
     final body = _body(captured);
-    expect(captured.path, '/exams/update-user-exam-status');
+    expect(captured.path, '/exams/sessions/mark');
+    expect(captured.method, 'POST');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('esess_id', 99));
     expect(body, containsPair('status', 'COMPLETE'));
@@ -227,7 +228,8 @@ void main() {
       status: 'COMPLETE',
     );
 
-    expect(captured.path, '/exams/update-user-exam-status');
+    expect(captured.path, '/exams/sessions/mark');
+    expect(captured.method, 'POST');
     expect(captured.extra['useGuestToken'], isTrue);
   });
 

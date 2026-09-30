@@ -111,7 +111,7 @@ class ExamApi implements ExamService {
     }
     await _runExamRequest(() async {
       final json = await _networkClient
-          .postJson('/exams/update-user-exam-status', <String, dynamic>{
+          .postJson('/exams/sessions/mark', <String, dynamic>{
             'profile_id': _requireProfileId(profileId),
             'esess_id': userExamId,
             'status': status,
