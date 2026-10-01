@@ -3,14 +3,65 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_list_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
+import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 void main() {
+  testWidgets('learning list colors assessment orange and grade teal', (
+    tester,
+  ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await tester.pumpWidget(
+      LingoScope(
+        lingo: lingo,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: NewHomeAssessmentList(
+              assessments: const [
+                GeneratedExam(
+                  userExamId: 1,
+                  examType: examTypeAssessment,
+                  grade: 1,
+                  questions: [],
+                ),
+                GeneratedExam(
+                  userExamId: 2,
+                  examType: examTypeGrade,
+                  grade: 1,
+                  level: 2,
+                  questions: [],
+                ),
+              ],
+              activeAssessment: null,
+              isLoading: false,
+              isOpeningActiveAssessment: false,
+              errorMessage: null,
+              onOpenExam: (_) {},
+              onResumeExam: () {},
+              onRetry: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    final rings = tester
+        .widgetList<ScoreProgressRing>(find.byType(ScoreProgressRing))
+        .toList();
+    expect(rings, hasLength(2));
+    expect(rings.first.color, AppColors.orange600);
+    expect(rings.last.color, AppColors.brandTeal);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('learning list shows skeleton until stats finish loading', (
     tester,
   ) async {

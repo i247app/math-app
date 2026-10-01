@@ -53,7 +53,10 @@ class AssessmentResultListItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ParentAssessmentScoreBadge(grade: exam.grade),
+              ParentAssessmentScoreBadge(
+                grade: exam.grade,
+                examType: exam.examType,
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12),

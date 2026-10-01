@@ -29,7 +29,7 @@ const homeCommonStrings = <String, Map<String, String>>{
     AppKeys.homeHeroAssessment: 'Đánh Giá',
     AppKeys.newHomeAssessmentTest: 'Đánh Giá\nTrình Độ',
     AppKeys.newHomeLearningPractice: 'Học Và\nLuyện Tập',
-    AppKeys.newHomeChartLevel: 'Cấp độ',
+    AppKeys.newHomeChartLevel: 'Cấp Độ',
     AppKeys.newHomeChartActivity: 'Trend',
     AppKeys.assessmentAction: 'Đánh Giá',
     AppKeys.viewAll: 'Xem tất cả',

@@ -76,17 +76,50 @@ void main() {
       ),
     );
 
-    expect(find.text('Toán Đánh Giá - Mẫu Giáo'), findsOneWidget);
-    expect(find.text('Toán Đánh Giá - Lớp 1'), findsOneWidget);
+    expect(find.text('Đánh Giá - Mẫu Giáo'), findsOneWidget);
+    expect(find.text('Đánh Giá - Lớp 1'), findsOneWidget);
     expect(find.text('Server kindergarten title'), findsNothing);
     expect(find.text('Server grade title'), findsNothing);
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
 
-    expect(find.text('Math Assessment - Kindergarten'), findsOneWidget);
-    expect(find.text('Math Assessment - Grade 1'), findsOneWidget);
+    expect(find.text('Assessment - Kindergarten'), findsOneWidget);
+    expect(find.text('Assessment - Grade 1'), findsOneWidget);
   });
+
+  for (final entry in [
+    (type: examTypeAssessment, color: AppColors.orange600),
+    (type: examTypeGrade, color: AppColors.brandTeal),
+    (type: ' assessment ', color: AppColors.orange600),
+    (type: ' grade ', color: AppColors.brandTeal),
+  ]) {
+    testWidgets('badge ring and number use exam type color (${entry.type})', (
+      tester,
+    ) async {
+      for (final grade in <int?>[0, 1, 2, 3, 4, 5, null]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ParentAssessmentScoreBadge(
+              grade: grade,
+              examType: entry.type,
+            ),
+          ),
+        );
+        final ring = tester.widget<ScoreProgressRing>(
+          find.byType(ScoreProgressRing),
+        );
+        expect(ring.progress, 1);
+        expect(ring.color, entry.color);
+        expect(ring.trackColor, entry.color);
+        final text = tester.widget<Text>(
+          find.byKey(const ValueKey('parent-assessment-grade-badge')),
+        );
+        expect(text.data, grade?.toString() ?? '--');
+        expect(text.style?.color, entry.color);
+      }
+    });
+  }
 
   testWidgets('GRADE item title uses its grade and level', (tester) async {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
@@ -115,13 +148,13 @@ void main() {
       ),
     );
 
-    expect(find.text('Bài kiểm tra Level 3.7'), findsOneWidget);
+    expect(find.text('Bài Học - Lớp 3 Level 7'), findsOneWidget);
     expect(find.text('Server title'), findsNothing);
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
 
-    expect(find.text('Level test 3.7'), findsOneWidget);
+    expect(find.text('Learning - Grade 3 Level 7'), findsOneWidget);
   });
 
   test(

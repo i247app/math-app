@@ -244,7 +244,7 @@ void main() {
         find.byType(AssessmentProgressionChart),
       );
       expect(chart.chartHeight, 150);
-      expect(find.text('Cấp độ'), findsOneWidget);
+      expect(find.text('Cấp Độ'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
       expect(find.text('CẤP ĐỘ'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
@@ -482,7 +482,7 @@ void main() {
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(PageHeader), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
-      expect(find.text('Cấp độ'), findsOneWidget);
+      expect(find.text('Cấp Độ'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
       expect(find.text('CẤP ĐỘ'), findsOneWidget);
       expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);

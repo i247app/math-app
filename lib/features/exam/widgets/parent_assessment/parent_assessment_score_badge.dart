@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_display_helpers.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 class ParentAssessmentScoreBadge extends StatelessWidget {
-  const ParentAssessmentScoreBadge({super.key, required this.grade});
+  const ParentAssessmentScoreBadge({
+    super.key,
+    required this.grade,
+    this.examType,
+  });
 
   final int? grade;
+  final String? examType;
 
   @override
   Widget build(BuildContext context) {
-    final color = parentAssessmentGradeColor(grade);
+    final color = switch (examType?.trim().toUpperCase()) {
+      examTypeAssessment => AppColors.orange600,
+      examTypeGrade => AppColors.brandTeal,
+      _ => parentAssessmentGradeColor(grade),
+    };
     return SizedBox(
       width: 56,
       child: ScoreProgressRing(

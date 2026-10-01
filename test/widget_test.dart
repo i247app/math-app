@@ -454,13 +454,13 @@ void main() {
       expect(tester.widget<Text>(currentGrade).data, '3');
       expect(tester.widget<Text>(currentGrade).style?.fontSize, 72);
       expect(find.text('Trình độ'), findsNothing);
-      expect(find.text('Cấp độ'), findsOneWidget);
+      expect(find.text('Cấp Độ'), findsOneWidget);
       expect(
-        tester.getBottomLeft(find.text('Cấp độ')).dy,
+        tester.getBottomLeft(find.text('Cấp Độ')).dy,
         lessThan(tester.getTopLeft(currentGrade).dy),
       );
       expect(
-        tester.getCenter(find.text('Cấp độ')).dx,
+        tester.getCenter(find.text('Cấp Độ')).dx,
         closeTo(tester.getCenter(currentGrade).dx, 1),
       );
       expect(
