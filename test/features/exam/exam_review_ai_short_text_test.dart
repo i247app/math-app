@@ -8,7 +8,7 @@ import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_grade_level_badge.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_practice_banner.dart';
 
 void main() {
@@ -20,7 +20,7 @@ void main() {
         (width: 280.0, scale: 2.0),
       ]) {
         testWidgets(
-          'AI title and description share a box below badge ($language, $dark, $viewport)',
+          'Grade, AI title and description share plain styling in one box ($language, $dark, $viewport)',
           (tester) async {
             await tester.binding.setSurfaceSize(Size(viewport.width, 844));
             addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -31,7 +31,12 @@ void main() {
               lingo.dispose();
             });
             await lingo.setLanguage(language);
-            Future<void> pump(String? shortText, {String? aiTitle}) async {
+            Future<void> pump(
+              String? shortText, {
+              String? aiTitle,
+              int? grade = 3,
+              int? level = 4,
+            }) async {
               await tester.pumpWidget(
                 LingoScope(
                   lingo: lingo,
@@ -43,10 +48,10 @@ void main() {
                       ),
                       child: Scaffold(
                         body: ExamReviewContent(
-                          exam: const GeneratedExam(
-                            grade: 3,
-                            level: 4,
-                            questions: [],
+                          exam: GeneratedExam(
+                            grade: grade,
+                            level: level,
+                            questions: const [],
                           ),
                           selectedIndex: 0,
                           mode: ExamReviewMode.result,
@@ -84,8 +89,21 @@ void main() {
             final box = find.byKey(
               const ValueKey('exam-review-ai-description-box'),
             );
+            final gradeText = find.byKey(
+              const ValueKey('exam-review-grade-level-text'),
+            );
             await pump(null);
-            expect(box, findsNothing);
+            expect(box, findsOneWidget);
+            expect(
+              find.descendant(of: box, matching: gradeText),
+              findsOneWidget,
+            );
+            expect(
+              tester.widget<Text>(gradeText).data,
+              language == AppLanguage.vi
+                  ? 'Lớp 3 - Level 4'
+                  : 'Grade 3 - Level 4',
+            );
             final emptyBannerTop = tester.getTopLeft(banner).dy;
             const text =
                 'Practice addition, subtraction, number comparisons and repeating patterns with familiar objects.';
@@ -96,17 +114,13 @@ void main() {
               findsOneWidget,
             );
             expect(tester.widget<Text>(description).data, text);
-            final badgeText = find.descendant(
-              of: find.byType(ExamReviewGradeLevelBadge),
-              matching: find.byType(Text),
-            );
             expect(
-              tester.widget<Text>(description).style?.fontSize,
-              tester.widget<Text>(badgeText).style?.fontSize,
+              tester.widget<Text>(description).style,
+              tester.widget<Text>(gradeText).style,
             );
             expect(
               tester.getTopLeft(description).dy,
-              greaterThanOrEqualTo(tester.getBottomLeft(badgeText).dy),
+              greaterThan(tester.getBottomLeft(gradeText).dy),
             );
             expect(
               tester.getBottomLeft(description).dy,
@@ -127,6 +141,10 @@ void main() {
             expect(tester.widget<Text>(description).data, text);
             expect(find.descendant(of: box, matching: title), findsOneWidget);
             expect(
+              find.descendant(of: box, matching: gradeText),
+              findsOneWidget,
+            );
+            expect(
               find.descendant(of: box, matching: description),
               findsOneWidget,
             );
@@ -135,8 +153,25 @@ void main() {
               lessThan(tester.getTopLeft(description).dy),
             );
             expect(
-              tester.getTopLeft(box).dy,
-              greaterThanOrEqualTo(tester.getBottomLeft(badgeText).dy),
+              tester.getBottomLeft(gradeText).dy,
+              lessThan(tester.getTopLeft(title).dy),
+            );
+            for (final textFinder in [gradeText, title, description]) {
+              final style = tester.widget<Text>(textFinder).style!;
+              expect(style, tester.widget<Text>(gradeText).style);
+              expect(style.fontWeight, FontWeight.w400);
+              expect(
+                style.color,
+                dark ? AppThemeColors.dark.textPrimary : Colors.black,
+              );
+            }
+            expect(
+              find.descendant(of: box, matching: find.byType(Icon)),
+              findsNothing,
+            );
+            expect(
+              find.byKey(const ValueKey('exam-review-grade-level-badge')),
+              findsNothing,
             );
             expect(
               tester.getBottomLeft(box).dy,
@@ -150,12 +185,28 @@ void main() {
             expect(tester.takeException(), isNull);
             for (final empty in [null, '', ' \n ']) {
               await pump(empty, aiTitle: empty);
-              expect(box, findsNothing);
+              expect(box, findsOneWidget);
               expect(title, findsNothing);
               expect(description, findsNothing);
               expect(tester.getTopLeft(banner).dy, emptyBannerTop);
               expect(tester.takeException(), isNull);
             }
+            await pump(null, grade: 0, level: 0);
+            expect(
+              tester.widget<Text>(gradeText).data,
+              language == AppLanguage.vi
+                  ? 'Mẫu giáo - Level 0'
+                  : 'Kindergarten - Level 0',
+            );
+            await pump(null, grade: null, level: null);
+            expect(box, findsNothing);
+            expect(gradeText, findsNothing);
+            await pump(text, aiTitle: titleText, grade: null, level: null);
+            expect(box, findsOneWidget);
+            expect(gradeText, findsNothing);
+            expect(title, findsOneWidget);
+            expect(description, findsOneWidget);
+            expect(tester.takeException(), isNull);
           },
         );
       }

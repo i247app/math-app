@@ -236,7 +236,7 @@ void main() {
 
     expect(service.requestedUserExamId, 912345);
     expect(
-      find.byKey(const ValueKey('exam-review-grade-level-badge')),
+      find.byKey(const ValueKey('exam-review-grade-level-text')),
       findsOneWidget,
     );
     expect(find.byType(ExamReviewWeakTopicsCard), findsOneWidget);
@@ -307,7 +307,7 @@ void main() {
       expect(
         tester
             .getBottomLeft(
-              find.byKey(const ValueKey('exam-review-grade-level-badge')),
+              find.byKey(const ValueKey('exam-review-grade-level-text')),
             )
             .dy,
         lessThan(

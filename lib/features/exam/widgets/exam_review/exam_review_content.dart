@@ -7,7 +7,6 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_grade_level_badge.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_practice_banner.dart';
@@ -77,10 +76,24 @@ class ExamReviewContent extends StatelessWidget {
     final title = aiTitle?.trim() ?? '';
     final shortText = aiShortText?.trim() ?? '';
     final colors = context.themeColors;
+    String? gradeLevelText;
+    if (exam.grade != null && exam.level != null) {
+      final gradeLabel = exam.grade == 0
+          ? context.getText(AppKeys.gradeRoadmapKindergarten)
+          : context.formatText(AppKeys.gradeRoadmapGrade, {
+              'grade': exam.grade,
+            });
+      gradeLevelText = context.formatText(AppKeys.examReviewGradeLevelBadge, {
+        'grade': gradeLabel,
+        'level': exam.level,
+      });
+    }
     final aiTextStyle = GoogleFonts.andika(
-      color: colors.textPrimary,
-      fontSize: ExamReviewGradeLevelBadge.textFontSize,
-      fontWeight: FontWeight.w700,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? colors.textPrimary
+          : Colors.black,
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
     );
 
     return SingleChildScrollView(
@@ -100,15 +113,9 @@ class ExamReviewContent extends StatelessWidget {
             ),
           ],
           if (onPractice != null) ...[
-            if (exam.grade != null && exam.level != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: ExamReviewGradeLevelBadge(
-                  grade: exam.grade!,
-                  level: exam.level!,
-                ),
-              ),
-            if (title.isNotEmpty || shortText.isNotEmpty)
+            if (gradeLevelText != null ||
+                title.isNotEmpty ||
+                shortText.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Container(
@@ -122,6 +129,15 @@ class ExamReviewContent extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (gradeLevelText != null)
+                        Text(
+                          gradeLevelText,
+                          key: const ValueKey('exam-review-grade-level-text'),
+                          style: aiTextStyle,
+                        ),
+                      if (gradeLevelText != null &&
+                          (title.isNotEmpty || shortText.isNotEmpty))
+                        const SizedBox(height: 8),
                       if (title.isNotEmpty)
                         Text(
                           title,
