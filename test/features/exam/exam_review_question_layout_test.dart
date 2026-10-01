@@ -322,8 +322,9 @@ void main() {
       expect(find.text('3/3 câu trả lời sai'), findsNothing);
       expect(
         find.text('Phép đếm, Trừ không nhớ, Trừ trong phạm vi 5'),
-        findsOneWidget,
+        findsNothing,
       );
+      expect(find.text('Bạn đang làm rất tốt!'), findsOneWidget);
       expect(
         find.descendant(
           of: find.byType(ExamReviewWeakTopicsCard),
@@ -348,6 +349,7 @@ void main() {
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();
       expect(find.text('Test - 912347'), findsOneWidget);
+      expect(find.text('You are doing good!'), findsOneWidget);
       expect(find.text('Test - 123'), findsNothing);
       expect(find.text('Grade 2 - Level 4'), findsOneWidget);
       expect(find.text('AI LEARING'), findsOneWidget);

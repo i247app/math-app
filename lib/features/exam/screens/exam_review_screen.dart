@@ -14,6 +14,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_computed_correct_count.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_loading_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
@@ -97,9 +98,24 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
     }
   }
 
+  String? _reviewShortText(GeneratedExam exam) {
+    final total =
+        _sessionReview?.totalQuestions ??
+        exam.grading?.totalQuestions ??
+        exam.questions.length;
+    final correct =
+        _sessionReview?.correctNumber ??
+        exam.grading?.correctNumber ??
+        examReviewComputedCorrectCount(exam);
+    if (total > 0 && correct == total) {
+      return context.getText(AppKeys.examReviewPerfectScoreMessage);
+    }
+    return _sessionReview?.aiReviewShort;
+  }
+
   void _openReview(GeneratedExam exam) {
     final longText = _sessionReview?.aiReviewLong?.trim() ?? '';
-    final shortText = _sessionReview?.aiReviewShort?.trim() ?? '';
+    final shortText = _reviewShortText(exam)?.trim() ?? '';
     final topics = exam.practiceWeakTopics
         .map((topic) => topic.topic.trim())
         .where((topic) => topic.isNotEmpty)
@@ -232,7 +248,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                               ? null
                               : () => _startPractice(exam),
                           isGeneratingPractice: _isGeneratingPractice,
-                          aiReviewShort: _sessionReview?.aiReviewShort,
+                          aiReviewShort: _reviewShortText(exam),
                           aiShortText: _sessionReview?.aiShortText,
                           onOpenReview: () => _openReview(exam),
                         );

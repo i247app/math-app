@@ -890,6 +890,8 @@ class AppKeys {
       'exam_review_practice_banner_subtitle';
   static const examReviewGradeLevelBadge = 'exam_review_grade_level_badge';
   static const examReviewWeakTopicsTitle = 'exam_review_weak_topics_title';
+  static const examReviewPerfectScoreMessage =
+      'exam_review_perfect_score_message';
   static const examReviewPracticeBannerAction =
       'exam_review_practice_banner_action';
   static const scoreUpper = 'score_upper';

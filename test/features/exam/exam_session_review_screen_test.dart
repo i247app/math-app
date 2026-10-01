@@ -242,6 +242,123 @@ void main() {
     }
   }
 
+  for (final examType in [
+    examTypeAssessment,
+    examTypeGrade,
+    examTypePractice,
+  ]) {
+    for (final aiText in [null, 'AI feedback to replace.']) {
+      testWidgets('perfect score shows encouragement ($examType, $aiText)', (
+        tester,
+      ) async {
+        final pending = Completer<ExamStats?>();
+        final service = _ReviewService(
+          detail: _detail(sessionId: 80001, profileId: 42, withTopics: true),
+          pending: pending,
+        );
+        final lingo = LingoProvider();
+        final originalLanguage = AppLanguageState.current;
+        addTearDown(() {
+          AppLanguageState.current = originalLanguage;
+          lingo.dispose();
+        });
+        await lingo.setLanguage(AppLanguage.en);
+        await tester.pumpWidget(
+          _app(
+            service,
+            lingo,
+            ExamReviewScreen(
+              userExamId: 80001,
+              examType: examType,
+              initialExam: service.detail,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        pending.complete(_review(aiText, correctNumber: 10));
+        await tester.pumpAndSettle();
+        expect(find.text('You are doing good!'), findsOneWidget);
+        expect(find.text('AI feedback to replace.'), findsNothing);
+        expect(find.text('Subtraction, Counting'), findsNothing);
+        await tester.tap(find.byKey(const ValueKey('exam-review-open-text')));
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Long review should not be shown here.'),
+          findsOneWidget,
+        );
+        await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+        await tester.pumpAndSettle();
+        await lingo.setLanguage(AppLanguage.vi);
+        await tester.pumpAndSettle();
+        expect(find.text('Bạn đang làm rất tốt!'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets('perfect detail shows the box without AI text or weak topics', (
+    tester,
+  ) async {
+    final service = _ReviewService(
+      detail: _detail(
+        sessionId: 80002,
+        profileId: 42,
+        grading: const ExamGrading(correctNumber: 10, totalQuestions: 10),
+      ),
+    );
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpWidget(
+      _app(
+        service,
+        lingo,
+        ExamReviewScreen(userExamId: 80002, initialExam: service.detail),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('You are doing good!'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('exam-review-open-text')));
+    await tester.pumpAndSettle();
+    expect(find.text('You are doing good!'), findsOneWidget);
+    expect(find.byType(ExamReviewTextScreen), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final counts in [(correct: 0, total: 0), (correct: 9, total: 10)]) {
+    testWidgets('non-perfect counts keep the AI review ($counts)', (
+      tester,
+    ) async {
+      final pending = Completer<ExamStats?>();
+      final service = _ReviewService(
+        detail: _detail(sessionId: 80003, profileId: 42),
+        pending: pending,
+      );
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpWidget(
+        _app(
+          service,
+          lingo,
+          ExamReviewScreen(userExamId: 80003, initialExam: service.detail),
+        ),
+      );
+      await tester.pumpAndSettle();
+      pending.complete(
+        _review(
+          'Keep practicing.',
+          correctNumber: counts.correct,
+          totalQuestions: counts.total,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Keep practicing.'), findsOneWidget);
+      expect(find.text('You are doing good!'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final missingSession in [false, true]) {
     testWidgets(
       'skips review request when IDs are missing (session=$missingSession)',
@@ -280,9 +397,11 @@ GeneratedExam _detail({
   int? sessionId,
   int? profileId,
   bool withTopics = false,
+  ExamGrading? grading,
 }) => GeneratedExam(
   userExamId: sessionId,
   profileId: profileId,
+  grading: grading,
   practiceWeakTopics: withTopics
       ? const [
           ExamPracticeTopic(topic: 'Subtraction', answered: 1, wrong: 1),
@@ -302,11 +421,15 @@ GeneratedExam _detail({
 ExamStats _review(
   String? shortText, {
   String? longText = 'Long review should not be shown here.',
+  int correctNumber = 5,
+  int totalQuestions = 10,
 }) => ExamStats(
-  correctNumber: 5,
-  scorePercentage: 50,
+  correctNumber: correctNumber,
+  scorePercentage: totalQuestions > 0
+      ? correctNumber * 100 / totalQuestions
+      : 0,
   skippedNumber: 0,
-  totalQuestions: 10,
+  totalQuestions: totalQuestions,
   aiReviewShort: shortText,
   aiShortText: 'Short AI learning description.',
   aiReviewLong: longText,
