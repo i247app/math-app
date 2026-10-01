@@ -5,6 +5,7 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_weak_topics_card.dart';
 
@@ -24,19 +25,21 @@ void main() {
           lingo.dispose();
         });
         await lingo.setLanguage(language);
+        var taps = 0;
         await tester.pumpWidget(
           LingoScope(
             lingo: lingo,
             child: MaterialApp(
               theme: dark ? AppTheme.dark() : AppTheme.light(),
-              home: const MediaQuery(
-                data: MediaQueryData(textScaler: TextScaler.linear(2)),
+              home: MediaQuery(
+                data: const MediaQueryData(textScaler: TextScaler.linear(2)),
                 child: Scaffold(
                   body: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(13),
+                      padding: const EdgeInsets.all(13),
                       child: ExamReviewWeakTopicsCard(
-                        topics: [
+                        onOpenReview: () => taps++,
+                        topics: const [
                           ExamPracticeTopic(
                             topic: ' Phép cộng và phép trừ trong phạm vi 100 ',
                             answered: 3,
@@ -73,7 +76,67 @@ void main() {
           findsNothing,
         );
         expect(
-          find.text(language == AppLanguage.vi ? 'Điểm yếu' : 'Weaknesses'),
+          find.text(language == AppLanguage.vi ? 'Nhận Xét' : 'Review'),
+          findsOneWidget,
+        );
+        expect(find.byIcon(Icons.auto_stories_outlined), findsNothing);
+        final button = find.byKey(const ValueKey('exam-review-open-text'));
+        expect(tester.getSize(button), const Size(48, 48));
+        final icon = tester.widget<Icon>(
+          find.byIcon(Icons.chevron_right_rounded),
+        );
+        final cardContext = tester.element(
+          find.byType(ExamReviewWeakTopicsCard),
+        );
+        expect(icon.color, cardContext.themeColors.textMuted);
+        expect(icon.size, 32);
+        expect(
+          tester.getCenter(button).dx,
+          greaterThan(
+            tester
+                .getCenter(
+                  find.text('Phép cộng và phép trừ trong phạm vi 100, Toán đố'),
+                )
+                .dx,
+          ),
+        );
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        expect(taps, 1);
+        expect(tester.takeException(), isNull);
+
+        const aiText =
+            'Bé làm tốt đếm, ghép số, phân loại và sắp xếp. '
+            'Ba mẹ nên luyện thêm cộng trừ, so sánh số và quy luật lặp lại '
+            'bằng đồ vật quen thuộc.';
+        await tester.pumpWidget(
+          LingoScope(
+            lingo: lingo,
+            child: MaterialApp(
+              theme: dark ? AppTheme.dark() : AppTheme.light(),
+              home: MediaQuery(
+                data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+                child: Scaffold(
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(13),
+                      child: ExamReviewWeakTopicsCard(
+                        topics: [],
+                        aiReviewShort: aiText,
+                        onOpenReview: () => taps++,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.text(aiText), findsOneWidget);
+        expect(find.byIcon(Icons.auto_stories_outlined), findsNothing);
+        expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
+        expect(
+          find.text(language == AppLanguage.vi ? 'Nhận Xét' : 'Review'),
           findsOneWidget,
         );
         expect(tester.takeException(), isNull);

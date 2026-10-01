@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,11 +11,13 @@ import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_loading_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
+import 'package:numi/features/exam/screens/exam_review_text_screen.dart';
 
 typedef ExamReviewPracticeStarter = Future<void> Function(GeneratedExam exam);
 
@@ -30,6 +34,7 @@ class ReviewDetailScreen extends StatefulWidget {
     this.showTime = true,
     this.cacheKey,
     this.onPractice,
+    this.onLoadSessionReview,
   });
 
   final int detailId;
@@ -40,6 +45,7 @@ class ReviewDetailScreen extends StatefulWidget {
   final bool showTime;
   final Object? cacheKey;
   final ExamReviewPracticeStarter? onPractice;
+  final Future<ExamStats?> Function(GeneratedExam? exam)? onLoadSessionReview;
 
   @override
   State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
@@ -48,6 +54,7 @@ class ReviewDetailScreen extends StatefulWidget {
 class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   late final ExamReviewController _controller;
   bool _isGeneratingPractice = false;
+  ExamStats? _sessionReview;
 
   @override
   void initState() {
@@ -61,7 +68,21 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
           : ExamReviewMode.result,
       cacheKey: widget.cacheKey,
     );
-    _controller.loadExamDetail();
+    unawaited(_loadInitialDetail());
+  }
+
+  Future<void> _loadInitialDetail() async {
+    await _controller.loadExamDetail();
+    if (!mounted) return;
+    final loadReview = widget.onLoadSessionReview;
+    if (loadReview == null) return;
+    try {
+      final review = await loadReview(_controller.exam);
+      if (!mounted) return;
+      setState(() => _sessionReview = review);
+    } catch (error) {
+      AppLogger.warning('EXAM_REVIEW', 'Session review request failed: $error');
+    }
   }
 
   @override
@@ -74,6 +95,25 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
     if (_controller.selectQuestion(index)) {
       HapticFeedback.selectionClick();
     }
+  }
+
+  void _openReview(GeneratedExam exam) {
+    final longText = _sessionReview?.aiReviewLong?.trim() ?? '';
+    final shortText = _sessionReview?.aiReviewShort?.trim() ?? '';
+    final topics = exam.practiceWeakTopics
+        .map((topic) => topic.topic.trim())
+        .where((topic) => topic.isNotEmpty)
+        .join(', ');
+    final reviewText = longText.isNotEmpty
+        ? longText
+        : shortText.isNotEmpty
+        ? shortText
+        : topics;
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ExamReviewTextScreen(reviewText: reviewText),
+      ),
+    );
   }
 
   void _selectMode(ExamReviewMode mode) {
@@ -192,6 +232,9 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                               ? null
                               : () => _startPractice(exam),
                           isGeneratingPractice: _isGeneratingPractice,
+                          aiReviewShort: _sessionReview?.aiReviewShort,
+                          aiShortText: _sessionReview?.aiShortText,
+                          onOpenReview: () => _openReview(exam),
                         );
                       },
                     ),

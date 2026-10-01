@@ -47,7 +47,12 @@ void main() {
                           children: [
                             const ExamReviewGradeLevelBadge(grade: 3, level: 4),
                             const SizedBox(height: 10),
-                            ExamReviewPracticeBanner(onTap: () => taps++),
+                            ExamReviewPracticeBanner(
+                              onTap: () => taps++,
+                              aiShortText:
+                                  'Luyện thêm cộng trừ, so sánh số và quy luật '
+                                  'lặp lại bằng đồ vật quen thuộc.',
+                            ),
                           ],
                         ),
                       ),
@@ -66,7 +71,15 @@ void main() {
             ),
             findsOneWidget,
           );
-          expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+          expect(find.text('AI LEARING'), findsOneWidget);
+          expect(
+            find.text(
+              'Luyện thêm cộng trừ, so sánh số và quy luật '
+              'lặp lại bằng đồ vật quen thuộc.',
+            ),
+            findsOneWidget,
+          );
+          expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
           expect(
             (tester.widget<Image>(find.byType(Image)).image as ResizeImage)
                 .imageProvider,
@@ -113,6 +126,34 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  for (final shortText in [null, '', ' \n ']) {
+    testWidgets('empty AI description has no default subtitle ($shortText)', (
+      tester,
+    ) async {
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: ExamReviewPracticeBanner(
+                onTap: () {},
+                aiShortText: shortText,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('Chọn đáp án đúng.'), findsNothing);
+      expect(find.text('Choose the correct answer.'), findsNothing);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('kindergarten and level zero badge are localized', (
     tester,

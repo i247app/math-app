@@ -5,6 +5,7 @@ import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -758,6 +759,85 @@ void main() {
     expect(captured.path, '/exams/stats');
     expect(_body(captured), containsPair('profile_id', 21));
     expect(_body(captured), isNot(contains('exam_type')));
+  });
+
+  test(
+    'session review sends IDs and parses AI text from exam_session',
+    () async {
+      late RequestOptions captured;
+      const response = <String, dynamic>{
+        'mstatus': 200,
+        'status': 'Success',
+        'exam_session': <String, dynamic>{
+          'esess_id': 99,
+          'exam_type': 'GRADE',
+          'status': 'COMPLETE',
+          'total_questions': 10,
+          'correct_number': 5,
+          'skipped_number': 0,
+          'score_percentage': 50,
+          'review': 'Answered 5/10 correctly.',
+          'esess_flag': true,
+          'ai_short_text': 'Learn counting and subtraction.',
+          'ai_review_short': 'Practice counting and subtraction.',
+          'ai_review_long': 'First paragraph.\n\nSecond paragraph.',
+          'grade': 0,
+          'level': 1,
+          'last_submitted_dt': '2026-10-01T13:09:28.001546Z',
+          'ended_dt': '2026-10-01T13:09:28.266769Z',
+          'create_dt': '2026-10-01T13:09:07.978867Z',
+        },
+      };
+      final api = _apiReturning((options) {
+        captured = options;
+        return response;
+      });
+      final result = await api.getExamSessionReview(
+        profileId: 21,
+        userExamId: 99,
+      );
+      expect(captured.method, 'POST');
+      expect(captured.path, '/exams/sessions/review');
+      expect(_body(captured)['profile_id'], 21);
+      expect(_body(captured)['esess_id'], 99);
+      expect(_body(captured), isNot(contains('exam_type')));
+      expect(result, isNotNull);
+      expect(result!.userExamId, 99);
+      expect(result.examType, examTypeGrade);
+      expect(result.status, 'COMPLETE');
+      expect(result.grade, 0);
+      expect(result.level, 1);
+      expect(result.passed, isTrue);
+      expect(result.correctNumber, 5);
+      expect(result.scorePercentage, 50);
+      expect(result.aiReviewShort, 'Practice counting and subtraction.');
+      expect(result.aiShortText, 'Learn counting and subtraction.');
+      expect(result.aiReviewLong, 'First paragraph.\n\nSecond paragraph.');
+      expect(result.endedDt, DateTime.parse('2026-10-01T13:09:28.266769Z'));
+    },
+  );
+
+  test('session review returns null when exam_session is absent', () async {
+    final api = _apiReturning((_) => {'mstatus': 200, 'status': 'Success'});
+    expect(
+      await api.getExamSessionReview(profileId: 21, userExamId: 99),
+      isNull,
+    );
+  });
+
+  test('session review maps API failure to ExamException', () async {
+    final api = _apiReturning(
+      (_) => <String, dynamic>{
+        'mstatus': 503,
+        'mmessage': 'Review unavailable',
+      },
+    );
+    await expectLater(
+      api.getExamSessionReview(profileId: 21, userExamId: 99),
+      throwsA(
+        isA<ExamException>().having((error) => error.status, 'status', 503),
+      ),
+    );
   });
 
   test(

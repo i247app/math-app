@@ -36,6 +36,9 @@ class ExamReviewContent extends StatelessWidget {
     required this.onNext,
     this.onPractice,
     this.isGeneratingPractice = false,
+    this.aiReviewShort,
+    this.aiShortText,
+    this.onOpenReview,
   });
 
   final GeneratedExam exam;
@@ -55,6 +58,9 @@ class ExamReviewContent extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback? onPractice;
   final bool isGeneratingPractice;
+  final String? aiReviewShort;
+  final String? aiShortText;
+  final VoidCallback? onOpenReview;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +69,7 @@ class ExamReviewContent extends StatelessWidget {
         ? 0
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
+    final hasAiReview = aiReviewShort?.trim().isNotEmpty ?? false;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -94,18 +101,23 @@ class ExamReviewContent extends StatelessWidget {
               child: ExamReviewPracticeBanner(
                 isLoading: isGeneratingPractice,
                 onTap: onPractice!,
+                aiShortText: aiShortText,
               ),
             ),
-            if (exam.practiceWeakTopics.any(
-              (topic) => topic.topic.trim().isNotEmpty,
-            ))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: ExamReviewWeakTopicsCard(
-                  topics: exam.practiceWeakTopics,
-                ),
-              ),
           ],
+          if (hasAiReview ||
+              (onPractice != null &&
+                  exam.practiceWeakTopics.any(
+                    (topic) => topic.topic.trim().isNotEmpty,
+                  )))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ExamReviewWeakTopicsCard(
+                topics: exam.practiceWeakTopics,
+                aiReviewShort: aiReviewShort,
+                onOpenReview: onOpenReview,
+              ),
+            ),
           if (allowRetry) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 12),

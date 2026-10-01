@@ -67,4 +67,9 @@ abstract interface class ExamService {
     int? userExamId,
     String examType = examTypeAssessment,
   });
+
+  Future<ExamStats?> getExamSessionReview({
+    required int profileId,
+    required int userExamId,
+  });
 }

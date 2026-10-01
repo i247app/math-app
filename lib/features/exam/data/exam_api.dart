@@ -320,6 +320,33 @@ class ExamApi implements ExamService {
   }
 
   @override
+  Future<ExamStats?> getExamSessionReview({
+    required int profileId,
+    required int userExamId,
+  }) {
+    if (userExamId <= 0) {
+      throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
+    }
+    return _runExamRequest(
+      () => _postResponse<ExamStats?>(
+        '/exams/sessions/review',
+        <String, dynamic>{
+          'profile_id': _requireProfileId(profileId),
+          'esess_id': userExamId,
+        },
+        (json) {
+          final session = json['exam_session'];
+          return session == null
+              ? null
+              : ExamStatsDto.fromJson(
+                  Map<String, dynamic>.from(session as Map),
+                ).toModel();
+        },
+      ),
+    );
+  }
+
+  @override
   Future<List<ExamStats>> getGradeLadder({
     required int profileId,
     required int grade,

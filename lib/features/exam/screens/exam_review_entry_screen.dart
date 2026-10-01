@@ -57,16 +57,29 @@ class ExamReviewScreen extends StatelessWidget {
         examType: resolvedExamType,
       ),
       initialDetail: initialExam,
+      onLoadSessionReview: (detail) async {
+        final sessionId =
+            userExamId ?? detail?.userExamId ?? initialExam?.userExamId;
+        final sessionProfileId =
+            profileId ?? detail?.profileId ?? initialExam?.profileId;
+        if (sessionId == null ||
+            sessionId <= 0 ||
+            sessionProfileId == null ||
+            sessionProfileId <= 0) {
+          return null;
+        }
+        return examService.getExamSessionReview(
+          profileId: sessionProfileId,
+          userExamId: sessionId,
+        );
+      },
       cacheKey: isEntireJourney
           ? (
               type: '${resolvedExamType.toLowerCase()}-journey',
               userExamId: userExamId,
             )
           : null,
-      onPractice:
-          isEntireJourney &&
-              allowPractice &&
-              resolvedExamType != examTypeAssessment
+      onPractice: isEntireJourney && allowPractice
           ? (detail) async {
               final journeyId = detail.userExamId ?? userExamId;
               if (journeyId == null || journeyId <= 0) {

@@ -9,14 +9,17 @@ class ExamReviewPracticeBanner extends StatelessWidget {
     super.key,
     required this.onTap,
     this.isLoading = false,
+    this.aiShortText,
   });
 
   final VoidCallback onTap;
   final bool isLoading;
+  final String? aiShortText;
 
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(16);
+    final subtitle = aiShortText?.trim() ?? '';
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -75,18 +78,18 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                               height: 1.2,
                             ),
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            context.getText(
-                              AppKeys.examReviewPracticeBannerSubtitle,
+                          if (subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.andika(
+                                color: const Color(0xFF254443),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                height: 1.3,
+                              ),
                             ),
-                            style: GoogleFonts.andika(
-                              color: const Color(0xFF254443),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              height: 1.3,
-                            ),
-                          ),
+                          ],
                           const SizedBox(height: 12),
                           Container(
                             key: const ValueKey('exam-review-practice-action'),
@@ -111,47 +114,34 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: isLoading
-                                      ? const Padding(
-                                          padding: EdgeInsets.all(6),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Color(0xFFFF792B),
-                                          ),
-                                        )
-                                      : const Icon(
-                                          Icons.play_arrow_rounded,
-                                          color: Color(0xFFFF792B),
-                                          size: 24,
+                            child: SizedBox(
+                              height: 28,
+                              width: double.infinity,
+                              child: isLoading
+                                  ? const Center(
+                                      child: SizedBox.square(
+                                        dimension: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
                                         ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      context.getText(
-                                        AppKeys.examReviewPracticeBannerAction,
                                       ),
-                                      style: GoogleFonts.andika(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        height: 1.2,
+                                    )
+                                  : FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        context.getText(
+                                          AppKeys
+                                              .examReviewPracticeBannerAction,
+                                        ),
+                                        style: GoogleFonts.andika(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
+                                          height: 1.2,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ],

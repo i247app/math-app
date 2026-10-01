@@ -6,9 +6,16 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 class ExamReviewWeakTopicsCard extends StatelessWidget {
-  const ExamReviewWeakTopicsCard({super.key, required this.topics});
+  const ExamReviewWeakTopicsCard({
+    super.key,
+    required this.topics,
+    this.aiReviewShort,
+    this.onOpenReview,
+  });
 
   final List<ExamPracticeTopic> topics;
+  final String? aiReviewShort;
+  final VoidCallback? onOpenReview;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +23,9 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
         .map((topic) => topic.topic.trim())
         .where((topic) => topic.isNotEmpty)
         .join(', ');
-    if (topicText.isEmpty) return const SizedBox.shrink();
+    final aiText = aiReviewShort?.trim() ?? '';
+    final reviewText = aiText.isNotEmpty ? aiText : topicText;
+    if (reviewText.isEmpty) return const SizedBox.shrink();
     final colors = context.themeColors;
 
     return Container(
@@ -27,19 +36,13 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: colors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.auto_stories_outlined,
-                color: colors.brandStrong,
-                size: 22,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
                   context.getText(AppKeys.examReviewWeakTopicsTitle),
                   style: GoogleFonts.andika(
                     fontSize: 16,
@@ -47,14 +50,33 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
                     color: colors.textPrimary,
                   ),
                 ),
+                const SizedBox(height: 14),
+                Text(
+                  reviewText,
+                  style: GoogleFonts.andika(
+                    fontSize: 14,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (onOpenReview != null) ...[
+            const SizedBox(width: 8),
+            SizedBox.square(
+              dimension: 48,
+              child: IconButton(
+                key: const ValueKey('exam-review-open-text'),
+                onPressed: onOpenReview,
+                tooltip: context.getText(AppKeys.examReviewWeakTopicsTitle),
+                icon: Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.textMuted,
+                  size: 32,
+                ),
               ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            topicText,
-            style: GoogleFonts.andika(fontSize: 14, color: colors.textPrimary),
-          ),
+            ),
+          ],
         ],
       ),
     );

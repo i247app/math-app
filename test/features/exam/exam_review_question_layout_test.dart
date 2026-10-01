@@ -209,7 +209,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('assessment journey shows review modes without practice', (
+  testWidgets('assessment journey uses the shared AI learning review UI', (
     tester,
   ) async {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
@@ -237,9 +237,10 @@ void main() {
     expect(service.requestedUserExamId, 912345);
     expect(
       find.byKey(const ValueKey('exam-review-grade-level-badge')),
-      findsNothing,
+      findsOneWidget,
     );
-    expect(find.byType(ExamReviewWeakTopicsCard), findsNothing);
+    expect(find.byType(ExamReviewWeakTopicsCard), findsOneWidget);
+    expect(find.text('AI LEARING'), findsOneWidget);
     expect(find.text('Đề - 912345'), findsOneWidget);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
     final tabs = find.byType(ExamReviewModeTabButton);
@@ -265,7 +266,7 @@ void main() {
     expect(tester.widget<ExamReviewModeTabButton>(tabs.at(1)).label, 'Results');
     expect(
       find.byKey(const ValueKey('exam-review-practice-banner')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(tester.takeException(), isNull);
   });
@@ -301,7 +302,8 @@ void main() {
       expect(find.text('Đề - 912347'), findsOneWidget);
       expect(find.text('Đề - 123'), findsNothing);
       expect(find.text('Lớp 2 - Level 4'), findsOneWidget);
-      expect(find.text('Chọn đáp án đúng.'), findsOneWidget);
+      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('Chọn đáp án đúng.'), findsNothing);
       expect(
         tester
             .getBottomLeft(
@@ -316,7 +318,7 @@ void main() {
               .dy,
         ),
       );
-      expect(find.text('Điểm yếu'), findsOneWidget);
+      expect(find.text('Nhận Xét'), findsOneWidget);
       expect(find.text('3/3 câu trả lời sai'), findsNothing);
       expect(
         find.text('Phép đếm, Trừ không nhớ, Trừ trong phạm vi 5'),
@@ -348,8 +350,9 @@ void main() {
       expect(find.text('Test - 912347'), findsOneWidget);
       expect(find.text('Test - 123'), findsNothing);
       expect(find.text('Grade 2 - Level 4'), findsOneWidget);
-      expect(find.text('Choose the correct answer.'), findsOneWidget);
-      expect(find.text('Weaknesses'), findsOneWidget);
+      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('Choose the correct answer.'), findsNothing);
+      expect(find.text('Review'), findsOneWidget);
       expect(find.text('3/3 incorrect answers'), findsNothing);
       expect(
         find.byKey(const ValueKey('exam-review-practice-banner')),
@@ -359,55 +362,58 @@ void main() {
     },
   );
 
-  testWidgets('practice banner opens the full generate loader', (tester) async {
-    final lingo = LingoProvider();
-    final service = _PendingPracticeService();
-    addTearDown(lingo.dispose);
+  for (final examType in [examTypeGrade, examTypeAssessment]) {
+    testWidgets('practice banner opens the full generate loader ($examType)', (
+      tester,
+    ) async {
+      final lingo = LingoProvider();
+      final service = _PendingPracticeService();
+      addTearDown(lingo.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          useMaterial3: true,
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: RepositoryProvider<ExamService>.value(
-          value: service,
-          child: LingoScope(
-            lingo: lingo,
-            child: const ExamReviewScreen(
-              userExamId: 912347,
-              examType: examTypeGrade,
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            useMaterial3: true,
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: RepositoryProvider<ExamService>.value(
+            value: service,
+            child: LingoScope(
+              lingo: lingo,
+              child: ExamReviewScreen(userExamId: 912347, examType: examType),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('LUYỆN TẬP'), findsOneWidget);
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('LUYỆN TẬP'), findsOneWidget);
 
-    await lingo.setLanguage(AppLanguage.en);
-    await tester.pumpAndSettle();
-    expect(find.text('PRACTICE'), findsOneWidget);
-    expect(
-      tester
-          .widget<ExamReviewModeTabButton>(
-            find.byType(ExamReviewModeTabButton).first,
-          )
-          .label,
-      'Revise',
-    );
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
+      expect(find.text('PRACTICE'), findsOneWidget);
+      expect(
+        tester
+            .widget<ExamReviewModeTabButton>(
+              find.byType(ExamReviewModeTabButton).first,
+            )
+            .label,
+        'Revise',
+      );
 
-    await tester.tap(find.byKey(const ValueKey('exam-review-practice-banner')));
-    await tester.pump();
-    expect(service.requestedPracticeType, examTypePractice);
-    expect(service.requestedPracticeUserExamId, 912345);
-    expect(find.byType(AssessmentTestAgainLoader), findsOneWidget);
-    expect(find.byType(ExamReviewModeTabButton), findsNothing);
+      await tester.tap(
+        find.byKey(const ValueKey('exam-review-practice-banner')),
+      );
+      await tester.pump();
+      expect(service.requestedPracticeType, examTypePractice);
+      expect(service.requestedPracticeUserExamId, 912345);
+      expect(find.byType(AssessmentTestAgainLoader), findsOneWidget);
+      expect(find.byType(ExamReviewModeTabButton), findsNothing);
 
-    service.pendingPractice.completeError(StateError('generation failed'));
-    await tester.pumpAndSettle();
-    expect(find.byType(AssessmentTestAgainLoader), findsNothing);
-  });
+      service.pendingPractice.completeError(StateError('generation failed'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AssessmentTestAgainLoader), findsNothing);
+    });
+  }
 
   testWidgets('guest assessment review omits the practice banner', (
     tester,
@@ -487,6 +493,12 @@ void main() {
 
 class _JourneyDetailService implements ExamService {
   int? requestedUserExamId;
+
+  @override
+  Future<ExamStats?> getExamSessionReview({
+    required int profileId,
+    required int userExamId,
+  }) async => null;
 
   @override
   Future<GeneratedExam> getExamDetail(
