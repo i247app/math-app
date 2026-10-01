@@ -216,6 +216,9 @@ class ExamStats {
     this.passed,
     this.isLatest,
     this.review,
+    this.aiShortText,
+    this.aiReviewShort,
+    this.aiReviewLong,
     this.inProgressExams = const <GeneratedExam>[],
   });
 
@@ -234,6 +237,9 @@ class ExamStats {
   final bool? passed;
   final bool? isLatest;
   final String? review;
+  final String? aiShortText;
+  final String? aiReviewShort;
+  final String? aiReviewLong;
   final List<GeneratedExam> inProgressExams;
 }
 

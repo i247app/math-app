@@ -686,6 +686,9 @@ void main() {
             'esess_id': 99,
             'grade': 1,
             'level': 5,
+            'ai_short_text': 'Practice subtraction',
+            'ai_review_short': 'Good progress.',
+            'ai_review_long': 'Good progress. Focus on subtraction next.',
             'score_percentage': 65,
             'skipped_number': 0,
             'total_questions': 20,
@@ -725,6 +728,12 @@ void main() {
     expect(stats.single.status, 'COMPLETE');
     expect(stats.single.userExamId, 99);
     expect(stats.single.scorePercentage, 65);
+    expect(stats.single.aiShortText, 'Practice subtraction');
+    expect(stats.single.aiReviewShort, 'Good progress.');
+    expect(
+      stats.single.aiReviewLong,
+      'Good progress. Focus on subtraction next.',
+    );
     expect(stats.single.inProgressExams.single.userExamId, 99);
     expect(stats.single.inProgressExams.single.userAiExamId, 27);
     expect(stats.single.inProgressExams.single.examStatus, 'IN_PROGRESS');

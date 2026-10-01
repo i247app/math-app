@@ -367,6 +367,9 @@ class ExamStatsDto {
     this.passed,
     this.isLatest,
     this.review,
+    this.aiShortText,
+    this.aiReviewShort,
+    this.aiReviewLong,
     this.inProgressExam,
     this.inProgressExams = const <GeneratedExamDto>[],
   });
@@ -390,6 +393,9 @@ class ExamStatsDto {
   final bool? passed;
   final bool? isLatest;
   final String? review;
+  final String? aiShortText;
+  final String? aiReviewShort;
+  final String? aiReviewLong;
   final GeneratedExamDto? inProgressExam;
   final List<GeneratedExamDto> inProgressExams;
 

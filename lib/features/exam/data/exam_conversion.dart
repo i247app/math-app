@@ -226,6 +226,9 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       passed: passed,
       isLatest: isLatest,
       review: review,
+      aiShortText: aiShortText,
+      aiReviewShort: aiReviewShort,
+      aiReviewLong: aiReviewLong,
       inProgressExams: activeExams,
     );
   }
