@@ -3,161 +3,167 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/theme/font_size.dart';
 
 class ExamReviewPracticeBanner extends StatelessWidget {
   const ExamReviewPracticeBanner({
     super.key,
     required this.onTap,
-    this.focusText,
     this.isLoading = false,
   });
 
   final VoidCallback onTap;
-  final String? focusText;
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    final normalizedFocus = focusText?.trim();
-    final hasFocus = normalizedFocus != null && normalizedFocus.isNotEmpty;
     final radius = BorderRadius.circular(16);
 
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(
-        key: const ValueKey('exam-review-practice-banner'),
-        onTap: isLoading ? null : onTap,
-        borderRadius: radius,
-        child: Ink(
-          height: 126,
-          decoration: BoxDecoration(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final mascotWidth = constraints.maxWidth * 0.44;
+        return Semantics(
+          button: true,
+          enabled: !isLoading,
+          child: Material(
+            color: Colors.transparent,
             borderRadius: radius,
-            border: Border.all(color: colors.border.withValues(alpha: 0.65)),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[Color(0xFFF1FCFC), Color(0xFFFFE7DC)],
-            ),
-          ),
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
-            children: [
-              Positioned(
-                right: -2,
-                bottom: -16,
-                width: 132,
-                height: 132,
-                child: Image.asset(
-                  'assets/images/assessment-active-mascot.png',
-                  fit: BoxFit.contain,
-                  cacheWidth: 360,
-                  cacheHeight: 360,
-                  filterQuality: FilterQuality.high,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              key: const ValueKey('exam-review-practice-banner'),
+              onTap: isLoading ? null : onTap,
+              borderRadius: radius,
+              child: Ink(
+                decoration: BoxDecoration(
+                  borderRadius: radius,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFF6EC), Color(0xFFFFDED0)],
+                  ),
                 ),
-              ),
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 118, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.getText(AppKeys.examReviewPracticeBannerTitle),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.andika(
-                          color: colors.textPrimary,
-                          fontSize: FontSize.small,
-                          fontWeight: FontWeight.w800,
-                          height: 1.15,
-                        ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -8,
+                      top: 8,
+                      bottom: -10,
+                      width: mascotWidth,
+                      child: Image.asset(
+                        'assets/images/review-practice-mascot.png',
+                        fit: constraints.maxWidth >= 330
+                            ? BoxFit.cover
+                            : BoxFit.contain,
+                        alignment: Alignment.bottomRight,
+                        cacheWidth: 600,
+                        filterQuality: FilterQuality.high,
+                        excludeFromSemantics: true,
                       ),
-                      if (hasFocus) ...[
-                        const SizedBox(height: 1),
-                        Expanded(
-                          child: Text(
-                            normalizedFocus,
-                            maxLines: 3,
-                            overflow: TextOverflow.clip,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(16, 12, mascotWidth + 2, 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.getText(
+                              AppKeys.examReviewPracticeBannerTitle,
+                            ),
                             style: GoogleFonts.andika(
-                              color: colors.textPrimary,
-                              fontSize: FontSize.xs,
+                              color: const Color(0xFF254443),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            context.getText(
+                              AppKeys.examReviewPracticeBannerSubtitle,
+                            ),
+                            style: GoogleFonts.andika(
+                              color: const Color(0xFF254443),
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              height: 1.15,
+                              height: 1.3,
                             ),
                           ),
-                        ),
-                      ] else
-                        const Spacer(),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.coral600,
-                          borderRadius: BorderRadius.circular(22),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.coral600.withValues(alpha: 0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                          const SizedBox(height: 12),
+                          Container(
+                            key: const ValueKey('exam-review-practice-action'),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
                             ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (isLoading)
-                                SizedBox.square(
-                                  dimension: 14,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: colors.onBrand,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFFF9B29), Color(0xFFFF4E28)],
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0xFFD9421E),
+                                  offset: Offset(0, 5),
+                                ),
+                                BoxShadow(
+                                  color: Color(0x30FF792B),
+                                  offset: Offset(0, 7),
+                                  blurRadius: 12,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
                                   ),
-                                )
-                              else
-                                Flexible(
+                                  child: isLoading
+                                      ? const Padding(
+                                          padding: EdgeInsets.all(6),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFFFF792B),
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.play_arrow_rounded,
+                                          color: Color(0xFFFF792B),
+                                          size: 24,
+                                        ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       context.getText(
                                         AppKeys.examReviewPracticeBannerAction,
                                       ),
-                                      maxLines: 1,
                                       style: GoogleFonts.andika(
-                                        color: colors.onBrand,
-                                        fontSize: FontSize.xs,
+                                        color: Colors.white,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w800,
-                                        height: 1,
+                                        height: 1.2,
                                       ),
                                     ),
                                   ),
                                 ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.arrow_forward_rounded,
-                                color: colors.onBrand,
-                                size: 16,
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

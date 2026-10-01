@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
-import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_grade_level_badge.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_practice_banner.dart';
@@ -14,6 +14,7 @@ import 'package:numi/features/exam/widgets/exam_review/exam_review_result_questi
 import 'package:numi/features/exam/widgets/exam_review/exam_review_retry_question_view.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_stats_card.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_weak_topics_card.dart';
 
 class ExamReviewContent extends StatelessWidget {
   const ExamReviewContent({
@@ -62,10 +63,6 @@ class ExamReviewContent extends StatelessWidget {
         ? 0
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
-    final weakTopicText = formatExamPracticeTopics(
-      exam.practiceWeakTopics,
-      conjunction: context.getText(AppKeys.examReviewTopicConjunction),
-    );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -84,16 +81,30 @@ class ExamReviewContent extends StatelessWidget {
             ),
           ],
           if (onPractice != null) ...[
+            if (exam.grade != null && exam.level != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: ExamReviewGradeLevelBadge(
+                  grade: exam.grade!,
+                  level: exam.level!,
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ExamReviewPracticeBanner(
-                focusText: weakTopicText.isNotEmpty
-                    ? weakTopicText
-                    : exam.lastSetShortText,
                 isLoading: isGeneratingPractice,
                 onTap: onPractice!,
               ),
             ),
+            if (exam.practiceWeakTopics.any(
+              (topic) => topic.topic.trim().isNotEmpty,
+            ))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: ExamReviewWeakTopicsCard(
+                  topics: exam.practiceWeakTopics,
+                ),
+              ),
           ],
           if (allowRetry) ...[
             Padding(

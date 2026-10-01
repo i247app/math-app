@@ -20,6 +20,7 @@ import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_butt
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_result_question_card.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_stats_card.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_weak_topics_card.dart';
 
 void main() {
   const longQuestion =
@@ -234,6 +235,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.requestedUserExamId, 912345);
+    expect(
+      find.byKey(const ValueKey('exam-review-grade-level-badge')),
+      findsNothing,
+    );
+    expect(find.byType(ExamReviewWeakTopicsCard), findsNothing);
     expect(find.text('Đề - 912345'), findsOneWidget);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
     final tabs = find.byType(ExamReviewModeTabButton);
@@ -294,10 +300,57 @@ void main() {
 
       expect(find.text('Đề - 912347'), findsOneWidget);
       expect(find.text('Đề - 123'), findsNothing);
+      expect(find.text('Lớp 2 - Level 4'), findsOneWidget);
+      expect(find.text('Chọn đáp án đúng.'), findsOneWidget);
+      expect(
+        tester
+            .getBottomLeft(
+              find.byKey(const ValueKey('exam-review-grade-level-badge')),
+            )
+            .dy,
+        lessThan(
+          tester
+              .getTopLeft(
+                find.byKey(const ValueKey('exam-review-practice-banner')),
+              )
+              .dy,
+        ),
+      );
+      expect(find.text('Điểm yếu'), findsOneWidget);
+      expect(find.text('3/3 câu trả lời sai'), findsNothing);
+      expect(
+        find.text('Phép đếm, Trừ không nhớ, Trừ trong phạm vi 5'),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(ExamReviewWeakTopicsCard),
+          matching: find.byType(Divider),
+        ),
+        findsNothing,
+      );
+      expect(
+        tester
+            .getTopLeft(
+              find.byKey(const ValueKey('exam-review-weak-topics-card')),
+            )
+            .dy,
+        greaterThan(
+          tester
+              .getBottomLeft(
+                find.byKey(const ValueKey('exam-review-practice-banner')),
+              )
+              .dy,
+        ),
+      );
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();
       expect(find.text('Test - 912347'), findsOneWidget);
       expect(find.text('Test - 123'), findsNothing);
+      expect(find.text('Grade 2 - Level 4'), findsOneWidget);
+      expect(find.text('Choose the correct answer.'), findsOneWidget);
+      expect(find.text('Weaknesses'), findsOneWidget);
+      expect(find.text('3/3 incorrect answers'), findsNothing);
       expect(
         find.byKey(const ValueKey('exam-review-practice-banner')),
         findsOneWidget,
@@ -330,11 +383,11 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('LUYỆN TẬP NGAY'), findsOneWidget);
+    expect(find.text('LUYỆN TẬP'), findsOneWidget);
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpAndSettle();
-    expect(find.text('PRACTICE NOW'), findsOneWidget);
+    expect(find.text('PRACTICE'), findsOneWidget);
     expect(
       tester
           .widget<ExamReviewModeTabButton>(
@@ -448,6 +501,7 @@ class _JourneyDetailService implements ExamService {
       profileId: 42,
       grade: 2,
       lastSetGrade: 4,
+      level: 4,
       lastSetShortText: 'Phép cộng trong phạm vi 100',
       practiceWeakTopics: <ExamPracticeTopic>[
         ExamPracticeTopic(topic: 'Phép đếm', answered: 3, wrong: 3),
