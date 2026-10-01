@@ -41,7 +41,7 @@ abstract interface class ExamService {
     required int grade,
   });
 
-  Future<List<ExamStats>> getGradeLadder({
+  Future<List<ExamStats>> getGradeRoadmap({
     required int profileId,
     required int grade,
   });

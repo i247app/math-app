@@ -347,12 +347,12 @@ class ExamApi implements ExamService {
   }
 
   @override
-  Future<List<ExamStats>> getGradeLadder({
+  Future<List<ExamStats>> getGradeRoadmap({
     required int profileId,
     required int grade,
   }) async {
     final response = await _runExamRequest(
-      () => _postResponse('/exams/grade/ladder', <String, dynamic>{
+      () => _postResponse('/exams/grade/roadmap', <String, dynamic>{
         'profile_id': _requireProfileId(profileId),
         'exam_type': examTypeGrade,
         'grade': grade,

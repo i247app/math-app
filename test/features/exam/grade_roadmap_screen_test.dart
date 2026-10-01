@@ -322,11 +322,11 @@ void main() {
     });
   }
 
-  testWidgets('GRADE ladder opens the matching grade and level detail', (
+  testWidgets('GRADE roadmap opens the matching grade and level detail', (
     tester,
   ) async {
     final service = _FakeExamService(
-      ladder: [
+      roadmap: [
         const ExamStats(
           correctNumber: 7,
           scorePercentage: 70,
@@ -375,7 +375,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
-    expect(service.ladderRequests, [2]);
+    expect(service.roadmapRequests, [2]);
     expect(service.statsRequests, 0);
     expect(service.detailRequests, [602]);
     expect(find.byType(ExamReviewScreen), findsOneWidget);
@@ -385,11 +385,11 @@ void main() {
 
   for (final passed in [false, true]) {
     testWidgets(
-      'ladder uses pass flag $passed instead of score for the current level',
+      'roadmap uses pass flag $passed instead of score for the current level',
       (tester) async {
         final service = _FakeExamService(
-          ladder: [
-            _ladderSession(
+          roadmap: [
+            _roadmapSession(
               passed ? 104 : 103,
               passed: passed,
               isLatest: false,
@@ -428,12 +428,12 @@ void main() {
   }
 
   testWidgets(
-    'reopening roadmap restores the next level from a passed ladder',
+    'reopening roadmap restores the next level from a passed roadmap',
     (tester) async {
-      final ladder = <ExamStats>[];
+      final roadmap = <ExamStats>[];
       final service = _FakeExamService(
         levelsByGrade: const {2: GradeLevels(latestLevel: 3, maxLevel: 3)},
-        ladder: ladder,
+        roadmap: roadmap,
       );
       await pumpRoadmap(
         tester,
@@ -463,10 +463,10 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      ladder.add(_ladderSession(8103, passed: true, level: 3));
+      roadmap.add(_roadmapSession(8103, passed: true, level: 3));
       await pumpRoadmap(tester, service);
       expect(service.levelRequests, [2, 2]);
-      expect(service.ladderRequests, [2, 2]);
+      expect(service.roadmapRequests, [2, 2]);
       expect(
         find.byKey(const ValueKey('grade-roadmap-level-3-completed')),
         findsOneWidget,
@@ -506,7 +506,7 @@ void main() {
   ) async {
     final service = _FakeExamService(
       levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 2)},
-      ladder: [_ladderSession(8202, passed: false, isLatest: false)],
+      roadmap: [_roadmapSession(8202, passed: false, isLatest: false)],
     );
     await pumpRoadmap(tester, service);
     expect(
@@ -532,18 +532,18 @@ void main() {
     tester,
   ) async {
     final service = _FakeExamService(
-      ladder: [
-        _ladderSession(8301, passed: true, grade: 1, level: 9),
-        _ladderSession(8302, passed: true, status: 'ACTIVE', level: 7),
-        _ladderSession(8303, passed: false, level: 5, score: 100),
-        _ladderSession(
+      roadmap: [
+        _roadmapSession(8301, passed: true, grade: 1, level: 9),
+        _roadmapSession(8302, passed: true, status: 'ACTIVE', level: 7),
+        _roadmapSession(8303, passed: false, level: 5, score: 100),
+        _roadmapSession(
           8304,
           passed: true,
           examType: examTypeAssessment,
           level: 8,
         ),
-        _ladderSession(0, passed: true, level: 6),
-        _ladderSession(8305, passed: true, level: 11),
+        _roadmapSession(0, passed: true, level: 6),
+        _roadmapSession(8305, passed: true, level: 11),
       ],
     );
     await pumpRoadmap(tester, service);
@@ -556,7 +556,7 @@ void main() {
 
   testWidgets('a passed Level 10 remains capped at Level 10', (tester) async {
     final service = _FakeExamService(
-      ladder: [_ladderSession(8410, passed: true, level: 10)],
+      roadmap: [_roadmapSession(8410, passed: true, level: 10)],
     );
     await pumpRoadmap(tester, service);
     for (var level = 1; level <= 10; level++) {
@@ -583,7 +583,7 @@ void main() {
     (tester) async {
       final service = _FakeExamService(
         levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
-        ladder: [_ladderSession(8051, passed: false, isLatest: false)],
+        roadmap: [_roadmapSession(8051, passed: false, isLatest: false)],
       );
       await pumpRoadmap(
         tester,
@@ -621,11 +621,11 @@ void main() {
     },
   );
 
-  testWidgets('new completion stays visible until ladder catches up', (
+  testWidgets('new completion stays visible until roadmap catches up', (
     tester,
   ) async {
-    final ladder = [_ladderSession(8010, passed: false)];
-    final service = _FakeExamService(ladder: ladder);
+    final roadmap = [_roadmapSession(8010, passed: false)];
+    final service = _FakeExamService(roadmap: roadmap);
     await pumpRoadmap(
       tester,
       service,
@@ -664,12 +664,12 @@ void main() {
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
     await tester.pumpAndSettle();
 
-    ladder[0] = _ladderSession(8011, passed: true, isLatest: false);
+    roadmap[0] = _roadmapSession(8011, passed: true, isLatest: false);
     await tester
         .widget<RefreshIndicator>(find.byType(RefreshIndicator))
         .onRefresh();
     await tester.pumpAndSettle();
-    ladder[0] = _ladderSession(8012, passed: false);
+    roadmap[0] = _roadmapSession(8012, passed: false);
     await tester
         .widget<RefreshIndicator>(find.byType(RefreshIndicator))
         .onRefresh();
@@ -695,8 +695,8 @@ void main() {
             final serverDate = pendingDate.add(Duration(days: newer ? 1 : -1));
             // Session IDs deliberately do not follow chronological order.
             final serverId = newer ? 8600 : 8602;
-            final ladder = <ExamStats>[];
-            final service = _FakeExamService(ladder: ladder);
+            final roadmap = <ExamStats>[];
+            final service = _FakeExamService(roadmap: roadmap);
             await pumpRoadmap(
               tester,
               service,
@@ -728,8 +728,8 @@ void main() {
                 ),
               ),
             );
-            ladder.add(
-              _ladderSession(
+            roadmap.add(
+              _roadmapSession(
                 serverId,
                 passed: passed,
                 isLatest: false,
@@ -785,8 +785,8 @@ void main() {
       tester,
     ) async {
       final service = _FakeExamService(
-        ladder: [
-          _ladderSession(
+        roadmap: [
+          _roadmapSession(
             8802,
             passed: false,
             isLatest: false,
@@ -850,9 +850,9 @@ void main() {
     testWidgets(
       'grade completion keeps server $dateField date for pending review',
       (tester) async {
-        final ladder = <ExamStats>[];
+        final roadmap = <ExamStats>[];
         final service = _FakeExamService(
-          ladder: ladder,
+          roadmap: roadmap,
           submittedDt: dateField == 'submission'
               ? '2026-01-02T00:00:00Z'
               : null,
@@ -869,8 +869,8 @@ void main() {
         await tester.tap(find.byType(AssessmentBottomActionButton).last);
         await tester.pumpAndSettle();
         expect(find.byType(GradeRoadmapScreen), findsOneWidget);
-        ladder.add(
-          _ladderSession(
+        roadmap.add(
+          _roadmapSession(
             8901,
             passed: false,
             lastSubmittedDt: dateField == 'submission'
@@ -906,9 +906,9 @@ void main() {
         (tester) async {
           final service = _FakeExamService(
             levelsByGrade: const {2: GradeLevels(latestLevel: 2, maxLevel: 2)},
-            ladder: [
-              _ladderSession(61, passed: passed, isLatest: isLatest),
-              _ladderSession(63, passed: true, level: 2),
+            roadmap: [
+              _roadmapSession(61, passed: passed, isLatest: isLatest),
+              _roadmapSession(63, passed: true, level: 2),
             ],
           );
           // Recreate the screen to ensure review does not rely on pending state.
@@ -956,30 +956,34 @@ void main() {
     }
   }
 
-  testWidgets('ladder failure keeps roadmap unavailable until retry succeeds', (
-    tester,
-  ) async {
-    final service = _FakeExamService(failLadder: true);
-    await pumpRoadmap(tester, service);
-    expect(
-      find.byKey(const ValueKey('grade-roadmap-unavailable')),
-      findsOneWidget,
-    );
-    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsNothing);
-    service.failLadder = false;
-    await tester.tap(find.text('Không tải được lộ trình level.'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsOneWidget);
-    expect(service.ladderRequests, [2, 2]);
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'roadmap failure keeps roadmap unavailable until retry succeeds',
+    (tester) async {
+      final service = _FakeExamService(failRoadmap: true);
+      await pumpRoadmap(tester, service);
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-unavailable')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('grade-roadmap-level-1')), findsNothing);
+      service.failRoadmap = false;
+      await tester.tap(find.text('Không tải được lộ trình level.'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-1')),
+        findsOneWidget,
+      );
+      expect(service.roadmapRequests, [2, 2]);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
-  testWidgets('Level 0 ladder history does not appear on the roadmap', (
+  testWidgets('Level 0 roadmap history does not appear on the roadmap', (
     tester,
   ) async {
     final service = _FakeExamService(
       levelsByGrade: const {2: GradeLevels(latestLevel: 0, maxLevel: 0)},
-      ladder: const [
+      roadmap: const [
         ExamStats(
           correctNumber: 8,
           scorePercentage: 80,
@@ -1085,7 +1089,7 @@ void main() {
     (tester) async {
       final service = _FakeExamService(
         levelsByGrade: const {2: GradeLevels(latestLevel: 0, maxLevel: 1)},
-        ladder: const [
+        roadmap: const [
           ExamStats(
             correctNumber: 8,
             scorePercentage: 80,
@@ -1141,7 +1145,7 @@ void main() {
         expect(service.updatedStatuses, ['COMPLETE']);
         expect(service.markedFlags, [passed]);
         expect(service.levelRequests, [2, 2]);
-        expect(service.ladderRequests, [2, 2]);
+        expect(service.roadmapRequests, [2, 2]);
         expect(service.statsRequests, 0);
         expect(
           find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
@@ -1227,9 +1231,9 @@ void main() {
           };
           final service = _FakeExamService(
             levelsByGrade: levels,
-            ladder: [
-              _ladderSession(8501, passed: true, level: 2, isLatest: false),
-              _ladderSession(8502, passed: false),
+            roadmap: [
+              _roadmapSession(8501, passed: true, level: 2, isLatest: false),
+              _roadmapSession(8502, passed: false),
             ],
           );
           await pumpRoadmap(tester, service);
@@ -1538,7 +1542,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(examService.levelRequests, <int>[2, 2]);
-    expect(examService.ladderRequests, [2, 2]);
+    expect(examService.roadmapRequests, [2, 2]);
     expect(examService.statsRequests, 0);
     expect(tester.takeException(), isNull);
     expect(find.byKey(const ValueKey('grade-roadmap-level-3')), findsOneWidget);
@@ -1652,7 +1656,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.levelRequests, <int>[1]);
-    expect(service.ladderRequests, [1]);
+    expect(service.roadmapRequests, [1]);
     expect(service.statsRequests, 0);
     expect(find.text('Tiếp tục ở Level 4?'), findsNothing);
     expect(
@@ -1763,7 +1767,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(service.levelRequests, <int>[grade]);
-      expect(service.ladderRequests, [grade]);
+      expect(service.roadmapRequests, [grade]);
       expect(service.statsRequests, 0);
       expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
       for (var level = 1; level <= 10; level++) {
@@ -2194,7 +2198,7 @@ void main() {
   });
 }
 
-ExamStats _ladderSession(
+ExamStats _roadmapSession(
   int id, {
   required bool passed,
   bool? isLatest = true,
@@ -2290,8 +2294,8 @@ class _FakeExamService implements ExamService {
   _FakeExamService({
     this.levelsByGrade = const <int, GradeLevels>{},
     this.failLevels = false,
-    this.ladder = const <ExamStats>[],
-    this.failLadder = false,
+    this.roadmap = const <ExamStats>[],
+    this.failRoadmap = false,
     this.questionCount = 1,
     this.failCompletion = false,
     this.submittedDt,
@@ -2300,15 +2304,15 @@ class _FakeExamService implements ExamService {
 
   final Map<int, GradeLevels> levelsByGrade;
   bool failLevels;
-  final List<ExamStats> ladder;
-  bool failLadder;
+  final List<ExamStats> roadmap;
+  bool failRoadmap;
   final int questionCount;
   final bool failCompletion;
   final String? submittedDt;
   final String? createDt;
   final List<int> levelRequests = <int>[];
   final List<int> detailRequests = <int>[];
-  final List<int> ladderRequests = <int>[];
+  final List<int> roadmapRequests = <int>[];
   final List<String> updatedStatuses = <String>[];
   final List<bool?> markedFlags = <bool?>[];
   final List<int> submittedAnswerCounts = <int>[];
@@ -2388,17 +2392,17 @@ class _FakeExamService implements ExamService {
     List<String> examTypes = const [examTypeAssessment],
   }) async {
     statsRequests++;
-    throw StateError('Roadmap must use ladder, not stats');
+    throw StateError('Roadmap must use roadmap, not stats');
   }
 
   @override
-  Future<List<ExamStats>> getGradeLadder({
+  Future<List<ExamStats>> getGradeRoadmap({
     required int profileId,
     required int grade,
   }) async {
-    ladderRequests.add(grade);
-    if (failLadder) throw StateError('Grade ladder unavailable');
-    return ladder;
+    roadmapRequests.add(grade);
+    if (failRoadmap) throw StateError('Grade roadmap unavailable');
+    return roadmap;
   }
 
   @override

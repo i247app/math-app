@@ -66,7 +66,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   int _levelRequestId = 0;
   final Map<int, int> _locallyUnlockedLevels = <int, int>{};
   final Set<int> _gradesWithKnownUnlockBaseline = <int>{};
-  final Map<(int, int), ExamStats> _ladderSessions = {};
+  final Map<(int, int), ExamStats> _roadmapSessions = {};
   final Map<(int, int), ExamStats> _pendingSessions = {};
   bool _isLoading = true;
   bool _isOpeningExam = false;
@@ -136,7 +136,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
           profileId: widget.profileId,
           grade: grade,
         ),
-        widget.examService.getGradeLadder(
+        widget.examService.getGradeRoadmap(
           profileId: widget.profileId,
           grade: grade,
         ),
@@ -144,8 +144,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       if (!mounted || requestId != _levelRequestId) return;
       setState(() {
         _gradeLevels = levels;
-        _ladderSessions.removeWhere((key, _) => key.$1 == grade);
-        // Ladder supplies one representative session per level, regardless of is_latest.
+        _roadmapSessions.removeWhere((key, _) => key.$1 == grade);
+        // Roadmap supplies one representative session per level, regardless of is_latest.
         for (final session in sessions) {
           final level = session.level;
           if (session.grade != grade ||
@@ -165,11 +165,11 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             );
           }
           final key = (grade, level);
-          _ladderSessions[key] = session;
+          _roadmapSessions[key] = session;
         }
         _pendingSessions.removeWhere((key, pending) {
           if (key.$1 != grade) return false;
-          final latest = _ladderSessions[key];
+          final latest = _roadmapSessions[key];
           if (latest == null) return false;
           if (latest.userExamId == pending.userExamId) return true;
           return _isNewerServerSession(latest, pending);
@@ -249,7 +249,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         questions: const <ExamQuestion>[],
       ),
     );
-    // Keep the completed attempt visible until ladder catches up or supersedes it.
+    // Keep the completed attempt visible until roadmap catches up or supersedes it.
     _pendingSessions[(grade, level)] = ExamStats(
       userExamId: exam.userExamId,
       examType: examTypeGrade,
@@ -273,7 +273,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   ExamStats? _latestSessionFor(int grade, int level) =>
-      _pendingSessions[(grade, level)] ?? _ladderSessions[(grade, level)];
+      _pendingSessions[(grade, level)] ?? _roadmapSessions[(grade, level)];
 
   bool _isActiveExam(GeneratedExam exam) {
     final status = exam.examStatus?.trim().toUpperCase();

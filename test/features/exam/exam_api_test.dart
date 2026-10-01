@@ -924,7 +924,7 @@ void main() {
   });
 
   test(
-    'reads grade ladder sessions and pass flags for a selected grade',
+    'reads grade roadmap sessions and pass flags for a selected grade',
     () async {
       late RequestOptions captured;
       final api = _apiReturning((options) {
@@ -957,9 +957,9 @@ void main() {
         };
       });
 
-      final sessions = await api.getGradeLadder(profileId: 21, grade: 2);
+      final sessions = await api.getGradeRoadmap(profileId: 21, grade: 2);
 
-      expect(captured.path, '/exams/grade/ladder');
+      expect(captured.path, '/exams/grade/roadmap');
       expect(_body(captured), containsPair('profile_id', 21));
       expect(_body(captured), containsPair('exam_type', 'GRADE'));
       expect(_body(captured), containsPair('grade', 2));
@@ -986,15 +986,15 @@ void main() {
     },
   );
 
-  test('grade ladder accepts an empty session history', () async {
+  test('grade roadmap accepts an empty session history', () async {
     final api = _apiReturning((_) => {'mstatus': 200, 'exam_sessions': []});
-    expect(await api.getGradeLadder(profileId: 21, grade: 0), isEmpty);
+    expect(await api.getGradeRoadmap(profileId: 21, grade: 0), isEmpty);
   });
 
-  test('grade ladder propagates API failure', () async {
+  test('grade roadmap propagates API failure', () async {
     final api = _apiReturning((_) => {'mstatus': 500, 'status': 'Failed'});
     await expectLater(
-      api.getGradeLadder(profileId: 21, grade: 2),
+      api.getGradeRoadmap(profileId: 21, grade: 2),
       throwsException,
     );
   });
