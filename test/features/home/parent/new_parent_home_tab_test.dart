@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -26,6 +28,7 @@ import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
+import 'package:numi/features/home/widgets/parent/new_home_skeleton.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -36,6 +39,152 @@ import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+
+  for (final isStudent in [false, true]) {
+    for (final progressFirst in [false, true]) {
+      testWidgets('new home skeleton waits for layout and chart '
+          '(student=$isStudent, progressFirst=$progressFirst)', (tester) async {
+        const profileId = 90;
+        HomeProfileCache.instance.invalidateProfile(profileId);
+        addTearDown(
+          () => HomeProfileCache.instance.invalidateProfile(profileId),
+        );
+        final lingo = LingoProvider();
+        addTearDown(lingo.dispose);
+        final homeService = _DelayedHomeService();
+        final examService = _DelayedProgressService();
+        final buildContent = isStudent
+            ? NewStudentHomeContent.new
+            : NewParentHomeContent.new;
+        await tester.pumpWidget(
+          RepositoryProvider<HomeLayoutService>.value(
+            value: homeService,
+            child: LingoScope(
+              lingo: lingo,
+              child: MaterialApp(
+                theme: AppTheme.light(),
+                home: Scaffold(
+                  body: buildContent(
+                    user: null,
+                    profiles: const [],
+                    activeProfile: const UserProfile(profileId: profileId),
+                    isActive: true,
+                    activeRefreshTick: 0,
+                    initialGrades: const [],
+                    gradeService: _GradeService(),
+                    examService: examService,
+                    onRefreshProfiles: _noopAsync,
+                    onActivateProfile: _noopActivate,
+                    onProfileSaved: _noop,
+                    onOpenProfileMenu: _noop,
+                    onOpenClassroomTab: _noop,
+                    onOpenGamesTab: _noop,
+                    onParentAssessmentStateChanged: _noopAssessmentState,
+                    bottomPadding: 0,
+                    homeHeader: const Text('Home header'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.byType(NewHomeSkeleton), findsOneWidget);
+        expect(find.text('Home header'), findsOneWidget);
+        expect(find.byType(AssessmentProgressionChart), findsNothing);
+        expect(
+          find.byKey(const ValueKey('parent-home-assessment-action')),
+          findsNothing,
+        );
+
+        if (progressFirst) {
+          examService.progress.complete(
+            await _ExamService(true).getExamProgress(
+              profileId: profileId,
+              fromDt: DateTime.utc(2026),
+              toDt: DateTime.utc(2026, 10),
+            ),
+          );
+        } else {
+          homeService.layout.complete(const HomeLayout(role: 'PARENT'));
+        }
+        await tester.pump();
+        expect(find.byType(NewHomeSkeleton), findsOneWidget);
+
+        if (progressFirst) {
+          homeService.layout.complete(const HomeLayout(role: 'PARENT'));
+        } else {
+          examService.progress.complete(
+            await _ExamService(true).getExamProgress(
+              profileId: profileId,
+              fromDt: DateTime.utc(2026),
+              toDt: DateTime.utc(2026, 10),
+            ),
+          );
+        }
+        await tester.pumpAndSettle();
+        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(
+          tester
+              .widget<AssessmentProgressionChart>(
+                find.byType(AssessmentProgressionChart),
+              )
+              .finalGrade,
+          2,
+        );
+
+        homeService.layout = Completer<HomeLayout>();
+        examService.progress = Completer<ExamProgressResponse>();
+        final state = tester.state<NewParentHomeContentState>(
+          find.byType(isStudent ? NewStudentHomeContent : NewParentHomeContent),
+        );
+        final refresh = state.loadHome(forceRefresh: true);
+        await tester.pump();
+        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+
+        homeService.layout.completeError(Exception('Layout unavailable'));
+        examService.progress.completeError(Exception('Progress unavailable'));
+        await refresh;
+        await tester.pumpAndSettle();
+        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(
+          tester
+              .widget<AssessmentProgressionChart>(
+                find.byType(AssessmentProgressionChart),
+              )
+              .finalGrade,
+          2,
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets('new home skeleton fits a narrow screen with large text', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(280, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark(),
+        home: const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Scaffold(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(14),
+                child: NewHomeSkeleton(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(NewHomeSkeleton), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   for (final hasAssessment in [false, true]) {
     testWidgets('new parent home shows chart and actions without banner '
@@ -544,6 +693,27 @@ class _HomeService implements HomeLayoutService {
   @override
   Future<HomeLayout> getLayout({required int profileId}) async =>
       const HomeLayout(role: 'PARENT');
+}
+
+class _DelayedHomeService implements HomeLayoutService {
+  Completer<HomeLayout> layout = Completer<HomeLayout>();
+
+  @override
+  Future<HomeLayout> getLayout({required int profileId}) => layout.future;
+}
+
+class _DelayedProgressService extends _ExamService {
+  _DelayedProgressService() : super(true);
+
+  Completer<ExamProgressResponse> progress = Completer<ExamProgressResponse>();
+
+  @override
+  Future<ExamProgressResponse> getExamProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+    String examType = examTypeAssessment,
+  }) => progress.future;
 }
 
 class _ExamService implements ExamService {

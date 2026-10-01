@@ -31,6 +31,7 @@ import 'package:numi/features/home/widgets/parent/parent_profile_dialog_action.d
 import 'package:numi/features/home/widgets/parent/parent_select_student_dialog.dart';
 import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
 import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
+import 'package:numi/features/home/widgets/parent/new_home_skeleton.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 
@@ -126,6 +127,8 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
   int _assessmentLoadRequestId = 0;
   int _lastAppliedAssessmentLoadRequestId = 0;
   int _progressLoadRequestId = 0;
+  bool _isLoadingProgress = false;
+  bool _hasLoadedProgress = false;
   int _currentGrade = 0;
   List<int> _previousGrades = const <int>[];
   List<int> _testNumbers = const <int>[1];
@@ -162,6 +165,8 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
     if (oldProfileId != profileId || shouldForceRefresh) {
       hasLoadedHome = false;
       _progressLoadRequestId++;
+      _isLoadingProgress = false;
+      _hasLoadedProgress = false;
       _currentGrade = 0;
       _previousGrades = const <int>[];
       _testNumbers = const <int>[1];
@@ -228,6 +233,8 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
         activeAssessment = null;
         isLoadingAssessments = false;
         assessmentLoadError = null;
+        _isLoadingProgress = false;
+        _hasLoadedProgress = true;
         _currentGrade = 0;
         _previousGrades = const <int>[];
         _testNumbers = const <int>[1];
@@ -348,6 +355,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
 
   Future<void> _loadAssessmentProgress(int profileId) async {
     final requestId = ++_progressLoadRequestId;
+    setState(() => _isLoadingProgress = true);
     try {
       final toDt = DateTime.now();
       final progress = await widget.examService.getExamProgress(
@@ -375,6 +383,13 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
       });
     } catch (_) {
       // Keep the last chart when progress is temporarily unavailable.
+    } finally {
+      if (mounted && requestId == _progressLoadRequestId) {
+        setState(() {
+          _isLoadingProgress = false;
+          _hasLoadedProgress = true;
+        });
+      }
     }
   }
 
@@ -419,6 +434,9 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
   Widget build(BuildContext context) {
     _scheduleMissingStudentDialogIfNeeded();
     final padding = EdgeInsets.fromLTRB(14, 14, 14, widget.bottomPadding + 18);
+    final showInitialLoading =
+        (isLoading && !hasLoadedHome) ||
+        (_isLoadingProgress && !_hasLoadedProgress);
 
     return RefreshIndicator(
       color: context.themeColors.brandStrong,
@@ -436,50 +454,64 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  AssessmentGradeRibbon(currentGrade: _currentGrade),
-                  const SizedBox(height: 18),
-                  AssessmentProgressionChart(
-                    key: const ValueKey('parent-home-progress-chart'),
-                    finalGrade: _currentGrade,
-                    gradeTitle: context.getText(AppKeys.newHomeChartLevel),
-                    activityTitle: context.getText(
-                      AppKeys.newHomeChartActivity,
+                  if (showInitialLoading)
+                    const NewHomeSkeleton()
+                  else ...[
+                    AssessmentGradeRibbon(currentGrade: _currentGrade),
+                    const SizedBox(height: 18),
+                    AssessmentProgressionChart(
+                      key: const ValueKey('parent-home-progress-chart'),
+                      finalGrade: _currentGrade,
+                      gradeTitle: context.getText(AppKeys.newHomeChartLevel),
+                      activityTitle: context.getText(
+                        AppKeys.newHomeChartActivity,
+                      ),
+                      previousGrades: _previousGrades,
+                      testNumbers: _testNumbers,
+                      lastSubmittedAt: _lastSubmittedAt,
+                      chartHeight: 150,
                     ),
-                    previousGrades: _previousGrades,
-                    testNumbers: _testNumbers,
-                    lastSubmittedAt: _lastSubmittedAt,
-                    chartHeight: 150,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ParentHomeActionButton(
-                          key: const ValueKey('parent-home-assessment-action'),
-                          label: context.getText(AppKeys.newHomeAssessmentTest),
-                          iconAsset:
-                              'assets/icons/home-assessment-stopwatch.png',
-                          colors: const [Color(0xFFFFBE54), Color(0xFFFF993C)],
-                          accentColor: const Color(0xFFFFDB70),
-                          onTap: openInitialAssessment,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ParentHomeActionButton(
-                          key: const ValueKey('parent-home-practice-action'),
-                          label: context.getText(
-                            AppKeys.newHomeLearningPractice,
+                    const SizedBox(height: 24),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ParentHomeActionButton(
+                            key: const ValueKey(
+                              'parent-home-assessment-action',
+                            ),
+                            label: context.getText(
+                              AppKeys.newHomeAssessmentTest,
+                            ),
+                            iconAsset:
+                                'assets/icons/home-assessment-stopwatch.png',
+                            colors: const [
+                              Color(0xFFFFBE54),
+                              Color(0xFFFF993C),
+                            ],
+                            accentColor: const Color(0xFFFFDB70),
+                            onTap: openInitialAssessment,
                           ),
-                          iconAsset: 'assets/icons/home-learning-book.png',
-                          colors: const [Color(0xFFFFA18C), Color(0xFFFA796B)],
-                          accentColor: const Color(0xFFFFB0AA),
-                          onTap: widget.onOpenLearningTab ?? openGradeRoadmap,
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ParentHomeActionButton(
+                            key: const ValueKey('parent-home-practice-action'),
+                            label: context.getText(
+                              AppKeys.newHomeLearningPractice,
+                            ),
+                            iconAsset: 'assets/icons/home-learning-book.png',
+                            colors: const [
+                              Color(0xFFFFA18C),
+                              Color(0xFFFA796B),
+                            ],
+                            accentColor: const Color(0xFFFFB0AA),
+                            onTap: widget.onOpenLearningTab ?? openGradeRoadmap,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   if (widget.showAssessmentList) ...[
                     const SizedBox(height: 28),
                     NewHomeAssessmentList(
