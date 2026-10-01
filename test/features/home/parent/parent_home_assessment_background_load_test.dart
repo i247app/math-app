@@ -212,7 +212,9 @@ void main() {
     await pumpParentHome(isActive: true);
     await tester.pump();
     expect(examService.profileRequests, const <int?>[profileId]);
-    expect(examService.requestedExamTypes, const <String>[examTypeAssessment]);
+    expect(examService.requestedExamTypes, const [
+      [examTypeAssessment],
+    ]);
     expect(examService.listCalls, 0);
     expect(examService.listPageCalls, 0);
 
@@ -251,7 +253,7 @@ class _EmptyParentHomeService implements HomeLayoutService {
 
 class _RecordingExamService implements ExamService {
   final List<int?> profileRequests = <int?>[];
-  final List<String> requestedExamTypes = <String>[];
+  final List<List<String>> requestedExamTypes = [];
   int listCalls = 0;
   int listPageCalls = 0;
 
@@ -264,10 +266,10 @@ class _RecordingExamService implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     profileRequests.add(profileId);
-    requestedExamTypes.add(examType);
+    requestedExamTypes.add(examTypes);
     return <ExamStats>[
       ExamStats(
         correctNumber: 8,
@@ -342,7 +344,7 @@ class _ActiveHomeExamService extends _EmptyExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     statsCalls++;
     return const <ExamStats>[

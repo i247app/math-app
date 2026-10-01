@@ -244,18 +244,18 @@ void main() {
         find.byType(AssessmentProgressionChart),
       );
       expect(chart.chartHeight, 150);
-      expect(find.text('Cấp Độ'), findsOneWidget);
+      expect(find.text('Lớp'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
-      expect(find.text('CẤP ĐỘ'), findsOneWidget);
+      expect(find.text('LỚP'), findsOneWidget);
       expect(find.byType(LearningStreakCard), findsNothing);
       expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
       expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pumpAndSettle();
-      expect(find.text('Level'), findsOneWidget);
+      expect(find.text('Grade'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
-      expect(find.text('LEVEL'), findsOneWidget);
+      expect(find.text('GRADE'), findsOneWidget);
       expect(find.text('Assessment Test'), findsOneWidget);
       expect(find.text('Learning & Practice'), findsOneWidget);
 
@@ -322,7 +322,9 @@ void main() {
 
     expect(find.byType(AssessmentProgressionChart), findsOneWidget);
     expect(find.byType(NewHomeAssessmentList), findsOneWidget);
-    expect(examService.requestedStatsExamTypes, [examTypeAll]);
+    expect(examService.requestedStatsExamTypes, [
+      [examTypeGrade, examTypeAssessment],
+    ]);
     expect(find.byType(AssessmentResultListItemCard), findsNWidgets(2));
     final listedExamTypes = tester
         .widgetList<AssessmentResultListItemCard>(
@@ -482,9 +484,9 @@ void main() {
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(PageHeader), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
-      expect(find.text('Cấp Độ'), findsOneWidget);
+      expect(find.text('Lớp'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
-      expect(find.text('CẤP ĐỘ'), findsOneWidget);
+      expect(find.text('LỚP'), findsOneWidget);
       expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
       expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
 
@@ -727,7 +729,7 @@ class _ExamService implements ExamService {
   final bool hasActiveAssessment;
   final bool includeGradeStats;
   final List<int> gradeStatsProfileIds = [];
-  final List<String> requestedStatsExamTypes = [];
+  final List<List<String>> requestedStatsExamTypes = [];
   final List<int> progressProfileIds = [];
   final List<int?> generatedProfileIds = [];
 
@@ -759,10 +761,10 @@ class _ExamService implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
-    requestedStatsExamTypes.add(examType);
-    if (examType == examTypeGrade) {
+    requestedStatsExamTypes.add(examTypes);
+    if (examTypes.length == 1 && examTypes.single == examTypeGrade) {
       gradeStatsProfileIds.add(profileId);
       return const [];
     }
@@ -786,7 +788,7 @@ class _ExamService implements ExamService {
           examType: examTypeAssessment,
           grade: 2,
         ),
-      if (includeGradeStats && examType == examTypeAll)
+      if (includeGradeStats && examTypes.contains(examTypeGrade))
         const ExamStats(
           correctNumber: 7,
           scorePercentage: 70,

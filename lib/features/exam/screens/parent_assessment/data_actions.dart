@@ -33,7 +33,7 @@ extension _ParentAssessmentDataActions on _ParentAssessmentTabState {
       try {
         final stats = await widget.examService.getExamStats(
           profileId: profileId,
-          examType: _contentExamType,
+          examTypes: [_contentExamType],
         );
         loadedStats = true;
         final activeEntries =

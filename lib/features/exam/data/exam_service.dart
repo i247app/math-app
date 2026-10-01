@@ -4,8 +4,6 @@ import 'package:numi/features/exam/models/grade_levels.dart';
 const examTypeAssessment = 'ASSESSMENT';
 const examTypePractice = 'PRACTICE';
 const examTypeGrade = 'GRADE';
-// Passing this to getExamStats omits exam_type from the request.
-const examTypeAll = '';
 
 abstract interface class ExamService {
   Future<GeneratedExam> generateAssessmentExam({
@@ -35,7 +33,7 @@ abstract interface class ExamService {
 
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   });
 
   Future<GradeLevels> getGradeLevels({

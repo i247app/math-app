@@ -24,7 +24,7 @@ Future<void> openInitialAssessmentFromHome({
         ? null
         : await examService.getExamStats(
             profileId: profileId,
-            examType: examTypeAssessment,
+            examTypes: const [examTypeAssessment],
           );
   } catch (_) {
     if (!context.mounted) return;

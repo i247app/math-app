@@ -8,7 +8,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
     try {
       final stats = await widget.examService.getExamStats(
         profileId: profileId,
-        examType: examTypeAssessment,
+        examTypes: const [examTypeAssessment],
       );
       if (!mounted || requestId != _assessmentLoadRequestId) {
         return;

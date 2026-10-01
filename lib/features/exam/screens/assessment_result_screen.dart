@@ -178,7 +178,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PageHeader(
-            title: context.getText(AppKeys.assessmentResultTitle),
+            title: context.getText(AppKeys.assessmentResultHeaderTitle),
             topInset: 0,
             actionWidth: 40,
             horizontalPadding: 20,

@@ -71,7 +71,11 @@ void main() {
       tester.getCenter(find.byKey(const ValueKey('placement-result-close'))).dx,
       greaterThan(180),
     );
-    expect(find.text('Kết Quả'), findsOneWidget);
+    expect(
+      tester.widget<PageHeader>(find.byType(PageHeader)).title,
+      'Đánh Giá',
+    );
+    expect(find.text('Kết Quả'), findsNothing);
     expect(find.text('Trình độ'), findsOneWidget);
     expect(find.text('MẪU GIÁO'), findsOneWidget);
     expect(
@@ -654,8 +658,13 @@ void main() {
         'assets/images/grade-ribbon-numbers.png',
       ),
     );
-    expect(find.text('LEVEL'), findsOneWidget);
-    expect(find.text('CẤP ĐỘ'), findsNothing);
+    expect(
+      tester.widget<PageHeader>(find.byType(PageHeader)).title,
+      'Assessment',
+    );
+    expect(find.text('GRADE'), findsOneWidget);
+    expect(find.text('LỚP'), findsNothing);
+    expect(find.text('LEVEL'), findsNothing);
     expect(find.text('Trend'), findsOneWidget);
     expect(find.text('Practice'), findsNothing);
     expect(find.textContaining('Test '), findsNothing);
@@ -663,7 +672,7 @@ void main() {
       find.byKey(const ValueKey('placement-progression-submitted-time')),
       findsNothing,
     );
-    expect(tester.widget<Text>(find.text('LEVEL')).style?.color, Colors.black);
+    expect(tester.widget<Text>(find.text('GRADE')).style?.color, Colors.black);
 
     final gradeRect = tester.getRect(
       find.byKey(const ValueKey('placement-grade')),
@@ -731,7 +740,7 @@ void main() {
     final markerLabel = find.byKey(
       const ValueKey('placement-current-grade-label'),
     );
-    expect(find.text('CẤP ĐỘ'), findsOneWidget);
+    expect(find.text('LỚP'), findsOneWidget);
     expect(tester.widget<Text>(markerLabel).style?.color, Colors.black);
     expect(
       tester.getBottomLeft(markerLabel).dy,
@@ -1212,9 +1221,9 @@ void main() {
     );
     expect(tester.widget<Text>(currentGrade).data, '1');
     expect(find.text('K'), findsOneWidget);
-    expect(find.text('Level'), findsOneWidget);
+    expect(find.text('Grade'), findsOneWidget);
     expect(
-      tester.getBottomLeft(find.text('Level')).dy,
+      tester.getBottomLeft(find.text('Grade')).dy,
       lessThan(tester.getTopLeft(currentGrade).dy),
     );
     expect(
@@ -1240,7 +1249,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('English grade-zero chart shows 0 and Level label', (
+  testWidgets('English grade-zero chart shows 0 and Grade label', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -1268,13 +1277,13 @@ void main() {
     );
     expect(tester.widget<Text>(currentGrade).data, '0');
     expect(tester.widget<Text>(currentGrade).style?.fontSize, 72);
-    expect(find.text('Level'), findsOneWidget);
+    expect(find.text('Grade'), findsOneWidget);
     expect(
       tester.getCenter(gradeTitle).dx,
       closeTo(tester.getCenter(currentGrade).dx, 1),
     );
     expect(find.text('K'), findsOneWidget);
-    expect(find.text('Grade'), findsNothing);
+    expect(find.text('Level'), findsNothing);
     expect(find.text('Kinder.'), findsNothing);
     expect(tester.takeException(), isNull);
   });

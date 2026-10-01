@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
+import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
   testWidgets('closing practice does not update assessment status', (
     tester,
   ) async {
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     final lingo = LingoProvider();
     final service = _RecordingPracticeService();
     var didClose = false;
@@ -36,6 +40,18 @@ void main() {
       ),
     );
     await tester.pump();
+
+    expect(
+      tester.widget<PageHeader>(find.byType(PageHeader)).title,
+      'Luyện Tập',
+    );
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pump();
+    expect(
+      tester.widget<PageHeader>(find.byType(PageHeader)).title,
+      'Practice',
+    );
+    expect(find.text('Result'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('practice-result-close')));
     await tester.pump();

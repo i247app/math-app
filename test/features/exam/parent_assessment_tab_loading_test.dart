@@ -59,7 +59,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(examService.statsCalls, 1);
-    expect(examService.requestedExamTypes, const <String>[examTypeAssessment]);
+    expect(examService.requestedExamTypes, const [
+      [examTypeAssessment],
+    ]);
     expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
     expect(
       find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
@@ -239,7 +241,7 @@ void main() {
 
 class _CountingExamService implements ExamService {
   int statsCalls = 0;
-  final List<String> requestedExamTypes = <String>[];
+  final List<List<String>> requestedExamTypes = [];
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -253,10 +255,10 @@ class _CountingExamService implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     statsCalls++;
-    requestedExamTypes.add(examType);
+    requestedExamTypes.add(examTypes);
     return const <ExamStats>[];
   }
 
@@ -278,10 +280,10 @@ class _ActiveAssessmentExamService extends _CountingExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     statsCalls++;
-    requestedExamTypes.add(examType);
+    requestedExamTypes.add(examTypes);
     if (_isCanceled) {
       return const <ExamStats>[];
     }
@@ -311,7 +313,9 @@ class _ActiveAssessmentExamService extends _CountingExamService {
   }) async {
     requestedDetailId = detailId;
     requestedUserExamId = userExamId;
-    throw StateError('Resume must use in_progress_exam from /exams/stats.');
+    throw StateError(
+      'Resume must use in_progress_exam from /exams/sessions/list.',
+    );
   }
 
   @override

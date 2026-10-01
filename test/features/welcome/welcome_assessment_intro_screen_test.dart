@@ -137,7 +137,7 @@ void main() {
               ),
             )
             .data,
-        language == AppLanguage.vi ? 'CẤP ĐỘ' : 'LEVEL',
+        language == AppLanguage.vi ? 'LỚP' : 'GRADE',
       );
       expect(
         find.text(language == AppLanguage.vi ? 'Trend' : 'Trend'),

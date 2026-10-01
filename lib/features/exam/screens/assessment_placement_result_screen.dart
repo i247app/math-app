@@ -344,7 +344,9 @@ class _AssessmentPlacementResultScreenState
               children: [
                 PageHeader(
                   scale: 0.9,
-                  title: null,
+                  title: _showsAssessmentChart
+                      ? context.getText(AppKeys.assessmentResultHeaderTitle)
+                      : null,
                   topInset: 0,
                   backgroundColor: Colors.white,
                   actionWidth: 44,
@@ -381,13 +383,6 @@ class _AssessmentPlacementResultScreenState
                         onTap: _exitResult,
                       ),
                     ),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0,
-                  child: SizedBox(
-                    height: 0,
-                    child: Text(context.getText(AppKeys.assessmentResultTitle)),
                   ),
                 ),
                 SizedBox(height: isCompact ? 2.0 : 6.0),
@@ -507,9 +502,7 @@ class _AssessmentPlacementResultScreenState
                         Expanded(
                           child: _PlacementActionButton(
                             key: const ValueKey('placement-continue-grade'),
-                            label: context.getText(
-                              AppKeys.placementResultNext,
-                            ),
+                            label: context.getText(AppKeys.placementResultNext),
                             icon: Icons.arrow_forward_rounded,
                             color: AppColors.teal500,
                             onTap: _continueGrade,

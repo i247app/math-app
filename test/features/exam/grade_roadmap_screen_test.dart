@@ -2385,7 +2385,7 @@ class _FakeExamService implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     statsRequests++;
     throw StateError('Roadmap must use ladder, not stats');

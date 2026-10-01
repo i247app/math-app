@@ -136,10 +136,10 @@ class _IntroHistoryExamService implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     expect(profileId, 421);
-    expect(examType, examTypeAssessment);
+    expect(examTypes, [examTypeAssessment]);
     statsCalls++;
     return stats;
   }
@@ -454,13 +454,13 @@ void main() {
       expect(tester.widget<Text>(currentGrade).data, '3');
       expect(tester.widget<Text>(currentGrade).style?.fontSize, 72);
       expect(find.text('Trình độ'), findsNothing);
-      expect(find.text('Cấp Độ'), findsOneWidget);
+      expect(find.text('Lớp'), findsOneWidget);
       expect(
-        tester.getBottomLeft(find.text('Cấp Độ')).dy,
+        tester.getBottomLeft(find.text('Lớp')).dy,
         lessThan(tester.getTopLeft(currentGrade).dy),
       );
       expect(
-        tester.getCenter(find.text('Cấp Độ')).dx,
+        tester.getCenter(find.text('Lớp')).dx,
         closeTo(tester.getCenter(currentGrade).dx, 1),
       );
       expect(

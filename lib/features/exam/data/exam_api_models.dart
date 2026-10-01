@@ -93,10 +93,10 @@ class ExamListRequest {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ExamStatsRequest {
-  const ExamStatsRequest({required this.profileId, required this.examType});
+  const ExamStatsRequest({required this.profileId, required this.examTypes});
 
   final int profileId;
-  final String examType;
+  final List<String> examTypes;
 
   factory ExamStatsRequest.fromJson(Map<String, dynamic> json) =>
       _$ExamStatsRequestFromJson(json);
@@ -338,6 +338,7 @@ class ExamStatsResponseDto {
   });
 
   final int mstatus;
+  @JsonKey(name: 'exam_sessions')
   final List<ExamStatsDto> stats;
   final String? status;
   final String? mmessage;

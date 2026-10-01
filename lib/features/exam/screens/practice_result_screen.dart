@@ -164,7 +164,7 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PageHeader(
-          title: context.getText(AppKeys.assessmentResultTitle),
+          title: context.getText(AppKeys.practiceResultHeaderTitle),
           topInset: 0,
           actionWidth: 40,
           horizontalPadding: 20,

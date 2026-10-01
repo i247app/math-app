@@ -8,6 +8,7 @@ import 'package:numi/features/exam/data/exam_api.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 void main() {
@@ -673,93 +674,175 @@ void main() {
     },
   );
 
-  test('loads the new exam statistics endpoint', () async {
-    late RequestOptions captured;
-    final api = _apiReturning((options) {
-      captured = options;
-      return const <String, dynamic>{
-        'mstatus': 200,
-        'stats': <Map<String, dynamic>>[
-          <String, dynamic>{
-            'correct_number': 13,
-            'exam_type': 'ASSESSMENT',
-            'esess_status': 'COMPLETE',
-            'esess_id': 99,
-            'grade': 1,
-            'level': 5,
-            'ai_short_text': 'Practice subtraction',
-            'ai_review_short': 'Good progress.',
-            'ai_review_long': 'Good progress. Focus on subtraction next.',
-            'score_percentage': 65,
-            'skipped_number': 0,
-            'total_questions': 20,
-            'in_progress_exams': <Map<String, dynamic>>[
-              <String, dynamic>{
-                'exam_id': 14,
-                'elink_id': 27,
-                'profile_id': 21,
-                'exam_type': 'ASSESSMENT',
-                'grade': 2,
-                'num_questions': 1,
-                'elink_status': 'IN_PROGRESS',
-                'title': 'Lớp 2',
-                'questions': <Map<String, dynamic>>[
-                  <String, dynamic>{
-                    'question_name': 'Resume from stats',
-                    'question_number': 1,
-                    'right_answer_content': '4',
-                    'right_answer_label': 'A',
-                    'answers': <Map<String, dynamic>>[
-                      <String, dynamic>{'content': '4', 'label': 'A'},
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      };
+  test(
+    'loads session list with a single-type array and maps sessions',
+    () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return const <String, dynamic>{
+          'mstatus': 200,
+          'exam_sessions': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'correct_number': 13,
+              'exam_type': 'ASSESSMENT',
+              'esess_status': 'COMPLETE',
+              'esess_id': 99,
+              'grade': 1,
+              'level': 5,
+              'ai_short_text': 'Practice subtraction',
+              'ai_review_short': 'Good progress.',
+              'ai_review_long': 'Good progress. Focus on subtraction next.',
+              'score_percentage': 65,
+              'skipped_number': 0,
+              'total_questions': 20,
+              'in_progress_exams': <Map<String, dynamic>>[
+                <String, dynamic>{
+                  'exam_id': 14,
+                  'elink_id': 27,
+                  'profile_id': 21,
+                  'exam_type': 'ASSESSMENT',
+                  'grade': 2,
+                  'num_questions': 1,
+                  'elink_status': 'IN_PROGRESS',
+                  'title': 'Lớp 2',
+                  'questions': <Map<String, dynamic>>[
+                    <String, dynamic>{
+                      'question_name': 'Resume from stats',
+                      'question_number': 1,
+                      'right_answer_content': '4',
+                      'right_answer_label': 'A',
+                      'answers': <Map<String, dynamic>>[
+                        <String, dynamic>{'content': '4', 'label': 'A'},
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        };
+      });
+
+      final stats = await api.getExamStats(profileId: 21);
+
+      expect(captured.method, 'POST');
+      expect(captured.path, '/exams/sessions/list');
+      expect(_body(captured), containsPair('exam_types', ['ASSESSMENT']));
+      expect(_body(captured), isNot(contains('exam_type')));
+      expect(stats.single.level, 5);
+      expect(stats.single.status, 'COMPLETE');
+      expect(stats.single.userExamId, 99);
+      expect(stats.single.scorePercentage, 65);
+      expect(stats.single.aiShortText, 'Practice subtraction');
+      expect(stats.single.aiReviewShort, 'Good progress.');
+      expect(
+        stats.single.aiReviewLong,
+        'Good progress. Focus on subtraction next.',
+      );
+      expect(stats.single.inProgressExams.single.userExamId, 99);
+      expect(stats.single.inProgressExams.single.userAiExamId, 27);
+      expect(stats.single.inProgressExams.single.examStatus, 'IN_PROGRESS');
+      expect(
+        stats.single.inProgressExams.single.questions.single.questionName,
+        'Resume from stats',
+      );
+    },
+  );
+
+  test(
+    'Learning session list maps completed Assessment and Grade entries',
+    () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return const <String, dynamic>{
+          'mstatus': 200,
+          'exam_sessions': <Map<String, dynamic>>[
+            {
+              'esess_id': 101,
+              'exam_type': 'ASSESSMENT',
+              'status': 'COMPLETE',
+              'total_questions': 20,
+              'correct_number': 6,
+              'skipped_number': 0,
+              'score_percentage': 30,
+              'review': 'Answered 6/20 correctly.',
+              'esess_flag': null,
+              'ai_short_text': 'Enjoy learning math',
+              'ai_review_short': 'Practice counting and matching quantities.',
+              'ai_review_long': 'Practice with objects at home.',
+              'grade': 0,
+              'level': 1,
+              'last_submitted_dt': '2026-10-01T13:54:22.218208Z',
+              'ended_dt': '2026-10-01T13:54:22.500244Z',
+              'create_dt': '2026-10-01T13:53:45.600811Z',
+            },
+            {
+              'esess_id': 99,
+              'exam_type': 'GRADE',
+              'status': 'COMPLETE',
+              'total_questions': 10,
+              'correct_number': 5,
+              'skipped_number': 0,
+              'score_percentage': 50,
+              'review': 'Answered 5/10 correctly.',
+              'esess_flag': true,
+              'ai_review_short': 'Practice addition and subtraction.',
+              'ai_review_long': 'Use toys to practice at home.',
+              'grade': 0,
+              'level': 1,
+              'last_submitted_dt': '2026-10-01T13:09:28.001546Z',
+              'ended_dt': '2026-10-01T13:09:28.266769Z',
+              'create_dt': '2026-10-01T13:09:07.978867Z',
+            },
+          ],
+        };
+      });
+
+      final stats = await api.getExamStats(
+        profileId: 21,
+        examTypes: const [examTypeGrade, examTypeAssessment],
+      );
+
+      expect(captured.path, '/exams/sessions/list');
+      expect(captured.method, 'POST');
+      expect(_body(captured), containsPair('profile_id', 21));
+      expect(
+        _body(captured),
+        containsPair('exam_types', ['GRADE', 'ASSESSMENT']),
+      );
+      expect(_body(captured), isNot(contains('exam_type')));
+      expect(stats.map((entry) => entry.userExamId), [101, 99]);
+      expect(stats.map((entry) => entry.examType), ['ASSESSMENT', 'GRADE']);
+      expect(stats.every((entry) => entry.status == 'COMPLETE'), isTrue);
+      expect(stats.first.passed, isNull);
+      expect(stats.last.passed, isTrue);
+      expect(stats.first.aiShortText, 'Enjoy learning math');
+      final learningItems = stats
+          .where(isCompletedAssessmentStats)
+          .map((entry) => completedAssessmentFromStats(entry, profileId: 21))
+          .toList();
+      expect(learningItems.map((entry) => entry.userExamId), [101, 99]);
+      expect(learningItems.every((entry) => entry.grade == 0), isTrue);
+      expect(learningItems.every((entry) => entry.level == 1), isTrue);
+    },
+  );
+
+  for (final type in [examTypeGrade, examTypePractice]) {
+    test('session list sends a single $type in an array', () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return {'mstatus': 200, 'exam_sessions': <Map<String, dynamic>>[]};
+      });
+      await api.getExamStats(profileId: 21, examTypes: [type]);
+      expect(captured.path, '/exams/sessions/list');
+      expect(_body(captured), containsPair('profile_id', 21));
+      expect(_body(captured), containsPair('exam_types', [type]));
+      expect(_body(captured), isNot(contains('exam_type')));
     });
-
-    final stats = await api.getExamStats(profileId: 21);
-
-    expect(captured.path, '/exams/stats');
-    expect(_body(captured), containsPair('exam_type', 'ASSESSMENT'));
-    expect(stats.single.level, 5);
-    expect(stats.single.status, 'COMPLETE');
-    expect(stats.single.userExamId, 99);
-    expect(stats.single.scorePercentage, 65);
-    expect(stats.single.aiShortText, 'Practice subtraction');
-    expect(stats.single.aiReviewShort, 'Good progress.');
-    expect(
-      stats.single.aiReviewLong,
-      'Good progress. Focus on subtraction next.',
-    );
-    expect(stats.single.inProgressExams.single.userExamId, 99);
-    expect(stats.single.inProgressExams.single.userAiExamId, 27);
-    expect(stats.single.inProgressExams.single.examStatus, 'IN_PROGRESS');
-    expect(
-      stats.single.inProgressExams.single.questions.single.questionName,
-      'Resume from stats',
-    );
-  });
-
-  test('omits exam_type when requesting stats for all exam types', () async {
-    late RequestOptions captured;
-    final api = _apiReturning((options) {
-      captured = options;
-      return const <String, dynamic>{
-        'mstatus': 200,
-        'stats': <Map<String, dynamic>>[],
-      };
-    });
-
-    await api.getExamStats(profileId: 21, examType: examTypeAll);
-
-    expect(captured.path, '/exams/stats');
-    expect(_body(captured), containsPair('profile_id', 21));
-    expect(_body(captured), isNot(contains('exam_type')));
-  });
+  }
 
   test(
     'session review sends IDs and parses AI text from exam_session',

@@ -293,13 +293,13 @@ class ExamApi implements ExamService {
   @override
   Future<List<ExamStats>> getExamStats({
     required int profileId,
-    String examType = examTypeAssessment,
+    List<String> examTypes = const [examTypeAssessment],
   }) async {
     final response = await _runExamRequest(
       () => _getExamStatsResponse(
         ExamStatsRequest(
           profileId: _requireProfileId(profileId),
-          examType: examType,
+          examTypes: examTypes,
         ),
       ),
     );
@@ -352,18 +352,11 @@ class ExamApi implements ExamService {
     required int grade,
   }) async {
     final response = await _runExamRequest(
-      () => _postResponse(
-        '/exams/grade/ladder',
-        <String, dynamic>{
-          'profile_id': _requireProfileId(profileId),
-          'exam_type': examTypeGrade,
-          'grade': grade,
-        },
-        (json) => ExamStatsResponseDto.fromJson({
-          ...json,
-          'stats': json['exam_sessions'],
-        }),
-      ),
+      () => _postResponse('/exams/grade/ladder', <String, dynamic>{
+        'profile_id': _requireProfileId(profileId),
+        'exam_type': examTypeGrade,
+        'grade': grade,
+      }, ExamStatsResponseDto.fromJson),
     );
     return response.stats.map((session) => session.toModel()).toList();
   }
@@ -409,11 +402,11 @@ class ExamApi implements ExamService {
   }
 
   Future<ExamStatsResponseDto> _getExamStatsResponse(ExamStatsRequest request) {
-    final body = request.toJson();
-    if (request.examType.trim().isEmpty) {
-      body.remove('exam_type');
-    }
-    return _postResponse('/exams/stats', body, ExamStatsResponseDto.fromJson);
+    return _postResponse(
+      '/exams/sessions/list',
+      request.toJson(),
+      ExamStatsResponseDto.fromJson,
+    );
   }
 
   Future<T> _postResponse<T>(

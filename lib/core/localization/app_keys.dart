@@ -859,6 +859,8 @@ class AppKeys {
   static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewExam = 'generating_new_exam';
   static const assessmentResultTitle = 'assessment_result_title';
+  static const assessmentResultHeaderTitle = 'assessment_result_header_title';
+  static const practiceResultHeaderTitle = 'practice_result_header_title';
   static const placementResultCongratulations =
       'placement_result_congratulations';
   static const placementResultLevel = 'placement_result_level';
