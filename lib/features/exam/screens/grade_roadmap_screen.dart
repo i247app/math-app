@@ -618,9 +618,14 @@ class _GradeRoadmapHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topInset = MediaQuery.paddingOf(context).top;
+    final safePadding = MediaQuery.paddingOf(context);
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, topInset + 12, 12, 12),
+      padding: EdgeInsets.fromLTRB(
+        safePadding.left + 16,
+        safePadding.top + 12,
+        safePadding.right + 12,
+        12,
+      ),
       child: Row(
         children: [
           Material(

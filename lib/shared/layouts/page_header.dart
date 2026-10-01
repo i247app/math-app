@@ -36,7 +36,9 @@ class PageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final resolvedTopInset = topInset ?? MediaQuery.paddingOf(context).top;
+    // paddingOf excludes insets already consumed by an ancestor SafeArea.
+    final safePadding = MediaQuery.paddingOf(context);
+    final resolvedTopInset = topInset ?? safePadding.top;
     final scaledActionWidth = actionWidth * scale;
 
     return Container(
@@ -46,9 +48,9 @@ class PageHeader extends StatelessWidget {
         boxShadow: boxShadow,
       ),
       padding: EdgeInsets.fromLTRB(
-        horizontalPadding * scale,
+        safePadding.left + horizontalPadding * scale,
         resolvedTopInset + verticalPadding * scale,
-        horizontalPadding * scale,
+        safePadding.right + horizontalPadding * scale,
         verticalPadding * scale,
       ),
       child: Row(

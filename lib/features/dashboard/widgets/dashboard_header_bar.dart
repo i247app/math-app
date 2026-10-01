@@ -49,11 +49,17 @@ class DashboardHeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final safePadding = MediaQuery.paddingOf(context);
 
     return RepaintBoundary(
       child: Container(
         height: topInset + 64,
-        padding: EdgeInsets.fromLTRB(14, topInset + 6, 14, 6),
+        padding: EdgeInsets.fromLTRB(
+          safePadding.left + 14,
+          topInset + 6,
+          safePadding.right + 14,
+          6,
+        ),
         decoration: BoxDecoration(color: colors.elevatedSurface),
         child: Row(
           children: [

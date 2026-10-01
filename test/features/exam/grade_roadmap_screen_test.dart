@@ -91,6 +91,52 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final padding in const [
+    EdgeInsets.fromLTRB(59, 0, 0, 21),
+    EdgeInsets.fromLTRB(0, 0, 59, 21),
+    EdgeInsets.fromLTRB(59, 0, 59, 21),
+  ]) {
+    testWidgets(
+      'roadmap header actions avoid landscape camera insets $padding',
+      (tester) async {
+        const size = Size(852, 393);
+        final service = _FakeExamService();
+        await pumpRoadmap(
+          tester,
+          service,
+          home: GradeRoadmapScreen(
+            profileId: 11,
+            examService: service,
+            initialGrades: const [
+              GradeModel(id: 1, label: 'Lớp 1'),
+              GradeModel(id: 2, label: 'Lớp 2'),
+            ],
+            gradeService: _UnusedGradeService(),
+            gradeProgressStore: const _FakeProgressStore(
+              ProfileGradeProgress.initial,
+            ),
+          ),
+          size: size,
+          platform: TargetPlatform.iOS,
+          systemPadding: padding,
+        );
+        final selector = find.byKey(
+          const ValueKey('grade-roadmap-grade-selector'),
+        );
+        final close = find.byKey(const ValueKey('grade-roadmap-close'));
+        for (final action in [selector, close]) {
+          final rect = tester.getRect(action);
+          expect(rect.left, greaterThanOrEqualTo(padding.left));
+          expect(rect.right, lessThanOrEqualTo(size.width - padding.right));
+        }
+        await tester.tap(selector);
+        await tester.pumpAndSettle();
+        expect(find.byType(GradeSelectionScreen), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   for (final maxLevel in [0, 1, 3, 9, 10]) {
     testWidgets(
       'roadmap uses max_level $maxLevel directly with a minimum of 1',

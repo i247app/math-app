@@ -28,8 +28,14 @@ class TeacherTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = displayTeacherName(profile);
     final colors = context.themeColors;
+    final safePadding = MediaQuery.paddingOf(context);
     return Container(
-      padding: EdgeInsets.fromLTRB(18, topPadding + 16, 18, 14),
+      padding: EdgeInsets.fromLTRB(
+        safePadding.left + 18,
+        topPadding + 16,
+        safePadding.right + 18,
+        14,
+      ),
       decoration: BoxDecoration(color: colors.pageBackgroundTop),
       child: Row(
         spacing: 12,

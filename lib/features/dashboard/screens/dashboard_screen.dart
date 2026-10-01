@@ -247,8 +247,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return BlocBuilder<RoleTabCubit, RoleTabState>(
           bloc: roleTabCubit,
           builder: (context, navigation) {
-            final topInset = MediaQuery.paddingOf(context).top;
-            final bottomInset = MediaQuery.paddingOf(context).bottom;
+            final safePadding = MediaQuery.paddingOf(context);
+            final topInset = safePadding.top;
+            final bottomInset = safePadding.bottom;
             final studentName = compactProfileName(
               _displayProfileName(
                 context,
@@ -428,8 +429,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 if (showHeader && isMenuOpen && switchableProfiles.isNotEmpty)
                   Positioned(
-                    left: 28,
-                    right: 28,
+                    left: safePadding.left + 28,
+                    right: safePadding.right + 28,
                     top: headerHeight - 6,
                     child: Align(
                       alignment: Alignment.topLeft,
