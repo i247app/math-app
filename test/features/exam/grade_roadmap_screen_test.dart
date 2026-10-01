@@ -291,7 +291,7 @@ void main() {
     });
   }
 
-  testWidgets('GRADE ladder opens the matching grade and latest level detail', (
+  testWidgets('GRADE ladder opens the matching grade and level detail', (
     tester,
   ) async {
     final service = _FakeExamService(
@@ -308,20 +308,6 @@ void main() {
           status: 'COMPLETE',
           grade: 1,
           level: 1,
-        ),
-        ExamStats(
-          correctNumber: 7,
-          scorePercentage: 70,
-          skippedNumber: 0,
-          totalQuestions: 10,
-          examType: examTypeGrade,
-          userExamId: 601,
-          isLatest: false,
-          passed: false,
-          status: 'COMPLETE',
-          grade: 2,
-          level: 1,
-          lastSubmittedDt: DateTime(2026, 9, 30),
         ),
         ExamStats(
           correctNumber: 8,
@@ -372,11 +358,10 @@ void main() {
       (tester) async {
         final service = _FakeExamService(
           ladder: [
-            _ladderSession(101, passed: false, isLatest: false),
-            _ladderSession(102, passed: false, isLatest: false),
             _ladderSession(
               passed ? 104 : 103,
               passed: passed,
+              isLatest: false,
               score: passed ? 0 : 100,
             ),
           ],
@@ -489,10 +474,8 @@ void main() {
     tester,
   ) async {
     final service = _FakeExamService(
-      ladder: [
-        _ladderSession(8201, passed: true, isLatest: false),
-        _ladderSession(8202, passed: false),
-      ],
+      levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 2)},
+      ladder: [_ladderSession(8202, passed: false, isLatest: false)],
     );
     await pumpRoadmap(tester, service);
     expect(
@@ -564,50 +547,48 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('latest fail does not fall back to an older passing review', (
-    tester,
-  ) async {
-    final service = _FakeExamService(
-      levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
-      ladder: [
-        _ladderSession(8050, passed: true, isLatest: false),
-        _ladderSession(8051, passed: false),
-      ],
-    );
-    await pumpRoadmap(
-      tester,
-      service,
-      home: GradeRoadmapScreen(
-        profileId: 11,
-        initialGrade: 2,
-        examService: service,
-        gradeProgressStore: const _FakeProgressStore(
-          ProfileGradeProgress.initial,
-        ),
-        initialExams: const [
-          GeneratedExam(
-            userExamId: 8050,
-            examType: examTypeGrade,
-            examStatus: 'COMPLETE',
-            grade: 2,
-            level: 1,
-            grading: ExamGrading(scorePercentage: 90),
-            questions: [],
+  testWidgets(
+    'representative fail does not fall back to an older passing review',
+    (tester) async {
+      final service = _FakeExamService(
+        levelsByGrade: const {2: GradeLevels(latestLevel: 1, maxLevel: 3)},
+        ladder: [_ladderSession(8051, passed: false, isLatest: false)],
+      );
+      await pumpRoadmap(
+        tester,
+        service,
+        home: GradeRoadmapScreen(
+          profileId: 11,
+          initialGrade: 2,
+          examService: service,
+          gradeProgressStore: const _FakeProgressStore(
+            ProfileGradeProgress.initial,
           ),
-        ],
-      ),
-    );
-    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
-    await tester.pumpAndSettle();
-    await tester.tap(level);
-    await tester.pumpAndSettle();
-    expect(find.byType(ExamReviewScreen), findsNothing);
-    expect(find.byType(ExamAttemptScreen), findsOneWidget);
-    expect(service.detailRequests, isEmpty);
-    expect(service.generatedLevels, [1]);
-    expect(tester.takeException(), isNull);
-  });
+          initialExams: const [
+            GeneratedExam(
+              userExamId: 8050,
+              examType: examTypeGrade,
+              examStatus: 'COMPLETE',
+              grade: 2,
+              level: 1,
+              grading: ExamGrading(scorePercentage: 90),
+              questions: [],
+            ),
+          ],
+        ),
+      );
+      final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+      await tester.ensureVisible(level);
+      await tester.pumpAndSettle();
+      await tester.tap(level);
+      await tester.pumpAndSettle();
+      expect(find.byType(ExamReviewScreen), findsNothing);
+      expect(find.byType(ExamAttemptScreen), findsOneWidget);
+      expect(service.detailRequests, isEmpty);
+      expect(service.generatedLevels, [1]);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('new completion stays visible until ladder catches up', (
     tester,
@@ -652,7 +633,7 @@ void main() {
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
     await tester.pumpAndSettle();
 
-    ladder[0] = _ladderSession(8011, passed: true);
+    ladder[0] = _ladderSession(8011, passed: true, isLatest: false);
     await tester
         .widget<RefreshIndicator>(find.byType(RefreshIndicator))
         .onRefresh();
@@ -720,6 +701,7 @@ void main() {
               _ladderSession(
                 serverId,
                 passed: passed,
+                isLatest: false,
                 lastSubmittedDt: dateField == 'submission' ? serverDate : null,
                 createDt: dateField == 'creation' ? serverDate : null,
               ),
@@ -760,74 +742,11 @@ void main() {
     }
   }
 
-  for (final reportedPendingHasDates in [false, true]) {
-    testWidgets(
-      'pending review yields to server evidence with dates=$reportedPendingHasDates',
-      (tester) async {
-        // Start with no server acknowledgement of the local completion.
-        final ladder = <ExamStats>[];
-        final pendingService = _FakeExamService(ladder: ladder);
-        await pumpRoadmap(
-          tester,
-          pendingService,
-          home: GradeRoadmapScreen(
-            profileId: 11,
-            initialGrade: 2,
-            examService: pendingService,
-            gradeProgressStore: const _FakeProgressStore(
-              ProfileGradeProgress.initial,
-            ),
-            initialCompletion: const GradeExamCompletion(
-              grade: 2,
-              level: 1,
-              exam: GeneratedExam(userExamId: 8701, questions: []),
-              outcome: GradeExamOutcome(
-                progress: ProfileGradeProgress(grade: 2, level: 2),
-                passed: true,
-                levelIncrease: 1,
-              ),
-            ),
-          ),
-        );
-        ladder.addAll([
-          _ladderSession(
-            8701,
-            passed: true,
-            isLatest: reportedPendingHasDates ? null : false,
-            lastSubmittedDt: reportedPendingHasDates
-                ? DateTime.utc(2026, 1, 2)
-                : null,
-          ),
-          _ladderSession(
-            8700,
-            passed: false,
-            lastSubmittedDt: reportedPendingHasDates
-                ? DateTime.utc(2026, 1, 3)
-                : null,
-          ),
-        ]);
-        await tester
-            .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-            .onRefresh();
-        await tester.pumpAndSettle();
-        final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await tester.ensureVisible(level);
-        await tester.pumpAndSettle();
-        await tester.tap(level);
-        await tester.pumpAndSettle();
-        expect(find.byType(ExamReviewScreen), findsNothing);
-        expect(pendingService.generatedLevels, [1]);
-        expect(tester.takeException(), isNull);
-      },
-    );
-  }
-
   for (final serverCase in [
     'undated',
     'missing-pending-date',
     'same-time',
     'different-date-fields',
-    'non-latest',
     'another-grade',
     'another-level',
   ]) {
@@ -839,7 +758,7 @@ void main() {
           _ladderSession(
             8802,
             passed: false,
-            isLatest: serverCase != 'non-latest',
+            isLatest: false,
             grade: serverCase == 'another-grade' ? 1 : 2,
             level: serverCase == 'another-level' ? 2 : 1,
             lastSubmittedDt:
@@ -949,22 +868,62 @@ void main() {
     );
   }
 
-  testWidgets('non-latest ladder sessions do not become the level review', (
-    tester,
-  ) async {
-    final service = _FakeExamService(
-      ladder: [_ladderSession(101, passed: true, isLatest: false)],
-    );
-    await pumpRoadmap(tester, service);
-    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
-    await tester.pumpAndSettle();
-    await tester.tap(level);
-    await tester.pumpAndSettle();
-    expect(service.detailRequests, isEmpty);
-    expect(service.generatedLevels, [1]);
-    expect(tester.takeException(), isNull);
-  });
+  for (final isLatest in [false, null]) {
+    for (final passed in [true, false]) {
+      testWidgets(
+        'level representative with is_latest=$isLatest and pass=$passed opens correctly',
+        (tester) async {
+          final service = _FakeExamService(
+            levelsByGrade: const {2: GradeLevels(latestLevel: 2, maxLevel: 2)},
+            ladder: [
+              _ladderSession(61, passed: passed, isLatest: isLatest),
+              _ladderSession(63, passed: true, level: 2),
+            ],
+          );
+          // Recreate the screen to ensure review does not rely on pending state.
+          await pumpRoadmap(tester, service);
+          await tester.pumpWidget(const SizedBox.shrink());
+          await pumpRoadmap(tester, service);
+          final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+          await tester.ensureVisible(level);
+          await tester.pumpAndSettle();
+          await tester.tap(level);
+          await tester.pumpAndSettle();
+          if (passed) {
+            expect(
+              tester
+                  .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
+                  .userExamId,
+              61,
+            );
+            expect(service.generatedLevels, isEmpty);
+            tester.state<NavigatorState>(find.byType(Navigator)).pop();
+            await tester.pumpAndSettle();
+            final secondLevel = find.byKey(
+              const ValueKey('grade-roadmap-level-2'),
+            );
+            await tester.ensureVisible(secondLevel);
+            await tester.pumpAndSettle();
+            await tester.tap(secondLevel);
+            await tester.pumpAndSettle();
+            expect(
+              tester
+                  .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
+                  .userExamId,
+              63,
+            );
+            expect(service.generatedLevels, isEmpty);
+          } else {
+            expect(find.byType(ExamReviewScreen), findsNothing);
+            expect(find.byType(ExamAttemptScreen), findsOneWidget);
+            expect(service.generatedLevels, [1]);
+            expect(service.detailRequests, isEmpty);
+          }
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
 
   testWidgets('ladder failure keeps roadmap unavailable until retry succeeds', (
     tester,
@@ -1238,7 +1197,7 @@ void main() {
           final service = _FakeExamService(
             levelsByGrade: levels,
             ladder: [
-              _ladderSession(8501, passed: true, isLatest: false),
+              _ladderSession(8501, passed: true, level: 2, isLatest: false),
               _ladderSession(8502, passed: false),
             ],
           );

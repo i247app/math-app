@@ -145,7 +145,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       setState(() {
         _gradeLevels = levels;
         _ladderSessions.removeWhere((key, _) => key.$1 == grade);
-        final sessionsById = <int, ExamStats>{};
+        // Ladder supplies one representative session per level, regardless of is_latest.
         for (final session in sessions) {
           final level = session.level;
           if (session.grade != grade ||
@@ -157,7 +157,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                   session.examType!.trim().toUpperCase() != examTypeGrade)) {
             continue;
           }
-          sessionsById[session.userExamId!] = session;
           // A passed attempt keeps the next level unlocked, even after a retry.
           if (session.passed == true && isCompletedAssessmentStats(session)) {
             _locallyUnlockedLevels[grade] = math.max(
@@ -165,7 +164,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
               (level + 1).clamp(1, _maxLevel),
             );
           }
-          if (session.isLatest != true) continue;
           final key = (grade, level);
           _ladderSessions[key] = session;
         }
@@ -174,12 +172,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
           final latest = _ladderSessions[key];
           if (latest == null) return false;
           if (latest.userExamId == pending.userExamId) return true;
-          final reportedPending = sessionsById[pending.userExamId];
-          final matchingPending = reportedPending?.level == key.$2
-              ? reportedPending
-              : null;
-          return matchingPending?.isLatest == false ||
-              _isNewerServerSession(latest, pending, matchingPending);
+          return _isNewerServerSession(latest, pending);
         });
         _isLoading = false;
       });
@@ -195,19 +188,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
 
   Future<void> _reload() => _loadGradeLevels(_selectedGrade);
 
-  bool _isNewerServerSession(
-    ExamStats latest,
-    ExamStats pending,
-    ExamStats? reportedPending,
-  ) {
+  bool _isNewerServerSession(ExamStats latest, ExamStats pending) {
     // Compare matching server fields, never the device clock or session IDs.
     for (final (latestDate, pendingDate) in [
-      (
-        latest.lastSubmittedDt,
-        reportedPending?.lastSubmittedDt ?? pending.lastSubmittedDt,
-      ),
-      (latest.createDt, reportedPending?.createDt ?? pending.createDt),
-      (latest.endedDt, reportedPending?.endedDt ?? pending.endedDt),
+      (latest.lastSubmittedDt, pending.lastSubmittedDt),
+      (latest.createDt, pending.createDt),
+      (latest.endedDt, pending.endedDt),
     ]) {
       if (latestDate != null && pendingDate != null) {
         return latestDate.isAfter(pendingDate);
