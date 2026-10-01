@@ -264,37 +264,47 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('grade journey retains the practice banner', (tester) async {
-    final lingo = LingoProvider();
-    final service = _JourneyDetailService();
-    addTearDown(lingo.dispose);
+  testWidgets(
+    'grade journey localizes the session header and retains practice',
+    (tester) async {
+      final lingo = LingoProvider();
+      final service = _JourneyDetailService();
+      addTearDown(lingo.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          useMaterial3: true,
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: RepositoryProvider<ExamService>.value(
-          value: service,
-          child: LingoScope(
-            lingo: lingo,
-            child: const ExamReviewScreen(
-              userExamId: 912347,
-              examType: examTypeGrade,
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            useMaterial3: true,
+            extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+          ),
+          home: RepositoryProvider<ExamService>.value(
+            value: service,
+            child: LingoScope(
+              lingo: lingo,
+              child: const ExamReviewScreen(
+                examId: 123,
+                userExamId: 912347,
+                examType: examTypeGrade,
+              ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const ValueKey('exam-review-practice-banner')),
-      findsOneWidget,
-    );
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.text('Đề-912347'), findsOneWidget);
+      expect(find.text('Đề-123'), findsNothing);
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
+      expect(find.text('Test-912347'), findsOneWidget);
+      expect(find.text('Test-123'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('exam-review-practice-banner')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('practice banner opens the full generate loader', (tester) async {
     final lingo = LingoProvider();
@@ -384,7 +394,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('single assessment uses exam ID; grade keeps detail title', (
+  testWidgets('single assessment and grade use the same localized ID header', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -414,8 +424,11 @@ void main() {
     expect(find.text('Đề-123'), findsOneWidget);
 
     await showReview(examTypeGrade);
-    expect(find.text('Chi Tiết'), findsOneWidget);
-    expect(find.text('Đề-123'), findsNothing);
+    expect(find.text('Đề-123'), findsOneWidget);
+    expect(find.text('Chi Tiết'), findsNothing);
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
+    expect(find.text('Test-123'), findsOneWidget);
   });
 }
 

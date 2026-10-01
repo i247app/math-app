@@ -888,6 +888,7 @@ class _RoadmapLevelNode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final levelColor = colorForLevel(level);
+    final displayLevel = level - 1;
     final faceColor = unlocked || completed
         ? levelColor
         : Color.lerp(levelColor, const Color(0xFFCFD8DC), 0.14)!;
@@ -899,13 +900,13 @@ class _RoadmapLevelNode extends StatelessWidget {
         : current
         ? context.getText(AppKeys.gradeRoadmapCurrent)
         : unlocked
-        ? '${context.getText(AppKeys.gradeRoadmapLevel)} $level'
+        ? '${context.getText(AppKeys.gradeRoadmapLevel)} $displayLevel'
         : context.getText(AppKeys.gradeRoadmapLocked);
     return Semantics(
       key: ValueKey('grade-roadmap-level-$level'),
       button: onTap != null,
       label:
-          '${context.getText(AppKeys.gradeRoadmapLevel)} $level, $stateLabel',
+          '${context.getText(AppKeys.gradeRoadmapLevel)} $displayLevel, $stateLabel',
       child: AnimatedScale(
         scale: current ? 1.04 : 1,
         duration: const Duration(milliseconds: 280),
@@ -976,7 +977,7 @@ class _RoadmapLevelNode extends StatelessWidget {
                                   ),
                                 )
                               : unlocked || completed
-                              ? _RoadmapLevelLabel(level: level)
+                              ? _RoadmapLevelLabel(level: displayLevel)
                               : Icon(
                                   Icons.lock_rounded,
                                   key: ValueKey(

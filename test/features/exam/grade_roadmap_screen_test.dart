@@ -190,6 +190,37 @@ void main() {
     );
   }
 
+  for (final apiLevel in [1, 10]) {
+    testWidgets(
+      'roadmap displays ${apiLevel - 1} but generates API level $apiLevel',
+      (tester) async {
+        final service = _FakeExamService(
+          levelsByGrade: const {2: GradeLevels(latestLevel: 10, maxLevel: 10)},
+        );
+        await pumpRoadmap(tester, service);
+        for (var level = 1; level <= 10; level++) {
+          final node = find.byKey(ValueKey('grade-roadmap-level-$level'));
+          expect(
+            find.descendant(of: node, matching: find.text('${level - 1}')),
+            findsOneWidget,
+          );
+          expect(
+            tester.widget<Semantics>(node).properties.label,
+            startsWith('Level ${level - 1},'),
+          );
+        }
+        final target = find.byKey(ValueKey('grade-roadmap-level-$apiLevel'));
+        await tester.ensureVisible(target);
+        await tester.pumpAndSettle();
+        await tester.tap(target);
+        await tester.pumpAndSettle();
+        expect(service.generatedLevels, [apiLevel]);
+        expect(find.byType(ExamAttemptScreen), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
     testWidgets('roadmap stops at the image bottom on $platform', (
       tester,

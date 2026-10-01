@@ -43,7 +43,9 @@ class ExamReviewScreen extends StatelessWidget {
     return ReviewDetailScreen(
       detailId: detailId,
       showTime: false,
-      headerTitle: resolvedExamType == examTypeAssessment
+      headerTitle:
+          resolvedExamType == examTypeAssessment ||
+              resolvedExamType == examTypeGrade
           ? context.formatText(AppKeys.assessmentReviewHeaderTitle, {
               'id': detailId,
             })
