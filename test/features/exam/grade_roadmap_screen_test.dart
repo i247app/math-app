@@ -1604,7 +1604,9 @@ void main() {
     expect(gradeSelection.selectionOnly, isTrue);
 
     await tester.tap(
-      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
+      find.byKey(
+        const ValueKey('grade-card-assets/images/grade-selection-3.png'),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -1680,7 +1682,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey('grade-card-assets/icons/2.svg')),
+      find.byKey(
+        const ValueKey('grade-card-assets/images/grade-selection-2.png'),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -1713,7 +1717,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('grade-roadmap-grade-pill')));
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey('grade-card-assets/icons/3.svg')),
+      find.byKey(
+        const ValueKey('grade-card-assets/images/grade-selection-3.png'),
+      ),
     );
     await tester.pumpAndSettle();
     expect(

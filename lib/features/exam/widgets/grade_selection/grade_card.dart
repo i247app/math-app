@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:numi/features/exam/widgets/grade_selection/grade_option.dart';
 import 'package:numi/core/theme/app_colors.dart';
@@ -17,8 +14,6 @@ class GradeCard extends StatelessWidget {
   final GradeOption option;
   final bool isSelected;
   final VoidCallback onSelected;
-
-  static final Map<String, Future<Uint8List>> _iconBytesCache = {};
 
   @override
   Widget build(BuildContext context) {
@@ -70,55 +65,27 @@ class GradeCard extends StatelessWidget {
                     ),
                   )
                 : Center(
-                    child: FutureBuilder<Uint8List>(
-                      key: ValueKey('grade-icon-$iconAsset'),
-                      future: _iconBytesCache.putIfAbsent(
-                        iconAsset,
-                        () => _loadEmbeddedPng(iconAsset),
-                      ),
-                      builder: (context, snapshot) {
-                        final bytes = snapshot.data;
-                        if (bytes != null) {
-                          return Image.memory(
-                            bytes,
-                            key: ValueKey('grade-icon-image-$iconAsset'),
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high,
-                            gaplessPlayback: true,
-                          );
-                        }
-
-                        if (snapshot.hasError) {
-                          return _GradeIconFallback(
+                    key: ValueKey('grade-icon-$iconAsset'),
+                    child: Image.asset(
+                      iconAsset,
+                      key: ValueKey('grade-icon-image-$iconAsset'),
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                      cacheWidth: 360,
+                      filterQuality: FilterQuality.high,
+                      gaplessPlayback: true,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _GradeIconFallback(
                             key: ValueKey('grade-icon-fallback-$iconAsset'),
                             label: option.label,
-                          );
-                        }
-
-                        return SizedBox.square(
-                          key: ValueKey('grade-icon-loading-$iconAsset'),
-                          dimension: 120,
-                        );
-                      },
+                          ),
                     ),
                   ),
           ),
         ),
       ),
     );
-  }
-
-  static Future<Uint8List> _loadEmbeddedPng(String assetPath) async {
-    final svg = await rootBundle.loadString(assetPath);
-    final match = RegExp(r'base64,([^"]+)').firstMatch(svg);
-    final encoded = match?.group(1);
-    if (encoded == null || encoded.isEmpty) {
-      throw FormatException('No embedded image found in $assetPath');
-    }
-
-    return base64Decode(encoded);
   }
 
   Color get _backgroundColor {

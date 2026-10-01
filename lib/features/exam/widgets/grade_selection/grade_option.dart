@@ -26,15 +26,15 @@ class GradeOption {
 
   String? get iconAsset {
     if (isKindergarten) {
-      return 'assets/icons/mau_giao.svg';
+      return 'assets/images/grade-selection-k.png';
     }
 
     return switch (number) {
-      '1' => 'assets/icons/1.svg',
-      '2' => 'assets/icons/2.svg',
-      '3' => 'assets/icons/3.svg',
-      '4' => 'assets/icons/4.svg',
-      '5' => 'assets/icons/5.svg',
+      '1' => 'assets/images/grade-selection-1.png',
+      '2' => 'assets/images/grade-selection-2.png',
+      '3' => 'assets/images/grade-selection-3.png',
+      '4' => 'assets/images/grade-selection-4.png',
+      '5' => 'assets/images/grade-selection-5.png',
       _ => null,
     };
   }

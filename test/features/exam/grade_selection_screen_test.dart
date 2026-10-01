@@ -122,9 +122,12 @@ void main() {
           ),
         ),
       );
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 100)),
-      );
+      await tester.runAsync(() async {
+        final context = tester.element(find.byType(GradeSelectionScreen));
+        for (final image in tester.widgetList<Image>(find.byType(Image))) {
+          await precacheImage(image.image, context);
+        }
+      });
       await tester.pumpAndSettle();
 
       expect(find.byType(PageHeader), findsOneWidget);
@@ -134,18 +137,25 @@ void main() {
       expect(find.text('BỎ QUA'), findsNothing);
 
       const expectedAssets = <String>[
-        'assets/icons/mau_giao.svg',
-        'assets/icons/1.svg',
-        'assets/icons/2.svg',
-        'assets/icons/3.svg',
-        'assets/icons/4.svg',
-        'assets/icons/5.svg',
+        'assets/images/grade-selection-k.png',
+        'assets/images/grade-selection-1.png',
+        'assets/images/grade-selection-2.png',
+        'assets/images/grade-selection-3.png',
+        'assets/images/grade-selection-4.png',
+        'assets/images/grade-selection-5.png',
       ];
       expect(find.byType(SvgPicture), findsOneWidget);
       for (final asset in expectedAssets) {
         expect(find.byKey(ValueKey('grade-card-$asset')), findsOneWidget);
         expect(find.byKey(ValueKey('grade-icon-$asset')), findsOneWidget);
         expect(find.byKey(ValueKey('grade-icon-image-$asset')), findsOneWidget);
+        final imageFinder = find.byKey(ValueKey('grade-icon-image-$asset'));
+        final image = tester.widget<Image>(imageFinder);
+        expect((image.image as ResizeImage).imageProvider, AssetImage(asset));
+        final rendered = tester.widget<RawImage>(
+          find.descendant(of: imageFinder, matching: find.byType(RawImage)),
+        );
+        expect(rendered.image, isNotNull);
         expect(
           find.byKey(ValueKey('grade-icon-fallback-$asset')),
           findsNothing,
@@ -155,7 +165,9 @@ void main() {
         tester
             .getTopLeft(
               find.byKey(
-                const ValueKey('grade-card-assets/icons/mau_giao.svg'),
+                const ValueKey(
+                  'grade-card-assets/images/grade-selection-k.png',
+                ),
               ),
             )
             .dx,
@@ -263,7 +275,9 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(
-        find.byKey(const ValueKey('grade-card-assets/icons/1.svg')),
+        find.byKey(
+          const ValueKey('grade-card-assets/images/grade-selection-1.png'),
+        ),
       );
       await tester.tap(find.text('Tiếp tục'));
       await tester.pumpAndSettle();
