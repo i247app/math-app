@@ -72,6 +72,9 @@ GeneratedExam completedAssessmentFromStats(
     createDt: submittedAt,
     modifyDt: submittedAt,
     shortText: stats.review,
+    aiShortText: stats.aiShortText,
+    aiReviewShort: stats.aiReviewShort,
+    aiReviewLong: stats.aiReviewLong,
     grading: ExamGrading(
       aiDetectGrade: stats.grade == null ? null : 'Lớp ${stats.grade}',
       aiReview: stats.review,

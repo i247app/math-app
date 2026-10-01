@@ -303,6 +303,77 @@ void main() {
     expect(body, containsPair('exam_type', examTypeGrade));
   });
 
+  for (final entireJourney in [false, true]) {
+    for (final type in [examTypeAssessment, examTypeGrade, examTypePractice]) {
+      test(
+        'detail maps AI fields from stats ($type, journey=$entireJourney)',
+        () async {
+          final api = _apiReturning(
+            (_) => {
+              ..._examResponse(),
+              'exams': [
+                {
+                  'elink_id': 136,
+                  'exam_id': 136,
+                  'profile_id': 17,
+                  'exam_type': type,
+                  'grade': 1,
+                  'level': 3,
+                  'status': 'SUBMITTED',
+                  'short_text': 'Different set text',
+                  'num_questions': 10,
+                },
+              ],
+              'stats': {
+                'esess_id': 114,
+                'exam_type': type,
+                'status': 'COMPLETE',
+                'total_questions': 10,
+                'correct_number': 7,
+                'skipped_number': 0,
+                'score_percentage': 70,
+                'review': 'Answered 7/10 correctly.',
+                'ai_short_text': 'Numbers and arithmetic within 100',
+                'ai_review_short': 'Practice subtraction and ordering numbers.',
+                'ai_review_long': 'Detailed feedback saved in stats.',
+                'grade': 1,
+                'level': 3,
+              },
+              'details': [
+                {
+                  'elink_id': 136,
+                  'question_number': 1,
+                  'question_name': 'What comes after 47?',
+                  'right_answer_label': 'B',
+                  'right_answer_content': '48',
+                  'selected_label': 'B',
+                  'selected_content': '48',
+                  'is_correct': true,
+                  'answers': [
+                    {'label': 'A', 'content': '46'},
+                    {'label': 'B', 'content': '48'},
+                  ],
+                },
+              ],
+            },
+          );
+          final exam = await api.getExamDetail(
+            136,
+            profileId: 17,
+            userExamId: entireJourney ? 114 : null,
+            examType: type,
+          );
+          expect(exam.aiShortText, 'Numbers and arithmetic within 100');
+          expect(
+            exam.aiReviewShort,
+            'Practice subtraction and ordering numbers.',
+          );
+          expect(exam.aiReviewLong, 'Detailed feedback saved in stats.');
+        },
+      );
+    }
+  }
+
   test('loads an entire assessment journey by esess_id', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {

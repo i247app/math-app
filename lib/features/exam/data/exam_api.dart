@@ -284,6 +284,7 @@ class ExamApi implements ExamService {
     ];
     return exam.toModel(
       submittedAnswers: submittedAnswers,
+      stats: response.stats,
       useSequentialQuestionNumbers: isEntireJourney,
       userExamId: validUserExamId,
       practiceWeakTopics: _practiceWeakTopics(response),
@@ -474,6 +475,9 @@ GeneratedExam _journeyDetailToModel(
     grade: stats.grade ?? lastExam?.grade,
     lastSetGrade: lastExam?.grade ?? stats.grade,
     lastSetShortText: lastExam?.shortText,
+    aiShortText: stats.aiShortText,
+    aiReviewShort: stats.aiReviewShort,
+    aiReviewLong: stats.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
     level: stats.level ?? lastExam?.level,
     numQuestions: stats.totalQuestions,
@@ -562,6 +566,9 @@ GeneratedExam _activeJourneySetToModel({
     grade: activeExam.grade,
     lastSetGrade: activeExam.grade,
     lastSetShortText: activeExam.shortText,
+    aiShortText: response.stats?.aiShortText,
+    aiReviewShort: response.stats?.aiReviewShort,
+    aiReviewLong: response.stats?.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
     level: activeExam.level,
     numQuestions: activeDetails.length,

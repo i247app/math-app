@@ -892,6 +892,7 @@ class AppKeys {
   static const examReviewWeakTopicsTitle = 'exam_review_weak_topics_title';
   static const examReviewPerfectScoreMessage =
       'exam_review_perfect_score_message';
+  static const examReviewLoadFailed = 'exam_review_load_failed';
   static const examReviewPracticeBannerAction =
       'exam_review_practice_banner_action';
   static const scoreUpper = 'score_upper';

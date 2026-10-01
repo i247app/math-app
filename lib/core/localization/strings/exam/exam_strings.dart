@@ -92,6 +92,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examReviewTopicConjunction: 'và',
     AppKeys.examReviewWeakTopicsTitle: 'Nhận Xét',
     AppKeys.examReviewPerfectScoreMessage: 'Bạn đang làm rất tốt!',
+    AppKeys.examReviewLoadFailed: 'Không tải được nhận xét. Vui lòng thử lại.',
     AppKeys.examReviewPracticeBannerAction: 'LUYỆN TẬP',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
     AppKeys.numiAiReview: 'Numi AI nhận xét',
@@ -194,6 +195,8 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examReviewTopicConjunction: 'and',
     AppKeys.examReviewWeakTopicsTitle: 'Review',
     AppKeys.examReviewPerfectScoreMessage: 'You are doing good!',
+    AppKeys.examReviewLoadFailed:
+        'Could not load the review. Please try again.',
     AppKeys.examReviewPracticeBannerAction: 'PRACTICE',
     AppKeys.scoreUpper: 'SCORE',
     AppKeys.numiAiReview: 'Numi AI review',

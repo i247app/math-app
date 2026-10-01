@@ -11,7 +11,6 @@ import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/debug/app_logger.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_computed_correct_count.dart';
@@ -55,7 +54,7 @@ class ReviewDetailScreen extends StatefulWidget {
 class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   late final ExamReviewController _controller;
   bool _isGeneratingPractice = false;
-  ExamStats? _sessionReview;
+  bool _isReviewOpen = false;
 
   @override
   void initState() {
@@ -69,21 +68,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
           : ExamReviewMode.result,
       cacheKey: widget.cacheKey,
     );
-    unawaited(_loadInitialDetail());
-  }
-
-  Future<void> _loadInitialDetail() async {
-    await _controller.loadExamDetail();
-    if (!mounted) return;
-    final loadReview = widget.onLoadSessionReview;
-    if (loadReview == null) return;
-    try {
-      final review = await loadReview(_controller.exam);
-      if (!mounted) return;
-      setState(() => _sessionReview = review);
-    } catch (error) {
-      AppLogger.warning('EXAM_REVIEW', 'Session review request failed: $error');
-    }
+    unawaited(_controller.loadExamDetail());
   }
 
   @override
@@ -99,22 +84,21 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
   }
 
   String? _reviewShortText(GeneratedExam exam) {
-    final total =
-        _sessionReview?.totalQuestions ??
-        exam.grading?.totalQuestions ??
-        exam.questions.length;
+    final total = exam.grading?.totalQuestions ?? exam.questions.length;
     final correct =
-        _sessionReview?.correctNumber ??
-        exam.grading?.correctNumber ??
-        examReviewComputedCorrectCount(exam);
+        exam.grading?.correctNumber ?? examReviewComputedCorrectCount(exam);
     if (total > 0 && correct == total) {
       return context.getText(AppKeys.examReviewPerfectScoreMessage);
     }
-    return _sessionReview?.aiReviewShort;
+    return exam.aiReviewShort;
   }
 
-  void _openReview(GeneratedExam exam) {
-    final longText = _sessionReview?.aiReviewLong?.trim() ?? '';
+  Future<void> _openReview(GeneratedExam exam) async {
+    if (_isReviewOpen) return;
+    _isReviewOpen = true;
+    final longText = exam.aiReviewLong?.trim() ?? '';
+    final hasExistingReview =
+        longText.isNotEmpty && (exam.aiReviewShort?.trim().isNotEmpty ?? false);
     final shortText = _reviewShortText(exam)?.trim() ?? '';
     final topics = exam.practiceWeakTopics
         .map((topic) => topic.topic.trim())
@@ -125,11 +109,33 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
         : shortText.isNotEmpty
         ? shortText
         : topics;
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => ExamReviewTextScreen(reviewText: reviewText),
-      ),
-    );
+    final generateReview = widget.onLoadSessionReview;
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => ExamReviewTextScreen(
+            reviewText: reviewText,
+            reviewLoader: generateReview == null || hasExistingReview
+                ? null
+                : () async {
+                    final review = await generateReview(exam);
+                    final generatedLong = review?.aiReviewLong?.trim() ?? '';
+                    final generatedShort = review?.aiReviewShort?.trim() ?? '';
+                    return generatedLong.isNotEmpty
+                        ? generatedLong
+                        : generatedShort.isNotEmpty
+                        ? generatedShort
+                        : reviewText;
+                  },
+          ),
+        ),
+      );
+      if (mounted) {
+        await _controller.loadExamDetail(forceRefresh: true);
+      }
+    } finally {
+      _isReviewOpen = false;
+    }
   }
 
   void _selectMode(ExamReviewMode mode) {
@@ -249,7 +255,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                               : () => _startPractice(exam),
                           isGeneratingPractice: _isGeneratingPractice,
                           aiReviewShort: _reviewShortText(exam),
-                          aiShortText: _sessionReview?.aiShortText,
+                          aiShortText: exam.aiShortText,
                           onOpenReview: () => _openReview(exam),
                         );
                       },

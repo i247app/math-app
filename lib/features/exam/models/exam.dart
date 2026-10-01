@@ -149,6 +149,9 @@ class GeneratedExam {
     this.grade,
     this.lastSetGrade,
     this.lastSetShortText,
+    this.aiShortText,
+    this.aiReviewShort,
+    this.aiReviewLong,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
     this.level,
     this.numQuestions,
@@ -176,6 +179,9 @@ class GeneratedExam {
   final int? grade;
   final int? lastSetGrade;
   final String? lastSetShortText;
+  final String? aiShortText;
+  final String? aiReviewShort;
+  final String? aiReviewLong;
   final List<ExamPracticeTopic> practiceWeakTopics;
   final int? level;
   final int? numQuestions;
