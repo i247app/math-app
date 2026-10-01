@@ -156,12 +156,14 @@ void main() {
             shortReview: 'Updated short review.',
             longReview: 'Updated long review.',
             aiShortText: 'Updated AI description.',
+            aiTitle: 'Updated AI title.',
           );
           await tester.tap(find.byIcon(Icons.arrow_back_rounded));
           await tester.pumpAndSettle();
           expect(service.detailCalls, cached ? 1 : 2);
           expect(find.text('Updated short review.'), findsOneWidget);
           expect(find.text('Updated AI description.'), findsOneWidget);
+          expect(find.text('Updated AI title.'), findsOneWidget);
           expect(find.text('Detail short review.'), findsNothing);
           expect(find.text('1 + 1 = ?'), findsOneWidget);
           expect(service.requests.length, 1);
@@ -548,6 +550,7 @@ GeneratedExam _detail(
   String? shortReview = 'Detail short review.',
   String? longReview,
   String aiShortText = 'Detail AI description.',
+  String? aiTitle,
   bool withTopics = false,
 }) => GeneratedExam(
   userExamId: sessionId,
@@ -555,6 +558,7 @@ GeneratedExam _detail(
   grade: 1,
   level: 3,
   aiShortText: aiShortText,
+  aiTitle: aiTitle,
   aiReviewShort: shortReview,
   aiReviewLong: longReview,
   grading: ExamGrading(correctNumber: correct, totalQuestions: total),

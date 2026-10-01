@@ -78,6 +78,8 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                           const SizedBox(height: 12),
                           Container(
                             key: const ValueKey('exam-review-practice-action'),
+                            width:
+                                (constraints.maxWidth - mascotWidth - 18) * 0.9,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 10,

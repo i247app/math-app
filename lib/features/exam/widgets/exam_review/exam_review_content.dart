@@ -39,6 +39,7 @@ class ExamReviewContent extends StatelessWidget {
     this.onPractice,
     this.isGeneratingPractice = false,
     this.aiReviewShort,
+    this.aiTitle,
     this.aiShortText,
     this.onOpenReview,
   });
@@ -61,6 +62,7 @@ class ExamReviewContent extends StatelessWidget {
   final VoidCallback? onPractice;
   final bool isGeneratingPractice;
   final String? aiReviewShort;
+  final String? aiTitle;
   final String? aiShortText;
   final VoidCallback? onOpenReview;
 
@@ -72,7 +74,14 @@ class ExamReviewContent extends StatelessWidget {
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
     final hasAiReview = aiReviewShort?.trim().isNotEmpty ?? false;
+    final title = aiTitle?.trim() ?? '';
     final shortText = aiShortText?.trim() ?? '';
+    final colors = context.themeColors;
+    final aiTextStyle = GoogleFonts.andika(
+      color: colors.textPrimary,
+      fontSize: ExamReviewGradeLevelBadge.textFontSize,
+      fontWeight: FontWeight.w700,
+    );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -99,16 +108,35 @@ class ExamReviewContent extends StatelessWidget {
                   level: exam.level!,
                 ),
               ),
-            if (shortText.isNotEmpty)
+            if (title.isNotEmpty || shortText.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  shortText,
-                  key: const ValueKey('exam-review-ai-short-text'),
-                  style: GoogleFonts.andika(
-                    color: context.themeColors.textPrimary,
-                    fontSize: ExamReviewGradeLevelBadge.textFontSize,
-                    fontWeight: FontWeight.w700,
+                child: Container(
+                  key: const ValueKey('exam-review-ai-description-box'),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colors.elevatedSurface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (title.isNotEmpty)
+                        Text(
+                          title,
+                          key: const ValueKey('exam-review-ai-title'),
+                          style: aiTextStyle,
+                        ),
+                      if (title.isNotEmpty && shortText.isNotEmpty)
+                        const SizedBox(height: 8),
+                      if (shortText.isNotEmpty)
+                        Text(
+                          shortText,
+                          key: const ValueKey('exam-review-ai-short-text'),
+                          style: aiTextStyle,
+                        ),
+                    ],
                   ),
                 ),
               ),

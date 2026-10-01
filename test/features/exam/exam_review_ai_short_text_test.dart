@@ -20,7 +20,7 @@ void main() {
         (width: 280.0, scale: 2.0),
       ]) {
         testWidgets(
-          'AI description sits below badge without empty space ($language, $dark, $viewport)',
+          'AI title and description share a box below badge ($language, $dark, $viewport)',
           (tester) async {
             await tester.binding.setSurfaceSize(Size(viewport.width, 844));
             addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -31,7 +31,7 @@ void main() {
               lingo.dispose();
             });
             await lingo.setLanguage(language);
-            Future<void> pump(String? shortText) async {
+            Future<void> pump(String? shortText, {String? aiTitle}) async {
               await tester.pumpWidget(
                 LingoScope(
                   lingo: lingo,
@@ -63,6 +63,7 @@ void main() {
                           onPrevious: () {},
                           onNext: () {},
                           onPractice: () {},
+                          aiTitle: aiTitle,
                           aiShortText: shortText,
                         ),
                       ),
@@ -79,11 +80,21 @@ void main() {
             final description = find.byKey(
               const ValueKey('exam-review-ai-short-text'),
             );
+            final title = find.byKey(const ValueKey('exam-review-ai-title'));
+            final box = find.byKey(
+              const ValueKey('exam-review-ai-description-box'),
+            );
             await pump(null);
+            expect(box, findsNothing);
             final emptyBannerTop = tester.getTopLeft(banner).dy;
             const text =
                 'Practice addition, subtraction, number comparisons and repeating patterns with familiar objects.';
             await pump('  $text  ');
+            expect(title, findsNothing);
+            expect(
+              find.descendant(of: box, matching: description),
+              findsOneWidget,
+            );
             expect(tester.widget<Text>(description).data, text);
             final badgeText = find.descendant(
               of: find.byType(ExamReviewGradeLevelBadge),
@@ -110,8 +121,37 @@ void main() {
             );
             expect(tester.getTopLeft(banner).dy, greaterThan(emptyBannerTop));
             expect(tester.takeException(), isNull);
+            const titleText = 'Numbers and arithmetic within 100';
+            await pump('  $text  ', aiTitle: '  $titleText  ');
+            expect(tester.widget<Text>(title).data, titleText);
+            expect(tester.widget<Text>(description).data, text);
+            expect(find.descendant(of: box, matching: title), findsOneWidget);
+            expect(
+              find.descendant(of: box, matching: description),
+              findsOneWidget,
+            );
+            expect(
+              tester.getBottomLeft(title).dy,
+              lessThan(tester.getTopLeft(description).dy),
+            );
+            expect(
+              tester.getTopLeft(box).dy,
+              greaterThanOrEqualTo(tester.getBottomLeft(badgeText).dy),
+            );
+            expect(
+              tester.getBottomLeft(box).dy,
+              lessThan(tester.getTopLeft(banner).dy),
+            );
+            expect(tester.takeException(), isNull);
+            await pump(' \n ', aiTitle: titleText);
+            expect(box, findsOneWidget);
+            expect(title, findsOneWidget);
+            expect(description, findsNothing);
+            expect(tester.takeException(), isNull);
             for (final empty in [null, '', ' \n ']) {
-              await pump(empty);
+              await pump(empty, aiTitle: empty);
+              expect(box, findsNothing);
+              expect(title, findsNothing);
               expect(description, findsNothing);
               expect(tester.getTopLeft(banner).dy, emptyBannerTop);
               expect(tester.takeException(), isNull);

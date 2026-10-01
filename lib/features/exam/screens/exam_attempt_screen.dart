@@ -305,6 +305,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
             modifyDt: submittedExam.modifyDt,
             submittedDt: submittedExam.submittedDt,
             grading: submittedExam.grading,
+            aiTitle: submittedExam.aiTitle,
             aiShortText: submittedExam.aiShortText,
             aiReviewShort: submittedExam.aiReviewShort,
             aiReviewLong: submittedExam.aiReviewLong,

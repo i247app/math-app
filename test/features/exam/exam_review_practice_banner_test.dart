@@ -76,6 +76,14 @@ void main() {
           );
           expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
           expect(
+            tester
+                .getSize(
+                  find.byKey(const ValueKey('exam-review-practice-action')),
+                )
+                .width,
+            closeTo(((viewport.width - 26) * 0.56 - 18) * 0.9, 0.01),
+          );
+          expect(
             (tester.widget<Image>(find.byType(Image)).image as ResizeImage)
                 .imageProvider,
             const AssetImage('assets/images/review-practice-mascot.png'),

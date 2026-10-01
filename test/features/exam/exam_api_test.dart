@@ -333,6 +333,7 @@ void main() {
                 'skipped_number': 0,
                 'score_percentage': 70,
                 'review': 'Answered 7/10 correctly.',
+                'ai_title': 'Number skills',
                 'ai_short_text': 'Numbers and arithmetic within 100',
                 'ai_review_short': 'Practice subtraction and ordering numbers.',
                 'ai_review_long': 'Detailed feedback saved in stats.',
@@ -363,6 +364,7 @@ void main() {
             userExamId: entireJourney ? 114 : null,
             examType: type,
           );
+          expect(exam.aiTitle, 'Number skills');
           expect(exam.aiShortText, 'Numbers and arithmetic within 100');
           expect(
             exam.aiReviewShort,
@@ -932,6 +934,7 @@ void main() {
           'score_percentage': 50,
           'review': 'Answered 5/10 correctly.',
           'esess_flag': true,
+          'ai_title': 'Counting and subtraction',
           'ai_short_text': 'Learn counting and subtraction.',
           'ai_review_short': 'Practice counting and subtraction.',
           'ai_review_long': 'First paragraph.\n\nSecond paragraph.',
@@ -965,6 +968,7 @@ void main() {
       expect(result.correctNumber, 5);
       expect(result.scorePercentage, 50);
       expect(result.aiReviewShort, 'Practice counting and subtraction.');
+      expect(result.aiTitle, 'Counting and subtraction');
       expect(result.aiShortText, 'Learn counting and subtraction.');
       expect(result.aiReviewLong, 'First paragraph.\n\nSecond paragraph.');
       expect(result.endedDt, DateTime.parse('2026-10-01T13:09:28.266769Z'));

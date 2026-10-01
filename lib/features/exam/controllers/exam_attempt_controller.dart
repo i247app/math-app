@@ -842,6 +842,7 @@ class ExamAttemptController extends ChangeNotifier {
       examType: sourceExam.examType ?? submittedExam.examType,
       title: submittedExam.title ?? sourceExam.title,
       shortText: submittedExam.shortText ?? sourceExam.shortText,
+      aiTitle: submittedExam.aiTitle ?? sourceExam.aiTitle,
       aiShortText: submittedExam.aiShortText ?? sourceExam.aiShortText,
       aiReviewShort: submittedExam.aiReviewShort ?? sourceExam.aiReviewShort,
       aiReviewLong: submittedExam.aiReviewLong ?? sourceExam.aiReviewLong,

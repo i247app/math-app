@@ -72,6 +72,7 @@ GeneratedExam completedAssessmentFromStats(
     createDt: submittedAt,
     modifyDt: submittedAt,
     shortText: stats.review,
+    aiTitle: stats.aiTitle,
     aiShortText: stats.aiShortText,
     aiReviewShort: stats.aiReviewShort,
     aiReviewLong: stats.aiReviewLong,

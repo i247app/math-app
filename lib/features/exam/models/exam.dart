@@ -149,6 +149,7 @@ class GeneratedExam {
     this.grade,
     this.lastSetGrade,
     this.lastSetShortText,
+    this.aiTitle,
     this.aiShortText,
     this.aiReviewShort,
     this.aiReviewLong,
@@ -179,6 +180,7 @@ class GeneratedExam {
   final int? grade;
   final int? lastSetGrade;
   final String? lastSetShortText;
+  final String? aiTitle;
   final String? aiShortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
@@ -222,6 +224,7 @@ class ExamStats {
     this.passed,
     this.isLatest,
     this.review,
+    this.aiTitle,
     this.aiShortText,
     this.aiReviewShort,
     this.aiReviewLong,
@@ -243,6 +246,7 @@ class ExamStats {
   final bool? passed;
   final bool? isLatest;
   final String? review;
+  final String? aiTitle;
   final String? aiShortText;
   final String? aiReviewShort;
   final String? aiReviewLong;

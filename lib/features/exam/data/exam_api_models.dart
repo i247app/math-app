@@ -368,6 +368,7 @@ class ExamStatsDto {
     this.passed,
     this.isLatest,
     this.review,
+    this.aiTitle,
     this.aiShortText,
     this.aiReviewShort,
     this.aiReviewLong,
@@ -394,6 +395,7 @@ class ExamStatsDto {
   final bool? passed;
   final bool? isLatest;
   final String? review;
+  final String? aiTitle;
   final String? aiShortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
