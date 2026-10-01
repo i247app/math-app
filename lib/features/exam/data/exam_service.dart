@@ -58,6 +58,7 @@ abstract interface class ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   });
 
   Future<GeneratedExam> getExamDetail(

@@ -342,7 +342,7 @@ void main() {
         );
         expect(
           find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
-          findsOneWidget,
+          passed ? findsNothing : findsOneWidget,
         );
         final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
         await tester.ensureVisible(level);
@@ -364,6 +364,159 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'reopening roadmap restores the next level from a passed ladder',
+    (tester) async {
+      final ladder = <ExamStats>[];
+      final service = _FakeExamService(
+        levelsByGrade: const {2: GradeLevels(latestLevel: 3, maxLevel: 3)},
+        ladder: ladder,
+      );
+      await pumpRoadmap(
+        tester,
+        service,
+        home: GradeRoadmapScreen(
+          profileId: 11,
+          initialGrade: 2,
+          examService: service,
+          gradeProgressStore: const _FakeProgressStore(
+            ProfileGradeProgress.initial,
+          ),
+          initialCompletion: const GradeExamCompletion(
+            grade: 2,
+            level: 3,
+            exam: GeneratedExam(userExamId: 8103, questions: []),
+            outcome: GradeExamOutcome(
+              progress: ProfileGradeProgress(grade: 2, level: 4),
+              passed: true,
+              levelIncrease: 1,
+            ),
+          ),
+        ),
+      );
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-4-locked')),
+        findsNothing,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      ladder.add(_ladderSession(8103, passed: true, level: 3));
+      await pumpRoadmap(tester, service);
+      expect(service.levelRequests, [2, 2]);
+      expect(service.ladderRequests, [2, 2]);
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-3-completed')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-4-locked')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('grade-roadmap-level-5-locked')),
+        findsOneWidget,
+      );
+      final nextLevel = find.byKey(const ValueKey('grade-roadmap-level-4'));
+      expect(
+        tester
+            .widget<AnimatedScale>(
+              find.descendant(
+                of: nextLevel,
+                matching: find.byType(AnimatedScale),
+              ),
+            )
+            .scale,
+        1.04,
+      );
+      await tester.ensureVisible(nextLevel);
+      await tester.pumpAndSettle();
+      await tester.tap(nextLevel);
+      await tester.pumpAndSettle();
+      expect(service.generatedLevels, [4]);
+      expect(service.detailRequests, isEmpty);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a later failed retry does not remove a passed level unlock', (
+    tester,
+  ) async {
+    final service = _FakeExamService(
+      ladder: [
+        _ladderSession(8201, passed: true, isLatest: false),
+        _ladderSession(8202, passed: false),
+      ],
+    );
+    await pumpRoadmap(tester, service);
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
+      findsOneWidget,
+    );
+    final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+    await tester.ensureVisible(level);
+    await tester.pumpAndSettle();
+    await tester.tap(level);
+    await tester.pumpAndSettle();
+    expect(service.generatedLevels, [1]);
+    expect(service.detailRequests, isEmpty);
+    expect(find.byType(ExamReviewScreen), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('only completed passes in the selected grade restore unlocks', (
+    tester,
+  ) async {
+    final service = _FakeExamService(
+      ladder: [
+        _ladderSession(8301, passed: true, grade: 1, level: 9),
+        _ladderSession(8302, passed: true, status: 'ACTIVE', level: 7),
+        _ladderSession(8303, passed: false, level: 5, score: 100),
+        _ladderSession(
+          8304,
+          passed: true,
+          examType: examTypeAssessment,
+          level: 8,
+        ),
+        _ladderSession(0, passed: true, level: 6),
+        _ladderSession(8305, passed: true, level: 11),
+      ],
+    );
+    await pumpRoadmap(tester, service);
+    expect(
+      find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a passed Level 10 remains capped at Level 10', (tester) async {
+    final service = _FakeExamService(
+      ladder: [_ladderSession(8410, passed: true, level: 10)],
+    );
+    await pumpRoadmap(tester, service);
+    for (var level = 1; level <= 10; level++) {
+      expect(
+        find.byKey(ValueKey('grade-roadmap-level-$level-locked')),
+        findsNothing,
+      );
+    }
+    expect(find.byKey(const ValueKey('grade-roadmap-level-11')), findsNothing);
+    final level = find.byKey(const ValueKey('grade-roadmap-level-10'));
+    expect(
+      tester
+          .widget<AnimatedScale>(
+            find.descendant(of: level, matching: find.byType(AnimatedScale)),
+          )
+          .scale,
+      1.04,
+    );
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('latest fail does not fall back to an older passing review', (
     tester,
@@ -674,6 +827,7 @@ void main() {
         expect(find.byType(ExamAttemptScreen), findsNothing);
         expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
         expect(service.updatedStatuses, ['COMPLETE']);
+        expect(service.markedFlags, [passed]);
         expect(service.levelRequests, [2, 2]);
         expect(service.ladderRequests, [2, 2]);
         expect(service.statsRequests, 0);
@@ -787,6 +941,7 @@ void main() {
       findsOneWidget,
     );
     expect(service.submittedAnswerCounts, [6]);
+    expect(service.markedFlags, [true]);
     expect(tester.takeException(), isNull);
   });
 
@@ -1652,12 +1807,16 @@ ExamStats _ladderSession(
   required bool passed,
   bool isLatest = true,
   double score = 90,
+  int grade = 2,
+  int level = 1,
+  String status = 'COMPLETE',
+  String examType = examTypeGrade,
 }) => ExamStats(
   userExamId: id,
-  examType: examTypeGrade,
-  grade: 2,
-  level: 1,
-  status: 'COMPLETE',
+  examType: examType,
+  grade: grade,
+  level: level,
+  status: status,
   isLatest: isLatest,
   passed: passed,
   correctNumber: 9,
@@ -1751,6 +1910,7 @@ class _FakeExamService implements ExamService {
   final List<int> detailRequests = <int>[];
   final List<int> ladderRequests = <int>[];
   final List<String> updatedStatuses = <String>[];
+  final List<bool?> markedFlags = <bool?>[];
   final List<int> submittedAnswerCounts = <int>[];
   int statsRequests = 0;
   final List<int?> generatedLevels = <int?>[];
@@ -1863,8 +2023,10 @@ class _FakeExamService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     updatedStatuses.add(status);
+    markedFlags.add(esessFlag);
     if (failCompletion) throw Exception('Completion unavailable');
   }
 

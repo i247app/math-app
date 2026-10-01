@@ -212,8 +212,33 @@ void main() {
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('esess_id', 99));
     expect(body, containsPair('status', 'COMPLETE'));
+    expect(body, isNot(contains('esess_flag')));
     expect(captured.extra['useGuestToken'], isNull);
   });
+
+  for (final passed in [true, false]) {
+    test('marks a completed grade session with esess_flag=$passed', () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return const <String, dynamic>{'mstatus': 200, 'status': 'Success'};
+      });
+
+      await api.updateUserExamStatus(
+        profileId: 21,
+        userExamId: 99,
+        status: 'COMPLETE',
+        esessFlag: passed,
+      );
+
+      expect(captured.path, '/exams/sessions/mark');
+      expect(captured.method, 'POST');
+      expect(_body(captured), containsPair('profile_id', 21));
+      expect(_body(captured), containsPair('esess_id', 99));
+      expect(_body(captured), containsPair('status', 'COMPLETE'));
+      expect(_body(captured), containsPair('esess_flag', passed));
+    });
+  }
 
   test('updates guest user exam status with the guest token', () async {
     late RequestOptions captured;

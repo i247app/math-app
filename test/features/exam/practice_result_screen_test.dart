@@ -56,6 +56,7 @@ class _RecordingPracticeService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     completedUserExamId = userExamId;
     completedStatus = status;

@@ -147,8 +147,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         _ladderSessions.removeWhere((key, _) => key.$1 == grade);
         for (final session in sessions) {
           final level = session.level;
-          if (session.isLatest != true ||
-              session.grade != grade ||
+          if (session.grade != grade ||
               level == null ||
               level < 1 ||
               level > _maxLevel ||
@@ -157,6 +156,14 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                   session.examType!.trim().toUpperCase() != examTypeGrade)) {
             continue;
           }
+          // A passed attempt keeps the next level unlocked, even after a retry.
+          if (session.passed == true && isCompletedAssessmentStats(session)) {
+            _locallyUnlockedLevels[grade] = math.max(
+              _locallyUnlockedLevels[grade] ?? 1,
+              (level + 1).clamp(1, _maxLevel),
+            );
+          }
+          if (session.isLatest != true) continue;
           final key = (grade, level);
           _ladderSessions[key] = session;
           if (_pendingSessions[key]?.userExamId == session.userExamId) {

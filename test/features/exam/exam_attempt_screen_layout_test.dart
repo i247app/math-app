@@ -894,6 +894,7 @@ class _ExitStatusExamService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     events.add('status:$status:$userExamId');
     statusUpdates.add((userExamId, status));
@@ -934,6 +935,7 @@ class _CompletedJourneyReviewExamService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     events.add('status:$status');
     completedUserExamId = userExamId;

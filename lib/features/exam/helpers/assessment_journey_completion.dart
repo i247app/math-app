@@ -12,6 +12,7 @@ Future<void> completeAssessmentJourney({
   PendingAssessmentCompletionStore? completionStore,
   required int? userExamId,
   int? profileId,
+  bool? esessFlag,
 }) async {
   if (userExamId == null || userExamId <= 0) {
     throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
@@ -20,6 +21,7 @@ Future<void> completeAssessmentJourney({
     userExamId: userExamId,
     status: assessmentCompletedStatus,
     profileId: profileId,
+    esessFlag: esessFlag,
   );
   ExamCache.invalidateLists(profileId: profileId);
   try {

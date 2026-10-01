@@ -777,6 +777,7 @@ class _RecordingExamService implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     statusUpdates.add((userExamId, status));
   }

@@ -337,6 +337,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     updatedUserExamId = userExamId;
     updatedStatus = status;

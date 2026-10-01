@@ -270,6 +270,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
           examService: examService,
           userExamId: submittedUserExamId,
           profileId: profileId ?? submittedExam.profileId,
+          esessFlag: gradeOutcome?.passed,
         );
       } on Exception catch (error) {
         if (!mounted) {

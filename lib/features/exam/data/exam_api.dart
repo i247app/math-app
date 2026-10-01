@@ -105,6 +105,7 @@ class ExamApi implements ExamService {
     required int userExamId,
     required String status,
     int? profileId,
+    bool? esessFlag,
   }) async {
     if (userExamId <= 0) {
       throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
@@ -115,6 +116,7 @@ class ExamApi implements ExamService {
             'profile_id': _requireProfileId(profileId),
             'esess_id': userExamId,
             'status': status,
+            'esess_flag': ?esessFlag,
           }, useGuestToken: _guestAccountService?.current != null);
       NetworkClient.throwForApiStatus(json);
     });
