@@ -203,6 +203,10 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     final grade = completion.grade;
     final level = completion.level;
     final exam = completion.exam;
+    // Capture the visible baseline before switching to local outcome tracking.
+    final previouslyUnlocked = grade == _selectedGrade && _gradeLevels != null
+        ? _currentLevel
+        : _locallyUnlockedLevels[grade] ?? level;
     if (grade == _selectedGrade && _gradeLevels != null) {
       _gradesWithKnownUnlockBaseline.add(grade);
     }
@@ -240,13 +244,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       0,
       _maxLevel,
     );
-    _locallyUnlockedLevels[grade] = math.max(
-      _locallyUnlockedLevels[grade] ??
-          (grade == _selectedGrade && _gradeLevels != null
-              ? _currentLevel
-              : level),
-      unlocked,
-    );
+    _locallyUnlockedLevels[grade] = math.max(previouslyUnlocked, unlocked);
   }
 
   ExamStats? _latestSessionFor(int grade, int level) =>

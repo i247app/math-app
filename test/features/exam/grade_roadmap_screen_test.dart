@@ -905,6 +905,80 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final attemptedLevel in [1, 7]) {
+    for (final passed in [true, false]) {
+      testWidgets(
+        'Level $attemptedLevel ${passed ? "pass" : "fail"} preserves the higher unlocked baseline',
+        (tester) async {
+          final levels = <int, GradeLevels>{
+            2: const GradeLevels(latestLevel: 1, maxLevel: 7),
+          };
+          final service = _FakeExamService(
+            levelsByGrade: levels,
+            ladder: [
+              _ladderSession(8501, passed: true, isLatest: false),
+              _ladderSession(8502, passed: false),
+            ],
+          );
+          await pumpRoadmap(tester, service);
+          expect(
+            find.byKey(const ValueKey('grade-roadmap-level-7-locked')),
+            findsNothing,
+          );
+          final level = find.byKey(
+            ValueKey('grade-roadmap-level-$attemptedLevel'),
+          );
+          await tester.ensureVisible(level);
+          await tester.pumpAndSettle();
+          await tester.tap(level);
+          await tester.pumpAndSettle();
+          expect(service.generatedLevels, [attemptedLevel]);
+          expect(service.detailRequests, isEmpty);
+          final answers = find.byType(AssessmentAnswerButton);
+          await tester.tap(passed ? answers.first : answers.last);
+          await tester.pump();
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pumpAndSettle();
+
+          final currentLevel = attemptedLevel == 7 && passed ? 8 : 7;
+          void expectPreservedBaseline() {
+            expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+            for (var level = 1; level <= 10; level++) {
+              expect(
+                find.byKey(ValueKey('grade-roadmap-level-$level-locked')),
+                level > currentLevel ? findsOneWidget : findsNothing,
+              );
+            }
+            final current = find.byKey(
+              ValueKey('grade-roadmap-level-$currentLevel'),
+            );
+            expect(
+              tester
+                  .widget<AnimatedScale>(
+                    find.descendant(
+                      of: current,
+                      matching: find.byType(AnimatedScale),
+                    ),
+                  )
+                  .scale,
+              1.04,
+            );
+          }
+
+          expect(service.markedFlags, [passed]);
+          expectPreservedBaseline();
+          levels[2] = const GradeLevels(latestLevel: 1, maxLevel: 1);
+          await tester
+              .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+              .onRefresh();
+          await tester.pumpAndSettle();
+          expectPreservedBaseline();
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
   testWidgets('six correct answers unlock exactly one level after refresh', (
     tester,
   ) async {
