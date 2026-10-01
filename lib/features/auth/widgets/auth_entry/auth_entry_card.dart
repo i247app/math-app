@@ -11,7 +11,7 @@ import 'package:numi/features/auth/controllers/auth_state.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
 import 'package:numi/features/auth/widgets/auth_entry/phone_region_menu.dart';
 
-class AuthEntryCard extends StatelessWidget {
+class AuthEntryCard extends StatefulWidget {
   const AuthEntryCard({
     super.key,
     required this.controller,
@@ -46,6 +46,64 @@ class AuthEntryCard extends StatelessWidget {
   final String? identifierErrorText;
 
   @override
+  State<AuthEntryCard> createState() => _AuthEntryCardState();
+}
+
+class _AuthEntryCardState extends State<AuthEntryCard> {
+  final _inputFocus = FocusNode();
+  final _actionKey = GlobalKey();
+  double _keyboardInset = 0;
+  bool _revealScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _inputFocus.addListener(_revealAction);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    if (keyboardInset != _keyboardInset) {
+      _keyboardInset = keyboardInset;
+      _revealAction();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AuthEntryCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.identifierErrorText != oldWidget.identifierErrorText) {
+      _revealAction();
+    }
+  }
+
+  @override
+  void dispose() {
+    _inputFocus.dispose();
+    super.dispose();
+  }
+
+  void _revealAction() {
+    if (!_inputFocus.hasFocus || _keyboardInset == 0 || _revealScheduled) {
+      return;
+    }
+    _revealScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revealScheduled = false;
+      if (!mounted || !_inputFocus.hasFocus || _keyboardInset == 0) return;
+      final action = _actionKey.currentContext?.findRenderObject();
+      if (action is! RenderBox || !action.hasSize) return;
+      // Reveal the actual button, including any validation text above it,
+      // rather than only revealing the TextField's caret.
+      action.showOnScreen(
+        rect: Rect.fromLTWH(0, 0, action.size.width, action.size.height + 16),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
@@ -62,8 +120,11 @@ class AuthEntryCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (showPhoneRegion) ...[
-                PhoneRegionMenu(region: region, onChanged: onRegionChanged),
+              if (widget.showPhoneRegion) ...[
+                PhoneRegionMenu(
+                  region: widget.region,
+                  onChanged: widget.onRegionChanged,
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Container(width: 1, height: 24, color: colors.border),
@@ -71,8 +132,9 @@ class AuthEntryCard extends StatelessWidget {
               ],
               Expanded(
                 child: TextField(
-                  key: ValueKey('${region.name}-${mode.name}'),
-                  controller: controller,
+                  key: ValueKey('${widget.region.name}-${widget.mode.name}'),
+                  controller: widget.controller,
+                  focusNode: _inputFocus,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: null,
                   autocorrect: false,
@@ -81,9 +143,9 @@ class AuthEntryCard extends StatelessWidget {
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
                   inputFormatters: <TextInputFormatter>[
-                    LoginNameInputFormatter(region),
+                    LoginNameInputFormatter(widget.region),
                   ],
-                  onChanged: onIdentifierChanged,
+                  onChanged: widget.onIdentifierChanged,
                   decoration: InputDecoration(
                     hintText: context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -114,12 +176,12 @@ class AuthEntryCard extends StatelessWidget {
         ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
-          child: identifierErrorText == null
+          child: widget.identifierErrorText == null
               ? const SizedBox(height: 24)
               : Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   child: Text(
-                    identifierErrorText!,
+                    widget.identifierErrorText!,
                     key: const ValueKey('auth-identifier-error'),
                     style: TextStyle(
                       color: colors.error,
@@ -131,21 +193,27 @@ class AuthEntryCard extends StatelessWidget {
                 ),
         ),
         AuthEntryActionButton(
-          label: actionLabel,
-          onPressed: canSubmit && !isCheckingIdentifier && !isSubmitting
-              ? onSubmitIdentifier
+          key: _actionKey,
+          label: widget.actionLabel,
+          onPressed:
+              widget.canSubmit &&
+                  !widget.isCheckingIdentifier &&
+                  !widget.isSubmitting
+              ? widget.onSubmitIdentifier
               : null,
-          isBusy: canSubmit && (isCheckingIdentifier || isSubmitting),
+          isBusy:
+              widget.canSubmit &&
+              (widget.isCheckingIdentifier || widget.isSubmitting),
         ),
         SizedBox(
           height: 76,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 180),
-            child: mode == AuthEntryMode.login && canLoginWithPin
+            child: widget.mode == AuthEntryMode.login && widget.canLoginWithPin
                 ? Center(
                     key: const ValueKey('login-with-pin'),
                     child: InkWell(
-                      onTap: onLoginWithPin,
+                      onTap: widget.onLoginWithPin,
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

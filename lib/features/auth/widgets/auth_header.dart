@@ -79,25 +79,24 @@ class _AuthMascot extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 184),
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(11),
-            child: Image.asset(AuthHeader._mascotAsset, fit: BoxFit.contain),
-          ),
+    // AuthLayout measures intrinsic height. An explicit square keeps that
+    // measurement at 184 instead of the available screen width.
+    return SizedBox.square(
+      dimension: 184,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(11),
+          child: Image.asset(AuthHeader._mascotAsset, fit: BoxFit.contain),
         ),
       ),
     );

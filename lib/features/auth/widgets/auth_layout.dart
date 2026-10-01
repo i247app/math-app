@@ -12,6 +12,7 @@ class AuthLayout extends StatelessWidget {
     this.titleWidget,
     this.bodyGap = 46,
     this.fillRemainingBody = false,
+    this.hasScrollableBody = false,
   });
 
   final VoidCallback onBack;
@@ -20,6 +21,7 @@ class AuthLayout extends StatelessWidget {
   final Widget? titleWidget;
   final double bodyGap;
   final bool fillRemainingBody;
+  final bool hasScrollableBody;
 
   static const _maxWidth = 430.0;
   static const _minHeight = 690.0;
@@ -35,33 +37,48 @@ class AuthLayout extends StatelessWidget {
         color: colors.pageBackground,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              physics: const ClampingScrollPhysics(),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: _maxWidth,
-                    minHeight: _minHeight,
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: constraints.maxHeight,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        AuthHeader(
-                          onBack: onBack,
-                          title: title,
-                          titleWidget: titleWidget,
-                        ),
-                        SizedBox(height: bodyGap),
-                        if (fillRemainingBody)
-                          Expanded(child: bodyBuilder(context))
-                        else
-                          bodyBuilder(context),
-                      ],
+            Widget content = Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AuthHeader(
+                  onBack: onBack,
+                  title: title,
+                  titleWidget: titleWidget,
+                ),
+                SizedBox(height: bodyGap),
+                if (fillRemainingBody)
+                  Expanded(child: bodyBuilder(context))
+                else
+                  bodyBuilder(context),
+              ],
+            );
+            if (fillRemainingBody) {
+              // Forms may grow when validation text appears. A nested viewport
+              // instead needs a bounded height and cannot use intrinsic layout.
+              content = hasScrollableBody
+                  ? SizedBox(height: constraints.maxHeight, child: content)
+                  : IntrinsicHeight(child: content);
+            }
+            // Auth routes do not resize their Scaffold for the keyboard. Shrink
+            // the scroll viewport while keeping the form's full-height layout.
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                physics: const ClampingScrollPhysics(),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: _maxWidth,
+                      minHeight: fillRemainingBody && !hasScrollableBody
+                          ? constraints.maxHeight
+                          : _minHeight,
                     ),
+                    child: SizedBox(width: double.infinity, child: content),
                   ),
                 ),
               ),

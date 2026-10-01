@@ -39,6 +39,7 @@ class DeviceVerificationScreen extends StatelessWidget {
       titleWidget: const _DeviceVerificationHeading(),
       bodyGap: 28,
       fillRemainingBody: true,
+      hasScrollableBody: true,
       bodyBuilder: (context) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(28, 0, 28, 24),
