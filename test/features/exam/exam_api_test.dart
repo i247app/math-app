@@ -880,7 +880,7 @@ void main() {
         userExamId: 99,
       );
       expect(captured.method, 'POST');
-      expect(captured.path, '/exams/sessions/review');
+      expect(captured.path, '/exams/sessions/review/generate');
       expect(_body(captured)['profile_id'], 21);
       expect(_body(captured)['esess_id'], 99);
       expect(_body(captured), isNot(contains('exam_type')));

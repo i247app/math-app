@@ -240,7 +240,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(ExamReviewWeakTopicsCard), findsOneWidget);
-    expect(find.text('AI LEARING'), findsOneWidget);
+    expect(find.text('AI LEARNING'), findsOneWidget);
     expect(find.text('Đề - 912345'), findsOneWidget);
     expect(find.byType(ExamReviewModeTabButton), findsNWidgets(2));
     final tabs = find.byType(ExamReviewModeTabButton);
@@ -302,7 +302,7 @@ void main() {
       expect(find.text('Đề - 912347'), findsOneWidget);
       expect(find.text('Đề - 123'), findsNothing);
       expect(find.text('Lớp 2 - Level 4'), findsOneWidget);
-      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('AI LEARNING'), findsOneWidget);
       expect(find.text('Chọn đáp án đúng.'), findsNothing);
       expect(
         tester
@@ -352,7 +352,7 @@ void main() {
       expect(find.text('You are doing good!'), findsOneWidget);
       expect(find.text('Test - 123'), findsNothing);
       expect(find.text('Grade 2 - Level 4'), findsOneWidget);
-      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('AI LEARNING'), findsOneWidget);
       expect(find.text('Choose the correct answer.'), findsNothing);
       expect(find.text('Review'), findsOneWidget);
       expect(find.text('3/3 incorrect answers'), findsNothing);

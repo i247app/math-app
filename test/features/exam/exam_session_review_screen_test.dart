@@ -149,7 +149,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Subtraction, Counting'), findsOneWidget);
-      expect(find.text('AI LEARING'), findsOneWidget);
+      expect(find.text('AI LEARNING'), findsOneWidget);
       expect(find.text('Short AI learning description.'), findsNothing);
       const aiText = 'Bé làm tốt đếm số. Ba mẹ nên luyện thêm cộng trừ.';
       pending.complete(_review('  $aiText  '));

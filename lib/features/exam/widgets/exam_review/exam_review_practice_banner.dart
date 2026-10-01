@@ -9,17 +9,14 @@ class ExamReviewPracticeBanner extends StatelessWidget {
     super.key,
     required this.onTap,
     this.isLoading = false,
-    this.aiShortText,
   });
 
   final VoidCallback onTap;
   final bool isLoading;
-  final String? aiShortText;
 
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(16);
-    final subtitle = aiShortText?.trim() ?? '';
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -78,18 +75,6 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                               height: 1.2,
                             ),
                           ),
-                          if (subtitle.isNotEmpty) ...[
-                            const SizedBox(height: 3),
-                            Text(
-                              subtitle,
-                              style: GoogleFonts.andika(
-                                color: const Color(0xFF254443),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
                           const SizedBox(height: 12),
                           Container(
                             key: const ValueKey('exam-review-practice-action'),

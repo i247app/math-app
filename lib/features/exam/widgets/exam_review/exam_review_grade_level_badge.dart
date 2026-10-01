@@ -13,6 +13,7 @@ class ExamReviewGradeLevelBadge extends StatelessWidget {
 
   final int grade;
   final int level;
+  static const textFontSize = 13.0;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class ExamReviewGradeLevelBadge extends StatelessWidget {
                 }),
                 style: GoogleFonts.andika(
                   color: colors.brandStrong,
-                  fontSize: 13,
+                  fontSize: textFontSize,
                   fontWeight: FontWeight.w700,
                 ),
               ),

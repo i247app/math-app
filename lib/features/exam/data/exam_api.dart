@@ -329,7 +329,7 @@ class ExamApi implements ExamService {
     }
     return _runExamRequest(
       () => _postResponse<ExamStats?>(
-        '/exams/sessions/review',
+        '/exams/sessions/review/generate',
         <String, dynamic>{
           'profile_id': _requireProfileId(profileId),
           'esess_id': userExamId,

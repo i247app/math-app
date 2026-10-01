@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_grade_level_badge.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
@@ -70,6 +72,7 @@ class ExamReviewContent extends StatelessWidget {
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
     final hasAiReview = aiReviewShort?.trim().isNotEmpty ?? false;
+    final shortText = aiShortText?.trim() ?? '';
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -96,12 +99,24 @@ class ExamReviewContent extends StatelessWidget {
                   level: exam.level!,
                 ),
               ),
+            if (shortText.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  shortText,
+                  key: const ValueKey('exam-review-ai-short-text'),
+                  style: GoogleFonts.andika(
+                    color: context.themeColors.textPrimary,
+                    fontSize: ExamReviewGradeLevelBadge.textFontSize,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ExamReviewPracticeBanner(
                 isLoading: isGeneratingPractice,
                 onTap: onPractice!,
-                aiShortText: aiShortText,
               ),
             ),
           ],
