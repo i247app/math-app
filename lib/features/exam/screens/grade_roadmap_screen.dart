@@ -145,6 +145,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       setState(() {
         _gradeLevels = levels;
         _ladderSessions.removeWhere((key, _) => key.$1 == grade);
+        final sessionsById = <int, ExamStats>{};
         for (final session in sessions) {
           final level = session.level;
           if (session.grade != grade ||
@@ -156,6 +157,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                   session.examType!.trim().toUpperCase() != examTypeGrade)) {
             continue;
           }
+          sessionsById[session.userExamId!] = session;
           // A passed attempt keeps the next level unlocked, even after a retry.
           if (session.passed == true && isCompletedAssessmentStats(session)) {
             _locallyUnlockedLevels[grade] = math.max(
@@ -166,10 +168,19 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
           if (session.isLatest != true) continue;
           final key = (grade, level);
           _ladderSessions[key] = session;
-          if (_pendingSessions[key]?.userExamId == session.userExamId) {
-            _pendingSessions.remove(key);
-          }
         }
+        _pendingSessions.removeWhere((key, pending) {
+          if (key.$1 != grade) return false;
+          final latest = _ladderSessions[key];
+          if (latest == null) return false;
+          if (latest.userExamId == pending.userExamId) return true;
+          final reportedPending = sessionsById[pending.userExamId];
+          final matchingPending = reportedPending?.level == key.$2
+              ? reportedPending
+              : null;
+          return matchingPending?.isLatest == false ||
+              _isNewerServerSession(latest, pending, matchingPending);
+        });
         _isLoading = false;
       });
       _scrollToCurrentLevel();
@@ -183,6 +194,27 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   Future<void> _reload() => _loadGradeLevels(_selectedGrade);
+
+  bool _isNewerServerSession(
+    ExamStats latest,
+    ExamStats pending,
+    ExamStats? reportedPending,
+  ) {
+    // Compare matching server fields, never the device clock or session IDs.
+    for (final (latestDate, pendingDate) in [
+      (
+        latest.lastSubmittedDt,
+        reportedPending?.lastSubmittedDt ?? pending.lastSubmittedDt,
+      ),
+      (latest.createDt, reportedPending?.createDt ?? pending.createDt),
+      (latest.endedDt, reportedPending?.endedDt ?? pending.endedDt),
+    ]) {
+      if (latestDate != null && pendingDate != null) {
+        return latestDate.isAfter(pendingDate);
+      }
+    }
+    return false;
+  }
 
   void _mergeExam(GeneratedExam exam) {
     final index = _exams.indexWhere(
@@ -203,6 +235,9 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     final grade = completion.grade;
     final level = completion.level;
     final exam = completion.exam;
+    final submittedAt =
+        DateTime.tryParse(exam.submittedDt ?? '') ??
+        DateTime.tryParse(exam.modifyDt ?? '');
     // Capture the visible baseline before switching to local outcome tracking.
     final previouslyUnlocked = grade == _selectedGrade && _gradeLevels != null
         ? _currentLevel
@@ -220,12 +255,15 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         examType: examTypeGrade,
         grade: grade,
         level: level,
-        submittedDt: DateTime.now().toIso8601String(),
+        createDt: exam.createDt,
+        modifyDt: exam.modifyDt,
+        submittedDt:
+            submittedAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
         grading: exam.grading,
         questions: const <ExamQuestion>[],
       ),
     );
-    // Keep the completed attempt visible until ladder returns its session ID.
+    // Keep the completed attempt visible until ladder catches up or supersedes it.
     _pendingSessions[(grade, level)] = ExamStats(
       userExamId: exam.userExamId,
       examType: examTypeGrade,
@@ -234,7 +272,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       level: level,
       passed: completion.outcome.passed,
       isLatest: true,
-      lastSubmittedDt: DateTime.now(),
+      lastSubmittedDt: submittedAt,
+      createDt: DateTime.tryParse(exam.createDt ?? ''),
       correctNumber: exam.grading?.correctNumber ?? 0,
       scorePercentage: (exam.grading?.scorePercentage ?? 0).toDouble(),
       skippedNumber: exam.grading?.skippedNumber ?? 0,
