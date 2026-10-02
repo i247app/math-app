@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 
@@ -28,7 +30,7 @@ DateTime? _recentAssignmentSortDate(ClassroomExercise exercise) {
     exercise.endDate,
   ];
   for (final value in values) {
-    final parsed = DateTime.tryParse(value?.trim() ?? '');
+    final parsed = tryParseApiDateTime(value?.trim() ?? '');
     if (parsed != null) {
       return parsed;
     }

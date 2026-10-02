@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -46,14 +48,14 @@ List<ClassroomExercise> upcomingStudentClassroomExerciseExercises(
   final now = DateTime.now();
   final upcoming = exercises
       .where((exercise) {
-        final endDate = DateTime.tryParse(exercise.endDate?.trim() ?? '');
+        final endDate = tryParseApiDateTime(exercise.endDate?.trim() ?? '');
         return endDate != null && endDate.toLocal().isAfter(now);
       })
       .toList(growable: false);
 
   return upcoming..sort((first, second) {
-    final firstEnd = DateTime.tryParse(first.endDate?.trim() ?? '');
-    final secondEnd = DateTime.tryParse(second.endDate?.trim() ?? '');
+    final firstEnd = tryParseApiDateTime(first.endDate?.trim() ?? '');
+    final secondEnd = tryParseApiDateTime(second.endDate?.trim() ?? '');
     if (firstEnd == null && secondEnd == null) {
       return 0;
     }
@@ -94,7 +96,7 @@ bool studentClassClassroomExerciseIsSubmitted(ClassroomExercise exercise) {
 }
 
 String? studentClassDateTimeLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }

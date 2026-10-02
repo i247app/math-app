@@ -95,7 +95,7 @@ class ExamApi implements ExamService {
 
     return exam.toModel(
       submittedAnswers: submittedAnswers,
-      stats: response.stats,
+      stats: response.examSession,
       userExamId: response.userExamId,
     );
   }
@@ -284,7 +284,7 @@ class ExamApi implements ExamService {
     ];
     return exam.toModel(
       submittedAnswers: submittedAnswers,
-      stats: response.stats,
+      stats: response.examSession,
       useSequentialQuestionNumbers: isEntireJourney,
       userExamId: validUserExamId,
       practiceWeakTopics: _practiceWeakTopics(response),
@@ -394,7 +394,7 @@ class ExamApi implements ExamService {
     required int profileId,
     required String examType,
   }) {
-    return _postResponse('/exams/detail', <String, dynamic>{
+    return _postResponse('/exams/sessions/detail', <String, dynamic>{
       'profile_id': profileId,
       'exam_type': examType,
       'elink_id': ?userAiExamId,
@@ -432,7 +432,7 @@ GeneratedExam _journeyDetailToModel(
   int userExamId, {
   GeneratedExamDto? detailedActiveExam,
 }) {
-  final stats = response.stats;
+  final stats = response.examSession;
   final activeExam = _activeJourneyExam(response);
   if (activeExam != null) {
     return _activeJourneySetToModel(
@@ -544,7 +544,7 @@ GeneratedExam _activeJourneySetToModel({
   if (activeExam.questions.length >= expectedQuestionCount) {
     return activeExam.toModel(
       submittedAnswers: submittedAnswers,
-      stats: response.stats,
+      stats: response.examSession,
       userExamId: userExamId,
       userAiExamIdOverride: activeUserAiExamId,
       examStatusOverride: activeStatus,
@@ -567,10 +567,10 @@ GeneratedExam _activeJourneySetToModel({
     grade: activeExam.grade,
     lastSetGrade: activeExam.grade,
     lastSetShortText: activeExam.shortText,
-    aiTitle: response.stats?.aiTitle,
-    aiShortText: response.stats?.aiShortText,
-    aiReviewShort: response.stats?.aiReviewShort,
-    aiReviewLong: response.stats?.aiReviewLong,
+    aiTitle: response.examSession?.aiTitle,
+    aiShortText: response.examSession?.aiShortText,
+    aiReviewShort: response.examSession?.aiReviewShort,
+    aiReviewLong: response.examSession?.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
     level: activeExam.level,
     numQuestions: activeDetails.length,
@@ -608,7 +608,7 @@ List<ExamPracticeTopic> _practiceWeakTopics(ExamDetailResponseDto response) {
 }
 
 GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {
-  if (response.stats?.status?.trim().toUpperCase() == 'COMPLETE') {
+  if (response.examSession?.status?.trim().toUpperCase() == 'COMPLETE') {
     return null;
   }
   for (final candidate in response.exams.reversed) {
@@ -621,7 +621,7 @@ GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {
     return response.exam;
   }
 
-  if (!_isActiveExamStatus(response.stats?.status)) {
+  if (!_isActiveExamStatus(response.examSession?.status)) {
     return null;
   }
   if (response.exams.isNotEmpty) {

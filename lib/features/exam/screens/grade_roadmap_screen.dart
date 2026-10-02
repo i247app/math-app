@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:numi/core/helpers/api_date_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -222,8 +223,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
     final level = completion.level;
     final exam = completion.exam;
     final submittedAt =
-        DateTime.tryParse(exam.submittedDt ?? '') ??
-        DateTime.tryParse(exam.modifyDt ?? '');
+        tryParseApiDateTime(exam.submittedDt ?? '') ??
+        tryParseApiDateTime(exam.modifyDt ?? '');
     // Capture the visible baseline before switching to local outcome tracking.
     final previouslyUnlocked = grade == _selectedGrade && _gradeLevels != null
         ? _currentLevel
@@ -263,7 +264,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       passed: completion.outcome.passed,
       isLatest: true,
       lastSubmittedDt: submittedAt,
-      createDt: DateTime.tryParse(exam.createDt ?? ''),
+      createDt: tryParseApiDateTime(exam.createDt ?? ''),
       correctNumber: exam.grading?.correctNumber ?? 0,
       scorePercentage: (exam.grading?.scorePercentage ?? 0).toDouble(),
       skippedNumber: exam.grading?.skippedNumber ?? 0,
@@ -337,7 +338,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   }
 
   DateTime _examDate(GeneratedExam exam) {
-    return DateTime.tryParse(
+    return tryParseApiDateTime(
           exam.modifyDt ?? exam.submittedDt ?? exam.createDt ?? '',
         ) ??
         DateTime.fromMillisecondsSinceEpoch(0);

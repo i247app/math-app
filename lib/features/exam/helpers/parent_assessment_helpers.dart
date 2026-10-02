@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -200,7 +202,7 @@ Future<CompletedParentAssessmentPage> loadCompletedParentAssessments({
 }
 
 DateTime examDate(GeneratedExam exam) =>
-    DateTime.tryParse(exam.modifyDt ?? exam.createDt ?? '') ??
+    tryParseApiDateTime(exam.modifyDt ?? exam.createDt ?? '') ??
     DateTime.fromMillisecondsSinceEpoch(0);
 
 String homeExamDateLabel(GeneratedExam exam) {

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:numi/core/helpers/api_date_time.dart';
 
 part 'exam_api_models.g.dart';
 
@@ -134,7 +135,7 @@ class SubmitExamResponseDto {
   const SubmitExamResponseDto({
     required this.mstatus,
     this.exam,
-    this.stats,
+    this.examSession,
     this.userExamId,
     this.status,
     this.mmessage,
@@ -143,7 +144,8 @@ class SubmitExamResponseDto {
 
   final int mstatus;
   final GeneratedExamDto? exam;
-  final ExamStatsDto? stats;
+  @JsonKey(name: 'exam_session')
+  final ExamStatsDto? examSession;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
   final int? userExamId;
   final String? status;
@@ -186,7 +188,7 @@ class ExamDetailResponseDto {
     required this.mstatus,
     this.exam,
     this.exams = const <GeneratedExamDto>[],
-    this.stats,
+    this.examSession,
     this.practicePreview,
     this.details = const <ExamDetailAnswerDto>[],
     this.status,
@@ -197,7 +199,7 @@ class ExamDetailResponseDto {
   final int mstatus;
   final GeneratedExamDto? exam;
   final List<GeneratedExamDto> exams;
-  final ExamStatsDto? stats;
+  final ExamStatsDto? examSession;
   final ExamPracticePreviewDto? practicePreview;
   final List<ExamDetailAnswerDto> details;
   final String? status;
@@ -388,8 +390,11 @@ class ExamStatsDto {
   final String? status;
   final int? grade;
   final int? level;
+  @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? lastSubmittedDt;
+  @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? endedDt;
+  @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? createDt;
   @JsonKey(name: 'esess_flag')
   final bool? passed;
@@ -427,7 +432,9 @@ class ExamProgressResponseDto {
 
   final int mstatus;
   final int? profileId;
+  @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? fromDt;
+  @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? toDt;
   final int? limit;
   final String? examType;
@@ -460,6 +467,7 @@ class ExamProgressPointDto {
     this.level,
   });
 
+  @JsonKey(fromJson: parseApiDateTime)
   final DateTime lastSubmittedDt;
   final int correctNumber;
   @JsonKey(name: 'esess_id')

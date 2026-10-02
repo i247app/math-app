@@ -1,4 +1,6 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 DateTime historyDateValue(String? value) {
-  return DateTime.tryParse(value?.trim() ?? '')?.toLocal() ??
+  return tryParseApiDateTime(value?.trim() ?? '')?.toLocal() ??
       DateTime.fromMillisecondsSinceEpoch(0);
 }

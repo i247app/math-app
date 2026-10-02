@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -43,7 +45,7 @@ String studentClassroomExerciseCreatedDate(ClassroomExercise exercise) {
 }
 
 String? _studentClassroomExerciseDateLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }
@@ -82,7 +84,7 @@ bool studentClassroomExerciseIsOverdue(ClassroomExercise exercise) {
   if (studentClassroomExerciseIsSubmitted(exercise)) {
     return false;
   }
-  final parsed = DateTime.tryParse(exercise.endDate?.trim() ?? '');
+  final parsed = tryParseApiDateTime(exercise.endDate?.trim() ?? '');
   if (parsed == null) {
     return false;
   }

@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/widgets.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -37,7 +39,7 @@ DateTime? notificationDate(NotificationModel notification) {
     return null;
   }
 
-  final parsed = DateTime.tryParse(value);
+  final parsed = tryParseApiDateTime(value);
   if (parsed != null) {
     return parsed;
   }

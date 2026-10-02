@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:numi/features/auth/data/auth_api_models.dart';
 import 'package:numi/features/auth/data/device_api_models.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -76,7 +78,7 @@ extension DeviceModelDtoConversion on DeviceModel {
 
 int? _expiresInFrom(String? expiresAt) {
   if (expiresAt == null) return null;
-  final parsed = DateTime.tryParse(expiresAt);
+  final parsed = tryParseApiDateTime(expiresAt);
   if (parsed == null) return null;
   final seconds = parsed.toUtc().difference(DateTime.now().toUtc()).inSeconds;
   return seconds < 0 ? 0 : seconds;

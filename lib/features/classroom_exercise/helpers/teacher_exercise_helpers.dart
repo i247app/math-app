@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -51,7 +53,7 @@ String teacherExerciseDueDate(
 }
 
 String? teacherExerciseDateTimeLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }
@@ -61,7 +63,7 @@ String? teacherExerciseDateTimeLabel(String? value) {
 }
 
 TeacherExerciseDateParts teacherExerciseDateParts(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return const TeacherExerciseDateParts(day: '23', month: 'TH10');
   }

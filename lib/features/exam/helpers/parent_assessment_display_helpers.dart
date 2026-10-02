@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -51,7 +53,7 @@ Color parentAssessmentGradeColor(int? grade) {
 }
 
 ({String dt, String tm}) parentAssessmentDateParts(String? isoDate) {
-  final parsed = DateTime.tryParse(isoDate ?? '')?.toLocal();
+  final parsed = tryParseApiDateTime(isoDate ?? '')?.toLocal();
   if (parsed == null) {
     return (dt: '--/--/----', tm: '--:--');
   }

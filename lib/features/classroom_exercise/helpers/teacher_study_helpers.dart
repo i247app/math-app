@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
@@ -39,7 +41,7 @@ DateTime? teacherStudySortDate(ClassroomExercise exercise) {
     exercise.startDate,
     exercise.endDate,
   ]) {
-    final parsed = DateTime.tryParse(value?.trim() ?? '');
+    final parsed = tryParseApiDateTime(value?.trim() ?? '');
     if (parsed != null) {
       return parsed;
     }
@@ -48,7 +50,7 @@ DateTime? teacherStudySortDate(ClassroomExercise exercise) {
 }
 
 TeacherStudyDateParts? teacherStudyDateParts(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }
@@ -60,7 +62,7 @@ TeacherStudyDateParts? teacherStudyDateParts(String? value) {
 }
 
 String? teacherStudyDateLabel(BuildContext context, String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '');
+  final parsed = tryParseApiDateTime(value?.trim() ?? '');
   if (parsed == null) {
     return null;
   }

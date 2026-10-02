@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -326,7 +328,7 @@ String roomExerciseDueLabel(BuildContext context, ClassroomExercise? exercise) {
 }
 
 String roomDateOnlyLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
+  final parsed = tryParseApiDateTime(value?.trim() ?? '')?.toLocal();
   if (parsed == null) {
     return '--/--/----';
   }
@@ -335,7 +337,9 @@ String roomDateOnlyLabel(String? value) {
 }
 
 bool roomExerciseDueSoon(ClassroomExercise? exercise) {
-  final endDate = DateTime.tryParse(exercise?.endDate?.trim() ?? '')?.toLocal();
+  final endDate = tryParseApiDateTime(
+    exercise?.endDate?.trim() ?? '',
+  )?.toLocal();
   if (endDate == null) {
     return false;
   }
@@ -344,7 +348,7 @@ bool roomExerciseDueSoon(ClassroomExercise? exercise) {
 }
 
 String roomDateLabel(String? value) {
-  final parsed = DateTime.tryParse(value?.trim() ?? '')?.toLocal();
+  final parsed = tryParseApiDateTime(value?.trim() ?? '')?.toLocal();
   if (parsed == null) {
     return '--/--/----';
   }

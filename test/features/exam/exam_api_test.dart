@@ -149,7 +149,7 @@ void main() {
     expect(_body(captured), containsPair('grade', 0));
   });
 
-  test('submits answers by elink_id and maps result stats', () async {
+  test('submits answers by elink_id and maps exam_session', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {
       captured = options;
@@ -166,7 +166,7 @@ void main() {
             'total_questions': 1,
           },
         },
-        'stats': <String, dynamic>{
+        'exam_session': <String, dynamic>{
           'correct_number': 13,
           'score_percentage': 65,
           'skipped_number': 0,
@@ -199,7 +199,19 @@ void main() {
     late RequestOptions captured;
     final api = _apiReturning((options) {
       captured = options;
-      return const <String, dynamic>{'mstatus': 200, 'status': 'Success'};
+      return const <String, dynamic>{
+        'mstatus': 200,
+        'status': 'Success',
+        'exam_session': {
+          'esess_id': 99,
+          'status': 'COMPLETE',
+          'last_submitted_dt': '20260927071430.940271',
+          'correct_number': 5,
+          'score_percentage': 50,
+          'skipped_number': 0,
+          'total_questions': 10,
+        },
+      };
     });
 
     await api.updateUserExamStatus(
@@ -280,7 +292,7 @@ void main() {
     final exam = await api.getExamDetail(2, profileId: 21);
 
     final body = _body(captured);
-    expect(captured.path, '/exams/detail');
+    expect(captured.path, '/exams/sessions/detail');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('exam_type', examTypeAssessment));
     expect(body, containsPair('elink_id', 2));
@@ -299,14 +311,14 @@ void main() {
     await api.getExamDetail(2, profileId: 21, examType: examTypeGrade);
 
     final body = _body(captured);
-    expect(captured.path, '/exams/detail');
+    expect(captured.path, '/exams/sessions/detail');
     expect(body, containsPair('exam_type', examTypeGrade));
   });
 
   for (final entireJourney in [false, true]) {
     for (final type in [examTypeAssessment, examTypeGrade, examTypePractice]) {
       test(
-        'detail maps AI fields from stats ($type, journey=$entireJourney)',
+        'detail maps AI fields from exam_session ($type, journey=$entireJourney)',
         () async {
           final api = _apiReturning(
             (_) => {
@@ -324,7 +336,7 @@ void main() {
                   'num_questions': 10,
                 },
               ],
-              'stats': {
+              'exam_session': {
                 'esess_id': 114,
                 'exam_type': type,
                 'status': 'COMPLETE',
@@ -412,7 +424,7 @@ void main() {
             'submitted_dt': '2026-09-12T08:05:00Z',
           },
         ],
-        'stats': <String, dynamic>{
+        'exam_session': <String, dynamic>{
           'correct_number': 1,
           'score_percentage': 50,
           'skipped_number': 0,
@@ -421,7 +433,7 @@ void main() {
           'status': 'COMPLETE',
           'esess_id': 99,
           'grade': 1,
-          'last_submitted_dt': '2026-09-12T08:02:00Z',
+          'last_submitted_dt': '20260912080200',
           'review': 'Journey review',
         },
         'practice_preview': <String, dynamic>{
@@ -479,7 +491,7 @@ void main() {
     final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
 
     final body = _body(captured);
-    expect(captured.path, '/exams/detail');
+    expect(captured.path, '/exams/sessions/detail');
     expect(body, containsPair('profile_id', 21));
     expect(body, containsPair('exam_type', examTypeAssessment));
     expect(body, containsPair('esess_id', 99));
@@ -547,7 +559,7 @@ void main() {
             ),
           },
         ],
-        'stats': <String, dynamic>{
+        'exam_session': <String, dynamic>{
           'correct_number': 2,
           'score_percentage': 0,
           'skipped_number': 0,
@@ -622,7 +634,7 @@ void main() {
             ),
           },
         ],
-        'stats': <String, dynamic>{
+        'exam_session': <String, dynamic>{
           'correct_number': 1,
           'score_percentage': 0,
           'skipped_number': 0,
@@ -672,7 +684,7 @@ void main() {
                 'status': 'SUBMITTED',
               },
             ],
-            'stats': <String, dynamic>{
+            'exam_session': <String, dynamic>{
               'correct_number': 0,
               'score_percentage': 0,
               'skipped_number': 9,
@@ -847,9 +859,9 @@ void main() {
               'ai_review_long': 'Practice with objects at home.',
               'grade': 0,
               'level': 1,
-              'last_submitted_dt': '2026-10-01T13:54:22.218208Z',
-              'ended_dt': '2026-10-01T13:54:22.500244Z',
-              'create_dt': '2026-10-01T13:53:45.600811Z',
+              'last_submitted_dt': '20261001135422.218208',
+              'ended_dt': '20261001135422.500244',
+              'create_dt': '20261001135345.600811',
             },
             {
               'esess_id': 99,
@@ -865,9 +877,9 @@ void main() {
               'ai_review_long': 'Use toys to practice at home.',
               'grade': 0,
               'level': 1,
-              'last_submitted_dt': '2026-10-01T13:09:28.001546Z',
-              'ended_dt': '2026-10-01T13:09:28.266769Z',
-              'create_dt': '2026-10-01T13:09:07.978867Z',
+              'last_submitted_dt': '20261001130928.001546',
+              'ended_dt': '20261001130928.266769',
+              'create_dt': '20261001130907.978867',
             },
           ],
         };
@@ -940,9 +952,9 @@ void main() {
           'ai_review_long': 'First paragraph.\n\nSecond paragraph.',
           'grade': 0,
           'level': 1,
-          'last_submitted_dt': '2026-10-01T13:09:28.001546Z',
-          'ended_dt': '2026-10-01T13:09:28.266769Z',
-          'create_dt': '2026-10-01T13:09:07.978867Z',
+          'last_submitted_dt': '20261001130928.001546',
+          'ended_dt': '20261001130928.266769',
+          'create_dt': '20261001130907.978867',
         },
       };
       final api = _apiReturning((options) {
@@ -1024,9 +1036,9 @@ void main() {
                 'review': 'Session review',
                 'esess_flag': passed,
                 'is_latest': passed,
-                'last_submitted_dt': '2026-09-30T16:51:57.395796Z',
-                'ended_dt': '2026-09-30T17:06:45.875089Z',
-                'create_dt': '2026-09-30T16:50:20.962157Z',
+                'last_submitted_dt': '20260930165157.395796',
+                'ended_dt': '20260930170645.875089',
+                'create_dt': '20260930165020.962157',
               },
           ],
         };

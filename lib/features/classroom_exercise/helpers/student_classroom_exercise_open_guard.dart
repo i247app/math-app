@@ -1,3 +1,5 @@
+import 'package:numi/core/helpers/api_date_time.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -5,7 +7,7 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 
 bool studentClassroomExerciseIsNotOpen(ClassroomExercise exercise) {
-  final startDate = DateTime.tryParse(exercise.startDate?.trim() ?? '');
+  final startDate = tryParseApiDateTime(exercise.startDate?.trim() ?? '');
   if (startDate == null) {
     return false;
   }
