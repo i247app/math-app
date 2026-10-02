@@ -163,6 +163,15 @@ class ExamAttemptController extends ChangeNotifier {
   ExamAttemptRetryAction? get errorRetryAction => _errorRetryAction;
   bool get isGeneratingExam => _isGeneratingExam || _isTransitioningSet;
   bool get isTransitioningSet => _isTransitioningSet;
+  int? get transitioningGradeDelta {
+    final decision = _pendingGenerationDecision;
+    if (!_isAssessment || !_isTransitioningSet || decision == null) {
+      return null;
+    }
+    return decision.nextState.grade - _flowState.grade;
+  }
+
+  bool get isTransitioningToHigherGrade => (transitioningGradeDelta ?? 0) > 0;
   bool get isSubmittingExam => _isSubmittingExam;
   int? get userExamId {
     final currentId = _exam?.userExamId;

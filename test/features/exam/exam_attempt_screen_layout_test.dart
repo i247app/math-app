@@ -7,12 +7,15 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_set_transition_loader.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 
@@ -653,7 +656,7 @@ void main() {
   );
 
   testWidgets(
-    'five consecutive wrong answers fail after confirming question five',
+    'five wrong answers show stepping stones while preparing a lower grade',
     (tester) async {
       final service = _PendingGenerateExamService();
       await _pumpAssessment(
@@ -683,21 +686,34 @@ void main() {
       expect(service.submittedAnswers, hasLength(5));
       expect(service.generateCalls, 1);
       expect(service.requestedGradeLabels, <String?>['Lớp 1']);
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('set-transition-stepping-stones')),
+        findsOneWidget,
+      );
+      expect(
+        find.text('One step at a time.', findRichText: true),
+        findsOneWidget,
+      );
+      expect(find.text('You’ve got this.'), findsOneWidget);
+      _expectEmbeddedSetTransition(tester);
       expect(
         find.byKey(const ValueKey('assessment-question-skeleton')),
-        findsOneWidget,
+        findsNothing,
       );
 
       service.completeNextSet(grade: 1, setName: 'Recovery');
       await tester.pumpAndSettle();
 
+      expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
       expect(find.text('Recovery - Question 1'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
 
   testWidgets(
-    'shows question seven skeleton while generating the resolved next set',
+    'shows the trophy while preparing a higher grade then opens question seven',
     (tester) async {
       final service = _PendingGenerateExamService();
       await _pumpAssessment(
@@ -733,6 +749,7 @@ void main() {
 
       await tester.tap(find.byType(AssessmentBottomActionButton).last);
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
 
       expect(service.generateCalls, 1);
       expect(service.requestedGradeLabels, <String?>['Lớp 2']);
@@ -740,19 +757,29 @@ void main() {
       expect(service.submittedAnswers, hasLength(6));
       expect(
         find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsNothing,
+      );
+      expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+      expect(find.byKey(const ValueKey('grade-up-trophy')), findsOneWidget);
+      expect(
+        find.text('You are doing good', findRichText: true),
         findsOneWidget,
       );
+      _expectEmbeddedSetTransition(tester);
       expect(find.text('Set 1 - Question 6'), findsNothing);
       expect(find.byKey(const ValueKey('question-loader')), findsNothing);
-      final loadingQuestionLabel = tester.widget<Text>(
-        find.byKey(const ValueKey('assessment-question-label')),
-      );
-      expect(loadingQuestionLabel.data, contains('7'));
+      expect(find.byType(AssessmentBottomBar), findsNothing);
 
       service.completeNextSet();
       await tester.pumpAndSettle();
 
       expect(find.text('Set 2 - Question 1'), findsOneWidget);
+      expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+      expect(find.byType(AssessmentBottomBar), findsOneWidget);
+      expect(
+        tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+        AppThemeColors.light.surface,
+      );
       final questionLabel = tester.widget<Text>(
         find.byKey(const ValueKey('assessment-question-label')),
       );
@@ -761,6 +788,190 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('one-grade upgrade shows the sprout while loading', (
+    tester,
+  ) async {
+    final service = _PendingGenerateExamService();
+    await _pumpAssessment(
+      tester,
+      questions: _setQuestions('Set 1'),
+      examService: service,
+      initialGrade: 2,
+      examType: examTypeAssessment,
+    );
+    for (var index = 0; index < 10; index++) {
+      await tester.tap(
+        find.byType(AssessmentAnswerButton).at(index == 0 ? 1 : 0),
+      );
+      await tester.pump();
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+    }
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(service.requestedGradeLabels, <String?>['Lớp 3']);
+    expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+    expect(find.byKey(const ValueKey('set-transition-sprout')), findsOneWidget);
+    expect(
+      find.text('Every try helps you grow.', findRichText: true),
+      findsOneWidget,
+    );
+    expect(find.text('Let’s keep going.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('grade-up-trophy')), findsNothing);
+    _expectEmbeddedSetTransition(tester);
+    service.completeNextSet(grade: 3);
+    await tester.pumpAndSettle();
+    expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+    expect(find.text('Set 2 - Question 1'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'same-grade recovery shows the puzzle and then opens the next set',
+    (tester) async {
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        questions: _setQuestions('Set 1'),
+        examService: service,
+        examType: examTypeAssessment,
+      );
+      for (var index = 0; index < 5; index++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pump();
+      }
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(service.requestedGradeLabels, <String?>['Mẫu giáo']);
+      expect(
+        find.byKey(const ValueKey('set-transition-puzzle')),
+        findsOneWidget,
+      );
+      expect(
+        find.text('That was a bit tricky, right?', findRichText: true),
+        findsOneWidget,
+      );
+      expect(find.text('Let’s try another one.'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('assessment-question-skeleton')),
+        findsNothing,
+      );
+      _expectEmbeddedSetTransition(tester);
+      service.completeNextSet(grade: 0);
+      await tester.pumpAndSettle();
+      expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+      expect(find.text('Set 2 - Question 1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('upgrade capped at grade five uses the one-grade sprout', (
+    tester,
+  ) async {
+    final service = _PendingGenerateExamService();
+    await _pumpAssessment(
+      tester,
+      questions: _setQuestions('Set 1'),
+      examService: service,
+      initialGrade: 4,
+      examType: examTypeAssessment,
+    );
+    for (var index = 0; index < 6; index++) {
+      await tester.tap(find.byType(AssessmentAnswerButton).first);
+      await tester.pump();
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+    }
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(service.requestedGradeLabels, <String?>['Lớp 5']);
+    expect(find.byKey(const ValueKey('set-transition-sprout')), findsOneWidget);
+    expect(find.byKey(const ValueKey('grade-up-trophy')), findsNothing);
+    service.completeNextSet(grade: 5);
+    await tester.pumpAndSettle();
+    expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+    expect(find.text('Set 2 - Question 1'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('failed upgrade leaves the trophy and retry restores it', (
+    tester,
+  ) async {
+    final service = _PendingGenerateExamService();
+    await _pumpAssessment(
+      tester,
+      questions: _setQuestions('Set 1'),
+      examService: service,
+      examType: examTypeAssessment,
+    );
+    for (var index = 0; index < 6; index++) {
+      await tester.tap(find.byType(AssessmentAnswerButton).first);
+      await tester.pump();
+      await tester.tap(find.byType(AssessmentBottomActionButton).last);
+      await tester.pump();
+    }
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+    service.failNextSet();
+    await tester.pumpAndSettle();
+    expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+    expect(find.text('Could not prepare next set'), findsOneWidget);
+
+    await tester.tap(find.byType(AssessmentBottomActionButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+    expect(service.submitCalls, 1);
+    expect(service.generateCalls, 2);
+    service.completeNextSet();
+    await tester.pumpAndSettle();
+    expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+    expect(find.text('Set 2 - Question 1'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+void _expectEmbeddedSetTransition(WidgetTester tester) {
+  final loader = find.byType(AssessmentSetTransitionLoader);
+  final progress = find.byType(AssessmentProgressSection);
+  final bottomBar = find.byType(AssessmentBottomBar);
+  expect(find.byType(AssessmentHeader), findsOneWidget);
+  expect(progress, findsOneWidget);
+  expect(bottomBar, findsNothing);
+  expect(find.byType(AssessmentBottomActionButton), findsNothing);
+  expect(
+    find.descendant(
+      of: find.byKey(const ValueKey('question-content')),
+      matching: loader,
+    ),
+    findsOneWidget,
+  );
+  expect(
+    tester.getTopLeft(loader).dy,
+    greaterThanOrEqualTo(tester.getBottomLeft(progress).dy),
+  );
+  expect(
+    tester.getBottomLeft(loader).dy,
+    closeTo(tester.view.physicalSize.height - 14, 0.01),
+  );
+  final art = find.descendant(of: loader, matching: find.byType(CustomPaint));
+  final message = find.byKey(const ValueKey('set-transition-message'));
+  final contentCenterY =
+      (tester.getTopLeft(art).dy + tester.getBottomLeft(message).dy) / 2;
+  expect(contentCenterY, closeTo(tester.getCenter(loader).dy, 10));
+  expect(find.byType(AssessmentAnswerButton), findsNothing);
+  expect(
+    tester.widget<AssessmentProgressSection>(progress).onQuestionSelected,
+    isNull,
+  );
+  expect(
+    tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+    AppThemeColors.light.surface,
+  );
+  final background = tester.widget<ColoredBox>(
+    find.descendant(of: loader, matching: find.byType(ColoredBox)),
+  );
+  expect(background.color, const Color(0xFFF2F2F2));
 }
 
 List<ExamQuestion> _setQuestions(String setName) {
@@ -973,11 +1184,18 @@ class _CompletedJourneyReviewExamService implements ExamService {
 }
 
 class _PendingGenerateExamService implements ExamService {
-  final Completer<GeneratedExam> _nextSetCompleter = Completer<GeneratedExam>();
+  Completer<GeneratedExam> _nextSetCompleter = Completer<GeneratedExam>();
   int generateCalls = 0;
   int submitCalls = 0;
   List<SubmitExamAnswer>? submittedAnswers;
   final List<String?> requestedGradeLabels = <String?>[];
+
+  void failNextSet() {
+    _nextSetCompleter.completeError(
+      const ExamException('Could not prepare next set'),
+    );
+    _nextSetCompleter = Completer<GeneratedExam>();
+  }
 
   void completeNextSet({int grade = 2, String setName = 'Set 2'}) {
     _nextSetCompleter.complete(

@@ -22,6 +22,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dar
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_error_state.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_generating_loader.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_set_transition_loader.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
@@ -599,16 +600,22 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
           final errorMessage = _controller.errorMessage;
           final isGeneratingQuestion = _controller.isGeneratingQuestion;
           final isTransitioningSet = _controller.isTransitioningSet;
+          final setTransitionKind = switch (_controller
+              .transitioningGradeDelta) {
+            int delta when delta < 0 => AssessmentSetTransitionKind.downGrade,
+            0 => AssessmentSetTransitionKind.stayGrade,
+            1 => AssessmentSetTransitionKind.grow,
+            int delta when delta >= 2 => AssessmentSetTransitionKind.trophy,
+            _ => null,
+          };
           final isSubmittingExam =
               _controller.isSubmittingExam || _isCompletingAssessment;
           final hasActiveAttempt = questions.isNotEmpty;
           final isBusy =
               isGeneratingQuestion || isTransitioningSet || isSubmittingExam;
           final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-          final backgroundColor = colors.surface;
-
           final screen = Scaffold(
-            backgroundColor: backgroundColor,
+            backgroundColor: colors.surface,
             body: SafeArea(
               bottom: false,
               child: Center(
@@ -691,9 +698,10 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                               !_controller.isGrade,
                                         ),
                                         const SizedBox(height: 16),
-                                        if (isTransitioningSet)
+                                        if (setTransitionKind == null &&
+                                            isTransitioningSet)
                                           const AssessmentQuestionSkeleton()
-                                        else ...[
+                                        else if (setTransitionKind == null) ...[
                                           AssessmentQuestionCard(
                                             question:
                                                 currentQuestion!.questionName,
@@ -712,32 +720,54 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                       ],
                                     ),
                                   ),
-                                  SliverToBoxAdapter(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: AssessmentBottomBar(
-                                        bottomInset: bottomInset,
-                                        canGoBack:
-                                            _controller.questionIndex > 0,
-                                        allQuestionsAnswered:
-                                            _controller.allQuestionsAnswered &&
-                                            !_controller.isAssessment &&
-                                            !_controller.isGrade,
-                                        canContinue:
-                                            (!_controller.isAssessment &&
-                                                !_controller.isPractice &&
-                                                !_controller.isGrade) ||
-                                            _controller.canContinue,
-                                        isSubmitting: isSubmittingExam,
-                                        isTransitioning: isTransitioningSet,
-                                        alwaysShowExit:
-                                            _controller.isAssessment,
-                                        onBack: goToPreviousQuestion,
-                                        onExit: _exitController.requestExit,
-                                        onContinue: handleContinue,
+                                  if (setTransitionKind != null)
+                                    SliverFillRemaining(
+                                      child: Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                          14,
+                                          0,
+                                          14,
+                                          14 + bottomInset,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            26,
+                                          ),
+                                          child: AssessmentSetTransitionLoader(
+                                            key: ValueKey(setTransitionKind),
+                                            kind: setTransitionKind,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    SliverToBoxAdapter(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: AssessmentBottomBar(
+                                          bottomInset: bottomInset,
+                                          canGoBack:
+                                              _controller.questionIndex > 0,
+                                          allQuestionsAnswered:
+                                              _controller
+                                                  .allQuestionsAnswered &&
+                                              !_controller.isAssessment &&
+                                              !_controller.isGrade,
+                                          canContinue:
+                                              (!_controller.isAssessment &&
+                                                  !_controller.isPractice &&
+                                                  !_controller.isGrade) ||
+                                              _controller.canContinue,
+                                          isSubmitting: isSubmittingExam,
+                                          isTransitioning: isTransitioningSet,
+                                          alwaysShowExit:
+                                              _controller.isAssessment,
+                                          onBack: goToPreviousQuestion,
+                                          onExit: _exitController.requestExit,
+                                          onContinue: handleContinue,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

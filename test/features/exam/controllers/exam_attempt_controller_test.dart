@@ -391,16 +391,21 @@ void main() {
 
     expect(service.events, <String>['submit:start']);
     expect(service.generateCalls, 0);
+    expect(controller.isTransitioningToHigherGrade, isTrue);
+    expect(controller.transitioningGradeDelta, 2);
 
     service.completeSubmit();
     await Future<void>.delayed(Duration.zero);
 
     expect(service.events, <String>['submit:start', 'generate:start']);
     expect(service.generateCalls, 1);
+    expect(controller.isTransitioningToHigherGrade, isTrue);
 
     service.completeGenerate();
     expect(await transition, AssessmentFlowAction.generateSet);
     expect(controller.currentGrade, 2);
+    expect(controller.isTransitioningToHigherGrade, isFalse);
+    expect(controller.transitioningGradeDelta, isNull);
   });
 
   test(
