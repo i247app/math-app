@@ -10,12 +10,12 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
     super.key,
     required this.topics,
     this.aiReviewShort,
-    this.onOpenReview,
+    this.onOpenAiReview,
   });
 
   final List<ExamPracticeTopic> topics;
   final String? aiReviewShort;
-  final VoidCallback? onOpenReview;
+  final VoidCallback? onOpenAiReview;
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +61,13 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
               ],
             ),
           ),
-          if (onOpenReview != null) ...[
+          if (onOpenAiReview != null) ...[
             const SizedBox(width: 8),
             SizedBox.square(
               dimension: 48,
               child: IconButton(
                 key: const ValueKey('exam-review-open-text'),
-                onPressed: onOpenReview,
+                onPressed: onOpenAiReview,
                 tooltip: context.getText(AppKeys.examReviewWeakTopicsTitle),
                 icon: Icon(
                   Icons.chevron_right_rounded,

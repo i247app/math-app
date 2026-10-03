@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/exam/controllers/exam_review_controller.dart';
+import 'package:numi/features/exam/controllers/review_detail_controller.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tab_button.dart';
 
 class ExamReviewModeTabs extends StatelessWidget {

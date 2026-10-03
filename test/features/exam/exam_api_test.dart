@@ -961,7 +961,7 @@ void main() {
         captured = options;
         return response;
       });
-      final result = await api.getExamSessionReview(
+      final result = await api.generateExamSessionAiReview(
         profileId: 21,
         userExamId: 99,
       );
@@ -990,7 +990,7 @@ void main() {
   test('session review returns null when exam_session is absent', () async {
     final api = _apiReturning((_) => {'mstatus': 200, 'status': 'Success'});
     expect(
-      await api.getExamSessionReview(profileId: 21, userExamId: 99),
+      await api.generateExamSessionAiReview(profileId: 21, userExamId: 99),
       isNull,
     );
   });
@@ -1003,7 +1003,7 @@ void main() {
       },
     );
     await expectLater(
-      api.getExamSessionReview(profileId: 21, userExamId: 99),
+      api.generateExamSessionAiReview(profileId: 21, userExamId: 99),
       throwsA(
         isA<ExamException>().having((error) => error.status, 'status', 503),
       ),

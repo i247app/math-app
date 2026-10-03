@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/exam/controllers/exam_review_controller.dart';
+import 'package:numi/features/exam/controllers/review_detail_controller.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';

@@ -8,15 +8,15 @@ import 'package:numi/features/exam/data/exam_exception.dart';
 
 enum ExamReviewMode { retry, result }
 
-class ExamReviewController extends ChangeNotifier {
-  ExamReviewController({
-    required this.examId,
+class ReviewDetailController extends ChangeNotifier {
+  ReviewDetailController({
+    required this.detailId,
     required ExamDetailLoader loadDetail,
     GeneratedExam? initialExam,
     ExamReviewMode initialMode = ExamReviewMode.retry,
     Object? cacheKey,
   }) : _loadDetail = loadDetail,
-       _cacheKey = cacheKey ?? examId,
+       _cacheKey = cacheKey ?? detailId,
        _exam = initialExam {
     _mode = initialMode;
     _seedSubmittedAnswers(initialExam);
@@ -25,7 +25,7 @@ class ExamReviewController extends ChangeNotifier {
     }
   }
 
-  final int examId;
+  final int detailId;
   final ExamDetailLoader _loadDetail;
   final Object _cacheKey;
 
@@ -49,7 +49,7 @@ class ExamReviewController extends ChangeNotifier {
   Map<int, String> get retryAnswers =>
       Map<int, String>.unmodifiable(_retryAnswers);
 
-  Future<void> loadExamDetail({bool forceRefresh = false}) async {
+  Future<void> loadDetail({bool forceRefresh = false}) async {
     final requestId = ++_loadRequestId;
     final cachedExam = ExamCache.peekDetail(_cacheKey);
     final initialExamHasDetail = _exam?.questions.isNotEmpty == true;
@@ -78,7 +78,7 @@ class ExamReviewController extends ChangeNotifier {
       final exam = await ExamCache.loadDetail(
         loadDetail: _loadDetail,
         cacheKey: _cacheKey,
-        serviceExamId: examId,
+        serviceExamId: detailId,
         forceRefresh: forceRefresh || hasVisibleDetail,
       );
       if (_disposed || requestId != _loadRequestId) {

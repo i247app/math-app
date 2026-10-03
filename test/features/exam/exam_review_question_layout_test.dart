@@ -11,7 +11,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_list.dart';
@@ -497,7 +497,7 @@ class _JourneyDetailService implements ExamService {
   int? requestedUserExamId;
 
   @override
-  Future<ExamStats?> getExamSessionReview({
+  Future<ExamStats?> generateExamSessionAiReview({
     required int profileId,
     required int userExamId,
   }) async => null;

@@ -19,7 +19,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/grade.dart';

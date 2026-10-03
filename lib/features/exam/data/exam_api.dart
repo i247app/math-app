@@ -321,7 +321,7 @@ class ExamApi implements ExamService {
   }
 
   @override
-  Future<ExamStats?> getExamSessionReview({
+  Future<ExamStats?> generateExamSessionAiReview({
     required int profileId,
     required int userExamId,
   }) {

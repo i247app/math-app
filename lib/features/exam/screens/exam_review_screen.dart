@@ -1,270 +1,131 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/exam_review_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
-import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_content.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_computed_correct_count.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_loading_content.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
-import 'package:numi/features/exam/screens/exam_review_text_screen.dart';
+import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
+import 'package:numi/features/exam/screens/review_detail_screen.dart';
 
-typedef ExamReviewPracticeStarter = Future<void> Function(GeneratedExam exam);
-
-/// Shared review-detail layout used by exam and classroom-exercise entry
-/// screens. Source-specific screens provide the detail loader and data model.
-class ReviewDetailScreen extends StatefulWidget {
-  const ReviewDetailScreen({
+/// Exam-specific route into the shared review-detail layout.
+class ExamReviewScreen extends StatelessWidget {
+  const ExamReviewScreen({
     super.key,
-    required this.detailId,
-    required this.detailLoader,
-    this.headerTitle,
-    this.initialDetail,
-    this.allowRetry = true,
-    this.showTime = true,
-    this.cacheKey,
-    this.onPractice,
-    this.onLoadSessionReview,
-  });
+    this.examId,
+    this.userExamId,
+    this.profileId,
+    this.examType,
+    this.initialExam,
+    this.allowPractice = true,
+  }) : assert(examId != null || userExamId != null);
 
-  final int detailId;
-  final ExamDetailLoader detailLoader;
-  final String? headerTitle;
-  final GeneratedExam? initialDetail;
-  final bool allowRetry;
-  final bool showTime;
-  final Object? cacheKey;
-  final ExamReviewPracticeStarter? onPractice;
-  final Future<ExamStats?> Function(GeneratedExam? exam)? onLoadSessionReview;
-
-  @override
-  State<ReviewDetailScreen> createState() => _ReviewDetailScreenState();
-}
-
-class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
-  late final ExamReviewController _controller;
-  bool _isGeneratingPractice = false;
-  bool _isReviewOpen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = ExamReviewController(
-      examId: widget.detailId,
-      loadDetail: widget.detailLoader,
-      initialExam: widget.initialDetail,
-      initialMode: widget.allowRetry
-          ? ExamReviewMode.retry
-          : ExamReviewMode.result,
-      cacheKey: widget.cacheKey,
-    );
-    unawaited(_controller.loadExamDetail());
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _selectQuestion(int index) {
-    if (_controller.selectQuestion(index)) {
-      HapticFeedback.selectionClick();
-    }
-  }
-
-  String? _reviewShortText(GeneratedExam exam) {
-    final total = exam.grading?.totalQuestions ?? exam.questions.length;
-    final correct =
-        exam.grading?.correctNumber ?? examReviewComputedCorrectCount(exam);
-    if (total > 0 && correct == total) {
-      return context.getText(AppKeys.examReviewPerfectScoreMessage);
-    }
-    return exam.aiReviewShort;
-  }
-
-  Future<void> _openReview(GeneratedExam exam) async {
-    if (_isReviewOpen) return;
-    _isReviewOpen = true;
-    final longText = exam.aiReviewLong?.trim() ?? '';
-    final hasExistingReview =
-        longText.isNotEmpty && (exam.aiReviewShort?.trim().isNotEmpty ?? false);
-    final shortText = _reviewShortText(exam)?.trim() ?? '';
-    final topics = exam.practiceWeakTopics
-        .map((topic) => topic.topic.trim())
-        .where((topic) => topic.isNotEmpty)
-        .join(', ');
-    final reviewText = longText.isNotEmpty
-        ? longText
-        : shortText.isNotEmpty
-        ? shortText
-        : topics;
-    final generateReview = widget.onLoadSessionReview;
-    try {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => ExamReviewTextScreen(
-            reviewText: reviewText,
-            reviewLoader: generateReview == null || hasExistingReview
-                ? null
-                : () async {
-                    final review = await generateReview(exam);
-                    final generatedLong = review?.aiReviewLong?.trim() ?? '';
-                    final generatedShort = review?.aiReviewShort?.trim() ?? '';
-                    return generatedLong.isNotEmpty
-                        ? generatedLong
-                        : generatedShort.isNotEmpty
-                        ? generatedShort
-                        : reviewText;
-                  },
-          ),
-        ),
-      );
-      if (mounted) {
-        await _controller.loadExamDetail(forceRefresh: true);
-      }
-    } finally {
-      _isReviewOpen = false;
-    }
-  }
-
-  void _selectMode(ExamReviewMode mode) {
-    if (_controller.selectMode(mode)) {
-      HapticFeedback.selectionClick();
-    }
-  }
-
-  void _selectAnswer(int questionNumber, String label) {
-    HapticFeedback.selectionClick();
-    _controller.selectAnswer(questionNumber, label);
-  }
-
-  void _goToPreviousQuestion() {
-    if (_controller.goToPreviousQuestion()) {
-      HapticFeedback.selectionClick();
-    }
-  }
-
-  void _goToNextQuestion() {
-    if (_controller.goToNextQuestion()) {
-      HapticFeedback.selectionClick();
-    }
-  }
-
-  Future<void> _startPractice(GeneratedExam exam) async {
-    final onPractice = widget.onPractice;
-    if (onPractice == null || _isGeneratingPractice) {
-      return;
-    }
-    HapticFeedback.mediumImpact();
-    setState(() => _isGeneratingPractice = true);
-    try {
-      await onPractice(exam);
-    } on ExamException catch (error) {
-      _showPracticeError(error.message);
-    } catch (_) {
-      _showPracticeError(AppStrings.current(AppKeys.testAgainCreateFailed));
-    } finally {
-      if (mounted) {
-        setState(() => _isGeneratingPractice = false);
-      }
-    }
-  }
-
-  void _showPracticeError(String message) {
-    if (!mounted) {
-      return;
-    }
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.getText(AppKeys.testAgainDialogTitle)),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(context.getText(AppKeys.close)),
-          ),
-        ],
-      ),
-    );
-  }
+  final int? examId;
+  final int? userExamId;
+  final int? profileId;
+  final String? examType;
+  final GeneratedExam? initialExam;
+  final bool allowPractice;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-
-    return Scaffold(
-      backgroundColor: colors.pageBackground,
-      body: SafeArea(
-        bottom: false,
-        child: _isGeneratingPractice
-            ? const AssessmentTestAgainLoader()
-            : Column(
-                children: [
-                  ExamReviewHeader(
-                    title: widget.headerTitle,
-                    onBack: () => Navigator.of(context).pop(),
-                  ),
-                  Expanded(
-                    child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        final exam = _controller.exam;
-                        if (exam == null) {
-                          return _controller.isLoading
-                              ? const ExamReviewLoadingContent()
-                              : ExamReviewStatePanel(
-                                  isLoading: false,
-                                  message: _controller.errorMessage,
-                                  onRetry: () => _controller.loadExamDetail(
-                                    forceRefresh: true,
-                                  ),
-                                );
-                        }
-
-                        return ExamReviewContent(
-                          exam: exam,
-                          selectedIndex: _controller.selectedIndex,
-                          mode: _controller.mode,
-                          allowRetry: widget.allowRetry,
-                          showTime: widget.showTime,
-                          isLoading: _controller.isLoading,
-                          errorMessage: _controller.errorMessage,
-                          onRetry: () =>
-                              _controller.loadExamDetail(forceRefresh: true),
-                          onModeSelected: _selectMode,
-                          onQuestionSelected: _selectQuestion,
-                          submittedAnswers: _controller.submittedAnswers,
-                          retryAnswers: _controller.retryAnswers,
-                          onAnswerSelected: _selectAnswer,
-                          onPrevious: _goToPreviousQuestion,
-                          onNext: _goToNextQuestion,
-                          onPractice: widget.onPractice == null
-                              ? null
-                              : () => _startPractice(exam),
-                          isGeneratingPractice: _isGeneratingPractice,
-                          aiReviewShort: _reviewShortText(exam),
-                          aiTitle: exam.aiTitle,
-                          aiShortText: exam.aiShortText,
-                          onOpenReview: () => _openReview(exam),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+    final examService = context.read<ExamService>();
+    final detailId = userExamId ?? examId!;
+    final isEntireJourney = userExamId != null;
+    final resolvedExamType =
+        (examType ?? initialExam?.examType ?? examTypeAssessment)
+            .trim()
+            .toUpperCase();
+    return ReviewDetailScreen(
+      detailId: detailId,
+      showTime: false,
+      headerTitle:
+          resolvedExamType == examTypeAssessment ||
+              resolvedExamType == examTypeGrade
+          ? context.formatText(AppKeys.assessmentReviewHeaderTitle, {
+              'id': detailId,
+            })
+          : null,
+      detailLoader: (detailId) => examService.getExamDetail(
+        detailId,
+        profileId: profileId ?? initialExam?.profileId,
+        userExamId: userExamId,
+        examType: resolvedExamType,
       ),
+      initialDetail: initialExam,
+      onGenerateAiReview: (detail) async {
+        final sessionId =
+            userExamId ?? detail?.userExamId ?? initialExam?.userExamId;
+        final sessionProfileId =
+            profileId ?? detail?.profileId ?? initialExam?.profileId;
+        if (sessionId == null ||
+            sessionId <= 0 ||
+            sessionProfileId == null ||
+            sessionProfileId <= 0) {
+          return null;
+        }
+        return examService.generateExamSessionAiReview(
+          profileId: sessionProfileId,
+          userExamId: sessionId,
+        );
+      },
+      cacheKey: isEntireJourney
+          ? (
+              type: '${resolvedExamType.toLowerCase()}-journey',
+              userExamId: userExamId,
+            )
+          : null,
+      onPractice: isEntireJourney && allowPractice
+          ? (detail) async {
+              final journeyId = detail.userExamId ?? userExamId;
+              if (journeyId == null || journeyId <= 0) {
+                throw ExamException(
+                  AppStrings.current(AppKeys.missingExamIdShort),
+                );
+              }
+              final practiceGrade = AssessmentFlowPolicy.clampGrade(
+                detail.lastSetGrade ?? detail.grade ?? initialExam?.grade ?? 0,
+              );
+              final practiceProfileId =
+                  detail.profileId ?? profileId ?? initialExam?.profileId;
+              final generatedExam = await examService.generateAssessmentExam(
+                examType: examTypePractice,
+                gradeLabel: AssessmentFlowPolicy.gradeLabel(practiceGrade),
+                profileId: practiceProfileId,
+                userExamId: journeyId,
+              );
+              if (!context.mounted) {
+                return;
+              }
+              ExamCache.seedDetail(generatedExam);
+              final reviewRoute = ModalRoute.of(context);
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (practiceContext) => ExamAttemptScreen(
+                    examService: examService,
+                    initialExam: generatedExam,
+                    examType: examTypePractice,
+                    gradeLabel: AssessmentFlowPolicy.gradeLabel(practiceGrade),
+                    profileId: practiceProfileId,
+                    onResultBack: () {
+                      final navigator = Navigator.of(practiceContext);
+                      if (reviewRoute == null) {
+                        navigator.popUntil((route) => route.isFirst);
+                        return;
+                      }
+                      navigator.popUntil(
+                        (route) => identical(route, reviewRoute),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          : null,
     );
   }
 }

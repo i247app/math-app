@@ -11,8 +11,8 @@ import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_text_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
+import 'package:numi/features/exam/screens/ai_review_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -59,7 +59,7 @@ void main() {
         await tester.pump(const Duration(seconds: 1));
         await tester.pump();
         expect(service.requests, [(profileId: 21, sessionId: id)]);
-        expect(find.byType(ExamReviewTextScreen), findsOneWidget);
+        expect(find.byType(AiReviewScreen), findsOneWidget);
         expect(find.byType(PageHeader), findsOneWidget);
         expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -355,7 +355,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
-    expect(find.byType(ExamReviewTextScreen), findsNothing);
+    expect(find.byType(AiReviewScreen), findsNothing);
     expect(service.detailCalls, 1);
     pending.complete(_review());
     await tester.pump();
@@ -619,7 +619,7 @@ class _ReviewService implements ExamService {
   }
 
   @override
-  Future<ExamStats?> getExamSessionReview({
+  Future<ExamStats?> generateExamSessionAiReview({
     required int profileId,
     required int userExamId,
   }) async {

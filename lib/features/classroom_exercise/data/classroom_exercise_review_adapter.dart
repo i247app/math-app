@@ -4,8 +4,8 @@ import 'package:numi/features/classroom_exercise/data/classroom_exercise_service
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_exception.dart';
 
 /// Adapts a submitted classroom exercise to the shared exam review UI.
-class ClassroomExerciseExamReviewService {
-  ClassroomExerciseExamReviewService({
+class ClassroomExerciseReviewAdapter {
+  ClassroomExerciseReviewAdapter({
     required this.profileId,
     required ClassroomExerciseService exerciseService,
   }) : _exerciseService = exerciseService;
@@ -13,9 +13,9 @@ class ClassroomExerciseExamReviewService {
   final int profileId;
   final ClassroomExerciseService _exerciseService;
 
-  Future<GeneratedExam> getExamDetail(int examId) async {
+  Future<GeneratedExam> loadDetail(int exerciseId) async {
     final exercise = await _exerciseService.getExerciseDetail(
-      exerciseId: examId,
+      exerciseId: exerciseId,
       profileId: profileId,
     );
     if (exercise == null) {

@@ -28,7 +28,7 @@ import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/exam/screens/parent_assessment_tab.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';

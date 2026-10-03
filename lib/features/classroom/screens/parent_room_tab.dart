@@ -15,7 +15,7 @@ import 'package:numi/features/home/data/home_layout_exception.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/shared/layouts/page_header.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/settings/screens/setting_tab.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';

@@ -21,7 +21,7 @@ import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
 import 'package:numi/features/exam/screens/learning_progress_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/exam/models/parent_assessment_entry.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_progress_chart.dart';

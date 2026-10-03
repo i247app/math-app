@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
-import 'package:numi/features/classroom_exercise/data/classroom_exercise_exam_review_service.dart';
-import 'package:numi/features/exam/screens/exam_review_screen.dart';
+import 'package:numi/features/classroom_exercise/data/classroom_exercise_review_adapter.dart';
+import 'package:numi/features/exam/screens/review_detail_screen.dart';
 
 /// Homework-specific route into the shared review-detail layout.
 class ClassroomExerciseReviewScreen extends StatelessWidget {
@@ -22,18 +22,16 @@ class ClassroomExerciseReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reviewService = ClassroomExerciseExamReviewService(
+    final reviewAdapter = ClassroomExerciseReviewAdapter(
       profileId: profileId,
       exerciseService: exerciseService,
     );
     return ReviewDetailScreen(
       detailId: exerciseId,
-      detailLoader: reviewService.getExamDetail,
+      detailLoader: reviewAdapter.loadDetail,
       initialDetail: initialExercise == null
           ? null
-          : ClassroomExerciseExamReviewService.toGeneratedExam(
-              initialExercise!,
-            ),
+          : ClassroomExerciseReviewAdapter.toGeneratedExam(initialExercise!),
       allowRetry: false,
       // Homework detail and submitted answers are profile-specific. A record
       // also keeps this namespace separate from integer exam cache keys.

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/exam_review_controller.dart';
+import 'package:numi/features/exam/controllers/review_detail_controller.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
@@ -40,7 +40,7 @@ class ExamReviewContent extends StatelessWidget {
     this.aiReviewShort,
     this.aiTitle,
     this.aiShortText,
-    this.onOpenReview,
+    this.onOpenAiReview,
   });
 
   final GeneratedExam exam;
@@ -63,7 +63,7 @@ class ExamReviewContent extends StatelessWidget {
   final String? aiReviewShort;
   final String? aiTitle;
   final String? aiShortText;
-  final VoidCallback? onOpenReview;
+  final VoidCallback? onOpenAiReview;
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +174,7 @@ class ExamReviewContent extends StatelessWidget {
               child: ExamReviewWeakTopicsCard(
                 topics: exam.practiceWeakTopics,
                 aiReviewShort: aiReviewShort,
-                onOpenReview: onOpenReview,
+                onOpenAiReview: onOpenAiReview,
               ),
             ),
           if (allowRetry) ...[

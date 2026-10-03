@@ -16,7 +16,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
-import 'package:numi/features/exam/screens/exam_review_entry_screen.dart';
+import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';

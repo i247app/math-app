@@ -38,7 +38,7 @@ void main() {
                     child: Padding(
                       padding: const EdgeInsets.all(13),
                       child: ExamReviewWeakTopicsCard(
-                        onOpenReview: () => taps++,
+                        onOpenAiReview: () => taps++,
                         topics: const [
                           ExamPracticeTopic(
                             topic: ' Phép cộng và phép trừ trong phạm vi 100 ',
@@ -123,7 +123,7 @@ void main() {
                       child: ExamReviewWeakTopicsCard(
                         topics: [],
                         aiReviewShort: aiText,
-                        onOpenReview: () => taps++,
+                        onOpenAiReview: () => taps++,
                       ),
                     ),
                   ),

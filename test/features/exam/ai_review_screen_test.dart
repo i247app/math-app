@@ -5,7 +5,7 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
-import 'package:numi/features/exam/screens/exam_review_text_screen.dart';
+import 'package:numi/features/exam/screens/ai_review_screen.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -39,7 +39,7 @@ void main() {
                 ).copyWith(textScaler: const TextScaler.linear(2)),
                 child: child!,
               ),
-              home: ExamReviewTextScreen(reviewText: reviewText),
+              home: AiReviewScreen(reviewText: reviewText),
             ),
           ),
         );

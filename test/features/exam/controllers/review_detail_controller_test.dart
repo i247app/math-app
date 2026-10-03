@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/controllers/exam_review_controller.dart';
+import 'package:numi/features/exam/controllers/review_detail_controller.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 
 void main() {
@@ -27,8 +27,8 @@ void main() {
     const summary = GeneratedExam(id: examId, questions: <ExamQuestion>[]);
     ExamCache.seedDetail(detail);
     var loaderCalls = 0;
-    final controller = ExamReviewController(
-      examId: examId,
+    final controller = ReviewDetailController(
+      detailId: examId,
       initialExam: summary,
       loadDetail: (_) async {
         loaderCalls++;
@@ -37,7 +37,7 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await controller.loadExamDetail();
+    await controller.loadDetail();
 
     expect(controller.exam, same(detail));
     expect(controller.exam?.questions, isNotEmpty);
@@ -71,8 +71,8 @@ void main() {
     const secondCacheKey = (profileId: 981234012, exerciseId: exerciseId);
     var firstLoaderCalls = 0;
     var secondLoaderCalls = 0;
-    final firstController = ExamReviewController(
-      examId: exerciseId,
+    final firstController = ReviewDetailController(
+      detailId: exerciseId,
       cacheKey: firstCacheKey,
       initialExam: summary,
       loadDetail: (_) async {
@@ -82,10 +82,10 @@ void main() {
     );
     addTearDown(firstController.dispose);
 
-    await firstController.loadExamDetail();
+    await firstController.loadDetail();
 
-    final secondController = ExamReviewController(
-      examId: exerciseId,
+    final secondController = ReviewDetailController(
+      detailId: exerciseId,
       cacheKey: secondCacheKey,
       initialExam: summary,
       loadDetail: (_) async {
@@ -95,7 +95,7 @@ void main() {
     );
     addTearDown(secondController.dispose);
 
-    await secondController.loadExamDetail();
+    await secondController.loadDetail();
 
     expect(firstController.exam, same(firstDetail));
     expect(secondController.exam, same(secondDetail));

@@ -10,21 +10,21 @@ import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_header.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_state_panel.dart';
 
-class ExamReviewTextScreen extends StatefulWidget {
-  const ExamReviewTextScreen({
+class AiReviewScreen extends StatefulWidget {
+  const AiReviewScreen({
     super.key,
     required this.reviewText,
-    this.reviewLoader,
+    this.aiReviewLoader,
   });
 
   final String reviewText;
-  final Future<String> Function()? reviewLoader;
+  final Future<String> Function()? aiReviewLoader;
 
   @override
-  State<ExamReviewTextScreen> createState() => _ExamReviewTextScreenState();
+  State<AiReviewScreen> createState() => _AiReviewScreenState();
 }
 
-class _ExamReviewTextScreenState extends State<ExamReviewTextScreen> {
+class _AiReviewScreenState extends State<AiReviewScreen> {
   late String _reviewText;
   bool _isLoading = false;
   String? _errorMessage;
@@ -33,11 +33,11 @@ class _ExamReviewTextScreenState extends State<ExamReviewTextScreen> {
   void initState() {
     super.initState();
     _reviewText = widget.reviewText;
-    if (widget.reviewLoader != null) unawaited(_loadReview());
+    if (widget.aiReviewLoader != null) unawaited(_loadAiReview());
   }
 
-  Future<void> _loadReview() async {
-    final loader = widget.reviewLoader;
+  Future<void> _loadAiReview() async {
+    final loader = widget.aiReviewLoader;
     if (loader == null || _isLoading) return;
     setState(() {
       _isLoading = true;
@@ -78,7 +78,7 @@ class _ExamReviewTextScreenState extends State<ExamReviewTextScreen> {
                   ? ExamReviewStatePanel(
                       isLoading: false,
                       message: _errorMessage,
-                      onRetry: _loadReview,
+                      onRetry: _loadAiReview,
                     )
                   : SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
