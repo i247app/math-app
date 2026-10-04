@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
@@ -39,6 +40,9 @@ class ExamHistoryClassroomExerciseCache {
               final cachedExercises = List<ClassroomExercise>.unmodifiable(
                 exercises,
               );
+              if (!identical(_pending[profileId], request)) {
+                return cachedExercises;
+              }
               _submittedClassroomExerciseByProfile[profileId] = cachedExercises;
               _loadedAt[profileId] = DateTime.now();
               return cachedExercises;
@@ -66,6 +70,13 @@ class ExamHistoryClassroomExerciseCache {
     return loadedAt != null && DateTime.now().difference(loadedAt) <= maxAge;
   }
 
+  /// Drops all session data, including in-flight cache writes.
+  static void clear() {
+    _submittedClassroomExerciseByProfile.clear();
+    _loadedAt.clear();
+    _pending.clear();
+  }
+
   static void invalidateProfile(int profileId) {
     _submittedClassroomExerciseByProfile.remove(profileId);
     _loadedAt.remove(profileId);
@@ -77,9 +88,11 @@ class ExamHistoryClassroomExerciseCache {
     required ClassroomExerciseService assignmentService,
     required int profileId,
   }) async {
+    final cacheScope = SessionCacheScope.current;
     final classrooms = await classroomService.listMyJoinedClassrooms(
       profileId: profileId,
     );
+    if (!cacheScope.isCurrent) return const <ClassroomExercise>[];
     final classroomIds = classrooms
         .map((classroom) => classroom.stableId)
         .whereType<int>()

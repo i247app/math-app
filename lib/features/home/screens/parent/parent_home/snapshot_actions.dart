@@ -31,7 +31,7 @@ extension _ParentHomeSnapshotActions on ParentHomeContentState {
           childSummaries = _studentSummariesFromLayout(layout, assessments);
         }
       });
-      if (layout != null) {
+      if (layout != null && _cacheScope.isCurrent) {
         HomeProfileCache.instance.putParent(
           ParentHomeSnapshot(
             profileId: profileId,

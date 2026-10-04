@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/profile.dart';
@@ -66,6 +67,7 @@ class ParentRoomTab extends StatefulWidget {
 }
 
 class _ParentRoomTabState extends State<ParentRoomTab> {
+  final _cacheScope = SessionCacheScope.current;
   late final HomeLayoutService _homeLayoutService = context
       .read<HomeLayoutService>();
 
@@ -175,6 +177,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
         _hasLoaded = true;
         _errorMessage = null;
       });
+      if (!_cacheScope.isCurrent) return;
       cache.putParent(
         ParentHomeSnapshot(
           profileId: profileId,

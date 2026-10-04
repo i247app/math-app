@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
@@ -94,6 +95,7 @@ class ExamAttemptController extends ChangeNotifier {
     _restoreInitialAttempt(initialExam);
   }
 
+  final _cacheScope = SessionCacheScope.current;
   final ExamService _examService;
   final String examType;
   final String? gradeLabel;
@@ -753,7 +755,7 @@ class ExamAttemptController extends ChangeNotifier {
       profileId: profileId ?? _exam?.profileId,
       level: _currentLevel,
     );
-    ExamCache.seedDetail(generatedExam);
+    if (_cacheScope.isCurrent) ExamCache.seedDetail(generatedExam);
     return generatedExam;
   }
 
@@ -766,7 +768,7 @@ class ExamAttemptController extends ChangeNotifier {
       profileId: profileId,
       level: _currentLevel,
     );
-    ExamCache.seedDetail(generatedExam);
+    if (_cacheScope.isCurrent) ExamCache.seedDetail(generatedExam);
     return generatedExam;
   }
 
@@ -821,8 +823,10 @@ class ExamAttemptController extends ChangeNotifier {
     _submittedSets[examId] = cachedExam;
     final submittedProfileId =
         profileId ?? cachedExam.profileId ?? exam.profileId;
-    ExamCache.seedDetail(cachedExam);
-    ExamCache.invalidateLists(profileId: submittedProfileId);
+    if (_cacheScope.isCurrent) {
+      ExamCache.seedDetail(cachedExam);
+      ExamCache.invalidateLists(profileId: submittedProfileId);
+    }
     return cachedExam;
   }
 

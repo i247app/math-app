@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_exception.dart';
 import 'package:numi/features/classroom_exercise/models/student_classroom_exercise_attempt_question.dart';
@@ -52,6 +53,7 @@ class StudentClassroomExerciseAttemptController extends ChangeNotifier {
 
   final int exerciseId;
   final int profileId;
+  final _cacheScope = SessionCacheScope.current;
   final ClassroomExerciseService _exerciseService;
 
   ClassroomExercise? _exercise;
@@ -207,7 +209,7 @@ class StudentClassroomExerciseAttemptController extends ChangeNotifier {
         classroomExerciseId: submissionExerciseId,
         answers: answers,
       );
-      if (_disposed) {
+      if (_disposed || !_cacheScope.isCurrent) {
         return const StudentClassroomExerciseSubmitResult(
           StudentClassroomExerciseSubmitStatus.ignored,
         );
@@ -218,7 +220,7 @@ class StudentClassroomExerciseAttemptController extends ChangeNotifier {
       );
       return StudentClassroomExerciseSubmitResult.submitted(submission);
     } on ClassroomExerciseException catch (error) {
-      if (_disposed) {
+      if (_disposed || !_cacheScope.isCurrent) {
         return const StudentClassroomExerciseSubmitResult(
           StudentClassroomExerciseSubmitStatus.ignored,
         );
@@ -239,7 +241,7 @@ class StudentClassroomExerciseAttemptController extends ChangeNotifier {
         StudentClassroomExerciseSubmitStatus.failed,
       );
     } catch (_) {
-      if (_disposed) {
+      if (_disposed || !_cacheScope.isCurrent) {
         return const StudentClassroomExerciseSubmitResult(
           StudentClassroomExerciseSubmitStatus.ignored,
         );

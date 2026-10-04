@@ -8,6 +8,7 @@ import 'package:numi/app/controllers/app_coordinator_cubit.dart';
 import 'package:numi/app/controllers/app_coordinator_state.dart';
 import 'package:numi/app/navigation/app_screen.dart';
 import 'package:numi/core/data/session_scoped_repository_registry.dart';
+import 'package:numi/core/data/session_data_cleaner.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
@@ -155,6 +156,7 @@ class _AppFlowState extends State<AppFlow> {
                 initialSession: widget.initialSession,
                 authService: widget.authService ?? context.read<AuthService>(),
                 profileResolver: context.read(),
+                sessionDataCleaner: context.read<SessionDataCleaner>(),
                 guestAccountService: context.read<GuestAccountService>(),
               );
               context.read<SessionScopedRepositoryRegistry>().updateSession(

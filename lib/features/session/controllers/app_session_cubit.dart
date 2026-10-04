@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/debug/app_logger.dart';
+import 'package:numi/core/data/session_cache_scope.dart';
+import 'package:numi/core/data/session_data_cleaner.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -15,10 +17,12 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     AuthenticatedSession? initialSession,
     required AuthService authService,
     required ProfileSessionResolver profileResolver,
+    required SessionDataCleaner sessionDataCleaner,
     GuestAccountService? guestAccountService,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
        _authService = authService,
        _profileResolver = profileResolver,
+       _sessionDataCleaner = sessionDataCleaner,
        _guestAccountService = guestAccountService,
        super(
          initialSession == null
@@ -32,10 +36,14 @@ class AppSessionCubit extends Cubit<AppSessionState> {
                  profileLoadError: initialSession.profileLoadError,
                  shouldShowChildProfileDialog: false,
                ),
-       );
+       ) {
+    _clearSessionData();
+  }
 
   final ProfileSessionResolver _profileResolver;
   final AuthService _authService;
+  final SessionDataCleaner _sessionDataCleaner;
+  SessionCacheScope _cacheScope = SessionCacheScope.current;
   final GuestAccountService? _guestAccountService;
   int _sessionEpoch;
   int _operationRevision = 0;
@@ -43,6 +51,11 @@ class AppSessionCubit extends Cubit<AppSessionState> {
   Future<void>? _pendingProfileSelection;
 
   bool _isCurrent(int revision) => !isClosed && revision == _operationRevision;
+
+  void _clearSessionData() {
+    _sessionDataCleaner.clear();
+    _cacheScope = SessionCacheScope.current;
+  }
 
   void beginRestore() {
     if (isClosed ||
@@ -153,6 +166,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     final startsNewSession =
         !state.isAuthenticated || state.user?.id != user.id;
     if (startsNewSession) {
+      _clearSessionData();
       _sessionEpoch++;
     }
     emit(
@@ -191,6 +205,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
     final startsNewSession =
         !state.isAuthenticated || state.user?.id != session.user.id;
     if (startsNewSession) {
+      _clearSessionData();
       _sessionEpoch++;
     }
     final hasChildProfile = session.profiles.any(
@@ -224,6 +239,7 @@ class AppSessionCubit extends Cubit<AppSessionState> {
   void clear() {
     if (isClosed) return;
     _operationRevision++;
+    _clearSessionData();
     if (state.status == SessionStatus.unauthenticated) return;
     _sessionEpoch++;
     emit(AppSessionState(sessionEpoch: _sessionEpoch));
@@ -321,7 +337,11 @@ class AppSessionCubit extends Cubit<AppSessionState> {
 
   @override
   Future<void> close() {
+    if (isClosed) return super.close();
     _operationRevision++;
+    // A restart can create the replacement session before Flutter disposes
+    // this owner. Its disposal must not clear the replacement's cache.
+    if (_cacheScope.isCurrent) _sessionDataCleaner.clear();
     return super.close();
   }
 }

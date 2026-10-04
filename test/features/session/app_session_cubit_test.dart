@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/app/composition/app_session_data_cleaner.dart';
+import 'package:numi/core/data/session_data_cleaner.dart';
+import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
@@ -89,18 +93,126 @@ class _FakeGuestAccountService implements GuestAccountService {
   }
 }
 
+class _FakeSessionDataCleaner implements SessionDataCleaner {
+  int clearCalls = 0;
+
+  @override
+  void clear() => clearCalls++;
+}
+
 AppSessionCubit _buildCubit({
   _FakeAuthService? authService,
   ProfileSessionResolver? profileResolver,
   GuestAccountService? guestAccountService,
+  SessionDataCleaner? sessionDataCleaner,
 }) => AppSessionCubit(
   authService: authService ?? _FakeAuthService(),
   profileResolver: profileResolver ?? _FakeProfileSessionResolver(),
   guestAccountService: guestAccountService,
+  sessionDataCleaner: sessionDataCleaner ?? _FakeSessionDataCleaner(),
 );
 
 void main() {
   group('AppSessionCubit', () {
+    test(
+      'disposal during restart preserves the replacement session cache',
+      () async {
+        const cleaner = AppSessionDataCleaner();
+        final old = _buildCubit(sessionDataCleaner: cleaner);
+        old.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+        final replacement = _buildCubit(sessionDataCleaner: cleaner);
+        replacement.authenticate(
+          const AuthenticatedSession(user: LoginUser(id: 7)),
+        );
+        const exam = GeneratedExam(examId: 42, questions: []);
+        ExamCache.seedDetail(exam);
+        await old.close();
+        expect(ExamCache.peekDetail(42), same(exam));
+        await replacement.close();
+        expect(ExamCache.peekDetail(42), isNull);
+      },
+    );
+
+    test('cleans at startup, account changes, clear and close', () async {
+      final cleaner = _FakeSessionDataCleaner();
+      final cubit = _buildCubit(sessionDataCleaner: cleaner);
+      expect(cleaner.clearCalls, 1);
+      cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+      expect(cleaner.clearCalls, 2);
+      cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 8)));
+      expect(cleaner.clearCalls, 3);
+      cubit.clear();
+      expect(cleaner.clearCalls, 4);
+      await cubit.close();
+      expect(cleaner.clearCalls, 5);
+    });
+
+    test(
+      'preserves caches on same-account updates and profile switches',
+      () async {
+        final cleaner = _FakeSessionDataCleaner();
+        final cubit = _buildCubit(sessionDataCleaner: cleaner);
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+        final calls = cleaner.clearCalls;
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+        await cubit.activateProfile(const UserProfile(profileId: 70));
+        await cubit.refreshProfiles();
+        expect(cleaner.clearCalls, calls);
+        await cubit.close();
+      },
+    );
+
+    test(
+      'cleans before profile resolution and does not clean again on completion',
+      () async {
+        final cleaner = _FakeSessionDataCleaner();
+        final resolver = _ControlledProfileSessionResolver();
+        final cubit = _buildCubit(
+          sessionDataCleaner: cleaner,
+          profileResolver: resolver,
+        );
+        final pending = cubit.establishSession(user: const LoginUser(id: 7));
+        expect(cleaner.clearCalls, 2);
+        resolver.resolution.complete(const ProfileSessionResolution.empty());
+        await pending;
+        expect(cleaner.clearCalls, 2);
+        await cubit.close();
+      },
+    );
+
+    test(
+      'cleans synchronously on logout and leaves a newer session intact',
+      () async {
+        final auth = _PendingLogoutAuthService();
+        final cleaner = _FakeSessionDataCleaner();
+        final cubit = _buildCubit(
+          authService: auth,
+          sessionDataCleaner: cleaner,
+        );
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 7)));
+        final pending = cubit.logout();
+        expect(cubit.state.isAuthenticated, isFalse);
+        expect(cleaner.clearCalls, 3);
+        expect(cubit.logout(), same(pending));
+        cubit.authenticate(const AuthenticatedSession(user: LoginUser(id: 8)));
+        final calls = cleaner.clearCalls;
+        auth.completion.complete();
+        await pending;
+        expect(cubit.state.user?.id, 8);
+        expect(cleaner.clearCalls, calls);
+        await cubit.close();
+      },
+    );
+
+    test('cleans when session restoration finds no account', () async {
+      final cleaner = _FakeSessionDataCleaner();
+      final cubit = _buildCubit(sessionDataCleaner: cleaner);
+      await cubit.restoreSession();
+      expect(cubit.state.isAuthenticated, isFalse);
+      expect(cleaner.clearCalls, 2);
+      await cubit.close();
+    });
+
     test('clears guest data when a real user signs in', () async {
       final guestAccounts = _FakeGuestAccountService();
       final cubit = _buildCubit(guestAccountService: guestAccounts);
@@ -272,4 +384,11 @@ void main() {
       },
     );
   });
+}
+
+class _PendingLogoutAuthService extends _FakeAuthService {
+  final completion = Completer<void>();
+
+  @override
+  Future<void> logout() => completion.future;
 }

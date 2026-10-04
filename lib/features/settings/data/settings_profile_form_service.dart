@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/profile_options_cache.dart';
@@ -42,6 +43,7 @@ class SettingsProfileFormService {
     final cached = cachedOptions(userId);
     if (cached != null) return cached;
 
+    final cacheScope = SessionCacheScope.current;
     late final List<SchoolModel> schools;
     late final List<GradeModel> grades;
     late final List<ProgramModel> programs;
@@ -59,6 +61,7 @@ class SettingsProfileFormService {
           .then<void>((value) => semesters = value),
     ]);
     return _optionsCache.save(
+      cacheScope: cacheScope,
       userId: userId,
       schools: schools,
       grades: grades,

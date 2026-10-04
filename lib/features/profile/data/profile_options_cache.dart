@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/program.dart';
 import 'package:numi/features/profile/models/school.dart';
@@ -42,12 +43,14 @@ class ProfileOptionsCache {
     return snapshot;
   }
 
+  /// Returns the loaded options, retaining them only for the originating session.
   ProfileOptionsSnapshot save({
     required int userId,
     required List<SchoolModel> schools,
     required List<GradeModel> grades,
     required List<ProgramModel> programs,
     required List<SemesterModel> semesters,
+    SessionCacheScope? cacheScope,
   }) {
     final snapshot = ProfileOptionsSnapshot(
       userId: userId,
@@ -57,7 +60,7 @@ class ProfileOptionsCache {
       semesters: List<SemesterModel>.unmodifiable(semesters),
       createdAt: DateTime.now(),
     );
-    _snapshot = snapshot;
+    if (cacheScope == null || cacheScope.isCurrent) _snapshot = snapshot;
     return snapshot;
   }
 

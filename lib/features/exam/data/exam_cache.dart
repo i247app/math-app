@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 
@@ -42,6 +43,7 @@ class ExamCache {
         .listExams(userId: userId, profileId: profileId)
         .then((exams) {
           final cachedExams = List<GeneratedExam>.unmodifiable(exams);
+          if (!identical(_pendingLists[key], request)) return cachedExams;
           _lists[key] = cachedExams;
           _listLoadedAt[key] = DateTime.now();
           for (final exam in cachedExams) {
@@ -106,6 +108,7 @@ class ExamCache {
     late final Future<GeneratedExam> request;
     request = _loadDetailWithEmptyResponseRetry(loadDetail, serviceExamId)
         .then((exam) {
+          if (!identical(_pendingDetails[cacheKey], request)) return exam;
           seedDetail(exam, fallbackCacheKey: cacheKey);
           return exam;
         })
@@ -125,12 +128,14 @@ class ExamCache {
     ExamDetailLoader loadDetail,
     int examId,
   ) async {
+    final cacheScope = SessionCacheScope.current;
     final exam = await loadDetail(examId);
     if (exam.questions.isNotEmpty) {
       return exam;
     }
 
     await Future<void>.delayed(_emptyDetailRetryDelay);
+    if (!cacheScope.isCurrent) return exam;
     return loadDetail(examId);
   }
 
@@ -198,6 +203,16 @@ class ExamCache {
       _listLoadedAt[key] = DateTime.now();
     }
     _lists.addAll(updatedLists);
+  }
+
+  /// Drops all session data, including in-flight cache writes.
+  static void clear() {
+    _lists.clear();
+    _listLoadedAt.clear();
+    _pendingLists.clear();
+    _details.clear();
+    _detailLoadedAt.clear();
+    _pendingDetails.clear();
   }
 
   static void invalidateLists({int? userId, int? profileId}) {

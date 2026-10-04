@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
@@ -46,6 +47,7 @@ class AssessmentResultScreen extends StatefulWidget {
 }
 
 class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
+  final _cacheScope = SessionCacheScope.current;
   late final ExamService _examService;
   bool isGeneratingAgain = false;
 
@@ -85,7 +87,7 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
             ? widget.exam?.userExamId
             : null,
       );
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       ExamCache.seedDetail(generatedExam);
@@ -97,14 +99,14 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
         Navigator.of(context).pop(generatedExam);
       }
     } on ExamException catch (error) {
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
 
       setState(() => isGeneratingAgain = false);
       showTestAgainError(error.message);
     } catch (_) {
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
 

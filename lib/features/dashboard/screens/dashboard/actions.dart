@@ -41,7 +41,6 @@ extension _DashboardActions on _DashboardScreenState {
   }
 
   void _handleLogout() {
-    context.read<SessionDataCleaner>().clear();
     widget.onLogout();
   }
 

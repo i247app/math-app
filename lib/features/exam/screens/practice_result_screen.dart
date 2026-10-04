@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
@@ -50,6 +51,7 @@ class PracticeResultScreen extends StatefulWidget {
 }
 
 class _PracticeResultScreenState extends State<PracticeResultScreen> {
+  final _cacheScope = SessionCacheScope.current;
   late final ExamService _examService;
   bool _isGeneratingAgain = false;
 
@@ -77,7 +79,7 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
         profileId: widget.profileId,
         userExamId: widget.userExamId,
       );
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       ExamCache.seedDetail(generatedExam);
@@ -97,7 +99,7 @@ class _PracticeResultScreenState extends State<PracticeResultScreen> {
   }
 
   void _handleGenerationFailure(String message) {
-    if (!mounted) {
+    if (!mounted || !_cacheScope.isCurrent) {
       return;
     }
     setState(() => _isGeneratingAgain = false);

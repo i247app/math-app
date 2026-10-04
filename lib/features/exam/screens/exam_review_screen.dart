@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
@@ -33,6 +34,7 @@ class ExamReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cacheScope = SessionCacheScope.current;
     final examService = context.read<ExamService>();
     final detailId = userExamId ?? examId!;
     final isEntireJourney = userExamId != null;
@@ -98,7 +100,7 @@ class ExamReviewScreen extends StatelessWidget {
                 profileId: practiceProfileId,
                 userExamId: journeyId,
               );
-              if (!context.mounted) {
+              if (!context.mounted || !cacheScope.isCurrent) {
                 return;
               }
               ExamCache.seedDetail(generatedExam);

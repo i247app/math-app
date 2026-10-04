@@ -9,10 +9,7 @@ import 'package:numi/features/home/models/home_layout.dart';
 /// - If snapshot [isStale] → background refresh while user sees cached content
 /// - If no cache → show skeleton → load → cache result
 ///
-/// Lifetime: tied to the [DashboardScreen] widget (create in [_DashboardScreenState],
-/// pass down to tabs via [HomeProfileCache.instance] or constructor injection).
-///
-/// Call [invalidateAll] on logout.
+/// The app session owner calls [invalidateAll] when an account session ends.
 class HomeProfileCache {
   HomeProfileCache._();
 

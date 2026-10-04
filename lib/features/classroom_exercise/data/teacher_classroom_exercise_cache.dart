@@ -55,6 +55,7 @@ class TeacherClassroomExerciseCache {
           final cachedExercises = List<ClassroomExercise>.unmodifiable(
             exercises,
           );
+          if (!identical(_pendingLists[key], request)) return cachedExercises;
           _lists[key] = cachedExercises;
           for (final exercise in cachedExercises) {
             final exerciseId = exercise.stableId;
@@ -111,7 +112,9 @@ class TeacherClassroomExerciseCache {
     request = service
         .getExerciseDetail(exerciseId: exerciseId, profileId: profileId)
         .then((exercise) {
-          _details[key] = exercise;
+          if (identical(_pendingDetails[key], request)) {
+            _details[key] = exercise;
+          }
           return exercise;
         })
         .whenComplete(() {
@@ -161,6 +164,14 @@ class TeacherClassroomExerciseCache {
         purpose: exercise.purpose ?? classroomExercisePurposeHomework,
       );
     }
+  }
+
+  /// Drops all session data, including in-flight cache writes.
+  static void clear() {
+    _lists.clear();
+    _pendingLists.clear();
+    _details.clear();
+    _pendingDetails.clear();
   }
 
   static void invalidateList({

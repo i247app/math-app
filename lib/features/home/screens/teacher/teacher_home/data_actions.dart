@@ -76,6 +76,7 @@ extension _TeacherHomeDataActions on _TeacherRoleTabState {
         _hasLoadedHomeLayout = true;
         _homeLayoutError = null;
       });
+      if (!_cacheScope.isCurrent) return;
       cache.putTeacher(
         TeacherHomeSnapshot(
           profileId: profileId,

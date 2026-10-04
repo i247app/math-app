@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -80,6 +81,7 @@ class TeacherHomeTab extends StatefulWidget {
 }
 
 class _TeacherRoleTabState extends State<TeacherHomeTab> {
+  final _cacheScope = SessionCacheScope.current;
   late final HomeLayoutService _homeLayoutService =
       widget._homeLayoutService ?? context.read<HomeLayoutService>();
 

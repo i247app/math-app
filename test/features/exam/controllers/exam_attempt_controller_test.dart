@@ -1,12 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/app/composition/app_session_data_cleaner.dart';
+import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 
 void main() {
+  test('late generation cannot seed details after logout', () async {
+    const cleaner = AppSessionDataCleaner();
+    cleaner.clear();
+    addTearDown(cleaner.clear);
+    final service = _SequentialTransitionExamService();
+    final controller = ExamAttemptController(examService: service);
+    addTearDown(controller.dispose);
+    final pending = controller.generateExam();
+    cleaner.clear();
+    service.completeGenerate();
+    await pending;
+    expect(ExamCache.peekDetail(93), isNull);
+  });
+
   const answers = <ExamAnswer>[
     ExamAnswer(label: 'A', content: '18'),
     ExamAnswer(label: 'B', content: '20'),

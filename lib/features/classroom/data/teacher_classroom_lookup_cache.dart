@@ -53,12 +53,17 @@ class TeacherClassroomLookupCache {
       }
     }
 
-    final request = _loadFresh(
-      userId: userId,
-      gradeService: gradeService,
-      profileService: profileService,
-      schoolService: schoolService,
-    );
+    late final Future<TeacherClassroomLookupOptions> request;
+    request =
+        _loadFresh(
+          userId: userId,
+          gradeService: gradeService,
+          profileService: profileService,
+          schoolService: schoolService,
+        ).then((options) {
+          if (identical(_pending[userId], request)) _cache[userId] = options;
+          return options;
+        });
     _pending[userId] = request;
     return request.whenComplete(() {
       if (identical(_pending[userId], request)) {
@@ -84,7 +89,6 @@ class TeacherClassroomLookupCache {
       programs: List.unmodifiable(results[1] as List<ProgramModel>),
       schools: List.unmodifiable(results[2] as List<SchoolModel>),
     );
-    _cache[userId] = options;
     return options;
   }
 

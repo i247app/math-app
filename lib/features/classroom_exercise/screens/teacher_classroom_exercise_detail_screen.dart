@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -44,6 +45,7 @@ class TeacherClassroomExerciseDetailScreen extends StatefulWidget {
 
 class _TeacherClassroomExerciseDetailScreenState
     extends State<TeacherClassroomExerciseDetailScreen> {
+  final _cacheScope = SessionCacheScope.current;
   late final ClassroomExerciseService _exerciseService =
       widget._exerciseService ?? context.read<ClassroomExerciseService>();
 
@@ -104,7 +106,7 @@ class _TeacherClassroomExerciseDetailScreenState
         profileId: widget.profileId,
         forceRefresh: forceRefresh,
       );
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       final visibility = normalizeExerciseVisibility(exercise?.visibility);
@@ -116,7 +118,7 @@ class _TeacherClassroomExerciseDetailScreenState
         }
       });
     } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       setState(() {
@@ -154,7 +156,7 @@ class _TeacherClassroomExerciseDetailScreenState
         visibility: visibility,
         purpose: _effectivePurpose,
       );
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       setState(() {
@@ -170,7 +172,7 @@ class _TeacherClassroomExerciseDetailScreenState
         );
       }
     } on ClassroomExerciseException catch (error) {
-      if (!mounted) {
+      if (!mounted || !_cacheScope.isCurrent) {
         return;
       }
       context.showErrorDialog(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/grade.dart';
@@ -109,6 +110,7 @@ enum ParentHomeEntranceMode {
 }
 
 class ParentHomeContentState extends State<ParentHomeContent> {
+  final _cacheScope = SessionCacheScope.current;
   late final HomeLayoutService _homeLayoutService = context
       .read<HomeLayoutService>();
   bool isLoading = true;
@@ -260,6 +262,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         childSummaries = summaries;
         this.completedAssessments = completedAssessments;
       });
+      if (!_cacheScope.isCurrent) return;
       cache.putParent(
         ParentHomeSnapshot(
           profileId: profileId,

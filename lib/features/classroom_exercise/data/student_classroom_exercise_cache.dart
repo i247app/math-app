@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 
@@ -68,6 +69,7 @@ class StudentClassroomExerciseCache {
           final cachedExercises = List<ClassroomExercise>.unmodifiable(
             exercises,
           );
+          if (!identical(_pendingLists[key], request)) return cachedExercises;
           _lists[key] = cachedExercises;
           for (final exercise in cachedExercises) {
             seedDetail(profileId: profileId, exercise: exercise);
@@ -126,7 +128,8 @@ class StudentClassroomExerciseCache {
               profileId: profileId,
             )
             .then((exercise) {
-              if (exercise != null) {
+              if (exercise != null &&
+                  identical(_pendingDetails[key], request)) {
                 seedDetail(
                   profileId: profileId,
                   exercise: exercise,
@@ -152,6 +155,7 @@ class StudentClassroomExerciseCache {
     required int exerciseId,
     required int profileId,
   }) async {
+    final cacheScope = SessionCacheScope.current;
     final exercise = await service.getExerciseDetail(
       exerciseId: exerciseId,
       profileId: profileId,
@@ -161,6 +165,7 @@ class StudentClassroomExerciseCache {
     }
 
     await Future<void>.delayed(_emptyDetailRetryDelay);
+    if (!cacheScope.isCurrent) return exercise;
     return service.getExerciseDetail(
       exerciseId: exerciseId,
       profileId: profileId,
@@ -263,6 +268,14 @@ class StudentClassroomExerciseCache {
     _pendingLists.removeWhere(
       (key, _) => key.profileId == profileId && key.classroomId == classroomId,
     );
+  }
+
+  /// Drops all session data, including in-flight cache writes.
+  static void clear() {
+    _lists.clear();
+    _pendingLists.clear();
+    _details.clear();
+    _pendingDetails.clear();
   }
 
   static void invalidateListsForProfile(int profileId) {

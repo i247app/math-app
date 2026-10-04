@@ -1,3 +1,4 @@
+import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
@@ -17,13 +18,14 @@ Future<void> completeAssessmentJourney({
   if (userExamId == null || userExamId <= 0) {
     throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
   }
+  final cacheScope = SessionCacheScope.current;
   await examService.updateUserExamStatus(
     userExamId: userExamId,
     status: assessmentCompletedStatus,
     profileId: profileId,
     esessFlag: esessFlag,
   );
-  ExamCache.invalidateLists(profileId: profileId);
+  if (cacheScope.isCurrent) ExamCache.invalidateLists(profileId: profileId);
   try {
     await completionStore?.remove(userExamId);
   } catch (_) {
