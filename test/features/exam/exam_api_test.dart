@@ -272,6 +272,209 @@ void main() {
     expect(captured.extra['useGuestToken'], isTrue);
   });
 
+  for (final id in <int?>[null, 0, -1]) {
+    test('mark sends missing or invalid IDs to backend: $id', () async {
+      final requests = <RequestOptions>[];
+      final api = _apiReturning((options) {
+        requests.add(options);
+        return const <String, dynamic>{
+          'mstatus': 400,
+          'mmessage': 'Backend rejected mark',
+        };
+      }, guestAccountService: _GuestAccountService());
+
+      await expectLater(
+        api.updateUserExamStatus(
+          profileId: id,
+          userExamId: id,
+          status: 'CANCEL',
+        ),
+        throwsA(
+          isA<ExamException>().having((error) => error.status, 'status', 400),
+        ),
+      );
+
+      expect(requests, hasLength(1));
+      expect(requests.single.path, '/exams/sessions/mark');
+      expect(_body(requests.single), containsPair('profile_id', id));
+      expect(_body(requests.single), containsPair('esess_id', id));
+      expect(_body(requests.single), containsPair('status', 'CANCEL'));
+    });
+  }
+
+  test(
+    'cancel with no exam still calls mark and exposes the backend error',
+    () async {
+      final requests = <RequestOptions>[];
+      final api = _apiReturning((options) {
+        requests.add(options);
+        return const <String, dynamic>{
+          'mstatus': 400,
+          'mmessage': 'Missing ID',
+        };
+      }, guestAccountService: _GuestAccountService());
+      final controller = ExamAttemptController(examService: api);
+      addTearDown(controller.dispose);
+
+      await expectLater(
+        controller.updateStatusForExit('CANCEL'),
+        throwsA(
+          isA<ExamException>().having((error) => error.status, 'status', 400),
+        ),
+      );
+
+      expect(requests, hasLength(1));
+      expect(requests.single.path, '/exams/sessions/mark');
+      expect(_body(requests.single), containsPair('esess_id', null));
+      expect(_body(requests.single), containsPair('profile_id', null));
+      expect(_body(requests.single), containsPair('status', 'CANCEL'));
+    },
+  );
+
+  for (final nestedSessionId in [false, true]) {
+    test(
+      'cancels guest assessment with nested exam_session: $nestedSessionId',
+      () async {
+        final requests = <RequestOptions>[];
+        final api = _apiReturning((options) {
+          requests.add(options);
+          if (options.path == '/exams/sessions/mark') {
+            return const <String, dynamic>{'mstatus': 200, 'status': 'Success'};
+          }
+          final response = _examResponse();
+          if (nestedSessionId) {
+            response.remove('esess_id');
+            (response['exam'] as Map<String, dynamic>).remove('esess_id');
+            response['exam_session'] = <String, dynamic>{
+              'esess_id': 9,
+              'exam_type': 'ASSESSMENT',
+              'status': 'ACTIVE',
+              'total_questions': 0,
+              'correct_number': 0,
+              'skipped_number': 0,
+              'esess_flag': null,
+              'grade': 0,
+              'level': 1,
+              'create_dt': '20261005095805.694854',
+            };
+            response['resumed'] = false;
+          }
+          return response;
+        }, guestAccountService: _GuestAccountService());
+        final controller = ExamAttemptController(
+          examService: api,
+          profileId: 21,
+        );
+        addTearDown(controller.dispose);
+
+        expect(await controller.generateExam(), isTrue);
+        expect(controller.userExamId, nestedSessionId ? 9 : 99);
+        await controller.updateStatusForExit('CANCEL');
+
+        expect(requests.map((request) => request.path).toList(), <String>[
+          '/exams/generate',
+          '/exams/sessions/mark',
+        ]);
+        expect(
+          _body(requests.last),
+          containsPair('esess_id', nestedSessionId ? 9 : 99),
+        );
+        expect(_body(requests.last), isNot(contains('elink_id')));
+        expect(_body(requests.last), containsPair('profile_id', 21));
+        expect(_body(requests.last), containsPair('status', 'CANCEL'));
+        expect(
+          requests.every((request) => request.extra['useGuestToken'] == true),
+          isTrue,
+        );
+      },
+    );
+  }
+
+  for (final totalQuestions in [0, 6, 12]) {
+    test(
+      'assessment continues at session total_questions + 1: $totalQuestions',
+      () async {
+        final api = _apiReturning((_) {
+          final response = _examResponse()..remove('esess_id');
+          (response['exam'] as Map<String, dynamic>).remove('esess_id');
+          response['exam_session'] = <String, dynamic>{
+            'esess_id': 9,
+            'exam_type': 'ASSESSMENT',
+            'status': 'ACTIVE',
+            'total_questions': totalQuestions,
+            'correct_number': 0,
+            'skipped_number': 0,
+            'grade': 2,
+            'level': 1,
+          };
+          response['resumed'] = totalQuestions > 0;
+          return response;
+        }, guestAccountService: _GuestAccountService());
+        final controller = ExamAttemptController(
+          examService: api,
+          profileId: 21,
+        );
+        addTearDown(controller.dispose);
+
+        expect(await controller.generateExam(), isTrue);
+        expect(controller.userExamId, 9);
+        expect(controller.questionIndex, 0);
+        expect(controller.questionNumberOffset, totalQuestions);
+        expect(controller.displayedQuestionNumber, totalQuestions + 1);
+        if (totalQuestions > 0) expect(controller.currentGrade, 2);
+
+        final reopened = ExamAttemptController(
+          examService: api,
+          initialExam: controller.exam,
+          profileId: 21,
+        );
+        addTearDown(reopened.dispose);
+        expect(reopened.displayedQuestionNumber, totalQuestions + 1);
+      },
+    );
+  }
+
+  for (final examType in [examTypeAssessment, examTypeGrade]) {
+    test(
+      'active session list preserves assessment numbering only: $examType',
+      () async {
+        final api = _apiReturning(
+          (_) => <String, dynamic>{
+            'mstatus': 200,
+            'exam_sessions': <Map<String, dynamic>>[
+              <String, dynamic>{
+                'esess_id': 9,
+                'exam_type': examType,
+                'status': 'ACTIVE',
+                'total_questions': 12,
+                'correct_number': 0,
+                'skipped_number': 0,
+                'in_progress_exams': <Map<String, dynamic>>[
+                  <String, dynamic>{
+                    ..._examResponse()['exam'] as Map<String, dynamic>,
+                    'exam_type': examType,
+                  },
+                ],
+              },
+            ],
+          },
+        );
+        final sessions = await api.getExamStats(profileId: 21);
+        final controller = ExamAttemptController(
+          examService: api,
+          initialExam: sessions.single.inProgressExams.single,
+        );
+        addTearDown(controller.dispose);
+
+        expect(controller.userExamId, 9);
+        expect(
+          controller.displayedQuestionNumber,
+          examType == examTypeAssessment ? 13 : 1,
+        );
+      },
+    );
+  }
+
   test('loads exam detail and maps selected answers from details', () async {
     late RequestOptions captured;
     final api = _apiReturning((options) {

@@ -1550,7 +1550,7 @@ class _RecordingGenerateService implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,

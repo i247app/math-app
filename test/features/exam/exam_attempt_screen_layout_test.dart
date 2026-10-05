@@ -502,7 +502,38 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('canceling without a user exam id does not submit', (
+  testWidgets(
+    'canceling without a session id still calls mark with a null session id',
+    (tester) async {
+      final service = _ExitStatusExamService();
+      await _pumpAssessment(
+        tester,
+        examService: service,
+        examType: examTypeAssessment,
+        initialUserExamId: null,
+      );
+
+      await tester.tap(find.byIcon(Icons.close_rounded).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+      await tester.pumpAndSettle();
+
+      expect(service.events, <String>['status:CANCEL:null']);
+      expect(service.submittedAnswers, isNull);
+      expect(service.statusUpdates, isEmpty);
+      expect(
+        find.byKey(const ValueKey('assessment-exit-dialog')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('assessment-exit-dialog-error')),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('canceling with a session id calls mark directly', (
     tester,
   ) async {
     final service = _ExitStatusExamService();
@@ -510,7 +541,7 @@ void main() {
       tester,
       examService: service,
       examType: examTypeAssessment,
-      initialUserExamId: null,
+      profileId: 21,
     );
 
     await tester.tap(find.byIcon(Icons.close_rounded).first);
@@ -518,9 +549,42 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
     await tester.pumpAndSettle();
 
-    expect(service.events, isEmpty);
+    expect(service.events, <String>['status:CANCEL:7001']);
+    expect(service.markProfileId, 21);
     expect(service.submittedAnswers, isNull);
-    expect(service.statusUpdates, isEmpty);
+    expect(find.byKey(const ValueKey('assessment-exit-dialog')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('failed cancel keeps the dialog open and allows retry', (
+    tester,
+  ) async {
+    final service = _ExitStatusExamService()
+      ..markError = const ExamException('Cancel failed');
+    await _pumpAssessment(
+      tester,
+      examService: service,
+      examType: examTypeAssessment,
+    );
+
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('assessment-exit-dialog')),
+      findsOneWidget,
+    );
+    expect(find.text('Cancel failed'), findsOneWidget);
+
+    service.markError = null;
+    await tester.tap(find.byKey(const ValueKey('assessment-cancel-attempt')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('assessment-exit-dialog')), findsNothing);
+    expect(service.statusUpdates, <(int, String)>[(7001, 'CANCEL')]);
+    expect(service.submittedAnswers, isNull);
     expect(tester.takeException(), isNull);
   });
 
@@ -1083,6 +1147,8 @@ class _ExitStatusExamService implements ExamService {
   final List<(int, String)> statusUpdates = <(int, String)>[];
   final List<String> events = <String>[];
   List<SubmitExamAnswer>? submittedAnswers;
+  int? markProfileId;
+  ExamException? markError;
 
   @override
   Future<GeneratedExam> submitExam({
@@ -1102,13 +1168,17 @@ class _ExitStatusExamService implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,
   }) async {
     events.add('status:$status:$userExamId');
-    statusUpdates.add((userExamId, status));
+    markProfileId = profileId;
+    if (markError case final error?) {
+      throw error;
+    }
+    if (userExamId != null) statusUpdates.add((userExamId, status));
   }
 
   @override
@@ -1143,7 +1213,7 @@ class _CompletedJourneyReviewExamService implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,

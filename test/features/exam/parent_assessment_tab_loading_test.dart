@@ -338,7 +338,7 @@ class _ActiveAssessmentExamService extends _CountingExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,

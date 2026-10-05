@@ -795,12 +795,12 @@ class _RecordingExamService implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,
   }) async {
-    statusUpdates.add((userExamId, status));
+    statusUpdates.add((userExamId!, status));
   }
 
   @override

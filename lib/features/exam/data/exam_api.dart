@@ -66,7 +66,19 @@ class ExamApi implements ExamService {
       throw ExamException(AppStrings.current(AppKeys.examHasNoQuestions));
     }
 
-    return exam.toModel(userExamId: response.userExamId ?? validUserExamId);
+    final answeredQuestionCount = normalizedExamType == examTypeAssessment
+        ? response.examSession?.totalQuestions ?? 0
+        : 0;
+    return exam.toModel(
+      userExamId:
+          response.examSession?.userExamId ??
+          response.userExamId ??
+          validUserExamId,
+      stats: response.examSession,
+      questionNumberOffset: answeredQuestionCount > 0
+          ? answeredQuestionCount
+          : 0,
+    );
   }
 
   @override
@@ -102,18 +114,15 @@ class ExamApi implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,
   }) async {
-    if (userExamId <= 0) {
-      throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
-    }
     await _runExamRequest(() async {
       final json = await _networkClient
           .postJson('/exams/sessions/mark', <String, dynamic>{
-            'profile_id': _requireProfileId(profileId),
+            'profile_id': profileId,
             'esess_id': userExamId,
             'status': status,
             'esess_flag': ?esessFlag,

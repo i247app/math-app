@@ -53,7 +53,7 @@ abstract interface class ExamService {
   });
 
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,

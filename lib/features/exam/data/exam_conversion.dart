@@ -88,6 +88,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     int? userAiExamIdOverride,
     String? examStatusOverride,
     int? resumeQuestionIndex,
+    int questionNumberOffset = 0,
     List<ExamPracticeTopic> practiceWeakTopics = const <ExamPracticeTopic>[],
   }) => GeneratedExam(
     id: userAiExamIdOverride ?? userAiExamId,
@@ -124,6 +125,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
         )
         .toList(),
     resumeQuestionIndex: resumeQuestionIndex,
+    questionNumberOffset: questionNumberOffset,
     questions: questions.indexed
         .map(
           (entry) => entry.$2.toModel(
@@ -209,10 +211,22 @@ extension ExamProgressResponseDtoConversion on ExamProgressResponseDto {
 
 extension ExamStatsDtoConversion on ExamStatsDto {
   ExamStats toModel() {
+    final questionNumberOffset =
+        examType?.trim().toUpperCase() == 'ASSESSMENT' && totalQuestions > 0
+        ? totalQuestions
+        : 0;
     final activeExams = <GeneratedExam>[
-      ...inProgressExams.map((exam) => exam.toModel(userExamId: userExamId)),
+      ...inProgressExams.map(
+        (exam) => exam.toModel(
+          userExamId: userExamId,
+          questionNumberOffset: questionNumberOffset,
+        ),
+      ),
       if (inProgressExam != null)
-        inProgressExam!.toModel(userExamId: userExamId),
+        inProgressExam!.toModel(
+          userExamId: userExamId,
+          questionNumberOffset: questionNumberOffset,
+        ),
     ];
     return ExamStats(
       correctNumber: correctNumber,

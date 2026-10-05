@@ -239,6 +239,7 @@ class ExamAttemptController extends ChangeNotifier {
   bool get shouldAutoSubmitAssessment => _allowsPartialSubmit;
 
   void _restoreInitialAttempt(GeneratedExam? initialExam) {
+    _questionNumberOffset = initialExam?.questionNumberOffset ?? 0;
     final questions = initialExam?.questions ?? const <ExamQuestion>[];
     final answers = initialExam?.answers ?? const <SubmitExamAnswer>[];
     if (questions.isEmpty) {
@@ -297,17 +298,15 @@ class ExamAttemptController extends ChangeNotifier {
 
   Future<void> updateStatusForExit(String status) async {
     if (_isSubmittingExam || _isUpdatingExitStatus) {
-      return;
-    }
-    final existingUserExamId = userExamId;
-    if (existingUserExamId == null || existingUserExamId <= 0) {
-      return;
+      throw ExamException(
+        AppStrings.current(AppKeys.assessmentStatusUpdateFailed),
+      );
     }
 
     _isUpdatingExitStatus = true;
     try {
       await _examService.updateUserExamStatus(
-        userExamId: existingUserExamId,
+        userExamId: userExamId,
         status: status,
         profileId: profileId ?? _exam?.profileId,
       );
@@ -389,6 +388,14 @@ class ExamAttemptController extends ChangeNotifier {
       }
 
       _exam = generatedExam;
+      _restoreInitialAttempt(generatedExam);
+      if (_isAssessment && generatedExam.questionNumberOffset > 0) {
+        _flowState = _flowState.copyWith(
+          grade: AssessmentFlowPolicy.clampGrade(
+            generatedExam.grade ?? initialGrade,
+          ),
+        );
+      }
       _isGeneratingExam = false;
       notifyListeners();
       return true;

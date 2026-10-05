@@ -107,7 +107,7 @@ class _RecordingExamService implements ExamService {
 
   @override
   Future<void> updateUserExamStatus({
-    required int userExamId,
+    int? userExamId,
     required String status,
     int? profileId,
     bool? esessFlag,
@@ -116,7 +116,7 @@ class _RecordingExamService implements ExamService {
       throw StateError('offline');
     }
     expect(status, 'COMPLETE');
-    completed.add((userExamId, profileId));
+    completed.add((userExamId!, profileId));
   }
 
   @override
