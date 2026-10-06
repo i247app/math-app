@@ -55,6 +55,31 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final width in <double>[280, 360]) {
+    testWidgets('comparison answers have matching typography at width $width', (
+      tester,
+    ) async {
+      const contents = <String>['38 < 35', '38 = 35', '38 > 35', '35 > 38'];
+      await _pumpAnswers(tester, contents, (_) {}, width: width);
+
+      expect(find.byType(GridView), findsNothing);
+      final referenceStyle = tester
+          .widget<Text>(find.text(contents.first))
+          .style!;
+      final buttons = find.byType(AssessmentAnswerButton);
+      for (var index = 0; index < contents.length; index++) {
+        final text = tester.widget<Text>(find.text(contents[index]));
+        expect(text.style!.fontSize, referenceStyle.fontSize);
+        expect(text.style!.fontWeight, FontWeight.w500);
+        expect(
+          tester.getSize(buttons.at(index)).height,
+          tester.getSize(buttons.first).height,
+        );
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('icon grid fits a narrow screen with answer feedback', (
     tester,
   ) async {

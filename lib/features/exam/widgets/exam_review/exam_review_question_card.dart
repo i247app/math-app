@@ -5,6 +5,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_badge.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_font_size.dart';
+import 'package:numi/features/exam/widgets/exam_math_text.dart';
 
 class ExamReviewQuestionCard extends StatelessWidget {
   const ExamReviewQuestionCard({super.key, required this.question});
@@ -14,6 +15,13 @@ class ExamReviewQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final questionStyle = TextStyle(
+      color: colors.textPrimary,
+      fontSize: examReviewQuestionFontSize(question.questionName),
+      fontWeight: FontWeight.w900,
+      height: 1.08,
+      letterSpacing: 0,
+    );
     return Container(
       constraints: const BoxConstraints(minHeight: 146),
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
@@ -41,17 +49,18 @@ class ExamReviewQuestionCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            question.questionName,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: colors.textPrimary,
-              fontSize: examReviewQuestionFontSize(question.questionName),
-              fontWeight: FontWeight.w900,
-              height: 1.08,
-              letterSpacing: 0,
+          if (question.isFraction)
+            ExamMathText(
+              question.questionName,
+              textAlign: TextAlign.center,
+              style: questionStyle,
+            )
+          else
+            Text(
+              question.questionName,
+              textAlign: TextAlign.center,
+              style: questionStyle,
             ),
-          ),
         ],
       ),
     );

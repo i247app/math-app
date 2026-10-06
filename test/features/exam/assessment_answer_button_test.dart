@@ -6,6 +6,23 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 
 void main() {
+  test('comparisons use text styling while numbers keep numeric styling', () {
+    for (final content in <String>[
+      '38 < 35',
+      '38 = 35',
+      '38 > 35',
+      '35 > 38',
+      '3 ≤ 5',
+      '5 ≥ 3',
+      '3 ≠ 5',
+    ]) {
+      expect(isNumericAssessmentContent(content), isFalse, reason: content);
+    }
+    for (final content in <String>['38', '2 + 3', '2 + ?']) {
+      expect(isNumericAssessmentContent(content), isTrue, reason: content);
+    }
+  });
+
   testWidgets('normalizes Unicode separators and wraps a long answer', (
     tester,
   ) async {

@@ -19,6 +19,7 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
     correctAnswer: rightAnswerContent,
     difficulty: questionLevel,
     topic: questionTopic,
+    questionType: questionType,
   );
 }
 
@@ -59,6 +60,7 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
       correctAnswer: rightAnswerContent,
       difficulty: questionLevel,
       topic: questionTopic,
+      questionType: questionType,
     );
   }
 }

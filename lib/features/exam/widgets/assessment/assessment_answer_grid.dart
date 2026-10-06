@@ -10,11 +10,13 @@ class AssessmentAnswerGrid extends StatelessWidget {
     required this.selectedAnswerLabel,
     this.selectedAnswerFeedbackCorrect,
     required this.onSelected,
+    this.renderLatex = false,
   });
   final List<ExamAnswer> answers;
   final String? selectedAnswerLabel;
   final bool? selectedAnswerFeedbackCorrect;
   final ValueChanged<ExamAnswer> onSelected;
+  final bool renderLatex;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,8 @@ class AssessmentAnswerGrid extends StatelessWidget {
     final hasLongNumericAnswer = answers.any(
       (answer) => RegExp(r'\d').allMatches(answer.content).length >= 4,
     );
-    final useCompactGrid = hasOnlyCompactAnswers && !hasLongNumericAnswer;
+    final useCompactGrid =
+        !renderLatex && hasOnlyCompactAnswers && !hasLongNumericAnswer;
 
     if (!useCompactGrid) {
       return Column(
@@ -37,6 +40,7 @@ class AssessmentAnswerGrid extends StatelessWidget {
           for (var index = 0; index < answers.length; index++) ...[
             AssessmentAnswerButton(
               answer: answers[index],
+              renderLatex: renderLatex,
               selected: answers[index].label == selectedAnswerLabel,
               feedbackCorrect: answers[index].label == selectedAnswerLabel
                   ? selectedAnswerFeedbackCorrect

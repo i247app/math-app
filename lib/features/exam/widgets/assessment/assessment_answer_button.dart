@@ -4,6 +4,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
+import 'package:numi/features/exam/widgets/exam_math_text.dart';
 
 class AssessmentAnswerButton extends StatelessWidget {
   const AssessmentAnswerButton({
@@ -13,6 +14,7 @@ class AssessmentAnswerButton extends StatelessWidget {
     required this.onTap,
     this.feedbackCorrect,
     this.compact = false,
+    this.renderLatex = false,
   });
 
   final ExamAnswer answer;
@@ -20,6 +22,7 @@ class AssessmentAnswerButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool? feedbackCorrect;
   final bool compact;
+  final bool renderLatex;
 
   static const double _borderRadius = 20;
 
@@ -99,7 +102,17 @@ class AssessmentAnswerButton extends StatelessWidget {
                 ),
                 SizedBox(width: compact ? 10 : 18),
                 Expanded(
-                  child: isNumeric || isIcon
+                  child: renderLatex
+                      ? ExamMathText(
+                          displayContent,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: FontSize.xxxl,
+                            fontWeight: FontWeight.w500,
+                            height: 1.2,
+                          ),
+                        )
+                      : isNumeric || isIcon
                       ? FittedBox(
                           alignment: Alignment.centerLeft,
                           fit: BoxFit.scaleDown,
@@ -188,7 +201,7 @@ bool isNumericAssessmentContent(String value) {
   final normalized = value.trim();
   return normalized.isNotEmpty &&
       RegExp(r'\d').hasMatch(normalized) &&
-      RegExp(r'^[0-9\s+×xX*/÷:()=?.,%\-−]+$').hasMatch(normalized);
+      RegExp(r'^[0-9\s+×xX*/÷:()?.,%\-−]+$').hasMatch(normalized);
 }
 
 bool isIconAssessmentContent(String value) {

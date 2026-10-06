@@ -282,6 +282,7 @@ class ExamQuestion {
     this.correctAnswer,
     this.difficulty,
     this.topic,
+    this.questionType,
   });
 
   final String questionName;
@@ -291,6 +292,9 @@ class ExamQuestion {
   final String? correctAnswer;
   final int? difficulty;
   final String? topic;
+  final String? questionType;
+
+  bool get isFraction => questionType?.trim().toUpperCase() == 'FRACTION';
 }
 
 class ExamAnswer {

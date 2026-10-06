@@ -7,6 +7,7 @@ import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_list.d
 import 'package:numi/features/exam/widgets/exam_review/exam_review_correct_answer_label.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_badge.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_question_status.dart';
+import 'package:numi/features/exam/widgets/exam_math_text.dart';
 
 class ExamReviewResultQuestionCard extends StatelessWidget {
   const ExamReviewResultQuestionCard({
@@ -24,6 +25,13 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
     final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
     final accent = isCorrect ? AppColors.teal600 : AppColors.red;
     final colors = context.themeColors;
+    final questionStyle = TextStyle(
+      color: colors.textPrimary,
+      fontSize: 23,
+      fontWeight: FontWeight.w900,
+      height: 1.15,
+      letterSpacing: 0,
+    );
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -65,16 +73,10 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
                         ExamReviewQuestionStatus(isCorrect: isCorrect),
                       ],
                     ),
-                    Text(
-                      question.questionName,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w900,
-                        height: 1.15,
-                        letterSpacing: 0,
-                      ),
-                    ),
+                    if (question.isFraction)
+                      ExamMathText(question.questionName, style: questionStyle)
+                    else
+                      Text(question.questionName, style: questionStyle),
                     ExamReviewAnswerList(
                       question: question,
                       selectedLabel: selectedLabel,

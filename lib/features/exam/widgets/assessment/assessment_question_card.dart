@@ -4,10 +4,16 @@ import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
+import 'package:numi/features/exam/widgets/exam_math_text.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
-  const AssessmentQuestionCard({super.key, required this.question});
+  const AssessmentQuestionCard({
+    super.key,
+    required this.question,
+    this.renderLatex = false,
+  });
   final String question;
+  final bool renderLatex;
 
   static final RegExp _pictorialSymbolPattern = RegExp(
     <String>[
@@ -44,7 +50,18 @@ class AssessmentQuestionCard extends StatelessWidget {
         border: Border.all(color: colors.border),
         boxShadow: AppShadows.card(colors),
       ),
-      child: mathQuestion != null
+      child: renderLatex
+          ? ExamMathText(
+              displayQuestion,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: FontSize.displaySmall,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+            )
+          : mathQuestion != null
           ? _AssessmentMathQuestion(
               prefix: mathQuestion.prefix,
               expression: mathQuestion.expression,

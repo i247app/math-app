@@ -4,6 +4,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_centered_text.dart';
+import 'package:numi/features/exam/widgets/exam_math_text.dart';
 
 class ExamReviewAnswerTile extends StatelessWidget {
   const ExamReviewAnswerTile({
@@ -13,6 +14,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
     required this.correctLabel,
     required this.showCorrectAnswer,
     this.onTap,
+    this.renderLatex = false,
   });
 
   final ExamAnswer answer;
@@ -20,6 +22,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
   final String? correctLabel;
   final bool showCorrectAnswer;
   final VoidCallback? onTap;
+  final bool renderLatex;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,14 @@ class ExamReviewAnswerTile extends StatelessWidget {
     final foreground = isWrongSelected || isHighlightedCorrect
         ? (isWrongSelected ? AppColors.red : AppColors.teal600)
         : AppColors.textInk;
+    final answerStyle = TextStyle(
+      color: foreground,
+      fontSize: FontSize.large,
+      fontWeight: isWrongSelected || isHighlightedCorrect
+          ? FontWeight.w900
+          : FontWeight.w600,
+      letterSpacing: 0,
+    );
 
     return Material(
       color: Colors.transparent,
@@ -84,19 +95,14 @@ class ExamReviewAnswerTile extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Text(
-                  answer.content,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: FontSize.large,
-                    fontWeight: isWrongSelected || isHighlightedCorrect
-                        ? FontWeight.w900
-                        : FontWeight.w600,
-                    letterSpacing: 0,
-                  ),
-                ),
+                child: renderLatex
+                    ? ExamMathText(answer.content, style: answerStyle)
+                    : Text(
+                        answer.content,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: answerStyle,
+                      ),
               ),
               if (isWrongSelected || isRevealedCorrect)
                 Container(

@@ -705,10 +705,14 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                           AssessmentQuestionCard(
                                             question:
                                                 currentQuestion!.questionName,
+                                            renderLatex:
+                                                currentQuestion.isFraction,
                                           ),
                                           const SizedBox(height: 32),
                                           AssessmentAnswerGrid(
                                             answers: currentQuestion.answers,
+                                            renderLatex:
+                                                currentQuestion.isFraction,
                                             selectedAnswerLabel:
                                                 _controller.selectedAnswerLabel,
                                             selectedAnswerFeedbackCorrect:

@@ -28,6 +28,7 @@ class ExamReviewAnswerList extends StatelessWidget {
           .map(
             (answer) => ExamReviewAnswerTile(
               answer: answer,
+              renderLatex: question.isFraction,
               selectedLabel: selectedLabel,
               correctLabel: correctLabel,
               showCorrectAnswer: showCorrectAnswer,

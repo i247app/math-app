@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
@@ -25,6 +26,48 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  for (final examType in <String>[
+    examTypeAssessment,
+    examTypeGrade,
+    examTypePractice,
+  ]) {
+    testWidgets('$examType passes fraction rendering to question and answers', (
+      tester,
+    ) async {
+      await _pumpAssessment(
+        tester,
+        examType: examType,
+        questions: const <ExamQuestion>[
+          ExamQuestion(
+            questionName: r'Tính $\frac{1}{3} + \frac{1}{3}$',
+            questionNumber: 1,
+            questionType: 'FRACTION',
+            rightAnswer: 'B',
+            answers: <ExamAnswer>[
+              ExamAnswer(label: 'A', content: r'\frac{1}{3}'),
+              ExamAnswer(label: 'B', content: r'\frac{2}{3}'),
+            ],
+          ),
+        ],
+      );
+      expect(find.byType(Math), findsNWidgets(3));
+      for (final math in tester.widgetList<Math>(find.byType(Math))) {
+        expect(math.parseError, isNull);
+      }
+      await tester.tap(find.byType(AssessmentAnswerButton).last);
+      await tester.pump();
+      expect(
+        tester
+            .widget<AssessmentAnswerButton>(
+              find.byType(AssessmentAnswerButton).last,
+            )
+            .selected,
+        isTrue,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('standard questions fit without vertical scrolling', (
     tester,
   ) async {
