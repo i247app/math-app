@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:numi/core/helpers/api_date_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,13 +9,13 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
+import 'package:numi/features/exam/controllers/grade_roadmap_controller.dart';
+import 'package:numi/features/exam/controllers/grade_roadmap_state.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
-import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_screen.dart';
@@ -58,327 +57,59 @@ class GradeRoadmapScreen extends StatefulWidget {
 
 class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
   static const _mascotAsset = 'assets/images/grade-roadmap-mascot.png';
-  static const _maxLevel = 10;
 
-  late final ProfileGradeProgressStore _progressStore;
-  late List<GeneratedExam> _exams;
-  GradeLevels? _gradeLevels;
-  late int _selectedGrade;
-  int _levelRequestId = 0;
-  final Map<int, int> _locallyUnlockedLevels = <int, int>{};
-  final Set<int> _gradesWithKnownUnlockBaseline = <int>{};
-  final Map<(int, int), ExamStats> _roadmapSessions = {};
-  final Map<(int, int), ExamStats> _pendingSessions = {};
-  bool _isLoading = true;
-  bool _isOpeningExam = false;
-  int? _openingLevel;
+  late final GradeRoadmapController _controller;
+  bool _wasLoading = true;
   bool _isOpeningGradeSelection = false;
-  String? _errorMessage;
   final List<ScrollController> _scrollControllers = List.generate(
     6,
     (_) => ScrollController(),
   );
 
   ScrollController get _scrollController =>
-      _scrollControllers[_selectedGrade.clamp(0, 5)];
+      _scrollControllers[_controller.state.selectedGrade];
 
   @override
   void initState() {
     super.initState();
-    _progressStore =
-        widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
-    _exams = List<GeneratedExam>.of(widget.initialExams);
-    _selectedGrade = widget.initialGrade.clamp(0, 5);
-    final completion = widget.initialCompletion;
-    if (completion != null) {
-      _selectedGrade = completion.grade;
-      _recordCompletion(completion);
-    }
-    unawaited(_loadProgress());
+    _controller = GradeRoadmapController(
+      profileId: widget.profileId,
+      examService: widget.examService,
+      progressStore:
+          widget.gradeProgressStore ?? const SecureProfileGradeProgressStore(),
+      initialExams: widget.initialExams,
+      initialGrade: widget.initialGrade,
+      initialCompletion: widget.initialCompletion,
+    )..addListener(_handleStateChanged);
+    unawaited(_controller.initialize());
+  }
+
+  void _handleStateChanged() {
+    if (!mounted) return;
+    final state = _controller.state;
+    final shouldScroll =
+        _wasLoading && !state.isLoading && state.gradeLevels != null;
+    _wasLoading = state.isLoading;
+    setState(() {});
+    if (shouldScroll) _scrollToCurrentLevel();
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_handleStateChanged);
+    _controller.dispose();
     for (final controller in _scrollControllers) {
       controller.dispose();
     }
     super.dispose();
   }
 
-  Future<void> _loadProgress() async {
-    final saved = await _readSavedProgress();
-    if (!mounted) return;
-    if ((saved.grade > 0 || saved.level > 0) &&
-        widget.initialCompletion == null) {
-      setState(() => _selectedGrade = saved.grade);
-    }
-    await _loadGradeLevels(_selectedGrade);
-  }
-
-  Future<ProfileGradeProgress> _readSavedProgress() async {
-    try {
-      return await _progressStore.read(widget.profileId);
-    } catch (_) {
-      return ProfileGradeProgress.initial;
-    }
-  }
-
-  Future<void> _loadGradeLevels(int grade) async {
-    if (!mounted) return;
-    final requestId = ++_levelRequestId;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      _gradeLevels = null;
-    });
-    try {
-      final (levels, sessions) = await (
-        widget.examService.getGradeLevels(
-          profileId: widget.profileId,
-          grade: grade,
-        ),
-        widget.examService.getGradeRoadmap(
-          profileId: widget.profileId,
-          grade: grade,
-        ),
-      ).wait;
-      if (!mounted || requestId != _levelRequestId) return;
-      setState(() {
-        _gradeLevels = levels;
-        _roadmapSessions.removeWhere((key, _) => key.$1 == grade);
-        // Roadmap supplies one representative session per level, regardless of is_latest.
-        for (final session in sessions) {
-          final level = session.level;
-          if (session.grade != grade ||
-              level == null ||
-              level < 1 ||
-              level > _maxLevel ||
-              (session.userExamId ?? 0) <= 0 ||
-              (session.examType != null &&
-                  session.examType!.trim().toUpperCase() != examTypeGrade)) {
-            continue;
-          }
-          // A passed attempt keeps the next level unlocked, even after a retry.
-          if (session.passed == true && isCompletedAssessmentStats(session)) {
-            _locallyUnlockedLevels[grade] = math.max(
-              _locallyUnlockedLevels[grade] ?? 1,
-              (level + 1).clamp(1, _maxLevel),
-            );
-          }
-          final key = (grade, level);
-          _roadmapSessions[key] = session;
-        }
-        _pendingSessions.removeWhere((key, pending) {
-          if (key.$1 != grade) return false;
-          final latest = _roadmapSessions[key];
-          if (latest == null) return false;
-          if (latest.userExamId == pending.userExamId) return true;
-          return _isNewerServerSession(latest, pending);
-        });
-        _isLoading = false;
-      });
-      _scrollToCurrentLevel();
-    } catch (_) {
-      if (!mounted || requestId != _levelRequestId) return;
-      setState(() {
-        _isLoading = false;
-        _errorMessage = context.readText(AppKeys.gradeRoadmapLoadFailed);
-      });
-    }
-  }
-
-  Future<void> _reload() => _loadGradeLevels(_selectedGrade);
-
-  bool _isNewerServerSession(ExamStats latest, ExamStats pending) {
-    // Compare matching server fields, never the device clock or session IDs.
-    for (final (latestDate, pendingDate) in [
-      (latest.lastSubmittedDt, pending.lastSubmittedDt),
-      (latest.createDt, pending.createDt),
-      (latest.endedDt, pending.endedDt),
-    ]) {
-      if (latestDate != null && pendingDate != null) {
-        return latestDate.isAfter(pendingDate);
-      }
-    }
-    return false;
-  }
-
-  void _mergeExam(GeneratedExam exam) {
-    final index = _exams.indexWhere(
-      (existing) =>
-          exam.userExamId != null && existing.userExamId == exam.userExamId,
-    );
-    if (index < 0) {
-      _exams.add(exam);
-    } else if (!_isActiveExam(_exams[index]) && _isActiveExam(exam)) {
-      return;
-    } else if (_isActiveExam(_exams[index]) ||
-        !_examDate(exam).isBefore(_examDate(_exams[index]))) {
-      _exams[index] = exam;
-    }
-  }
-
-  void _recordCompletion(GradeExamCompletion completion) {
-    final grade = completion.grade;
-    final level = completion.level;
-    final exam = completion.exam;
-    final submittedAt =
-        tryParseApiDateTime(exam.submittedDt ?? '') ??
-        tryParseApiDateTime(exam.modifyDt ?? '');
-    // Capture the visible baseline before switching to local outcome tracking.
-    final previouslyUnlocked = grade == _selectedGrade && _gradeLevels != null
-        ? _currentLevel
-        : _locallyUnlockedLevels[grade] ?? level;
-    if (grade == _selectedGrade && _gradeLevels != null) {
-      _gradesWithKnownUnlockBaseline.add(grade);
-    }
-    _mergeExam(
-      GeneratedExam(
-        examId: exam.examId,
-        userAiExamId: exam.userAiExamId,
-        userExamId: exam.userExamId,
-        profileId: widget.profileId,
-        examStatus: 'COMPLETE',
-        examType: examTypeGrade,
-        grade: grade,
-        level: level,
-        createDt: exam.createDt,
-        modifyDt: exam.modifyDt,
-        submittedDt:
-            submittedAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
-        grading: exam.grading,
-        aiTitle: exam.aiTitle,
-        aiShortText: exam.aiShortText,
-        aiReviewShort: exam.aiReviewShort,
-        aiReviewLong: exam.aiReviewLong,
-        questions: const <ExamQuestion>[],
-      ),
-    );
-    // Keep the completed attempt visible until roadmap catches up or supersedes it.
-    _pendingSessions[(grade, level)] = ExamStats(
-      userExamId: exam.userExamId,
-      examType: examTypeGrade,
-      status: 'COMPLETE',
-      grade: grade,
-      level: level,
-      passed: completion.outcome.passed,
-      isLatest: true,
-      lastSubmittedDt: submittedAt,
-      createDt: tryParseApiDateTime(exam.createDt ?? ''),
-      correctNumber: exam.grading?.correctNumber ?? 0,
-      scorePercentage: (exam.grading?.scorePercentage ?? 0).toDouble(),
-      skippedNumber: exam.grading?.skippedNumber ?? 0,
-      totalQuestions: exam.grading?.totalQuestions ?? 0,
-    );
-    final unlocked = (level + (completion.outcome.passed ? 1 : 0)).clamp(
-      0,
-      _maxLevel,
-    );
-    _locallyUnlockedLevels[grade] = math.max(previouslyUnlocked, unlocked);
-  }
-
-  ExamStats? _latestSessionFor(int grade, int level) =>
-      _pendingSessions[(grade, level)] ?? _roadmapSessions[(grade, level)];
-
-  bool _isActiveExam(GeneratedExam exam) {
-    final status = exam.examStatus?.trim().toUpperCase();
-    return status == 'ACTIVE' || status == 'IN_PROGRESS';
-  }
-
-  bool _isGradeExam(GeneratedExam exam) {
-    final examType = exam.examType?.trim().toUpperCase();
-    return examType == null || examType == examTypeGrade;
-  }
-
-  GeneratedExam? _activeExamFor(int grade, int level) {
-    final session = _latestSessionFor(grade, level);
-    if (session != null) return activeInProgressAssessmentExam(session);
-    GeneratedExam? latest;
-    for (final exam in _exams) {
-      if (_isGradeExam(exam) &&
-          _isActiveExam(exam) &&
-          exam.grade == grade &&
-          exam.level == level) {
-        if (latest == null || _examDate(exam).isAfter(_examDate(latest))) {
-          latest = exam;
-        }
-      }
-    }
-    return latest;
-  }
-
-  GeneratedExam? _completedExamFor(int grade, int level) {
-    final session = _latestSessionFor(grade, level);
-    if (session != null) {
-      return session.passed == true && isCompletedAssessmentStats(session)
-          ? completedAssessmentFromStats(
-              session,
-              profileId: widget.profileId,
-              fallbackExamType: examTypeGrade,
-            )
-          : null;
-    }
-    GeneratedExam? latest;
-    for (final exam in _exams) {
-      if (_isGradeExam(exam) &&
-          (const {
-                'COMPLETE',
-                'SUBMITTED',
-              }.contains(exam.examStatus?.trim().toUpperCase()) ||
-              (exam.examStatus?.trim().isEmpty != false &&
-                  exam.grading != null)) &&
-          exam.grade == grade &&
-          exam.level == level) {
-        if (latest == null || _examDate(exam).isAfter(_examDate(latest))) {
-          latest = exam;
-        }
-      }
-    }
-    return latest;
-  }
-
-  DateTime _examDate(GeneratedExam exam) {
-    return tryParseApiDateTime(
-          exam.modifyDt ?? exam.submittedDt ?? exam.createDt ?? '',
-        ) ??
-        DateTime.fromMillisecondsSinceEpoch(0);
-  }
-
-  int get _currentLevel {
-    // Keep the single-step outcome while the server catches up after submission.
-    final local = _locallyUnlockedLevels[_selectedGrade];
-    final remote = (_gradeLevels?.maxLevel ?? 1).clamp(1, _maxLevel);
-    return (_gradesWithKnownUnlockBaseline.contains(_selectedGrade)
-            ? local ?? remote
-            : math.max(remote, local ?? 0))
-        .clamp(1, _maxLevel);
-  }
-
-  bool _isLevelUnlocked(int level) {
-    return level <= _currentLevel ||
-        _completedExamFor(_selectedGrade, level) != null;
-  }
-
-  bool _isLevelCompleted(int level) {
-    if (level < _currentLevel) return true;
-    final session = _latestSessionFor(_selectedGrade, level);
-    if (session != null) {
-      return isCompletedAssessmentStats(session) && session.passed == true;
-    }
-    final exam = _completedExamFor(_selectedGrade, level);
-    final score = exam?.grading?.scorePercentage;
-    return exam != null && score != null && score >= 50;
-  }
-
   Future<void> _handleLevelTap(int level) async {
-    if (_isOpeningExam || !_isLevelUnlocked(level)) return;
-    final completed = _completedExamFor(_selectedGrade, level);
-    if (completed != null &&
-        (completed.userExamId != null ||
-            completed.examId != null ||
-            completed.userAiExamId != null)) {
-      setState(() => _isOpeningExam = true);
-      try {
+    final target = _controller.beginOpeningLevel(level);
+    if (target == null) return;
+    try {
+      if (target.destination == GradeRoadmapExamDestination.review) {
+        final completed = target.exam!;
         await Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (_) => RepositoryProvider<ExamService>.value(
@@ -392,67 +123,47 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             ),
           ),
         );
-      } finally {
-        if (mounted) setState(() => _isOpeningExam = false);
+      } else {
+        await _openAssessment(target);
       }
-      return;
+    } finally {
+      _controller.finishOpeningExam();
     }
-    final active = _activeExamFor(_selectedGrade, level);
-    await _openAssessment(level: level, activeExam: active);
   }
 
-  Future<void> _openAssessment({
-    required int level,
-    GeneratedExam? activeExam,
-  }) async {
-    if (_isOpeningExam) return;
+  Future<void> _openAssessment(GradeRoadmapExamTarget target) async {
     HapticFeedback.mediumImpact();
-    setState(() {
-      _isOpeningExam = true;
-      _openingLevel = level;
-    });
     final roadmapRoute = ModalRoute.of(context);
-    try {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => ExamAttemptScreen(
-            examService: widget.examService,
-            initialExam: activeExam,
-            examType: examTypeGrade,
-            gradeLabel: AssessmentFlowPolicy.gradeLabel(_selectedGrade),
-            level: level,
-            profileId: widget.profileId,
-            startAtKindergarten: false,
-            gradeProgressStore: _progressStore,
-            allowQuestionNavigation: false,
-            showQuestionNavigation: false,
-            isResumedAssessment: activeExam != null,
-            onGradeCompleted: (completion) {
-              if (!mounted) return;
-              setState(() => _recordCompletion(completion));
-            },
-            onResultBack: () {
-              if (!mounted) return;
-              if (activeExam != null) _exams.remove(activeExam);
-              final navigator = Navigator.of(context);
-              if (roadmapRoute == null) {
-                navigator.popUntil((route) => route.isFirst);
-                return;
-              }
-              navigator.popUntil((route) => identical(route, roadmapRoute));
-            },
-          ),
+    final activeExam = target.exam;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ExamAttemptScreen(
+          examService: widget.examService,
+          initialExam: activeExam,
+          examType: examTypeGrade,
+          gradeLabel: AssessmentFlowPolicy.gradeLabel(target.grade),
+          level: target.level,
+          profileId: widget.profileId,
+          startAtKindergarten: false,
+          gradeProgressStore: _controller.progressStore,
+          allowQuestionNavigation: false,
+          showQuestionNavigation: false,
+          isResumedAssessment: activeExam != null,
+          onGradeCompleted: _controller.recordCompletion,
+          onResultBack: () {
+            if (!mounted) return;
+            if (activeExam != null) _controller.discardActiveExam(activeExam);
+            final navigator = Navigator.of(context);
+            if (roadmapRoute == null) {
+              navigator.popUntil((route) => route.isFirst);
+              return;
+            }
+            navigator.popUntil((route) => identical(route, roadmapRoute));
+          },
         ),
-      );
-      if (mounted) await _reload();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isOpeningExam = false;
-          _openingLevel = null;
-        });
-      }
-    }
+      ),
+    );
+    if (mounted) await _controller.reload();
   }
 
   Future<void> _openGradeSelection() async {
@@ -467,19 +178,18 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             initialGrades: widget.initialGrades,
             gradeService: widget.gradeService,
             examService: widget.examService,
-            gradeProgressStore: _progressStore,
+            gradeProgressStore: _controller.progressStore,
             examType: examTypeGrade,
             profileId: widget.profileId,
-            initialGradeLabel: AssessmentFlowPolicy.gradeLabel(_selectedGrade),
+            initialGradeLabel: AssessmentFlowPolicy.gradeLabel(
+              _controller.state.selectedGrade,
+            ),
             selectionOnly: true,
           ),
         ),
       );
       if (!mounted || selectedGrade == null) return;
-      setState(() {
-        _selectedGrade = AssessmentFlowPolicy.clampGrade(selectedGrade);
-      });
-      await _loadGradeLevels(_selectedGrade);
+      await _controller.selectGrade(selectedGrade);
     } finally {
       _isOpeningGradeSelection = false;
     }
@@ -493,7 +203,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       final viewport = position.context.notificationContext?.findRenderObject();
       if (viewport is! RenderBox || !viewport.hasSize) return;
       final center = GradeRoadmapLayout.centerForLevel(
-        _currentLevel,
+        _controller.state.currentLevel,
         viewport.size.width,
       );
       final target = (center.dy - position.viewportDimension * 0.55).clamp(
@@ -513,6 +223,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = _controller.state;
     final colors = context.themeColors;
     return Scaffold(
       backgroundColor: const Color(0xFFD8EFB6),
@@ -525,21 +236,21 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
               switchOutCurve: Curves.easeIn,
               transitionBuilder: (child, animation) =>
                   FadeTransition(opacity: animation, child: child),
-              child: _isLoading
+              child: state.isLoading
                   ? Center(
                       key: const ValueKey('grade-roadmap-loading'),
                       child: CircularProgressIndicator(
                         color: colors.brandStrong,
                       ),
                     )
-                  : _gradeLevels == null
+                  : state.gradeLevels == null
                   ? const SizedBox.expand(
                       key: ValueKey('grade-roadmap-unavailable'),
                     )
                   : RefreshIndicator(
-                      key: ValueKey('grade-roadmap-$_selectedGrade'),
+                      key: ValueKey('grade-roadmap-${state.selectedGrade}'),
                       color: colors.brandStrong,
-                      onRefresh: _reload,
+                      onRefresh: _controller.reload,
                       child: SingleChildScrollView(
                         controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(
@@ -547,12 +258,13 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                         ),
                         padding: EdgeInsets.only(bottom: widget.bottomPadding),
                         child: _GradeRoadmapPath(
-                          currentLevel: _currentLevel,
-                          openingLevel: _openingLevel,
-                          isCompleted: _isLevelCompleted,
-                          isUnlocked: _isLevelUnlocked,
+                          currentLevel: state.currentLevel,
+                          openingLevel: state.openingLevel,
+                          isCompleted: (level) =>
+                              state.level(level).isCompleted,
+                          isUnlocked: (level) => state.level(level).isUnlocked,
                           hasActiveExam: (level) =>
-                              _activeExamFor(_selectedGrade, level) != null,
+                              state.level(level).activeExam != null,
                           onLevelTap: _handleLevelTap,
                           mascotAsset: _mascotAsset,
                         ),
@@ -567,7 +279,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
             child: Column(
               children: [
                 _GradeRoadmapHeader(
-                  selectedGrade: _selectedGrade,
+                  selectedGrade: state.selectedGrade,
                   gradeTitles: List<String>.generate(
                     6,
                     (grade) => _gradeTitle(context, grade),
@@ -577,12 +289,12 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                       ? () => Navigator.pop(context)
                       : null,
                 ),
-                if (_errorMessage != null)
+                if (state.errorKey != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18),
                     child: _RoadmapError(
-                      message: _errorMessage!,
-                      onRetry: _reload,
+                      message: context.getText(state.errorKey!),
+                      onRetry: _controller.reload,
                     ),
                   ),
               ],
