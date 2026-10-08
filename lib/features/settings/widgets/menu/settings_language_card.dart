@@ -5,12 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_language.dart';
-import 'package:numi/core/theme/app_radius.dart';
-import 'package:numi/core/theme/app_spacing.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/settings/widgets/menu/language_bottom_sheet.dart';
 import 'package:numi/features/settings/widgets/menu/language_pill.dart';
+import 'package:numi/shared/widgets/settings_card_shell.dart';
 
 class SettingsLanguageCard extends StatelessWidget {
   const SettingsLanguageCard({
@@ -42,66 +41,41 @@ class SettingsLanguageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final radius = BorderRadius.circular(AppRadius.r16);
 
-    return Material(
-      color: colors.elevatedSurface,
-      elevation: 0,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: () => _showLanguageSheet(context),
-        borderRadius: radius,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 72),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.s16,
-            vertical: AppSpacing.s12,
-          ),
-          decoration: BoxDecoration(
-            color: colors.elevatedSurface,
-            borderRadius: radius,
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: 0.06),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
+    return SettingsCardShell(
+      onTap: () => _showLanguageSheet(context),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: colors.brand.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 14),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: colors.brand.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.language_rounded,
-                    color: colors.brandStrong,
-                    size: 22,
-                  ),
-                ),
+              child: Icon(
+                Icons.language_rounded,
+                color: colors.brandStrong,
+                size: 22,
               ),
-              Expanded(
-                child: Text(
-                  context.getText(AppKeys.language),
-                  style: GoogleFonts.andika(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-              LanguagePill(currentLanguage: currentLanguage),
-            ],
+            ),
           ),
-        ),
+          Expanded(
+            child: Text(
+              context.getText(AppKeys.language),
+              style: GoogleFonts.andika(
+                color: colors.textPrimary,
+                fontSize: FontSize.normal,
+                fontWeight: FontWeight.w700,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+          LanguagePill(currentLanguage: currentLanguage),
+        ],
       ),
     );
   }

@@ -429,8 +429,12 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Bạn muốn rời bài đánh giá?'), findsOneWidget);
-    expect(find.text('Hủy bài làm'), findsOneWidget);
-    expect(find.text('Thoát'), findsOneWidget);
+    expect(find.text('HỦY BÀI LÀM'), findsOneWidget);
+    final leaveText = find.descendant(
+      of: find.byKey(const ValueKey('assessment-leave-active')),
+      matching: find.text('THOÁT'),
+    );
+    expect(leaveText, findsOneWidget);
     final cancelButtonRect = tester.getRect(
       find.byKey(const ValueKey('assessment-cancel-attempt')),
     );
@@ -440,8 +444,8 @@ void main() {
     expect(cancelButtonRect.top, leaveButtonRect.top);
     expect(cancelButtonRect.bottom, leaveButtonRect.bottom);
     expect(cancelButtonRect.height, 42);
-    final cancelTextRect = tester.getRect(find.text('Hủy bài làm'));
-    final leaveTextRect = tester.getRect(find.text('Thoát'));
+    final cancelTextRect = tester.getRect(find.text('HỦY BÀI LÀM'));
+    final leaveTextRect = tester.getRect(leaveText);
     expect(cancelTextRect.left, greaterThan(cancelButtonRect.left));
     expect(cancelTextRect.right, lessThan(cancelButtonRect.right));
     expect(leaveTextRect.left, greaterThan(leaveButtonRect.left));

@@ -11,6 +11,7 @@ import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_she
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_primary_button.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_selected_chip.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
+import 'package:numi/shared/widgets/option_bottom_sheet_shell.dart';
 
 class TeacherMultiSelectField<T> extends StatelessWidget {
   const TeacherMultiSelectField({
@@ -123,7 +124,6 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
         final maxSheetHeight = math.min(
           MediaQuery.sizeOf(context).height * 0.78,
           620.0,
@@ -135,118 +135,86 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                 .where((item) => selectedIds.contains(itemId(item)))
                 .toList(growable: false);
 
-            return Container(
+            return ConstrainedBox(
               constraints: BoxConstraints(maxHeight: maxSheetHeight),
-              padding: EdgeInsets.fromLTRB(20, 10, 20, bottomInset + 18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(28),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.10),
-                    blurRadius: 24,
-                    offset: const Offset(0, -8),
+              child: OptionBottomSheetShell(
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: AppColors.teal520,
+                      fontSize: FontSize.xxxl,
+                      fontWeight: FontWeight.w700,
+                      height: 1.15,
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) =>
+                            const Divider(height: 1, color: Color(0xFFEFF4F5)),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          final id = itemId(item);
+                          if (id == null) {
+                            return const SizedBox.shrink();
+                          }
+                          final isSelected = selectedIds.contains(id);
+                          return Material(
+                            color: Colors.transparent,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                displayText(item),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: AppColors.textInkDark,
+                                  fontSize: FontSize.normal,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              trailing: Icon(
+                                isSelected
+                                    ? Icons.check_circle_outline_rounded
+                                    : Icons.radio_button_unchecked_rounded,
+                                color: isSelected
+                                    ? AppColors.teal520
+                                    : const Color(0xFFC4C6D2),
+                                size: 22,
+                              ),
+                              onTap: () {
+                                setSheetState(() {
+                                  selectedIds = Set<int>.from(selectedIds);
+                                  if (isSelected) {
+                                    selectedIds.remove(id);
+                                  } else {
+                                    selectedIds.add(id);
+                                  }
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14),
+                    child: TeacherPrimaryButton(
+                      label: context.getText(AppKeys.save),
+                      icon: Icons.check_rounded,
+                      width: double.infinity,
+                      height: 50,
+                      onPressed: () =>
+                          Navigator.of(context).pop(selectedValues),
+                    ),
                   ),
                 ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 46,
-                        height: 5,
-                        margin: const EdgeInsets.only(bottom: 14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE2E9EC),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        color: AppColors.teal520,
-                        fontSize: FontSize.xxxl,
-                        fontWeight: FontWeight.w700,
-                        height: 1.15,
-                      ),
-                    ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: items.length,
-                          separatorBuilder: (_, _) => const Divider(
-                            height: 1,
-                            color: Color(0xFFEFF4F5),
-                          ),
-                          itemBuilder: (context, index) {
-                            final item = items[index];
-                            final id = itemId(item);
-                            if (id == null) {
-                              return const SizedBox.shrink();
-                            }
-                            final isSelected = selectedIds.contains(id);
-                            return Material(
-                              color: Colors.transparent,
-                              child: ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  displayText(item),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: AppColors.textInkDark,
-                                    fontSize: FontSize.normal,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                trailing: Icon(
-                                  isSelected
-                                      ? Icons.check_circle_outline_rounded
-                                      : Icons.radio_button_unchecked_rounded,
-                                  color: isSelected
-                                      ? AppColors.teal520
-                                      : const Color(0xFFC4C6D2),
-                                  size: 22,
-                                ),
-                                onTap: () {
-                                  setSheetState(() {
-                                    selectedIds = Set<int>.from(selectedIds);
-                                    if (isSelected) {
-                                      selectedIds.remove(id);
-                                    } else {
-                                      selectedIds.add(id);
-                                    }
-                                  });
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 14),
-                      child: TeacherPrimaryButton(
-                        label: context.getText(AppKeys.save),
-                        icon: Icons.check_rounded,
-                        width: double.infinity,
-                        height: 50,
-                        onPressed: () =>
-                            Navigator.of(context).pop(selectedValues),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             );
           },

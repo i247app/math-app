@@ -1,13 +1,14 @@
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_field_shell.dart';
-import 'package:numi/features/profile/widgets/form/profile_form_select_result.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_keyboard.dart';
+import 'package:numi/features/profile/widgets/form/profile_form_select_result.dart';
+import 'package:numi/shared/widgets/option_bottom_sheet_shell.dart';
 
 class ProfileFormDropdown<T> extends StatelessWidget {
   const ProfileFormDropdown({
@@ -89,109 +90,66 @@ class ProfileFormDropdown<T> extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return Container(
-          padding: EdgeInsets.fromLTRB(20, 10, 20, bottomInset + 18),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.10),
-                blurRadius: 24,
-                offset: const Offset(0, -8),
+        return OptionBottomSheetShell(
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.andika(
+                color: AppColors.tealIcon,
+                fontSize: FontSize.xxxl,
+                fontWeight: FontWeight.w900,
+                height: 1.15,
               ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 46,
-                    height: 5,
-                    margin: const EdgeInsets.only(bottom: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE2E9EC),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                Text(
-                  label,
-                  style: GoogleFonts.andika(
-                    color: AppColors.tealIcon,
-                    fontSize: FontSize.xxxl,
-                    fontWeight: FontWeight.w900,
-                    height: 1.15,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 360),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: items.length + (allowEmpty ? 1 : 0),
-                      separatorBuilder: (_, _) =>
-                          const Divider(height: 1, color: Color(0xFFEFF4F5)),
-                      itemBuilder: (context, index) {
-                        final isEmptyOption = allowEmpty && index == 0;
-                        final item = isEmptyOption
-                            ? null
-                            : items[index - (allowEmpty ? 1 : 0)];
-                        final optionLabel = isEmptyOption
-                            ? emptyLabel ??
-                                  context.getText(AppKeys.profileIdTypeNone)
-                            : itemLabel(item as T);
-                        final isSelected = isEmptyOption
-                            ? selectedValue == null
-                            : identical(item, selectedValue) ||
-                                  item == selectedValue;
-
-                        return Material(
-                          color: Colors.transparent,
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(
-                              optionLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.andika(
-                                color: AppColors.textPrimary,
-                                fontSize: FontSize.normal,
-                                fontWeight: isSelected
-                                    ? FontWeight.w900
-                                    : FontWeight.w700,
-                                letterSpacing: 0,
-                              ),
-                            ),
-                            trailing: isSelected
-                                ? const Icon(
-                                    Icons.check_circle_rounded,
-                                    color: AppColors.tealIcon,
-                                    size: 22,
-                                  )
-                                : null,
-                            onTap: () {
-                              dismissProfileFormKeyboard();
-                              Navigator.of(
-                                context,
-                              ).pop(ProfileFormSelectResult<T>(item));
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
             ),
-          ),
+            OptionBottomSheetList(
+              itemCount: items.length + (allowEmpty ? 1 : 0),
+              itemBuilder: (context, index) {
+                final isEmptyOption = allowEmpty && index == 0;
+                final item = isEmptyOption
+                    ? null
+                    : items[index - (allowEmpty ? 1 : 0)];
+                final optionLabel = isEmptyOption
+                    ? emptyLabel ?? context.getText(AppKeys.profileIdTypeNone)
+                    : itemLabel(item as T);
+                final isSelected = isEmptyOption
+                    ? selectedValue == null
+                    : identical(item, selectedValue) || item == selectedValue;
+
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      optionLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.andika(
+                        color: AppColors.textPrimary,
+                        fontSize: FontSize.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w900
+                            : FontWeight.w700,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.tealIcon,
+                            size: 22,
+                          )
+                        : null,
+                    onTap: () {
+                      dismissProfileFormKeyboard();
+                      Navigator.of(
+                        context,
+                      ).pop(ProfileFormSelectResult<T>(item));
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
         );
       },
     );

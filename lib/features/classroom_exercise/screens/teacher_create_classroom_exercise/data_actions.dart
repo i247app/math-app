@@ -124,14 +124,12 @@ extension _TeacherCreateClassroomExerciseDataActions
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
         return CreateClassroomExerciseOptionBottomSheet<ClassroomModel>(
           options: _classrooms,
           titleKey: AppKeys.teacherAssignmentSelectClass,
           isSelected: (classroom) => classroom.stableId == _selectedClassroomId,
           titleBuilder: createClassroomExerciseClassName,
           subtitleBuilder: createClassroomExerciseStudentCount,
-          bottomInset: bottomInset,
         );
       },
     );
@@ -162,13 +160,11 @@ extension _TeacherCreateClassroomExerciseDataActions
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final bottomInset = MediaQuery.paddingOf(context).bottom;
         return CreateClassroomExerciseOptionBottomSheet<ClassroomProgramOption>(
           options: options,
           titleKey: AppKeys.teacherAssignmentProgramLabel,
           isSelected: (option) => option.id == _selectedProgramId,
           titleBuilder: (_, option) => option.label,
-          bottomInset: bottomInset,
         );
       },
     );

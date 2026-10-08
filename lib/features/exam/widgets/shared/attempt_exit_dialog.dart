@@ -132,35 +132,38 @@ class _AssessmentExitDialogState extends State<_AssessmentExitDialog> {
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _AssessmentExitButton(
-                      buttonKey: const ValueKey('assessment-cancel-attempt'),
-                      label: context.getText(AppKeys.assessmentCancelAttempt),
-                      icon: Icons.delete_outline_rounded,
-                      color: colors.error,
-                      outlined: true,
-                      isLoading: _updatingStatus == assessmentCanceledStatus,
-                      onPressed: _isUpdating
-                          ? null
-                          : () => _updateAndExit(assessmentCanceledStatus),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: _AssessmentExitButton(
+                        buttonKey: const ValueKey('assessment-cancel-attempt'),
+                        label: context.getText(AppKeys.assessmentCancelAttempt),
+                        icon: Icons.delete_outline_rounded,
+                        color: colors.error,
+                        outlined: true,
+                        isLoading: _updatingStatus == assessmentCanceledStatus,
+                        onPressed: _isUpdating
+                            ? null
+                            : () => _updateAndExit(assessmentCanceledStatus),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _AssessmentExitButton(
-                      buttonKey: const ValueKey('assessment-leave-active'),
-                      label: context.getText(AppKeys.assessmentLeaveAttempt),
-                      icon: Icons.logout_rounded,
-                      color: colors.brandStrong,
-                      isLoading: _updatingStatus == assessmentActiveStatus,
-                      onPressed: _isUpdating
-                          ? null
-                          : () => _updateAndExit(assessmentActiveStatus),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _AssessmentExitButton(
+                        buttonKey: const ValueKey('assessment-leave-active'),
+                        label: context.getText(AppKeys.assessmentLeaveAttempt),
+                        icon: Icons.logout_rounded,
+                        color: colors.brandStrong,
+                        isLoading: _updatingStatus == assessmentActiveStatus,
+                        onPressed: _isUpdating
+                            ? null
+                            : () => _updateAndExit(assessmentActiveStatus),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               if (_errorMessage case final message?) ...[
                 const SizedBox(height: 14),
@@ -212,17 +215,16 @@ class _AssessmentExitButton extends StatelessWidget {
               color: outlined ? color : colors.onBrand,
             ),
           )
-        : FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 17),
-                const SizedBox(width: 5),
-                Text(
-                  label,
-                  maxLines: 1,
-                  softWrap: false,
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 17),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label.toUpperCase(),
+                  softWrap: true,
+                  textAlign: TextAlign.center,
                   style: context.textStyles.labelMedium?.copyWith(
                     fontSize: FontSize.xs,
                     fontWeight: FontWeight.w800,
@@ -230,12 +232,12 @@ class _AssessmentExitButton extends StatelessWidget {
                     letterSpacing: 0,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
 
-    return SizedBox(
-      height: 42,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 42),
       child: outlined
           ? OutlinedButton(
               key: buttonKey,
