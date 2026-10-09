@@ -14,6 +14,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
+import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
@@ -45,11 +46,7 @@ class _WelcomeAssessmentIntroScreenState
     extends State<WelcomeAssessmentIntroScreen> {
   bool _isStarting = false;
   bool _isLoadingHistory = true;
-  bool _hasExamProgress = false;
-  int _currentGrade = 0;
-  List<int> _previousGrades = const <int>[];
-  List<int> _testNumbers = const <int>[1];
-  DateTime? _lastSubmittedAt;
+  AssessmentProgressChartData _chart = AssessmentProgressChartData.empty;
   int _chartRequestId = 0;
 
   @override
@@ -82,22 +79,8 @@ class _WelcomeAssessmentIntroScreenState
         toDt: toDt,
       );
       if (!mounted || requestId != _chartRequestId) return;
-      final points = progress.series.where((point) {
-        final status = point.status?.trim().toUpperCase();
-        return point.grade != null &&
-            (status == null || status == 'COMPLETE' || status == 'SUBMITTED');
-      }).toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
       setState(() {
-        _hasExamProgress = points.isNotEmpty;
-        _currentGrade = points.isEmpty ? 0 : points.last.grade!.clamp(0, 5);
-        _previousGrades = points
-            .take(points.length - 1)
-            .map((point) => point.grade!.clamp(0, 5))
-            .toList(growable: false);
-        _testNumbers = points.isEmpty
-            ? const <int>[1]
-            : points.map((point) => point.sequence).toList(growable: false);
-        _lastSubmittedAt = points.isEmpty ? null : points.last.completedDt;
+        _chart = AssessmentProgressChartData.fromProgress(progress);
       });
     } catch (_) {
       // Keep the last rendered state if progress cannot be refreshed.
@@ -113,10 +96,10 @@ class _WelcomeAssessmentIntroScreenState
       key: const ValueKey('welcome-assessment-intro-chart'),
       width: width,
       child: AssessmentProgressionChart(
-        finalGrade: _currentGrade,
-        previousGrades: _previousGrades,
-        testNumbers: _testNumbers,
-        lastSubmittedAt: _lastSubmittedAt,
+        finalGrade: _chart.finalGrade,
+        previousGrades: _chart.previousGrades,
+        testNumbers: _chart.testNumbers,
+        lastSubmittedAt: _chart.lastSubmittedAt,
         chartHeight: 180,
       ),
     );
@@ -222,7 +205,7 @@ class _WelcomeAssessmentIntroScreenState
         alignment: Alignment.center,
         minWidth: ribbonWidth,
         maxWidth: ribbonWidth,
-        child: AssessmentGradeRibbon(currentGrade: _currentGrade),
+        child: AssessmentGradeRibbon(currentGrade: _chart.finalGrade),
       ),
     );
   }
@@ -238,7 +221,7 @@ class _WelcomeAssessmentIntroScreenState
         ),
       );
     }
-    if (_hasExamProgress) return _buildProgressChart(contentWidth);
+    if (_chart.hasProgress) return _buildProgressChart(contentWidth);
     return Image.asset(
       WelcomeAssessmentIntroScreen._mascotAsset,
       key: const ValueKey('welcome-assessment-intro-mascot'),

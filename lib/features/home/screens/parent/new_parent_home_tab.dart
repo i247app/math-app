@@ -33,6 +33,7 @@ import 'package:numi/features/home/widgets/parent/parent_select_student_dialog.d
 import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
 import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
 import 'package:numi/features/home/widgets/parent/new_home_skeleton.dart';
+import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 
@@ -131,10 +132,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
   int _progressLoadRequestId = 0;
   bool _isLoadingProgress = false;
   bool _hasLoadedProgress = false;
-  int _currentGrade = 0;
-  List<int> _previousGrades = const <int>[];
-  List<int> _testNumbers = const <int>[1];
-  DateTime? _lastSubmittedAt;
+  AssessmentProgressChartData _chart = AssessmentProgressChartData.empty;
   final Set<NewParentHomeEntranceMode> _playedEntrances = {};
   bool _hasOfferedMissingStudentProfile = false;
   bool _isMissingStudentDialogVisible = false;
@@ -169,10 +167,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
       _progressLoadRequestId++;
       _isLoadingProgress = false;
       _hasLoadedProgress = false;
-      _currentGrade = 0;
-      _previousGrades = const <int>[];
-      _testNumbers = const <int>[1];
-      _lastSubmittedAt = null;
+      _chart = AssessmentProgressChartData.empty;
       isLoadingAssessments = false;
       activeAssessment = null;
       learningListExams = const <GeneratedExam>[];
@@ -237,10 +232,7 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
         assessmentLoadError = null;
         _isLoadingProgress = false;
         _hasLoadedProgress = true;
-        _currentGrade = 0;
-        _previousGrades = const <int>[];
-        _testNumbers = const <int>[1];
-        _lastSubmittedAt = null;
+        _chart = AssessmentProgressChartData.empty;
       });
       widget.onParentAssessmentStateChanged(false);
       return;
@@ -367,22 +359,8 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
         toDt: toDt,
       );
       if (!mounted || requestId != _progressLoadRequestId) return;
-      final points = progress.series.where((point) {
-        final status = point.status?.trim().toUpperCase();
-        return point.grade != null &&
-            (status == null || status == 'COMPLETE' || status == 'SUBMITTED');
-      }).toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
-      final grade = points.isEmpty ? 0 : points.last.grade!.clamp(0, 5);
       setState(() {
-        _currentGrade = grade;
-        _previousGrades = points
-            .take(points.length - 1)
-            .map((point) => point.grade!.clamp(0, 5))
-            .toList(growable: false);
-        _testNumbers = points.isEmpty
-            ? const <int>[1]
-            : points.map((point) => point.sequence).toList(growable: false);
-        _lastSubmittedAt = points.isEmpty ? null : points.last.completedDt;
+        _chart = AssessmentProgressChartData.fromProgress(progress);
       });
     } catch (_) {
       // Keep the last chart when progress is temporarily unavailable.
@@ -460,18 +438,18 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                   if (showInitialLoading)
                     const NewHomeSkeleton()
                   else ...[
-                    AssessmentGradeRibbon(currentGrade: _currentGrade),
+                    AssessmentGradeRibbon(currentGrade: _chart.finalGrade),
                     const SizedBox(height: 18),
                     AssessmentProgressionChart(
                       key: const ValueKey('parent-home-progress-chart'),
-                      finalGrade: _currentGrade,
+                      finalGrade: _chart.finalGrade,
                       gradeTitle: context.getText(AppKeys.newHomeChartLevel),
                       activityTitle: context.getText(
                         AppKeys.newHomeChartActivity,
                       ),
-                      previousGrades: _previousGrades,
-                      testNumbers: _testNumbers,
-                      lastSubmittedAt: _lastSubmittedAt,
+                      previousGrades: _chart.previousGrades,
+                      testNumbers: _chart.testNumbers,
+                      lastSubmittedAt: _chart.lastSubmittedAt,
                       chartHeight: 150,
                     ),
                     const SizedBox(height: 24),

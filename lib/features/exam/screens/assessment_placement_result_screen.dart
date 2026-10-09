@@ -3,23 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/controllers/placement_result_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/placement_result_config.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
-import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
+import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
+import 'package:numi/features/exam/widgets/assessment_result/placement_action_button.dart';
+import 'package:numi/features/exam/widgets/assessment_result/placement_celebration_mascot.dart';
+import 'package:numi/features/exam/widgets/assessment_result/placement_grade_title.dart';
+import 'package:numi/features/exam/widgets/assessment_result/placement_weak_topics_dropdown.dart';
 import 'package:numi/features/exam/widgets/assessment_result/test_again_loader.dart';
 import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
 import 'package:numi/shared/layouts/page_header.dart';
@@ -65,143 +68,41 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
 
 class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
-  final _cacheScope = SessionCacheScope.current;
-  late final ExamService _examService;
-  bool _isGeneratingAgain = false;
-  bool _progressResolved = false;
-  int? _resolvedCurrentGrade;
-  List<int> _resolvedPreviousGrades = const <int>[];
-  List<int> _resolvedPreviousTestNumbers = const <int>[];
-  int _resolvedCurrentTestNumber = 1;
-  DateTime? _resolvedCurrentSubmittedAt;
-
-  int get _grade =>
-      AssessmentFlowPolicy.clampGrade(_resolvedCurrentGrade ?? widget.grade);
-  bool get _showsAssessmentChart =>
-      widget.examType.trim().toUpperCase() == examTypeAssessment;
-  bool get _showsContinueAction =>
-      widget.examType.trim().toUpperCase() == examTypeGrade;
-  int get _totalQuestions => widget.totalQuestions.clamp(0, 1000000);
-  int get _correctAnswers => widget.correctAnswers.clamp(0, _totalQuestions);
+  late final PlacementResultController _controller;
 
   @override
   void initState() {
     super.initState();
-    _examService = widget.examService ?? context.read<ExamService>();
-    _resolvedCurrentGrade = widget.grade;
-    _progressResolved = !_showsAssessmentChart || widget.profileId == null;
-    if (_showsAssessmentChart &&
-        _progressResolved &&
-        widget.previousGrade != null) {
-      _resolvedPreviousGrades = <int>[widget.previousGrade!];
-      _resolvedPreviousTestNumbers = const <int>[1];
-      _resolvedCurrentTestNumber = 2;
-    }
-    if (_showsAssessmentChart) _fetchExamProgress();
+    _controller = PlacementResultController(
+      examService: widget.examService ?? context.read<ExamService>(),
+      grade: widget.grade,
+      level: widget.level,
+      correctAnswers: widget.correctAnswers,
+      totalQuestions: widget.totalQuestions,
+      examType: widget.examType,
+      profileId: widget.profileId,
+      userExamId: widget.userExamId,
+      previousGrade: widget.previousGrade,
+    )..addListener(_handleStateChanged);
+    _controller.initialize();
   }
 
-  Future<void> _fetchExamProgress() async {
-    final profileId = widget.profileId;
-    if (profileId == null) {
-      return;
-    }
-    var hasUsableProgress = false;
-    try {
-      final toDt = DateTime.now();
-      final progress = await _examService.getExamProgress(
-        profileId: profileId,
-        fromDt: toDt.subtract(const Duration(days: 7)),
-        toDt: toDt,
-        examType: widget.examType,
-      );
-      if (mounted) {
-        hasUsableProgress = _applyExamProgress(progress);
-      }
-    } catch (_) {
-      // Keep the current result visible if progress is unavailable.
-    } finally {
-      if (mounted) {
-        setState(() {
-          if (!hasUsableProgress) {
-            _resolvedCurrentSubmittedAt = null;
-            _resolvedPreviousGrades = widget.previousGrade == null
-                ? const <int>[]
-                : <int>[widget.previousGrade!];
-            _resolvedPreviousTestNumbers = widget.previousGrade == null
-                ? const <int>[]
-                : const <int>[1];
-            _resolvedCurrentTestNumber = _resolvedPreviousGrades.isEmpty
-                ? 1
-                : 2;
-          }
-          _progressResolved = true;
-        });
-      }
-    }
+  void _handleStateChanged() {
+    if (mounted) setState(() {});
   }
 
-  bool _applyExamProgress(ExamProgressResponse progress) {
-    final validPoints = progress.series.where((point) {
-      final status = point.status?.trim().toUpperCase();
-      final isCompleted =
-          status == null || status == 'COMPLETE' || status == 'SUBMITTED';
-      return point.grade != null && isCompleted;
-    }).toList();
-    if (validPoints.isEmpty) return false;
-
-    validPoints.sort((a, b) {
-      final bySequence = a.sequence.compareTo(b.sequence);
-      return bySequence != 0
-          ? bySequence
-          : a.completedDt.compareTo(b.completedDt);
-    });
-
-    final currentIndex = widget.userExamId == null
-        ? validPoints.length - 1
-        : validPoints.indexWhere((point) => point.examId == widget.userExamId);
-    final hasCurrentResult = currentIndex >= 0;
-    final currentPoint = hasCurrentResult ? validPoints[currentIndex] : null;
-    final currentTestNumber = hasCurrentResult
-        ? currentPoint!.sequence
-        : validPoints.last.sequence + 1;
-    final historyEndIndex = hasCurrentResult
-        ? currentIndex
-        : validPoints.length;
-    final historyStartIndex = historyEndIndex > 6 ? historyEndIndex - 6 : 0;
-    final previousPoints = validPoints.sublist(
-      historyStartIndex,
-      historyEndIndex,
-    );
-
-    if (currentPoint?.grade != null) {
-      _resolvedCurrentGrade = currentPoint!.grade!;
-    }
-    _resolvedPreviousGrades = previousPoints
-        .map((point) => point.grade!)
-        .toList(growable: false);
-    _resolvedPreviousTestNumbers = previousPoints
-        .map((point) => point.sequence)
-        .toList(growable: false);
-    _resolvedCurrentTestNumber = currentTestNumber;
-    _resolvedCurrentSubmittedAt = currentPoint?.completedDt;
-    return true;
+  @override
+  void dispose() {
+    _controller.removeListener(_handleStateChanged);
+    _controller.dispose();
+    super.dispose();
   }
 
-  Future<void> _continueGrade() async {
+  Future<void> _generateNextExam() async {
     HapticFeedback.mediumImpact();
-    setState(() => _isGeneratingAgain = true);
-
     try {
-      final generatedExam = await _examService.generateAssessmentExam(
-        examType: examTypeGrade,
-        gradeLabel: AssessmentFlowPolicy.gradeLabel(_grade),
-        level: (widget.level ?? 1).clamp(1, 10),
-        profileId: widget.profileId,
-      );
-      if (!mounted || !_cacheScope.isCurrent) {
-        return;
-      }
-      ExamCache.seedDetail(generatedExam);
+      final generatedExam = await _controller.generateNextExam();
+      if (!mounted || generatedExam == null) return;
       final onGenerated = widget.onTestAgainGenerated;
       if (onGenerated != null) {
         onGenerated(generatedExam);
@@ -209,17 +110,11 @@ class _AssessmentPlacementResultScreenState
         Navigator.of(context).pop(generatedExam);
       }
     } on ExamException catch (error) {
-      if (!mounted || !_cacheScope.isCurrent) {
-        return;
-      }
-      setState(() => _isGeneratingAgain = false);
-      _showGenerationError(error.message);
+      if (mounted) _showGenerationError(error.message);
     } catch (_) {
-      if (!mounted || !_cacheScope.isCurrent) {
-        return;
+      if (mounted) {
+        _showGenerationError(AppStrings.current(AppKeys.testAgainCreateFailed));
       }
-      setState(() => _isGeneratingAgain = false);
-      _showGenerationError(AppStrings.current(AppKeys.testAgainCreateFailed));
     }
   }
 
@@ -242,7 +137,7 @@ class _AssessmentPlacementResultScreenState
   }
 
   void _exitResult() {
-    if (_isGeneratingAgain) {
+    if (_controller.state.isGenerating) {
       return;
     }
     HapticFeedback.mediumImpact();
@@ -273,9 +168,9 @@ class _AssessmentPlacementResultScreenState
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
-              child: _isGeneratingAgain
+              child: _controller.state.isGenerating
                   ? const AssessmentTestAgainLoader()
-                  : !_progressResolved
+                  : !_controller.state.progressResolved
                   ? _buildProgressSkeleton()
                   : _buildResultContent(context),
             ),
@@ -320,9 +215,15 @@ class _AssessmentPlacementResultScreenState
 
   Widget _buildResultContent(BuildContext context) {
     final colors = context.themeColors;
+    final config = _controller.config;
+    final chart = _controller.state.chart;
+    final generationAction = config.generationAction;
     final resultSummary = context.formatText(
       AppKeys.placementResultCorrectSummary,
-      {'correct': _correctAnswers, 'total': _totalQuestions},
+      {
+        'correct': _controller.correctAnswers,
+        'total': _controller.totalQuestions,
+      },
     );
     final weakTopics = examPracticeTopicNames(widget.practiceWeakTopics);
 
@@ -346,9 +247,9 @@ class _AssessmentPlacementResultScreenState
               children: [
                 PageHeader(
                   scale: 0.9,
-                  title: _showsAssessmentChart
-                      ? context.getText(AppKeys.assessmentResultHeaderTitle)
-                      : null,
+                  title: config.headerTitleKey == null
+                      ? null
+                      : context.getText(config.headerTitleKey!),
                   topInset: 0,
                   backgroundColor: Colors.white,
                   actionWidth: 44,
@@ -389,11 +290,7 @@ class _AssessmentPlacementResultScreenState
                 ),
                 SizedBox(height: isCompact ? 2.0 : 6.0),
                 Text(
-                  context.getText(
-                    _showsContinueAction
-                        ? AppKeys.placementResultGradeHeading
-                        : AppKeys.placementResultLevel,
-                  ),
+                  context.getText(config.headingKey),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.nunito(
                     color: const Color(0xFF04A8B3),
@@ -405,7 +302,10 @@ class _AssessmentPlacementResultScreenState
                 SizedBox(
                   height: isVeryCompact ? 4.0 : (isCompact ? 8.0 : 10.0),
                 ),
-                _PlacementGradeTitle(grade: _grade, compact: isCompact),
+                PlacementGradeTitle(
+                  grade: _controller.state.grade,
+                  compact: isCompact,
+                ),
                 if (widget.level case final level?) ...[
                   const SizedBox(height: 6),
                   Text(
@@ -423,7 +323,7 @@ class _AssessmentPlacementResultScreenState
                 ],
                 if (!isVeryCompact) ...[
                   SizedBox(height: isCompact ? 2.0 : 4.0),
-                  _CelebrationMascot(size: mascotSize),
+                  PlacementCelebrationMascot(size: mascotSize),
                   SizedBox(height: isCompact ? 2.0 : 4.0),
                 ],
                 TweenAnimationBuilder<double>(
@@ -439,27 +339,24 @@ class _AssessmentPlacementResultScreenState
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _showsContinueAction
+                        child: config.ribbon == PlacementResultRibbon.gradeLevel
                             ? GradeExamLevelRibbon(
                                 currentLevel: widget.level ?? 0,
                               )
-                            : AssessmentGradeRibbon(currentGrade: _grade),
+                            : AssessmentGradeRibbon(
+                                currentGrade: _controller.state.grade,
+                              ),
                       ),
-                      if (_showsAssessmentChart) ...[
+                      if (config.showsAssessmentChart) ...[
                         SizedBox(height: sectionSpacing),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: AssessmentProgressionChart(
-                            finalGrade: _grade,
-                            previousGrades: _resolvedPreviousGrades,
-                            testNumbers: <int>[
-                              ..._resolvedPreviousTestNumbers,
-                              _resolvedCurrentTestNumber,
-                            ],
-                            firstTestNumber:
-                                _resolvedCurrentTestNumber -
-                                _resolvedPreviousGrades.length,
-                            lastSubmittedAt: _resolvedCurrentSubmittedAt,
+                            finalGrade: _controller.state.grade,
+                            previousGrades: chart.previousGrades,
+                            testNumbers: chart.testNumbers,
+                            firstTestNumber: chart.firstTestNumber,
+                            lastSubmittedAt: chart.lastSubmittedAt,
                             chartHeight: isCompact ? 90.0 : 115.0,
                           ),
                         ),
@@ -471,7 +368,7 @@ class _AssessmentPlacementResultScreenState
                   SizedBox(height: sectionSpacing),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: _PlacementWeakTopicsDropdown(
+                    child: PlacementWeakTopicsDropdown(
                       topics: weakTopics,
                       maxExpandedHeight: viewportHeight * 0.25,
                     ),
@@ -485,8 +382,10 @@ class _AssessmentPlacementResultScreenState
                       Expanded(
                         child: Center(
                           child: SizedBox(
-                            width: _showsContinueAction ? double.infinity : 220,
-                            child: _PlacementActionButton(
+                            width: generationAction != null
+                                ? double.infinity
+                                : 220,
+                            child: PlacementActionButton(
                               key: const ValueKey('placement-view-details'),
                               label: context.getText(
                                 AppKeys.placementResultReview,
@@ -499,15 +398,15 @@ class _AssessmentPlacementResultScreenState
                           ),
                         ),
                       ),
-                      if (_showsContinueAction) ...[
+                      if (generationAction != null) ...[
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _PlacementActionButton(
+                          child: PlacementActionButton(
                             key: const ValueKey('placement-continue-grade'),
-                            label: context.getText(AppKeys.placementResultNext),
+                            label: context.getText(generationAction.labelKey),
                             icon: Icons.arrow_forward_rounded,
                             color: AppColors.teal500,
-                            onTap: _continueGrade,
+                            onTap: _generateNextExam,
                           ),
                         ),
                       ],
@@ -522,504 +421,6 @@ class _AssessmentPlacementResultScreenState
           ),
         );
       },
-    );
-  }
-}
-
-class _PlacementWeakTopicsDropdown extends StatefulWidget {
-  const _PlacementWeakTopicsDropdown({
-    required this.topics,
-    required this.maxExpandedHeight,
-  });
-
-  final List<String> topics;
-  final double maxExpandedHeight;
-
-  @override
-  State<_PlacementWeakTopicsDropdown> createState() =>
-      _PlacementWeakTopicsDropdownState();
-}
-
-class _PlacementWeakTopicsDropdownState
-    extends State<_PlacementWeakTopicsDropdown> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyle = GoogleFonts.andika(
-      color: AppColors.coral600,
-      fontSize: FontSize.small,
-      fontWeight: FontWeight.w700,
-      height: 1.2,
-    );
-
-    return Container(
-      key: const ValueKey('placement-weak-topics'),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFE2D6),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Semantics(
-            button: true,
-            expanded: _expanded,
-            child: InkWell(
-              key: const ValueKey('placement-weak-topics-toggle'),
-              onTap: () => setState(() => _expanded = !_expanded),
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox(
-                height: 40,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          context.getText(
-                            AppKeys.placementResultWeaknessesTitle,
-                          ),
-                          style: textStyle,
-                        ),
-                      ),
-                      AnimatedRotation(
-                        turns: _expanded ? 0.5 : 0,
-                        duration: const Duration(milliseconds: 250),
-                        child: const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: AppColors.coral600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          ClipRect(
-            child: AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: _expanded
-                  ? ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: widget.maxExpandedHeight,
-                      ),
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (final topic in widget.topics)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 6),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('•', style: textStyle),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(topic, style: textStyle),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PlacementGradeTitle extends StatelessWidget {
-  const _PlacementGradeTitle({required this.grade, required this.compact});
-
-  final int grade;
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = grade == AssessmentFlowPolicy.minimumGrade
-        ? context.getText(AppKeys.placementResultKindergarten)
-        : context.formatText(AppKeys.placementResultGrade, {'grade': grade});
-    final separatorIndex = label.lastIndexOf(' ');
-    final splitIndex = separatorIndex < 0
-        ? (label.characters.length / 2).ceil()
-        : label.characters.toList().indexOf(' ');
-    final glyphs = label.characters.toList();
-    final textStyle = GoogleFonts.nunito(
-      fontSize: compact ? 34 : 38,
-      fontWeight: FontWeight.w900,
-      height: 1,
-      letterSpacing: 0.5,
-    );
-
-    return SizedBox(
-      key: const ValueKey('placement-grade-container'),
-      height: compact ? 44 : 48,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Semantics(
-          label: label,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Keeps the complete localized title available to finders and
-              // accessibility tools while the visible glyphs follow an arc.
-              ExcludeSemantics(
-                child: Opacity(
-                  opacity: 0,
-                  child: Text(label, key: const ValueKey('placement-grade')),
-                ),
-              ),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    for (var index = 0; index < glyphs.length; index++)
-                      Transform.translate(
-                        offset: Offset(
-                          0,
-                          -5.0 *
-                              (1 -
-                                  ((index / (glyphs.length - 1)) * 2 - 1)
-                                      .abs()),
-                        ),
-                        child: Transform.rotate(
-                          angle: ((index / (glyphs.length - 1)) - 0.5) * 0.22,
-                          child: Text(
-                            glyphs[index],
-                            style: textStyle.copyWith(
-                              color: index < splitIndex
-                                  ? AppColors.teal600
-                                  : AppColors.coral600,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CelebrationMascot extends StatefulWidget {
-  const _CelebrationMascot({required this.size});
-
-  final double size;
-
-  @override
-  State<_CelebrationMascot> createState() => _CelebrationMascotState();
-}
-
-class _CelebrationMascotState extends State<_CelebrationMascot>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _mascotScale;
-  late final Animation<double> _mascotOffsetY;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1050),
-    );
-    _mascotScale = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0, 0.78, curve: Curves.easeOutBack),
-    ).drive(Tween<double>(begin: 0.96, end: 1));
-    _mascotOffsetY =
-        TweenSequence<double>([
-          TweenSequenceItem(
-            tween: Tween<double>(
-              begin: 12,
-              end: -9,
-            ).chain(CurveTween(curve: Curves.easeOut)),
-            weight: 48,
-          ),
-          TweenSequenceItem(
-            tween: Tween<double>(
-              begin: -9,
-              end: 3,
-            ).chain(CurveTween(curve: Curves.easeInOut)),
-            weight: 30,
-          ),
-          TweenSequenceItem(
-            tween: Tween<double>(
-              begin: 3,
-              end: 0,
-            ).chain(CurveTween(curve: Curves.easeOut)),
-            weight: 22,
-          ),
-        ]).animate(
-          CurvedAnimation(parent: _controller, curve: const Interval(0, 0.8)),
-        );
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox.square(
-        key: const ValueKey('placement-mascot'),
-        dimension: widget.size,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Opacity(
-              opacity: 0,
-              child: SizedBox(
-                width: 0,
-                height: 0,
-                child: Stack(
-                  children: [
-                    _buildBurstAsset(
-                      key: const ValueKey('placement-decoration-stars'),
-                      asset: 'assets/images/assessment-result-stars.png',
-                      left: widget.size * 0.12,
-                      top: 0,
-                      dimension: widget.size * 0.76,
-                      originOffset: Offset(0, widget.size * 0.075),
-                      intervalStart: 0.05,
-                    ),
-                    _buildBurstAsset(
-                      key: const ValueKey('placement-decoration-numbers'),
-                      asset: 'assets/images/assessment-result-numbers.png',
-                      left: widget.size * 0.01,
-                      top: widget.size * 0.43,
-                      dimension: widget.size * 0.25,
-                      originOffset: Offset(
-                        widget.size * 0.07,
-                        -widget.size * 0.015,
-                      ),
-                      intervalStart: 0.12,
-                    ),
-                    _buildBurstAsset(
-                      key: const ValueKey('placement-decoration-blocks'),
-                      asset: 'assets/images/assessment-result-blocks.png',
-                      left: widget.size * 0.035,
-                      top: widget.size * 0.69,
-                      dimension: widget.size * 0.25,
-                      originOffset: Offset(
-                        widget.size * 0.065,
-                        -widget.size * 0.055,
-                      ),
-                      intervalStart: 0.2,
-                    ),
-                    _buildBurstAsset(
-                      key: const ValueKey('placement-decoration-checklist'),
-                      asset: 'assets/images/assessment-result-checklist.png',
-                      right: widget.size * 0.025,
-                      top: widget.size * 0.43,
-                      dimension: widget.size * 0.23,
-                      originOffset: Offset(
-                        -widget.size * 0.065,
-                        -widget.size * 0.015,
-                      ),
-                      intervalStart: 0.16,
-                    ),
-                    _buildBurstAsset(
-                      key: const ValueKey('placement-decoration-pencil'),
-                      asset: 'assets/images/assessment-result-pencil.png',
-                      right: 0,
-                      top: widget.size * 0.7,
-                      dimension: widget.size * 0.25,
-                      originOffset: Offset(
-                        -widget.size * 0.07,
-                        -widget.size * 0.055,
-                      ),
-                      intervalStart: 0.24,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) => Transform.translate(
-                  offset: Offset(0, _mascotOffsetY.value),
-                  child: Transform.scale(
-                    scale: _mascotScale.value,
-                    child: child,
-                  ),
-                ),
-                child: Image.asset(
-                  'assets/images/assessment-result-mascot.png',
-                  key: const ValueKey('placement-mascot-character'),
-                  fit: BoxFit.contain,
-                  cacheWidth: 520,
-                  cacheHeight: 520,
-                  filterQuality: FilterQuality.high,
-                  semanticLabel: context.getText(AppKeys.placementResultLevel),
-                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                    'assets/images/numi-mascot.png',
-                    fit: BoxFit.contain,
-                    cacheWidth: 520,
-                    cacheHeight: 520,
-                    filterQuality: FilterQuality.high,
-                    semanticLabel: context.getText(
-                      AppKeys.placementResultLevel,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBurstAsset({
-    required Key key,
-    required String asset,
-    required double top,
-    required double dimension,
-    required Offset originOffset,
-    required double intervalStart,
-    double? left,
-    double? right,
-  }) {
-    final animation = CurvedAnimation(
-      parent: _controller,
-      curve: Interval(intervalStart, 0.82, curve: Curves.easeOutBack),
-    );
-
-    return Positioned(
-      left: left,
-      right: right,
-      top: top,
-      width: dimension,
-      height: dimension,
-      child: ExcludeSemantics(
-        child: AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            final progress = animation.value;
-            return Opacity(
-              opacity: progress.clamp(0, 1),
-              child: Transform.translate(
-                offset: originOffset * (1 - progress),
-                child: Transform.scale(
-                  scale: 0.95 + (0.05 * progress),
-                  child: child,
-                ),
-              ),
-            );
-          },
-          child: Image.asset(
-            asset,
-            key: key,
-            fit: BoxFit.contain,
-            cacheWidth: 360,
-            cacheHeight: 360,
-            filterQuality: FilterQuality.high,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PlacementActionButton extends StatelessWidget {
-  const _PlacementActionButton({
-    super.key,
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-    this.outlined = false,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  final bool outlined;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    final radius = BorderRadius.circular(14);
-
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Ink(
-          height: 50,
-          decoration: BoxDecoration(
-            color: outlined ? Colors.white : color,
-            borderRadius: radius,
-            border: outlined ? Border.all(color: color, width: 1.5) : null,
-            boxShadow: outlined
-                ? null
-                : [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.2),
-                      blurRadius: 14,
-                      offset: const Offset(0, 7),
-                    ),
-                  ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    color: outlined ? color : colors.onBrand,
-                    size: 19,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: GoogleFonts.andika(
-                      color: outlined ? color : colors.onBrand,
-                      fontSize: FontSize.normal,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

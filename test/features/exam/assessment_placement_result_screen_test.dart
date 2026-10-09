@@ -6,11 +6,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
@@ -19,6 +21,62 @@ import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ri
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
+  for (final error in [
+    const ExamException('Please try again later'),
+    StateError('Unexpected generation failure'),
+  ]) {
+    testWidgets(
+      'Grade generation error restores actions (${error.runtimeType})',
+      (tester) async {
+        final lingo = LingoProvider();
+        addTearDown(lingo.dispose);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(
+              extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+            ),
+            home: LingoScope(
+              lingo: lingo,
+              child: AssessmentPlacementResultScreen(
+                grade: 4,
+                level: 7,
+                correctAnswers: 5,
+                totalQuestions: 8,
+                examType: examTypeGrade,
+                examService: _FailingGenerateService(error),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const ValueKey('placement-continue-grade')),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(
+          find.text(
+            error is ExamException
+                ? error.message
+                : lingo.lookup(AppKeys.testAgainCreateFailed),
+          ),
+          findsOneWidget,
+        );
+        await tester.tap(find.text(lingo.lookup(AppKeys.close)));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('placement-continue-grade')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('placement-view-details')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('bundles every placement celebration layer', (tester) async {
     const assets = [
       'assets/images/assessment-result-mascot.png',
@@ -1502,6 +1560,24 @@ void main() {
 
 class _UnusedExamService implements ExamService {
   const _UnusedExamService();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FailingGenerateService implements ExamService {
+  const _FailingGenerateService(this.error);
+
+  final Object error;
+
+  @override
+  Future<GeneratedExam> generateAssessmentExam({
+    String examType = examTypeAssessment,
+    String? gradeLabel,
+    int? level,
+    int? profileId,
+    int? userExamId,
+  }) async => throw error;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
