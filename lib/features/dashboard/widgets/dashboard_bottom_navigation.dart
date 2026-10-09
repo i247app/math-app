@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -17,7 +18,7 @@ class DashboardBottomNavigation extends StatefulWidget {
   const DashboardBottomNavigation({
     super.key,
     required this.bottomInset,
-    required this.activeIndex,
+    required this.activeTab,
     required this.activeRole,
     required this.user,
     required this.swipePosition,
@@ -25,11 +26,11 @@ class DashboardBottomNavigation extends StatefulWidget {
   });
 
   final double bottomInset;
-  final int activeIndex;
+  final DashboardTabId activeTab;
   final ProfileRole activeRole;
   final LoginUser? user;
   final ValueListenable<double?> swipePosition;
-  final ValueChanged<int> onTabSelected;
+  final ValueChanged<DashboardTabId> onTabSelected;
 
   @override
   State<DashboardBottomNavigation> createState() =>
@@ -39,93 +40,87 @@ class DashboardBottomNavigation extends StatefulWidget {
 class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
   static const _indicatorDuration = Duration(milliseconds: 240);
 
-  int? _pendingActiveIndex;
+  DashboardTabId? _pendingActiveTab;
 
-  int get _activeIndex => _pendingActiveIndex ?? widget.activeIndex;
+  DashboardTabId get _activeTab => _pendingActiveTab ?? widget.activeTab;
 
   @override
   void didUpdateWidget(covariant DashboardBottomNavigation oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_pendingActiveIndex == widget.activeIndex ||
+    if (_pendingActiveTab == widget.activeTab ||
         oldWidget.activeRole != widget.activeRole) {
-      _pendingActiveIndex = null;
+      _pendingActiveTab = null;
     }
   }
 
-  void _selectTab(int index) {
-    if (index == _activeIndex) {
+  void _selectTab(DashboardTabId tab) {
+    if (tab == _activeTab) {
       return;
     }
 
     // Paint the selected navigation item before the target tab has a chance
     // to build or begin loading. This preserves instant touch feedback even
     // when a tab's first frame is expensive.
-    setState(() => _pendingActiveIndex = index);
+    setState(() => _pendingActiveTab = tab);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _pendingActiveIndex != index) {
+      if (!mounted || _pendingActiveTab != tab) {
         return;
       }
-      widget.onTabSelected(index);
+      widget.onTabSelected(tab);
     });
+  }
+
+  DashboardNavItemData _itemFor(BuildContext context, DashboardTabId tab) {
+    final teacher = widget.activeRole == ProfileRole.teacher;
+    return switch (tab) {
+      DashboardTabId.home => DashboardNavItemData(
+        teacher ? Icons.home_filled : null,
+        context.getText(AppKeys.navHome),
+        null,
+        assetPath: teacher ? null : parentHomeNavHomeAsset,
+      ),
+      DashboardTabId.learning => DashboardNavItemData(
+        Icons.menu_book_rounded,
+        context.getText(AppKeys.navLearning),
+        null,
+      ),
+      DashboardTabId.games => DashboardNavItemData(
+        Icons.sports_esports_rounded,
+        context.getText(AppKeys.navGames),
+        null,
+      ),
+      DashboardTabId.classroom => DashboardNavItemData(
+        Icons.bar_chart_rounded,
+        context.getText(AppKeys.navClassroom),
+        null,
+      ),
+      DashboardTabId.study => DashboardNavItemData(
+        Icons.menu_book_rounded,
+        context.getText(AppKeys.navStudy),
+        null,
+      ),
+      DashboardTabId.members => DashboardNavItemData(
+        Icons.chat_bubble_outline_rounded,
+        context.getText(AppKeys.navMembers),
+        null,
+      ),
+      DashboardTabId.settings => DashboardNavItemData(
+        null,
+        context.getText(AppKeys.navSettings),
+        teacher ? widget.user : null,
+        assetPath: teacher ? null : parentHomeNavSettingsAsset,
+      ),
+      DashboardTabId.assessment || DashboardTabId.room => throw StateError(
+        'Hidden destination in dashboard navigation: $tab',
+      ),
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final visibleTabs = visibleDashboardTabs(widget.activeRole);
-    final items = switch (widget.activeRole) {
-      ProfileRole.teacher => [
-        DashboardNavItemData(
-          Icons.home_filled,
-          context.getText(AppKeys.navHome),
-          null,
-        ),
-        DashboardNavItemData(
-          Icons.bar_chart_rounded,
-          context.getText(AppKeys.navClassroom),
-          null,
-        ),
-        DashboardNavItemData(
-          Icons.menu_book_rounded,
-          context.getText(AppKeys.navStudy),
-          null,
-        ),
-        DashboardNavItemData(
-          Icons.chat_bubble_outline_rounded,
-          context.getText(AppKeys.navMembers),
-          null,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navSettings),
-          widget.user,
-        ),
-      ],
-      ProfileRole.student || ProfileRole.parent => [
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navHome),
-          null,
-          assetPath: parentHomeNavHomeAsset,
-        ),
-        DashboardNavItemData(
-          Icons.menu_book_rounded,
-          context.getText(AppKeys.navLearning),
-          null,
-        ),
-        DashboardNavItemData(
-          Icons.sports_esports_rounded,
-          context.getText(AppKeys.navGames),
-          null,
-        ),
-        DashboardNavItemData(
-          null,
-          context.getText(AppKeys.navSettings),
-          null,
-          assetPath: parentHomeNavSettingsAsset,
-        ),
-      ],
-    };
+    final items = [for (final tab in visibleTabs) _itemFor(context, tab)];
 
     const radius = BorderRadius.vertical(top: Radius.circular(48));
 
@@ -159,14 +154,14 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
                 return Expanded(
                   child: DashboardAnimatedNavItem(
                     data: items[index],
-                    active: _activeIndex == visibleTabs[index],
+                    active: _activeTab == visibleTabs[index],
                     onTap: () => _selectTab(visibleTabs[index]),
                   ),
                 );
               }),
             ),
             builder: (context, swipePosition, navigationItems) {
-              final activePosition = visibleTabs.indexOf(_activeIndex);
+              final activePosition = visibleTabs.indexOf(_activeTab);
               final indicatorPosition = (swipePosition ?? activePosition)
                   .clamp(0.0, items.length - 1.0)
                   .toDouble();

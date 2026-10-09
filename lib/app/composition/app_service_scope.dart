@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/features/classroom_exercise/navigation/classroom_exercise_navigator.dart';
 import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/core/data/session_data_cleaner.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
@@ -36,6 +37,9 @@ class AppServiceScope extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<ClassroomExerciseNavigator>.value(
+          value: services.classroomExerciseNavigator,
+        ),
         RepositoryProvider<AuthService>.value(value: services.authService),
         RepositoryProvider<GuestAccountService>.value(
           value: services.guestAccountService,

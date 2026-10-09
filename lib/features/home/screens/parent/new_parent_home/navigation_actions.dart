@@ -10,17 +10,7 @@ extension ParentHomeNavigationActions on NewParentHomeContentState {
     isOpeningGradeRoadmap = true;
     HapticFeedback.lightImpact();
     try {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => GradeRoadmapScreen(
-            profileId: profileId,
-            examService: widget.examService,
-            user: widget.user,
-            initialGrades: widget.initialGrades,
-            gradeService: widget.gradeService,
-          ),
-        ),
-      );
+      await widget.onOpenGradeRoadmap?.call(context);
       if (mounted) {
         await loadHome(forceRefresh: true);
       }
@@ -66,31 +56,8 @@ extension ParentHomeNavigationActions on NewParentHomeContentState {
 
     HapticFeedback.selectionClick();
     _updateState(() => isOpeningActiveAssessment = true);
-    final homeRoute = ModalRoute.of(context);
     try {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => ExamAttemptScreen(
-            examService: widget.examService,
-            initialExam: exam,
-            examType: exam.examType ?? examTypeAssessment,
-            gradeLabel: AssessmentFlowPolicy.gradeLabel(exam.grade ?? 0),
-            profileId: profileId,
-            allowQuestionNavigation: false,
-            showQuestionNavigation: false,
-            isResumedAssessment: true,
-            onResultBack: () {
-              if (!mounted) return;
-              final navigator = Navigator.of(context);
-              if (homeRoute == null) {
-                navigator.popUntil((route) => route.isFirst);
-              } else {
-                navigator.popUntil((route) => identical(route, homeRoute));
-              }
-            },
-          ),
-        ),
-      );
+      await widget.onResumeAssessment?.call(context, exam);
       if (mounted) {
         await loadHome(forceRefresh: true);
       }

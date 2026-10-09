@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
@@ -70,26 +72,95 @@ void main() {
 
   test('parent and student swipes skip hidden Assessment and Room tabs', () {
     for (final role in [ProfileRole.parent, ProfileRole.student]) {
-      expect(adjacentVisibleTab(role, 0, forward: true), learningTabIndex);
-      expect(adjacentVisibleTab(role, learningTabIndex, forward: false), 0);
-      expect(adjacentVisibleTab(role, learningTabIndex, forward: true), 3);
-      expect(adjacentVisibleTab(role, 3, forward: false), learningTabIndex);
-      expect(adjacentVisibleTab(role, 3, forward: true), 4);
-      expect(adjacentVisibleTab(role, 1, forward: true), isNull);
-      expect(adjacentVisibleTab(role, 2, forward: true), isNull);
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.home, forward: true),
+        DashboardTabId.learning,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.learning, forward: false),
+        DashboardTabId.home,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.learning, forward: true),
+        DashboardTabId.games,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.games, forward: false),
+        DashboardTabId.learning,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.games, forward: true),
+        DashboardTabId.settings,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.assessment, forward: true),
+        isNull,
+      );
+      expect(
+        adjacentVisibleTab(role, DashboardTabId.room, forward: true),
+        isNull,
+      );
     }
-    expect(visibleDashboardTabs(ProfileRole.teacher), [0, 1, 2, 3, 4]);
+    expect(visibleDashboardTabs(ProfileRole.teacher), [
+      DashboardTabId.home,
+      DashboardTabId.classroom,
+      DashboardTabId.study,
+      DashboardTabId.members,
+      DashboardTabId.settings,
+    ]);
   });
 
   test('slide direction follows visible tab order', () {
     for (final role in [ProfileRole.parent, ProfileRole.student]) {
-      expect(isForwardVisibleTabTransition(role, learningTabIndex, 3), isTrue);
-      expect(isForwardVisibleTabTransition(role, 3, learningTabIndex), isFalse);
-      expect(isForwardVisibleTabTransition(role, 3, 4), isTrue);
-      expect(isForwardVisibleTabTransition(role, 4, 3), isFalse);
-      expect(isForwardVisibleTabTransition(role, 0, learningTabIndex), isTrue);
+      expect(
+        isForwardVisibleTabTransition(
+          role,
+          DashboardTabId.learning,
+          DashboardTabId.games,
+        ),
+        isTrue,
+      );
+      expect(
+        isForwardVisibleTabTransition(
+          role,
+          DashboardTabId.games,
+          DashboardTabId.learning,
+        ),
+        isFalse,
+      );
+      expect(
+        isForwardVisibleTabTransition(
+          role,
+          DashboardTabId.games,
+          DashboardTabId.settings,
+        ),
+        isTrue,
+      );
+      expect(
+        isForwardVisibleTabTransition(
+          role,
+          DashboardTabId.settings,
+          DashboardTabId.games,
+        ),
+        isFalse,
+      );
+      expect(
+        isForwardVisibleTabTransition(
+          role,
+          DashboardTabId.home,
+          DashboardTabId.learning,
+        ),
+        isTrue,
+      );
     }
-    expect(isForwardVisibleTabTransition(ProfileRole.teacher, 3, 4), isTrue);
+    expect(
+      isForwardVisibleTabTransition(
+        ProfileRole.teacher,
+        DashboardTabId.members,
+        DashboardTabId.settings,
+      ),
+      isTrue,
+    );
   });
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
@@ -102,7 +173,7 @@ void main() {
         lingo.dispose();
         swipePosition.dispose();
       });
-      int? selectedTab;
+      DashboardTabId? selectedTab;
 
       await tester.pumpWidget(
         LingoScope(
@@ -112,7 +183,7 @@ void main() {
             home: Scaffold(
               bottomNavigationBar: DashboardBottomNavigation(
                 bottomInset: 0,
-                activeIndex: 0,
+                activeTab: DashboardTabId.home,
                 activeRole: role,
                 user: null,
                 swipePosition: swipePosition,
@@ -123,7 +194,12 @@ void main() {
         ),
       );
 
-      expect(visibleDashboardTabs(role), [0, learningTabIndex, 3, 4]);
+      expect(visibleDashboardTabs(role), [
+        DashboardTabId.home,
+        DashboardTabId.learning,
+        DashboardTabId.games,
+        DashboardTabId.settings,
+      ]);
       expect(find.text('THI'), findsNothing);
       expect(find.text('HỌC'), findsOneWidget);
       expect(find.text('PHÒNG'), findsNothing);
@@ -132,11 +208,11 @@ void main() {
 
       await tester.tap(find.text('HỌC'));
       await tester.pump();
-      expect(selectedTab, learningTabIndex);
+      expect(selectedTab, DashboardTabId.learning);
 
       await tester.tap(find.text('GAMES'));
       await tester.pump();
-      expect(selectedTab, 3);
+      expect(selectedTab, DashboardTabId.games);
 
       await lingo.setLanguage(AppLanguage.en);
       await tester.pump();
@@ -146,6 +222,51 @@ void main() {
       expect(find.text('GAMES'), findsOneWidget);
     });
   }
+
+  testWidgets(
+    'teacher navigation emits classroom, study and members identities',
+    (tester) async {
+      final originalLanguage = AppLanguageState.current;
+      final lingo = LingoProvider();
+      final swipePosition = ValueNotifier<double?>(null);
+      addTearDown(() {
+        AppLanguageState.current = originalLanguage;
+        lingo.dispose();
+        swipePosition.dispose();
+      });
+      await lingo.setLanguage(AppLanguage.en);
+      DashboardTabId? selected;
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              bottomNavigationBar: DashboardBottomNavigation(
+                bottomInset: 0,
+                activeTab: DashboardTabId.home,
+                activeRole: ProfileRole.teacher,
+                user: null,
+                swipePosition: swipePosition,
+                onTabSelected: (tab) => selected = tab,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(DashboardAnimatedNavItem), findsNWidgets(5));
+      for (final entry in const {
+        'CLASS': DashboardTabId.classroom,
+        'STUDY': DashboardTabId.study,
+        'MEMBERS': DashboardTabId.members,
+        'SETTINGS': DashboardTabId.settings,
+      }.entries) {
+        await tester.tap(find.text(entry.key));
+        await tester.pump();
+        expect(selected, entry.value);
+      }
+    },
+  );
 
   testWidgets('Games placeholder shows only mascot and localized message', (
     tester,

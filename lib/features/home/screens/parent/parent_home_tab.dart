@@ -70,6 +70,8 @@ class ParentHomeContent extends StatefulWidget {
     this.onOpenInitialAssessment,
     this.onOpenExamReview,
     this.onCreateStudentProfile,
+    this.onOpenGradeRoadmap,
+    this.onResumeAssessment,
   });
 
   final LoginUser? user;
@@ -93,6 +95,9 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
   final bool useActiveStudentProfileData;
+  final Future<void> Function(BuildContext context)? onOpenGradeRoadmap;
+  final Future<void> Function(BuildContext context, GeneratedExam exam)?
+  onResumeAssessment;
   final Future<void> Function(BuildContext context)? onOpenAssessment;
   final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?

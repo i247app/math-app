@@ -8,7 +8,6 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/models/home_layout.dart';
@@ -16,8 +15,7 @@ import 'package:numi/features/home/data/home_layout_exception.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/shared/layouts/page_header.dart';
-import 'package:numi/features/exam/screens/exam_review_screen.dart';
-import 'package:numi/features/settings/screens/setting_tab.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/classroom/helpers/parent_room_helpers.dart';
@@ -35,32 +33,31 @@ import 'package:numi/shared/widgets/app_content_section.dart';
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({
     super.key,
-    required this.user,
     required this.profiles,
     required this.activeProfile,
     required this.isActive,
     required this.activeRefreshTick,
     required this.assignmentService,
     required this.onRefreshProfiles,
-    required this.onActivateProfile,
-    required this.onProfileSaved,
     required this.onOpenClassroomTab,
     required this.onOpenProfileMenu,
     required this.bottomPadding,
+    required this.onOpenExamReview,
+    required this.onCreateStudentProfile,
   });
 
-  final LoginUser? user;
   final List<UserProfile> profiles;
   final UserProfile? activeProfile;
   final bool isActive;
   final int activeRefreshTick;
   final ClassroomExerciseService assignmentService;
   final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(UserProfile profile) onActivateProfile;
-  final VoidCallback onProfileSaved;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenProfileMenu;
   final double bottomPadding;
+  final Future<void> Function(BuildContext context, GeneratedExam exam)
+  onOpenExamReview;
+  final Future<void> Function(BuildContext context) onCreateStudentProfile;
 
   @override
   State<ParentRoomTab> createState() => _ParentRoomTabState();
@@ -427,11 +424,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       return;
     }
     HapticFeedback.selectionClick();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ExamReviewScreen(examId: examId, initialExam: exam),
-      ),
-    );
+    widget.onOpenExamReview(context, exam);
   }
 
   // Reuse with the Utilities section when the feature is enabled again.
@@ -468,29 +461,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
 
   Future<void> _openCreateStudentProfile() async {
     HapticFeedback.selectionClick();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => Material(
-          color: context.themeColors.pageBackground,
-          child: SafeArea(
-            child: SettingTab.page(
-              user: widget.user,
-              profiles: widget.profiles,
-              activeProfile: widget.activeProfile,
-              profileLoadError: null,
-              onLogout: () {},
-              onActivateProfile: widget.onActivateProfile,
-              onRefreshProfiles: widget.onRefreshProfiles,
-              onProfileSaved: widget.onProfileSaved,
-              bottomPadding: 0,
-              initialView: SettingPageView.profile,
-              isPushedPage: true,
-              openAddProfileOnStart: true,
-            ),
-          ),
-        ),
-      ),
-    );
+    await widget.onCreateStudentProfile(context);
     await widget.onRefreshProfiles();
     if (mounted) {
       await _loadLayout(forceRefresh: true);

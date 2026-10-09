@@ -59,15 +59,14 @@ void main() {
           theme: AppTheme.light(),
           home: Scaffold(
             body: ParentRoomTab(
-              user: null,
               profiles: const [],
               activeProfile: null,
               isActive: true,
               activeRefreshTick: 0,
               assignmentService: _UnusedAssignmentService(),
+              onOpenExamReview: (_, _) async {},
+              onCreateStudentProfile: (_) async {},
               onRefreshProfiles: () async {},
-              onActivateProfile: (_) async {},
-              onProfileSaved: () {},
               onOpenClassroomTab: () {},
               onOpenProfileMenu: () {},
               bottomPadding: 0,

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/profile/models/grade.dart';
-import 'package:numi/features/profile/models/profile.dart';
+import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
-import 'package:numi/features/classroom/data/classroom_service.dart';
-import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
-import 'package:numi/features/profile/data/grade_service.dart';
-import 'package:numi/features/auth/models/auth_models.dart';
-import 'package:numi/features/exam/data/exam_service.dart';
 
 part 'role_tab_host/gestures.dart';
 part 'role_tab_host/tab_builder.dart';
@@ -18,80 +12,22 @@ part 'role_tab_host/tab_builder.dart';
 class RoleTabHost extends StatefulWidget {
   const RoleTabHost({
     super.key,
-    required this.activeTab,
+    required this.args,
     required this.tabFactory,
-    required this.selectionRevision,
-    required this.user,
-    required this.profiles,
-    required this.activeProfile,
     required this.activeRole,
-    required this.profileLoadError,
-    required this.onRefreshProfiles,
-    required this.onActivateProfile,
-    required this.initialGrades,
-    required this.gradeService,
-    required this.classroomService,
-    required this.assignmentService,
-    required this.examService,
-    required this.onLogout,
-    required this.onAddProfileFromGames,
-    required this.onProfileSaved,
-    required this.openAddProfileRequestId,
-    required this.onCompleteTeacherProfile,
-    required this.onOpenClassroomTab,
-    required this.onOpenGamesTab,
-    required this.onOpenLearningTab,
-    required this.onOpenExercisesTab,
-    required this.onOpenProfileMenu,
-    required this.onParentAssessmentStateChanged,
     required this.profileResetSignal,
-    required this.bottomPadding,
-    required this.hasUnreadNotifications,
-    required this.onNotificationTap,
-    required this.showChildProfileDialogOnStart,
     required this.onSwipeToTab,
     required this.onSwipePositionChanged,
     required this.onSwipeInteractionEnded,
-    this.onChildProfileDialogShown,
-    this.homeHeader,
   });
 
-  final int activeTab;
+  final DashboardTabArgs args;
   final DashboardTabFactory tabFactory;
-  final int selectionRevision;
-  final LoginUser? user;
-  final List<UserProfile> profiles;
-  final UserProfile? activeProfile;
   final ProfileRole activeRole;
-  final String? profileLoadError;
-  final Future<void> Function() onRefreshProfiles;
-  final Future<void> Function(UserProfile profile) onActivateProfile;
-  final List<GradeModel> initialGrades;
-  final GradeService gradeService;
-  final ClassroomService classroomService;
-  final ClassroomExerciseService assignmentService;
-  final ExamService examService;
-  final VoidCallback onLogout;
-  final VoidCallback onAddProfileFromGames;
-  final VoidCallback onProfileSaved;
-  final int openAddProfileRequestId;
-  final Future<void> Function() onCompleteTeacherProfile;
-  final VoidCallback onOpenClassroomTab;
-  final VoidCallback onOpenGamesTab;
-  final VoidCallback onOpenLearningTab;
-  final VoidCallback onOpenExercisesTab;
-  final VoidCallback onOpenProfileMenu;
-  final ValueChanged<bool> onParentAssessmentStateChanged;
   final int profileResetSignal;
-  final double bottomPadding;
-  final bool hasUnreadNotifications;
-  final VoidCallback onNotificationTap;
-  final bool showChildProfileDialogOnStart;
-  final ValueChanged<int> onSwipeToTab;
-  final ValueChanged<double> onSwipePositionChanged;
+  final ValueChanged<DashboardTabId> onSwipeToTab;
+  final ValueChanged<double?> onSwipePositionChanged;
   final VoidCallback onSwipeInteractionEnded;
-  final VoidCallback? onChildProfileDialogShown;
-  final Widget? homeHeader;
 
   @override
   State<RoleTabHost> createState() => RoleTabHostState();
@@ -101,21 +37,24 @@ class RoleTabHostState extends State<RoleTabHost>
     with SingleTickerProviderStateMixin {
   static const _tabTransitionDuration = Duration(milliseconds: 240);
 
-  late final Set<int> _visitedTabs = <int>{widget.activeTab};
-  final Map<int, int> _activationTicks = <int, int>{};
-  final Map<int, Widget> _tabChildren = <int, Widget>{};
+  late final Set<DashboardTabId> _visitedTabs = <DashboardTabId>{
+    widget.args.activeTab,
+  };
+  final Map<DashboardTabId, int> _activationTicks = <DashboardTabId, int>{};
+  final Map<DashboardTabId, Widget> _tabChildren = <DashboardTabId, Widget>{};
   late final AnimationController _tabTransitionController;
-  late int _transitionFromTab = widget.activeTab;
-  late int _transitionToTab = widget.activeTab;
+  late DashboardTabId _transitionFromTab = widget.args.activeTab;
+  late DashboardTabId _transitionToTab = widget.args.activeTab;
   late int _lastProfileResetSignal = widget.profileResetSignal;
+  int _prewarmRevision = 0;
   bool _isDragging = false;
   bool _isSettlingDrag = false;
   bool _dragCompletesSelection = false;
   double _dragOffset = 0;
   double _dragWidth = 1;
   double _dragSettleStartProgress = 0;
-  int? _dragNeighborTab;
-  int? _pendingDragTarget;
+  DashboardTabId? _dragNeighborTab;
+  DashboardTabId? _pendingDragTarget;
 
   @override
   void initState() {
@@ -128,7 +67,7 @@ class RoleTabHostState extends State<RoleTabHost>
           )
           ..addListener(_handleTabTransitionTick)
           ..addStatusListener(_handleTabTransitionStatus);
-    _activationTicks[widget.activeTab] = 1;
+    _activationTicks[widget.args.activeTab] = 1;
     WidgetsBinding.instance.addPostFrameCallback((_) => _prewarmTabs());
   }
 
@@ -170,16 +109,20 @@ class RoleTabHostState extends State<RoleTabHost>
   }
 
   Future<void> _prewarmTabs() async {
+    final revision = ++_prewarmRevision;
     await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!mounted || revision != _prewarmRevision) return;
     final tabOrder = [
-      ...visibleDashboardTabs(widget.activeRole).where((tab) => tab != 0),
-      0,
+      ...visibleDashboardTabs(
+        widget.activeRole,
+      ).where((tab) => tab != DashboardTabId.home),
+      DashboardTabId.home,
     ];
     for (final tab in tabOrder) {
-      if (!mounted) {
+      if (!mounted || revision != _prewarmRevision) {
         return;
       }
-      if (tab == widget.activeTab || _visitedTabs.contains(tab)) {
+      if (tab == widget.args.activeTab || _visitedTabs.contains(tab)) {
         continue;
       }
 
@@ -195,11 +138,30 @@ class RoleTabHostState extends State<RoleTabHost>
   @override
   void didUpdateWidget(covariant RoleTabHost oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final activeTabChanged = oldWidget.activeTab != widget.activeTab;
+    if (oldWidget.activeRole != widget.activeRole) {
+      _tabTransitionController.stop();
+      _isDragging = false;
+      _isSettlingDrag = false;
+      _pendingDragTarget = null;
+      _dragNeighborTab = null;
+      _transitionFromTab = widget.args.activeTab;
+      _transitionToTab = widget.args.activeTab;
+      _visitedTabs
+        ..clear()
+        ..add(widget.args.activeTab);
+      _activationTicks
+        ..clear()
+        ..[widget.args.activeTab] = 1;
+      _tabChildren.clear();
+      _lastProfileResetSignal = widget.profileResetSignal;
+      _prewarmTabs();
+      return;
+    }
+    final activeTabChanged = oldWidget.args.activeTab != widget.args.activeTab;
     if (activeTabChanged) {
       final continuesDragTransition =
-          _pendingDragTarget == widget.activeTab &&
-          _transitionFromTab == oldWidget.activeTab;
+          _pendingDragTarget == widget.args.activeTab &&
+          _transitionFromTab == oldWidget.args.activeTab;
       _pendingDragTarget = null;
       if (!continuesDragTransition) {
         if (_isDragging || _isSettlingDrag) {
@@ -207,13 +169,13 @@ class RoleTabHostState extends State<RoleTabHost>
           _isSettlingDrag = false;
           widget.onSwipeInteractionEnded();
         }
-        _transitionFromTab = oldWidget.activeTab;
-        _transitionToTab = widget.activeTab;
+        _transitionFromTab = oldWidget.args.activeTab;
+        _transitionToTab = widget.args.activeTab;
       }
-      _visitedTabs.add(widget.activeTab);
+      _visitedTabs.add(widget.args.activeTab);
       // Rebuild the incoming tab immediately. The outgoing tab stays intact
       // until the transition completes so its layout cannot change mid-swipe.
-      _tabChildren.remove(widget.activeTab);
+      _tabChildren.remove(widget.args.activeTab);
       if (!continuesDragTransition) {
         _tabTransitionController.duration = _tabTransitionDuration;
         _tabTransitionController.forward(from: 0);
@@ -231,18 +193,19 @@ class RoleTabHostState extends State<RoleTabHost>
 
     if (_requiresAllTabsRebuild(oldWidget, widget)) {
       _tabChildren.clear();
-    } else if ((!activeTabChanged || _transitionFromTab != 0) &&
-        (oldWidget.homeHeader != widget.homeHeader ||
-            oldWidget.hasUnreadNotifications !=
-                widget.hasUnreadNotifications)) {
+    } else if ((!activeTabChanged ||
+            _transitionFromTab != DashboardTabId.home) &&
+        (oldWidget.args.presentation.homeHeader !=
+                widget.args.presentation.homeHeader ||
+            oldWidget.args.presentation.hasUnreadNotifications !=
+                widget.args.presentation.hasUnreadNotifications)) {
       // Keep the outgoing Home header intact until its slide completes.
-      _tabChildren.remove(0);
+      _tabChildren.remove(DashboardTabId.home);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final maxTabIndex = widget.activeRole == ProfileRole.teacher ? 4 : 5;
     return LayoutBuilder(
       builder: (context, constraints) {
         _dragWidth = constraints.maxWidth;
@@ -260,10 +223,12 @@ class RoleTabHostState extends State<RoleTabHost>
                 return Stack(
                   fit: StackFit.expand,
                   children: [
-                    for (var tab = 0; tab <= maxTabIndex; tab++)
+                    for (final tab in supportedDashboardTabs(widget.activeRole))
                       if (_visitedTabs.contains(tab))
                         Offstage(
-                          key: ValueKey('home-tab-$tab'),
+                          key: ValueKey(
+                            'home-tab-${dashboardTabWidgetKeySuffix(widget.activeRole, tab)}',
+                          ),
                           offstage: !_isTabVisible(tab, isTransitioning),
                           child: TickerMode(
                             enabled: _isTabVisible(tab, isTransitioning),
@@ -271,14 +236,16 @@ class RoleTabHostState extends State<RoleTabHost>
                               ignoring:
                                   _isDragging ||
                                   isTransitioning ||
-                                  tab != widget.activeTab,
+                                  tab != widget.args.activeTab,
                               child: FractionalTranslation(
                                 translation: Offset(
                                   _horizontalOffsetFor(tab, isTransitioning),
                                   0,
                                 ),
                                 child: KeyedSubtree(
-                                  key: ValueKey('home-dashboard-content-$tab'),
+                                  key: ValueKey(
+                                    'home-dashboard-content-${dashboardTabWidgetKeySuffix(widget.activeRole, tab)}',
+                                  ),
                                   child: _tabChildren.putIfAbsent(
                                     tab,
                                     () => _buildTab(context, tab),
@@ -298,19 +265,19 @@ class RoleTabHostState extends State<RoleTabHost>
     );
   }
 
-  bool _isTabVisible(int tab, bool isTransitioning) {
+  bool _isTabVisible(DashboardTabId tab, bool isTransitioning) {
     if (_isDragging) {
-      return tab == widget.activeTab || tab == _dragNeighborTab;
+      return tab == widget.args.activeTab || tab == _dragNeighborTab;
     }
     if (!isTransitioning) {
-      return tab == widget.activeTab;
+      return tab == widget.args.activeTab;
     }
     return tab == _transitionFromTab || tab == _transitionToTab;
   }
 
-  double _horizontalOffsetFor(int tab, bool isTransitioning) {
+  double _horizontalOffsetFor(DashboardTabId tab, bool isTransitioning) {
     if (_isDragging) {
-      if (tab == widget.activeTab) {
+      if (tab == widget.args.activeTab) {
         return _dragOffset;
       }
       if (tab == _dragNeighborTab) {
@@ -354,10 +321,14 @@ class RoleTabHostState extends State<RoleTabHost>
 
 bool _requiresAllTabsRebuild(RoleTabHost previous, RoleTabHost current) {
   return previous.activeRole != current.activeRole ||
-      previous.user != current.user ||
-      previous.profiles != current.profiles ||
-      previous.activeProfile != current.activeProfile ||
-      previous.profileLoadError != current.profileLoadError ||
-      previous.initialGrades != current.initialGrades ||
-      previous.bottomPadding != current.bottomPadding;
+      previous.args.session.user != current.args.session.user ||
+      previous.args.session.profiles != current.args.session.profiles ||
+      previous.args.session.activeProfile !=
+          current.args.session.activeProfile ||
+      previous.args.session.profileLoadError !=
+          current.args.session.profileLoadError ||
+      previous.args.session.initialGrades !=
+          current.args.session.initialGrades ||
+      previous.args.presentation.bottomPadding !=
+          current.args.presentation.bottomPadding;
 }

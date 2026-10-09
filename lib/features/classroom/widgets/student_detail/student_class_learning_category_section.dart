@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_category_tile.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_section_title.dart';
-import 'package:numi/features/classroom_exercise/screens/student_classroom_exercise_screen.dart';
+import 'package:numi/features/classroom_exercise/navigation/classroom_exercise_navigator.dart';
 
 class StudentClassLearningCategorySection extends StatelessWidget {
   const StudentClassLearningCategorySection({
@@ -50,14 +51,13 @@ class StudentClassLearningCategorySection extends StatelessWidget {
                         AppKeys.studentClassAssignmentsCountFormat,
                         {'count': classroomExerciseCount},
                       ),
-                onTap: () => Navigator.of(context).push<void>(
-                  MaterialPageRoute<void>(
-                    builder: (_) => StudentClassroomExerciseScreen(
+                onTap: () => context
+                    .read<ClassroomExerciseNavigator>()
+                    .openStudentExercises(
+                      context: context,
                       classroomId: classroomId,
                       profileId: profileId,
                     ),
-                  ),
-                ),
               ),
               StudentClassCategoryTile(
                 backgroundColor: const Color(0xFFFDF4EE),

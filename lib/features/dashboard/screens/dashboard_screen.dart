@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
+import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/core/debug/home_tab_performance_monitor.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -35,18 +37,6 @@ import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 
 part 'dashboard/actions.dart';
-
-enum _RoleTabDestination {
-  home,
-  classroom,
-  room,
-  assessment,
-  practice,
-  learning,
-  study,
-  members,
-  settings,
-}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
@@ -128,7 +118,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final HomeTabPerformanceMonitor _tabPerformanceMonitor =
       HomeTabPerformanceMonitor();
   final ValueNotifier<double?> _tabSwipePosition = ValueNotifier(null);
-  bool _returnToGamesAfterProfileSave = false;
   int _parentStreakCount = 1;
 
   @override
@@ -151,74 +140,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final targetCubit = _roleTabCubitFor(widget.activeRole);
       _selectTab(
         targetCubit,
-        _tabIndexAfterRoleChange(
-          fromRole: oldWidget.activeRole,
+        dashboardTabAfterRoleChange(
           toRole: widget.activeRole,
-          currentIndex: oldTab,
+          currentTab: oldTab,
         ),
       );
     }
-  }
-
-  int _tabIndexAfterRoleChange({
-    required ProfileRole fromRole,
-    required ProfileRole toRole,
-    required int currentIndex,
-  }) {
-    final destination = switch (fromRole) {
-      ProfileRole.parent => switch (currentIndex) {
-        1 => _RoleTabDestination.assessment,
-        2 => _RoleTabDestination.room,
-        3 => _RoleTabDestination.practice,
-        learningTabIndex => _RoleTabDestination.learning,
-        4 => _RoleTabDestination.settings,
-        _ => _RoleTabDestination.home,
-      },
-      ProfileRole.student => switch (currentIndex) {
-        1 => _RoleTabDestination.assessment,
-        2 => _RoleTabDestination.room,
-        3 => _RoleTabDestination.practice,
-        learningTabIndex => _RoleTabDestination.learning,
-        4 => _RoleTabDestination.settings,
-        _ => _RoleTabDestination.home,
-      },
-      ProfileRole.teacher => switch (currentIndex) {
-        1 => _RoleTabDestination.classroom,
-        2 => _RoleTabDestination.study,
-        3 => _RoleTabDestination.members,
-        4 => _RoleTabDestination.settings,
-        _ => _RoleTabDestination.home,
-      },
-    };
-
-    return switch (toRole) {
-      ProfileRole.parent => switch (destination) {
-        _RoleTabDestination.assessment => 1,
-        _RoleTabDestination.room || _RoleTabDestination.classroom => 2,
-        _RoleTabDestination.practice => 3,
-        _RoleTabDestination.learning ||
-        _RoleTabDestination.study => learningTabIndex,
-        _RoleTabDestination.settings => 4,
-        _ => 0,
-      },
-      ProfileRole.student => switch (destination) {
-        _RoleTabDestination.assessment => 1,
-        _RoleTabDestination.room || _RoleTabDestination.classroom => 2,
-        _RoleTabDestination.practice => 3,
-        _RoleTabDestination.learning ||
-        _RoleTabDestination.study => learningTabIndex,
-        _RoleTabDestination.settings => 4,
-        _ => 0,
-      },
-      ProfileRole.teacher => switch (destination) {
-        _RoleTabDestination.classroom || _RoleTabDestination.room => 1,
-        _RoleTabDestination.study => 2,
-        _RoleTabDestination.learning => 2,
-        _RoleTabDestination.members => 3,
-        _RoleTabDestination.settings => 4,
-        _ => 0,
-      },
-    };
   }
 
   @override
@@ -264,7 +191,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final headerHeight = 64 + topInset;
             final showHeader =
                 widget.activeRole != ProfileRole.teacher &&
-                navigation.activeTab == 0;
+                navigation.activeTab == DashboardTabId.home;
             final switchableProfiles = widget.profiles
                 .where(
                   (profile) =>
@@ -300,13 +227,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               navigation.activeTab,
               widget.activeRole,
             )) {
-              (0, ProfileRole.teacher) => TeacherHomeSkeleton(
+              (DashboardTabId.home, ProfileRole.teacher) => TeacherHomeSkeleton(
                 profile: widget.activeProfile,
                 bottomPadding: navHeight + 14,
                 onNotificationTap: _openNotifications,
                 hasUnreadNotifications: _notificationBadgeController.hasUnread,
               ),
-              (0, ProfileRole.parent) => ParentHomeSkeleton(
+              (DashboardTabId.home, ProfileRole.parent) => ParentHomeSkeleton(
                 bottomPadding: navHeight + 14,
                 homeHeader: homeHeader,
               ),
@@ -327,83 +254,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ? sessionLoadingContent
                       : RoleTabHost(
                           tabFactory: _tabFactory,
-                          // No ValueKey — profileResetSignal drives selective
-                          // data reload without recreating the widget subtree.
                           profileResetSignal: profileState.profileResetSignal,
-                          activeTab: navigation.activeTab,
-                          selectionRevision: navigation.selectionRevision,
-                          user: widget.user,
-                          profiles: widget.profiles,
-                          activeProfile: widget.activeProfile,
                           activeRole: widget.activeRole,
-                          profileLoadError: widget.profileLoadError,
-                          onRefreshProfiles: widget.onRefreshProfiles,
-                          onActivateProfile: widget.onActivateProfile,
-                          initialGrades: profileState.prefetchedGrades,
-                          gradeService:
-                              widget._gradeService ??
-                              context.read<GradeService>(),
-                          classroomService: _classroomService,
-                          assignmentService: _assignmentService,
-                          examService: _examService,
-                          onLogout: _handleLogout,
-                          onAddProfileFromGames: () {
+                          onSwipeToTab: (tab) {
                             HapticFeedback.selectionClick();
-                            _profileController.requestAddProfile();
-                            setState(() {
-                              _returnToGamesAfterProfileSave = true;
-                            });
-                            _selectTab(roleTabCubit, 4);
-                          },
-                          onProfileSaved: () {
-                            if (!_returnToGamesAfterProfileSave) {
-                              return;
-                            }
-                            setState(() {
-                              _returnToGamesAfterProfileSave = false;
-                            });
-                            _selectTab(roleTabCubit, 3);
-                          },
-                          openAddProfileRequestId:
-                              profileState.openAddProfileRequestId,
-                          onCompleteTeacherProfile: _openTeacherProfileForm,
-                          onOpenClassroomTab: () => _selectTab(
-                            roleTabCubit,
-                            widget.activeRole == ProfileRole.teacher ? 1 : 2,
-                          ),
-                          onOpenGamesTab: () {
-                            HapticFeedback.lightImpact();
-                            _selectTab(roleTabCubit, 3);
-                          },
-                          onOpenLearningTab: () {
-                            HapticFeedback.lightImpact();
-                            _selectTab(roleTabCubit, learningTabIndex);
-                          },
-                          onOpenExercisesTab: () {
-                            HapticFeedback.lightImpact();
-                            _selectTab(roleTabCubit, 2);
-                          },
-                          onOpenProfileMenu: () {
-                            if (switchableProfiles.isEmpty || isMenuOpen) {
-                              return;
-                            }
-                            HapticFeedback.selectionClick();
-                            _profileController.openMenu();
-                          },
-                          onParentAssessmentStateChanged: (hasAssessment) {
-                            _updateParentStreak(hasAssessment ? 4 : 1);
-                          },
-                          bottomPadding: navHeight + 14,
-                          hasUnreadNotifications:
-                              _notificationBadgeController.hasUnread ||
-                              hasMissingChildProfileNotice,
-                          onNotificationTap: _openNotifications,
-                          homeHeader: homeHeader,
-                          showChildProfileDialogOnStart:
-                              widget.showChildProfileDialogOnStart,
-                          onSwipeToTab: (index) {
-                            HapticFeedback.selectionClick();
-                            _selectTab(roleTabCubit, index);
+                            _selectTab(roleTabCubit, tab);
                           },
                           onSwipePositionChanged: (position) {
                             _tabSwipePosition.value = position;
@@ -411,8 +266,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onSwipeInteractionEnded: () {
                             _tabSwipePosition.value = null;
                           },
-                          onChildProfileDialogShown:
-                              widget.onChildProfileDialogShown,
+                          args: DashboardTabArgs(
+                            activeTab: navigation.activeTab,
+                            isActive: true,
+                            activeRefreshTick: 0,
+                            session: DashboardSessionData(
+                              user: widget.user,
+                              profiles: widget.profiles,
+                              activeProfile: widget.activeProfile,
+                              profileLoadError: widget.profileLoadError,
+                              initialGrades: profileState.prefetchedGrades,
+                            ),
+                            services: DashboardTabServices(
+                              gradeService:
+                                  widget._gradeService ??
+                                  context.read<GradeService>(),
+                              classroomService: _classroomService,
+                              assignmentService: _assignmentService,
+                              examService: _examService,
+                            ),
+                            actions: DashboardTabActions(
+                              onRefreshProfiles: widget.onRefreshProfiles,
+                              onActivateProfile: widget.onActivateProfile,
+                              onLogout: _handleLogout,
+                              onProfileSaved: () {},
+                              onCompleteTeacherProfile: _openTeacherProfileForm,
+                              onOpenClassroomTab: () => _selectTab(
+                                roleTabCubit,
+                                widget.activeRole == ProfileRole.teacher
+                                    ? DashboardTabId.classroom
+                                    : DashboardTabId.room,
+                              ),
+                              onOpenGamesTab: () {
+                                HapticFeedback.lightImpact();
+                                _selectTab(roleTabCubit, DashboardTabId.games);
+                              },
+                              onOpenExercisesTab: () {
+                                HapticFeedback.lightImpact();
+                                _selectTab(roleTabCubit, DashboardTabId.study);
+                              },
+                              onOpenProfileMenu: () {
+                                if (switchableProfiles.isEmpty || isMenuOpen) {
+                                  return;
+                                }
+                                HapticFeedback.selectionClick();
+                                _profileController.openMenu();
+                              },
+                              onParentAssessmentStateChanged: (hasAssessment) {
+                                _updateParentStreak(hasAssessment ? 4 : 1);
+                              },
+                              onNotificationTap: _openNotifications,
+                              onChildProfileDialogShown:
+                                  widget.onChildProfileDialogShown,
+                            ),
+                            presentation: DashboardTabPresentation(
+                              openAddProfileRequestId:
+                                  profileState.openAddProfileRequestId,
+                              bottomPadding: navHeight + 14,
+                              hasUnreadNotifications:
+                                  _notificationBadgeController.hasUnread ||
+                                  hasMissingChildProfileNotice,
+                              showChildProfileDialogOnStart:
+                                  widget.showChildProfileDialogOnStart,
+                              homeHeader: homeHeader,
+                            ),
+                          ),
                         ),
                 ),
                 if (widget.isResolvingProfile &&
@@ -461,12 +379,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ignoring: widget.isResolvingProfile,
                       child: DashboardBottomNavigation(
                         bottomInset: bottomInset,
-                        activeIndex: navigation.activeTab,
+                        activeTab: navigation.activeTab,
                         activeRole: widget.activeRole,
                         user: widget.user,
                         swipePosition: _tabSwipePosition,
-                        onTabSelected: (index) {
-                          _selectTab(roleTabCubit, index);
+                        onTabSelected: (tab) {
+                          _selectTab(roleTabCubit, tab);
                         },
                       ),
                     ),

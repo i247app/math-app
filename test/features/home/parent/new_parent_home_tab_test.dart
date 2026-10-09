@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/app/composition/app_dashboard_tab_factory.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -366,24 +368,15 @@ void main() {
           child: MaterialApp(
             theme: AppTheme.light(),
             home: Scaffold(
-              body: NewParentHomeContent(
-                user: null,
-                profiles: const <UserProfile>[],
-                activeProfile: const UserProfile(profileId: 81),
-                isActive: true,
-                activeRefreshTick: 0,
-                initialGrades: const [],
-                gradeService: _GradeService(),
-                examService: _ExamService(false, hasActiveAssessment: true),
-                onRefreshProfiles: _noopAsync,
-                onActivateProfile: _noopActivate,
-                onProfileSaved: _noop,
-                onOpenProfileMenu: _noop,
-                onOpenClassroomTab: _noop,
-                onOpenGamesTab: _noop,
-                onParentAssessmentStateChanged: _noopAssessmentState,
-                bottomPadding: 0,
-                showAssessmentList: true,
+              body: Builder(
+                builder: (context) => const AppDashboardTabFactory().buildTab(
+                  context: context,
+                  role: ProfileRole.parent,
+                  args: _dashboardArgs(
+                    profileId: 81,
+                    examService: _ExamService(false, hasActiveAssessment: true),
+                  ),
+                ),
               ),
             ),
           ),
@@ -407,6 +400,12 @@ void main() {
     expect(attempt.profileId, 81);
     expect(attempt.isResumedAssessment, isTrue);
     expect(find.text('Resume question'), findsOneWidget);
+    expect(attempt.allowQuestionNavigation, isFalse);
+    expect(attempt.showQuestionNavigation, isFalse);
+    attempt.onResultBack!();
+    await tester.pumpAndSettle();
+    expect(find.byType(ExamAttemptScreen), findsNothing);
+    expect(find.byType(NewParentHomeContent), findsOneWidget);
   });
 
   testWidgets(
@@ -422,7 +421,7 @@ void main() {
       });
       final homeService = _RecordingStudentHomeService();
       final examService = _ExamService(false);
-      var activeTab = 0;
+      var activeTab = DashboardTabId.home;
       late StateSetter setActiveTab;
 
       await tester.pumpWidget(
@@ -442,34 +441,39 @@ void main() {
                       args: DashboardTabArgs(
                         activeTab: activeTab,
                         isActive: true,
-                        user: null,
-                        profiles: const [UserProfile(profileId: 77)],
-                        activeProfile: const UserProfile(profileId: 78),
-                        profileLoadError: null,
-                        onRefreshProfiles: _noopAsync,
-                        onActivateProfile: _noopActivate,
-                        initialGrades: const [],
-                        gradeService: _GradeService(),
-                        classroomService: _ClassroomService(),
-                        assignmentService: _ClassroomExerciseService(),
-                        examService: examService,
-                        onLogout: _noop,
-                        onAddProfileFromGames: _noop,
-                        onProfileSaved: _noop,
-                        openAddProfileRequestId: 0,
-                        onCompleteTeacherProfile: _noopAsync,
-                        onOpenClassroomTab: _noop,
-                        onOpenGamesTab: _noop,
-                        onOpenLearningTab: () =>
-                            setTabState(() => activeTab = 5),
-                        onOpenExercisesTab: _noop,
-                        onOpenProfileMenu: _noop,
-                        onParentAssessmentStateChanged: _noopAssessmentState,
                         activeRefreshTick: 0,
-                        bottomPadding: 0,
-                        hasUnreadNotifications: false,
-                        onNotificationTap: _noop,
-                        showChildProfileDialogOnStart: true,
+                        session: const DashboardSessionData(
+                          user: null,
+                          profiles: [UserProfile(profileId: 77)],
+                          activeProfile: UserProfile(profileId: 78),
+                          profileLoadError: null,
+                          initialGrades: [],
+                        ),
+                        services: DashboardTabServices(
+                          gradeService: _GradeService(),
+                          classroomService: _ClassroomService(),
+                          assignmentService: _ClassroomExerciseService(),
+                          examService: examService,
+                        ),
+                        actions: const DashboardTabActions(
+                          onRefreshProfiles: _noopAsync,
+                          onActivateProfile: _noopActivate,
+                          onLogout: _noop,
+                          onProfileSaved: _noop,
+                          onCompleteTeacherProfile: _noopAsync,
+                          onOpenClassroomTab: _noop,
+                          onOpenGamesTab: _noop,
+                          onOpenExercisesTab: _noop,
+                          onOpenProfileMenu: _noop,
+                          onParentAssessmentStateChanged: _noopAssessmentState,
+                          onNotificationTap: _noop,
+                        ),
+                        presentation: const DashboardTabPresentation(
+                          openAddProfileRequestId: 0,
+                          bottomPadding: 0,
+                          hasUnreadNotifications: false,
+                          showChildProfileDialogOnStart: true,
+                        ),
                       ),
                     );
                   },
@@ -499,7 +503,7 @@ void main() {
 
       await tester.tap(find.text('Learning & Practice'));
       await tester.pumpAndSettle();
-      expect(activeTab, 0);
+      expect(activeTab, DashboardTabId.home);
       final homeRoadmap = tester.widget<GradeRoadmapScreen>(
         find.byType(GradeRoadmapScreen),
       );
@@ -507,7 +511,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
       await tester.pumpAndSettle();
 
-      setActiveTab(() => activeTab = 5);
+      setActiveTab(() => activeTab = DashboardTabId.learning);
       await tester.pumpAndSettle();
       expect(find.byType(NewStudentHomeContent), findsOneWidget);
       expect(find.byType(PageHeader), findsOneWidget);
@@ -539,7 +543,7 @@ void main() {
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
     for (final hasAssessment in [false, true]) {
-      for (final tabIndex in [0, 5]) {
+      for (final tabIndex in [DashboardTabId.home, DashboardTabId.learning]) {
         testWidgets(
           '$role tab $tabIndex opens intro with history=$hasAssessment',
           (tester) async {
@@ -573,40 +577,48 @@ void main() {
                               args: DashboardTabArgs(
                                 activeTab: tabIndex,
                                 isActive: true,
-                                user: const LoginUser(id: 271),
-                                profiles: const [],
-                                activeProfile: UserProfile(
-                                  profileId: profileId,
-                                  role: role == ProfileRole.parent
-                                      ? 'PARENT'
-                                      : 'STUDENT',
-                                ),
-                                profileLoadError: null,
-                                onRefreshProfiles: _noopAsync,
-                                onActivateProfile: _noopActivate,
-                                initialGrades: const [],
-                                gradeService: _GradeService(),
-                                classroomService: _ClassroomService(),
-                                assignmentService: _ClassroomExerciseService(),
-                                examService: examService,
-                                onLogout: _noop,
-                                onAddProfileFromGames: _noop,
-                                onProfileSaved: _noop,
-                                openAddProfileRequestId: 0,
-                                onCompleteTeacherProfile: _noopAsync,
-                                onOpenClassroomTab: _noop,
-                                onOpenGamesTab: _noop,
-                                onOpenLearningTab: _noop,
-                                onOpenExercisesTab: _noop,
-                                onOpenProfileMenu: _noop,
-                                onParentAssessmentStateChanged:
-                                    _noopAssessmentState,
                                 activeRefreshTick: 0,
-                                bottomPadding: 0,
-                                hasUnreadNotifications: false,
-                                onNotificationTap: _noop,
-                                showChildProfileDialogOnStart:
-                                    role == ProfileRole.parent && tabIndex == 0,
+                                session: DashboardSessionData(
+                                  user: const LoginUser(id: 271),
+                                  profiles: const [],
+                                  activeProfile: UserProfile(
+                                    profileId: profileId,
+                                    role: role == ProfileRole.parent
+                                        ? 'PARENT'
+                                        : 'STUDENT',
+                                  ),
+                                  profileLoadError: null,
+                                  initialGrades: [],
+                                ),
+                                services: DashboardTabServices(
+                                  gradeService: _GradeService(),
+                                  classroomService: _ClassroomService(),
+                                  assignmentService:
+                                      _ClassroomExerciseService(),
+                                  examService: examService,
+                                ),
+                                actions: const DashboardTabActions(
+                                  onRefreshProfiles: _noopAsync,
+                                  onActivateProfile: _noopActivate,
+                                  onLogout: _noop,
+                                  onProfileSaved: _noop,
+                                  onCompleteTeacherProfile: _noopAsync,
+                                  onOpenClassroomTab: _noop,
+                                  onOpenGamesTab: _noop,
+                                  onOpenExercisesTab: _noop,
+                                  onOpenProfileMenu: _noop,
+                                  onParentAssessmentStateChanged:
+                                      _noopAssessmentState,
+                                  onNotificationTap: _noop,
+                                ),
+                                presentation: DashboardTabPresentation(
+                                  openAddProfileRequestId: 0,
+                                  bottomPadding: 0,
+                                  hasUnreadNotifications: false,
+                                  showChildProfileDialogOnStart:
+                                      role == ProfileRole.parent &&
+                                      tabIndex == DashboardTabId.home,
+                                ),
                               ),
                             ),
                       ),
@@ -617,7 +629,7 @@ void main() {
             );
             await tester.pumpAndSettle();
 
-            if (role == ProfileRole.parent && tabIndex == 0) {
+            if (role == ProfileRole.parent && tabIndex == DashboardTabId.home) {
               expect(
                 tester
                     .widget<NewParentHomeContent>(
@@ -866,3 +878,44 @@ class _ClassroomExerciseService implements ClassroomExerciseService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
+
+DashboardTabArgs _dashboardArgs({
+  required int profileId,
+  required ExamService examService,
+}) => DashboardTabArgs(
+  activeTab: DashboardTabId.learning,
+  isActive: true,
+  activeRefreshTick: 0,
+  session: DashboardSessionData(
+    user: null,
+    profiles: const [],
+    activeProfile: UserProfile(profileId: profileId),
+    profileLoadError: null,
+    initialGrades: const [],
+  ),
+  services: DashboardTabServices(
+    gradeService: _GradeService(),
+    classroomService: _ClassroomService(),
+    assignmentService: _ClassroomExerciseService(),
+    examService: examService,
+  ),
+  actions: const DashboardTabActions(
+    onRefreshProfiles: _noopAsync,
+    onActivateProfile: _noopActivate,
+    onLogout: _noop,
+    onProfileSaved: _noop,
+    onCompleteTeacherProfile: _noopAsync,
+    onOpenClassroomTab: _noop,
+    onOpenGamesTab: _noop,
+    onOpenExercisesTab: _noop,
+    onOpenProfileMenu: _noop,
+    onParentAssessmentStateChanged: _noopAssessmentState,
+    onNotificationTap: _noop,
+  ),
+  presentation: const DashboardTabPresentation(
+    openAddProfileRequestId: 0,
+    bottomPadding: 0,
+    hasUnreadNotifications: false,
+    showChildProfileDialogOnStart: false,
+  ),
+);

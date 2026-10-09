@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -9,7 +10,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_empty_panel.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_section_title.dart';
 import 'package:numi/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart';
-import 'package:numi/features/classroom_exercise/screens/student_classroom_exercise_attempt_screen.dart';
+import 'package:numi/features/classroom_exercise/navigation/classroom_exercise_navigator.dart';
 import 'package:numi/features/classroom_exercise/helpers/student_classroom_exercise_open_guard.dart';
 
 class StudentClassUpcomingDeadlineSection extends StatelessWidget {
@@ -99,14 +100,11 @@ class StudentClassUpcomingDeadlineSection extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => StudentClassroomExerciseAttemptScreen(
-          exerciseId: exerciseId,
-          profileId: profileId,
-          initialExercise: exercise,
-        ),
-      ),
+    context.read<ClassroomExerciseNavigator>().openStudentAttempt(
+      context: context,
+      exerciseId: exerciseId,
+      profileId: profileId,
+      initialExercise: exercise,
     );
   }
 

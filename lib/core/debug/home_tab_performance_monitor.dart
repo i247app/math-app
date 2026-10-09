@@ -18,8 +18,8 @@ class HomeTabPerformanceMonitor {
 
   void beginTabSwitch({
     required String role,
-    required int fromTab,
-    required int toTab,
+    required String fromTab,
+    required String toTab,
   }) {
     if ((!kDebugMode && !kProfileMode) || fromTab == toTab) {
       return;
@@ -101,6 +101,6 @@ class _PendingTabSwitch {
   });
 
   final String role;
-  final int fromTab;
-  final int toTab;
+  final String fromTab;
+  final String toTab;
 }

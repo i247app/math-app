@@ -1,13 +1,13 @@
 part of '../dashboard_screen.dart';
 
 extension _DashboardActions on _DashboardScreenState {
-  void _selectTab(RoleTabCubit cubit, int index) {
+  void _selectTab(RoleTabCubit cubit, DashboardTabId tab) {
     _tabPerformanceMonitor.beginTabSwitch(
       role: widget.activeRole.name,
-      fromTab: cubit.state.activeTab,
-      toTab: index,
+      fromTab: cubit.state.activeTab.name,
+      toTab: tab.name,
     );
-    cubit.selectTab(index);
+    cubit.selectTab(tab);
   }
 
   void _updateParentStreak(int nextCount) {
@@ -37,7 +37,7 @@ extension _DashboardActions on _DashboardScreenState {
     }
     HapticFeedback.selectionClick();
     _profileController.requestAddProfile();
-    _selectTab(_roleTabCubitFor(widget.activeRole), 4);
+    _selectTab(_roleTabCubitFor(widget.activeRole), DashboardTabId.settings);
   }
 
   void _handleLogout() {

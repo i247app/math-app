@@ -3,7 +3,9 @@ part of '../role_tab_host.dart';
 extension _RoleTabHostGestures on RoleTabHostState {
   void _handleHorizontalDragStart(DragStartDetails details) {
     if (_tabTransitionController.isAnimating ||
-        !visibleDashboardTabs(widget.activeRole).contains(widget.activeTab)) {
+        !visibleDashboardTabs(
+          widget.activeRole,
+        ).contains(widget.args.activeTab)) {
       return;
     }
     _isDragging = true;
@@ -17,7 +19,7 @@ extension _RoleTabHostGestures on RoleTabHostState {
     }
 
     final visibleTabs = visibleDashboardTabs(widget.activeRole);
-    final activePosition = visibleTabs.indexOf(widget.activeTab);
+    final activePosition = visibleTabs.indexOf(widget.args.activeTab);
     var nextOffset = _dragOffset + details.delta.dx / _dragWidth;
     final isAtStartBoundary = activePosition == 0 && nextOffset > 0;
     final isAtEndBoundary =
@@ -32,7 +34,7 @@ extension _RoleTabHostGestures on RoleTabHostState {
         ? null
         : adjacentVisibleTab(
             widget.activeRole,
-            widget.activeTab,
+            widget.args.activeTab,
             forward: nextOffset < 0,
           );
 
@@ -78,7 +80,7 @@ extension _RoleTabHostGestures on RoleTabHostState {
       _dragCompletesSelection = completesSelection;
       _dragSettleStartProgress = progress;
       if (neighbor != null) {
-        _transitionFromTab = widget.activeTab;
+        _transitionFromTab = widget.args.activeTab;
         _transitionToTab = neighbor;
       }
     });

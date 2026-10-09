@@ -28,6 +28,18 @@ Other features follow the same layout. Create a folder only when it is needed;
 small features do not need every folder. Related widgets or screen parts can
 stay together in a subfolder. Navigation contracts belong in `navigation/`.
 
+Dashboard destinations use `DashboardTabId`; role support, visible order and
+role-change mapping live in `dashboard_tab_order.dart`. Numeric positions are
+only presentation coordinates or compatibility values for existing widget keys.
+The tab host receives grouped session, services, actions and presentation inputs.
+
+For a flow opened from another feature, expose a callback or a destination-owned
+navigation interface and build concrete routes in `app/composition/`. Home and
+Room use callbacks; Classroom uses `ClassroomExerciseNavigator`, provided above
+the application Navigator. Keep result handling, refresh and guards in the
+calling feature. Stable feature models and service interfaces may be reused
+where their ownership is clear; they do not need copies in a shared folder.
+
 - Use `classroom_exercise` for file/folder names and `ClassroomExercise` in type
   names. Use `student_` and `teacher_` when the two roles have different flows.
 - Keep state and request handling in controllers; screens handle rendering,

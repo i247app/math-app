@@ -20,9 +20,6 @@ import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
-import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
-import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/home/models/parent/parent_child_summary.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
@@ -68,6 +65,8 @@ class NewParentHomeContent extends StatefulWidget {
     this.onOpenExamReview,
     this.onOpenLearningTab,
     this.onCreateStudentProfile,
+    this.onOpenGradeRoadmap,
+    this.onResumeAssessment,
     this.showAssessmentList = false,
   });
 
@@ -91,6 +90,9 @@ class NewParentHomeContent extends StatefulWidget {
   final VoidCallback? onChildProfileDialogShown;
   final Widget? homeHeader;
   final bool useActiveStudentProfileData;
+  final Future<void> Function(BuildContext context)? onOpenGradeRoadmap;
+  final Future<void> Function(BuildContext context, GeneratedExam exam)?
+  onResumeAssessment;
   final Future<void> Function(BuildContext context)? onOpenAssessment;
   final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?

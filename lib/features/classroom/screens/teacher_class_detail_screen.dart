@@ -15,7 +15,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/controllers/classroom_cubit.dart';
 import 'package:numi/features/classroom/controllers/classroom_state.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
-import 'package:numi/features/classroom_exercise/screens/teacher_classroom_exercise_screen.dart';
+import 'package:numi/features/classroom_exercise/navigation/classroom_exercise_navigator.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/profile/data/school_service.dart';
@@ -211,30 +211,21 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   }
 
   void _openClassroomExercise(ClassroomModel? classroom) {
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => TeacherClassroomExerciseScreen(
-          classroomId: widget.classroomId,
-          profileId: widget.profileId,
-          userId: widget.userId,
-          initialClassroom: classroom,
-          purpose: classroomExercisePurposeHomework,
-        ),
-      ),
-    );
+    _openExercises(classroom, classroomExercisePurposeHomework);
   }
 
   void _openAssessment(ClassroomModel? classroom) {
-    Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => TeacherClassroomExerciseScreen(
-          classroomId: widget.classroomId,
-          profileId: widget.profileId,
-          userId: widget.userId,
-          initialClassroom: classroom,
-          purpose: classroomExercisePurposeExam,
-        ),
-      ),
+    _openExercises(classroom, classroomExercisePurposeExam);
+  }
+
+  void _openExercises(ClassroomModel? classroom, String purpose) {
+    context.read<ClassroomExerciseNavigator>().openTeacherExercises(
+      context: context,
+      classroomId: widget.classroomId,
+      profileId: widget.profileId,
+      userId: widget.userId,
+      initialClassroom: classroom,
+      purpose: purpose,
     );
   }
 
