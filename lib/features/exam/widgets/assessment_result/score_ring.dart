@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/exam/helpers/score_number.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 class AssessmentScoreRing extends StatelessWidget {
@@ -20,7 +19,9 @@ class AssessmentScoreRing extends StatelessWidget {
         : scoreText.substring(0, slashIndex);
     return ScoreDisplayRing(
       scoreText: scoreText,
-      progress: (scoreNumber(scoreValue) / 10).clamp(0, 1).toDouble(),
+      progress: ((double.tryParse(scoreValue.trim()) ?? 0) / 10)
+          .clamp(0, 1)
+          .toDouble(),
       ringColor: accentColor,
       scoreColor: accentColor,
     );

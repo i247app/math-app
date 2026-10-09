@@ -3,22 +3,14 @@ import '../app_keys.dart';
 const authStrings = <String, Map<String, String>>{
   'vi': {
     AppKeys.signingUp: 'Đang đăng ký...',
-    AppKeys.phoneLoginTitle: 'Số điện thoại',
-    AppKeys.phoneLoginBrandName: 'NUMINUMI',
-    AppKeys.phoneLoginSubtitle:
-        'Nhập số điện thoại để\nđăng ký hoặc đăng nhập !',
-    AppKeys.phoneNumberUpper: 'SỐ ĐIỆN THOẠI',
     AppKeys.phoneHint: 'Nhập số điện thoại',
     AppKeys.loginNameHint: 'Số điện thoại hoặc email',
     AppKeys.chooseCountry: 'Chọn quốc gia',
-    AppKeys.creatingAccount: 'Đang tạo tài khoản...',
-    AppKeys.checking: 'Đang kiểm tra...',
     AppKeys.phoneRequired: 'Vui lòng nhập số điện thoại.',
     AppKeys.invalidPhone: 'Số điện thoại chưa hợp lệ.',
     AppKeys.invalidEmail: 'Email chưa hợp lệ.',
     AppKeys.phoneTooShort: 'Số điện thoại chưa đủ ký tự.',
     AppKeys.restoringSession: 'Đang kiểm tra phiên đăng nhập...',
-    AppKeys.newAccountPrompt: 'Đây là tài khoản MỚI. Tiếp tục đăng ký?',
     AppKeys.signup: 'Đăng ký',
     AppKeys.login: 'Đăng nhập',
     AppKeys.loginWithPin: 'Đăng nhập bằng PIN',
@@ -33,18 +25,14 @@ const authStrings = <String, Map<String, String>>{
         'Không tìm thấy thiết bị đã xác minh cho tài khoản này.',
     AppKeys.trustedDeviceLoadFailed:
         'Không thể tải danh sách thiết bị. Vui lòng thử lại.',
-    AppKeys.otpWithin30Seconds: 'Bạn sẽ nhận được mã trong vòng 30 giây',
-    AppKeys.otpTitle: 'MÃ XÁC NHẬN',
     AppKeys.otpConfirming: 'Đang xác thực...',
     AppKeys.otpConfirm: 'Xác nhận',
     AppKeys.resendOtp: 'Gửi lại mã',
     AppKeys.resendOtpAfter: 'Gửi lại mã sau {seconds} giây',
     AppKeys.signupNameHint: 'vd: quoc, quyen',
-    AppKeys.signupEmailHint: 'numisilly@gmail.com',
     AppKeys.signupNameLabel: 'Tên',
     AppKeys.signupNameInvalid: 'Tên chỉ được gồm chữ, số và khoảng trắng.',
     AppKeys.signupUsernameExists: 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
-    AppKeys.signupEmailLabel: 'Email',
     AppKeys.signupRoleLabel: 'Bạn là',
     AppKeys.signupRoleStudent: 'Học Sinh',
     AppKeys.signupRoleParent: 'Phụ huynh',
@@ -62,8 +50,6 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabelMother: 'Tên Mẹ',
     AppKeys.signupNameLabelTeacherMale: 'Tên Thầy',
     AppKeys.signupNameLabelTeacherFemale: 'Tên Cô',
-    AppKeys.signupEmailDescription:
-        'Nhập email để theo dõi kết quả kiểm tra và hành\ntrình học tập của bé',
     AppKeys.signupTermsPrivacyPrefix: 'Tôi đồng ý với Điều khoản sử dụng và',
     AppKeys.signupPrivacyPolicyLabel: 'Chính sách bảo mật',
     AppKeys.signupPrivacyPolicyOpenFailed: 'Không thể mở Chính sách bảo mật.',
@@ -72,8 +58,6 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.phoneNumber: 'Số Điện Thoại',
     AppKeys.authPhoneCheckFailed: 'Không thể kiểm tra số điện thoại.',
     AppKeys.authLoginNameCheckFailed: 'Không thể kiểm tra tài khoản.',
-    AppKeys.loginPhoneNotRegistered:
-        'Số điện thoại này chưa có tài khoản. Vui lòng đăng ký.',
     AppKeys.loginNameNotRegistered:
         'Số điện thoại hoặc email này chưa có tài khoản. Vui lòng đăng ký.',
     AppKeys.signupPhoneAlreadyRegistered:
@@ -94,22 +78,14 @@ const authStrings = <String, Map<String, String>>{
   },
   'en': {
     AppKeys.signingUp: 'Signing up...',
-    AppKeys.phoneLoginTitle: 'Phone number',
-    AppKeys.phoneLoginBrandName: 'NUMINUMI',
-    AppKeys.phoneLoginSubtitle:
-        'Enter your phone number to\nsign up or log in!',
-    AppKeys.phoneNumberUpper: 'PHONE NUMBER',
     AppKeys.phoneHint: 'Enter phone number',
     AppKeys.loginNameHint: 'Phone number or email',
     AppKeys.chooseCountry: 'Choose country',
-    AppKeys.creatingAccount: 'Creating account...',
-    AppKeys.checking: 'Checking...',
     AppKeys.phoneRequired: 'Please enter a phone number.',
     AppKeys.invalidPhone: 'The phone number is invalid.',
     AppKeys.invalidEmail: 'The email address is invalid.',
     AppKeys.phoneTooShort: 'The phone number is too short.',
     AppKeys.restoringSession: 'Checking login session...',
-    AppKeys.newAccountPrompt: 'This is a NEW account. Continue to sign up?',
     AppKeys.signup: 'Sign up',
     AppKeys.login: 'Login',
     AppKeys.loginWithPin: 'Login with PIN',
@@ -124,20 +100,16 @@ const authStrings = <String, Map<String, String>>{
         'No verified devices were found for this account.',
     AppKeys.trustedDeviceLoadFailed:
         'Could not load trusted devices. Please try again.',
-    AppKeys.otpWithin30Seconds: 'You will receive a code within 30 seconds',
-    AppKeys.otpTitle: 'VERIFICATION CODE',
     AppKeys.otpConfirming: 'Verifying...',
     AppKeys.otpConfirm: 'Confirm',
     AppKeys.resendOtp: 'Resend code',
     AppKeys.resendOtpAfter: 'Resend code in {seconds}s',
     AppKeys.signupNameHint: 'ex: quoc, quyen',
-    AppKeys.signupEmailHint: 'numisilly@gmail.com',
     AppKeys.signupNameLabel: 'First Name',
     AppKeys.signupNameInvalid:
         'First name can only include letters, numbers, and spaces.',
     AppKeys.signupUsernameExists:
         'This name already exists. Please choose another name.',
-    AppKeys.signupEmailLabel: 'Email',
     AppKeys.signupRoleLabel: 'You are',
     AppKeys.signupRoleStudent: 'Student',
     AppKeys.signupRoleParent: 'Parent',
@@ -155,8 +127,6 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.signupNameLabelMother: "Mother's First Name",
     AppKeys.signupNameLabelTeacherMale: "Teacher's First Name",
     AppKeys.signupNameLabelTeacherFemale: "Teacher's First Name",
-    AppKeys.signupEmailDescription:
-        "Enter an email to follow your child's assessment results\nand learning journey",
     AppKeys.signupTermsPrivacyPrefix: 'I agree to the Terms of Use and',
     AppKeys.signupPrivacyPolicyLabel: 'Privacy Policy',
     AppKeys.signupPrivacyPolicyOpenFailed: 'Could not open the Privacy Policy.',
@@ -165,8 +135,6 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.phoneNumber: 'Phone Number',
     AppKeys.authPhoneCheckFailed: 'Could not check this phone number.',
     AppKeys.authLoginNameCheckFailed: 'Could not check this account.',
-    AppKeys.loginPhoneNotRegistered:
-        'This phone number does not have an account. Please sign up.',
     AppKeys.loginNameNotRegistered:
         'This phone number or email does not have an account. Please sign up.',
     AppKeys.signupPhoneAlreadyRegistered:

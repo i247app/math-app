@@ -1,7 +1,5 @@
 import 'package:numi/core/helpers/api_date_time.dart';
-
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/helpers/two_digits.dart';
 
 String examReviewTimeLabel(GeneratedExam exam) {
   final parsed = tryParseApiDateTime(
@@ -10,5 +8,7 @@ String examReviewTimeLabel(GeneratedExam exam) {
   if (parsed == null) {
     return '--:--';
   }
-  return '${twoDigits(parsed.hour)}:${twoDigits(parsed.minute)}';
+  return '${_twoDigits(parsed.hour)}:${_twoDigits(parsed.minute)}';
 }
+
+String _twoDigits(int value) => value.toString().padLeft(2, '0');

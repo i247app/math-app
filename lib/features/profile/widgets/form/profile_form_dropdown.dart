@@ -7,7 +7,6 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_field_shell.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_keyboard.dart';
-import 'package:numi/features/profile/widgets/form/profile_form_select_result.dart';
 import 'package:numi/shared/widgets/option_bottom_sheet_shell.dart';
 
 class ProfileFormDropdown<T> extends StatelessWidget {
@@ -86,7 +85,7 @@ class ProfileFormDropdown<T> extends StatelessWidget {
 
   Future<void> _openBottomSheet(BuildContext context, T? selectedValue) async {
     dismissProfileFormKeyboard();
-    final result = await showModalBottomSheet<ProfileFormSelectResult<T>>(
+    final result = await showModalBottomSheet<_ProfileFormSelectResult<T>>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
@@ -143,7 +142,7 @@ class ProfileFormDropdown<T> extends StatelessWidget {
                       dismissProfileFormKeyboard();
                       Navigator.of(
                         context,
-                      ).pop(ProfileFormSelectResult<T>(item));
+                      ).pop(_ProfileFormSelectResult<T>(item));
                     },
                   ),
                 );
@@ -165,4 +164,10 @@ class ProfileFormDropdown<T> extends StatelessWidget {
       });
     }
   }
+}
+
+class _ProfileFormSelectResult<T> {
+  const _ProfileFormSelectResult(this.value);
+
+  final T? value;
 }

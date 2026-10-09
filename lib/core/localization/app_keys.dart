@@ -7,12 +7,8 @@ class AppKeys {
   static const retry = 'retry';
   static const retryUpper = 'retry_upper';
   static const accept = 'accept';
-  static const reject = 'reject';
   static const delete = 'delete';
-  static const update = 'update';
-  static const add = 'add';
   static const back = 'back';
-  static const skipUpper = 'skip_upper';
   static const continueUpper = 'continue_upper';
   static const attemptExitTitle = 'attempt_exit_title';
   static const attemptExitMessage = 'attempt_exit_message';
@@ -27,35 +23,23 @@ class AppKeys {
   static const discardChangesUpper = 'discard_changes_upper';
   static const language = 'language';
   static const languageTitle = 'language_title';
-  static const languageMenuSubtitle = 'language_menu_subtitle';
   static const languageVietnamese = 'language_vietnamese';
   static const languageEnglish = 'language_english';
 
-  static const welcomeTitlePrefix = 'welcome_title_prefix';
-  static const welcomeTitleN = 'welcome_title_n';
-  static const welcomeSubtitlePrefix = 'welcome_subtitle_prefix';
-  static const welcomeSubtitle = 'welcome_subtitle';
   static const start = 'start';
   static const welcomeLogin = 'welcome_login';
   static const welcomeSignup = 'welcome_signup';
   static const welcomeTryIt = 'welcome_try_it';
 
-  static const phoneLoginTitle = 'phone_login_title';
-  static const phoneLoginBrandName = 'phone_login_brand_name';
-  static const phoneLoginSubtitle = 'phone_login_subtitle';
-  static const phoneNumberUpper = 'phone_number_upper';
   static const phoneHint = 'phone_hint';
   static const loginNameHint = 'login_name_hint';
   static const chooseCountry = 'choose_country';
   static const continueLabel = 'continue';
-  static const creatingAccount = 'creating_account';
-  static const checking = 'checking';
   static const phoneRequired = 'phone_required';
   static const invalidPhone = 'invalid_phone';
   static const invalidEmail = 'invalid_email';
   static const phoneTooShort = 'phone_too_short';
   static const restoringSession = 'restoring_session';
-  static const newAccountPrompt = 'new_account_prompt';
   static const signup = 'signup';
   static const login = 'login';
   static const loginWithPin = 'login_with_pin';
@@ -67,18 +51,14 @@ class AppKeys {
   static const trustedDeviceSending = 'trusted_device_sending';
   static const trustedDeviceEmpty = 'trusted_device_empty';
   static const trustedDeviceLoadFailed = 'trusted_device_load_failed';
-  static const otpWithin30Seconds = 'otp_within_30_seconds';
-  static const otpTitle = 'otp_title';
   static const otpConfirming = 'otp_confirming';
   static const otpConfirm = 'otp_confirm';
   static const resendOtp = 'resend_otp';
   static const resendOtpAfter = 'resend_otp_after';
   static const signupNameHint = 'signup_name_hint';
-  static const signupEmailHint = 'signup_email_hint';
   static const signupNameLabel = 'signup_name_label';
   static const signupNameInvalid = 'signup_name_invalid';
   static const signupUsernameExists = 'signup_username_exists';
-  static const signupEmailLabel = 'signup_email_label';
   static const signupRoleLabel = 'signup_role_label';
   static const signupRoleStudent = 'signup_role_student';
   static const signupRoleParent = 'signup_role_parent';
@@ -97,31 +77,22 @@ class AppKeys {
   static const signupNameLabelTeacherMale = 'signup_name_label_teacher_male';
   static const signupNameLabelTeacherFemale =
       'signup_name_label_teacher_female';
-  static const signupEmailDescription = 'signup_email_description';
   static const signupTermsPrivacyPrefix = 'signup_terms_privacy_prefix';
   static const signupPrivacyPolicyLabel = 'signup_privacy_policy_label';
   static const signupPrivacyPolicyOpenFailed =
       'signup_privacy_policy_open_failed';
   static const signupInformationAccuracy = 'signup_information_accuracy';
-  static const avatarUpper = 'avatar_upper';
   static const chooseAvatar = 'choose_avatar';
   static const signingUp = 'signing_up';
 
   static const navHome = 'nav_home';
   static const navClassroom = 'nav_classroom';
-  static const navClassroomExercise = 'nav_homework';
   static const navStudy = 'nav_study';
   static const navMembers = 'nav_members';
-  static const navReview = 'nav_review';
-  static const navAssessment = 'nav_assessment';
   static const navLearning = 'nav_learning';
   static const learningTabTitle = 'learning_tab_title';
-  static const navRoom = 'nav_room';
-  static const navProgram = 'nav_program';
   static const navGames = 'nav_games';
   static const parentAssessmentTabTitle = 'parent_assessment_tab_title';
-  static const navHistory = 'nav_history';
-  static const navReport = 'nav_report';
   static const navSettings = 'nav_settings';
 
   static const notificationTitle = 'notification_title';
@@ -140,14 +111,6 @@ class AppKeys {
 
   static const student = 'student';
   static const assessment = 'assessment';
-  static const assessmentDescription = 'assessment_description';
-  static const startNow = 'start_now';
-  static const practice = 'practice';
-  static const homeHeroTitle = 'home_hero_title';
-  static const homeHeroSubtitle = 'home_hero_subtitle';
-  static const homeHeroTextbookLabel = 'home_hero_textbook_label';
-  static const homeHeroPrompt = 'home_hero_prompt';
-  static const homeHeroAssessment = 'home_hero_assessment';
   static const newHomeAssessmentTest = 'new_home_assessment_test';
   static const newHomeLearningPractice = 'new_home_learning_practice';
   static const newHomeChartLevel = 'new_home_chart_level';
@@ -169,7 +132,6 @@ class AppKeys {
   static const learningProgressAllAssessments =
       'learning_progress_all_assessments';
   static const learningProgressFilterTime = 'learning_progress_filter_time';
-  static const learningProgressFilter = 'learning_progress_filter';
   static const learningProgressTestLegend = 'learning_progress_test_legend';
   static const learningProgressTestLabel = 'learning_progress_test_label';
   static const learningProgressScoreTitle = 'learning_progress_score_title';
@@ -206,8 +168,6 @@ class AppKeys {
   static const parentNoTeacher = 'parent_no_teacher';
   static const parentChildDashboardLoadFailed =
       'parent_child_dashboard_load_failed';
-  static const parentTeacherFeedback = 'parent_teacher_feedback';
-  static const parentTeacherReminder = 'parent_teacher_reminder';
   static const parentTasksTitle = 'parent_tasks_title';
   static const parentTasksCountTitle = 'parent_tasks_count_title';
   static const parentMessagesTitle = 'parent_messages_title';
@@ -218,17 +178,12 @@ class AppKeys {
   static const parentWeekdayThu = 'parent_weekday_thu';
   static const parentWeekdayFri = 'parent_weekday_fri';
   static const parentWeekdaySat = 'parent_weekday_sat';
-  static const yourAchievement = 'your_achievement';
   static const studentClassroomExercise = 'student_homework';
   static const studentClassroom = 'student_classroom';
   static const homeMessageTeacherOne = 'home_message_teacher_one';
   static const homeMessageTeacherTwo = 'home_message_teacher_two';
-  static const homeMessageClassOne = 'home_message_class_one';
-  static const homeMessageClassTwo = 'home_message_class_two';
   static const homeMessageTimeOne = 'home_message_time_one';
   static const homeMessageTimeTwo = 'home_message_time_two';
-  static const homeMessageStudentOne = 'home_message_student_one';
-  static const homeMessageStudentTwo = 'home_message_student_two';
   static const homeMessageBodyOne = 'home_message_body_one';
   static const homeMessageBodyTwo = 'home_message_body_two';
   static const parentMessagesGroupPreview = 'parent_messages_group_preview';
@@ -247,21 +202,15 @@ class AppKeys {
   static const parentMessagesBodyFour = 'parent_messages_body_four';
   static const parentMessagesTimeThree = 'parent_messages_time_three';
   static const parentMessagesTimeFour = 'parent_messages_time_four';
-  static const studentNoClassroomExerciseTitle = 'student_no_homework_title';
   static const studentNoClassroomExerciseMessage =
       'student_no_homework_message';
-  static const studentNoClassroomsTitle = 'student_no_classrooms_title';
-  static const studentNoClassroomsMessage = 'student_no_classrooms_message';
-  static const studentJoinNewClassroom = 'student_join_new_classroom';
   static const studentJoinAnotherClassroom = 'student_join_another_classroom';
   static const studentJoinClassroom = 'student_join_classroom';
-  static const studentJoinClassroomSoon = 'student_join_classroom_soon';
   static const studentClassroomLoadFailed = 'student_classroom_load_failed';
   static const studentMissingProfileId = 'student_missing_profile_id';
   static const studentClassCodeHint = 'student_class_code_hint';
   static const studentSearchClass = 'student_search_class';
   static const studentSearchResults = 'student_search_results';
-  static const studentDefaultSchoolFilter = 'student_default_school_filter';
   static const studentGradeFilter = 'student_grade_filter';
   static const studentClassSearchFailed = 'student_class_search_failed';
   static const studentClassSearchLoading = 'student_class_search_loading';
@@ -276,7 +225,6 @@ class AppKeys {
   static const studentEnterClassCodeMessage =
       'student_enter_class_code_message';
   static const studentClassMissingCode = 'student_class_missing_code';
-  static const studentJoinClassSuccess = 'student_join_class_success';
   static const studentJoinClassFailed = 'student_join_class_failed';
   static const studentAlreadyJoinedClass = 'student_already_joined_class';
   static const studentClassJoinRequestPending =
@@ -289,36 +237,18 @@ class AppKeys {
   static const studentClassRelationshipPendingRequest =
       'student_class_relationship_pending_request';
   static const studentClassRelationshipNone = 'student_class_relationship_none';
-  static const studentClassInvitations = 'student_class_invitations';
-  static const studentViewAllInvitations = 'student_view_all_invitations';
-  static const studentViewAllClassrooms = 'student_view_all_classrooms';
-  static const studentNoInvitationsTitle = 'student_no_invitations_title';
-  static const studentNoInvitationsMessage = 'student_no_invitations_message';
   static const parentNoStudentTitle = 'parent_no_student_title';
   static const parentNoStudentMessage = 'parent_no_student_message';
   static const parentCreateStudentNow = 'parent_create_student_now';
   static const parentCreateStudentLater = 'parent_create_student_later';
   static const parentSelectStudentMessage = 'parent_select_student_message';
   static const parentCreateStudent = 'parent_create_student';
-  static const parentSwitchStudentTitle = 'parent_switch_student_title';
-  static const parentSwitchStudentMessage = 'parent_switch_student_message';
   static const parentSwitchStudentAction = 'parent_switch_student_action';
-  static const studentInviteSubtitle = 'student_invite_subtitle';
-  static const studentInviteSubtitleFallback =
-      'student_invite_subtitle_fallback';
-  static const studentInvitationLoadFailed = 'student_invitation_load_failed';
-  static const studentInvitationAcceptSuccess =
-      'student_invitation_accept_success';
-  static const studentInvitationRejectSuccess =
-      'student_invitation_reject_success';
-  static const studentJoinClassroomUpper = 'student_join_classroom_upper';
   static const studentClassDetailTitle = 'student_class_detail_title';
   static const studentClassTeacherRole = 'student_class_teacher_role';
   static const studentClassLearningCategories =
       'student_class_learning_categories';
   static const studentClassAssignments = 'student_class_assignments';
-  static const studentClassAssignmentsSubtitle =
-      'student_class_assignments_subtitle';
   static const studentClassAssignmentsCountFormat =
       'student_class_assignments_count_format';
   static const studentClassExams = 'student_class_exams';
@@ -331,8 +261,6 @@ class AppKeys {
   static const studentClassUpcomingDeadlines =
       'student_class_upcoming_deadlines';
   static const studentClassAll = 'student_class_all';
-  static const studentClassReview15Minutes = 'student_class_review_15_minutes';
-  static const studentClassDeadlineSample = 'student_class_deadline_sample';
   static const studentClassComingSoon = 'student_class_coming_soon';
   static const studentClassroomExerciseSearchHint =
       'student_homework_search_hint';
@@ -340,13 +268,6 @@ class AppKeys {
       'student_homework_not_submitted';
   static const studentClassroomExerciseSubmitted = 'student_homework_submitted';
   static const studentClassroomExerciseOverdue = 'student_homework_overdue';
-  static const studentClassroomExerciseAssignedAt =
-      'student_homework_assigned_at';
-  static const studentClassroomExerciseReviewTitle =
-      'student_homework_review_title';
-  static const studentClassroomExerciseQuestionCount =
-      'student_homework_question_count';
-  static const studentClassroomExerciseDueDate = 'student_homework_due_date';
   static const studentClassroomExerciseDueFormat =
       'student_homework_due_format';
   static const studentClassroomExerciseLoadFailed =
@@ -355,8 +276,6 @@ class AppKeys {
       'student_homework_no_questions';
   static const studentClassroomExerciseQuestionMissingAnswers =
       'student_homework_question_missing_answers';
-  static const studentClassroomExerciseSubmitSuccess =
-      'student_homework_submit_success';
   static const studentClassroomExerciseSubmitFailed =
       'student_homework_submit_failed';
   static const studentClassroomExerciseMissingExercise =
@@ -364,40 +283,17 @@ class AppKeys {
   static const studentClassroomExerciseAlreadySubmitted =
       'student_homework_already_submitted';
   static const studentClassroomExerciseNotOpen = 'student_homework_not_open';
-  static const assessmentAction = 'assessment_action';
   static const viewAll = 'view_all';
-  static const viewAllUpper = 'view_all_upper';
-  static const progressAchievementTitle = 'progress_achievement_title';
-  static const todayCompletedExercises = 'today_completed_exercises';
-
-  static const reviewTitle = 'review_title';
   static const exercises = 'exercises';
-  static const days = 'days';
   static const noAccountForProfile = 'no_account_for_profile';
   static const noAccountForHistory = 'no_account_for_history';
   static const profileLoadFailed = 'profile_load_failed';
-  static const chapterMissingProfileInfo = 'chapter_missing_profile_info';
-  static const chapterLoadFailed = 'chapter_load_failed';
   static const profileLoadErrorTitle = 'profile_load_error_title';
   static const noProfileTitle = 'no_profile_title';
   static const noProfileMessage = 'no_profile_message';
   static const addProfile = 'add_profile';
-  static const chapterLoadErrorTitle = 'chapter_load_error_title';
-  static const noChapterTitle = 'no_chapter_title';
-  static const noChapterMessage = 'no_chapter_message';
   static const test = 'test';
-  static const startTest = 'start_test';
-  static const clearSelection = 'clear_selection';
-  static const startChapterTestMessage = 'start_chapter_test_message';
-  static const startSelectedTestMessage = 'start_selected_test_message';
-  static const chapter = 'chapter';
-  static const lessons = 'lessons';
-  static const lockedLessonMessage = 'locked_lesson_message';
-
-  static const historyTitle = 'history_title';
   static const searchHint = 'search_hint';
-  static const assessmentTab = 'assessment_tab';
-  static const practiceTab = 'practice_tab';
   static const historyLoadFailed = 'history_load_failed';
   static const historyLoadErrorTitle = 'history_load_error_title';
   static const noHistoryTitle = 'no_history_title';
@@ -418,10 +314,6 @@ class AppKeys {
   static const gradeRoadmapCompleted = 'grade_roadmap_completed';
   static const gradeRoadmapLocked = 'grade_roadmap_locked';
   static const gradeRoadmapLoadFailed = 'grade_roadmap_load_failed';
-  static const gradeRoadmapResumePrompt = 'grade_roadmap_resume_prompt';
-  static const gradeRoadmapResumeAction = 'grade_roadmap_resume_action';
-  static const mathPractice = 'math_practice';
-  static const mathReview = 'math_review';
   static const excellent = 'excellent';
   static const good = 'good';
   static const niceTry = 'nice_try';
@@ -435,24 +327,16 @@ class AppKeys {
   static const incorrect = 'incorrect';
   static const time = 'time';
   static const questionNumber = 'question_number';
-  static const testAgain = 'test_again';
-  static const viewResult = 'view_result';
   static const previous = 'previous';
   static const next = 'next';
   static const correctStatus = 'correct_status';
   static const incorrectStatus = 'incorrect_status';
-  static const showAnswerUpper = 'show_answer_upper';
-  static const hideAnswerUpper = 'hide_answer_upper';
-  static const noAnswer = 'no_answer';
   static const answer = 'answer';
   static const examDetailErrorTitle = 'exam_detail_error_title';
 
   static const settingsTitle = 'settings_title';
   static const accountTitle = 'account_title';
   static const profileTitle = 'profile_title';
-  static const addProfileTitle = 'add_profile_title';
-  static const updateProfileTitle = 'update_profile_title';
-  static const updatingProfile = 'updating_profile';
   static const school = 'school';
   static const accountMenuTitle = 'account_menu_title';
   static const accountMenuSubtitle = 'account_menu_subtitle';
@@ -468,36 +352,26 @@ class AppKeys {
   static const appThemeMenuSubtitleLight = 'app_theme_menu_subtitle_light';
   static const appThemeMenuSubtitleDark = 'app_theme_menu_subtitle_dark';
   static const createPasscodeTitle = 'create_passcode_title';
-  static const confirmPasscodeTitle = 'confirm_passcode_title';
   static const unlockPasscodeTitle = 'unlock_passcode_title';
   static const verifyPasscodeTitle = 'verify_passcode_title';
   static const createPasscodeSubtitle = 'create_passcode_subtitle';
-  static const confirmPasscodeSubtitle = 'confirm_passcode_subtitle';
   static const unlockPasscodeSubtitle = 'unlock_passcode_subtitle';
   static const verifyPasscodeSubtitle = 'verify_passcode_subtitle';
   static const changePasscodeTitle = 'change_passcode_title';
   static const enterCurrentPasscodeTitle = 'enter_current_passcode_title';
   static const passcodeContinue = 'passcode_continue';
   static const passcodeCreate = 'passcode_create';
-  static const passcodeUnlock = 'passcode_unlock';
   static const passcodeLogin = 'passcode_login';
   static const passcodeLoginWithEmail = 'passcode_login_with_email';
   static const passcodeSkip = 'passcode_skip';
   static const passcodeRemove = 'passcode_remove';
-  static const passcodeSetUp = 'passcode_set_up';
   static const passcodeChange = 'passcode_change';
-  static const passcodeMismatch = 'passcode_mismatch';
   static const passcodeIncorrect = 'passcode_incorrect';
   static const passcodeSaveFailed = 'passcode_save_failed';
-  static const passcodeSessionExpired = 'passcode_session_expired';
   static const passcodeRemoveFailed = 'passcode_remove_failed';
-  static const passcodeSet = 'passcode_set';
-  static const passcodeChanged = 'passcode_changed';
-  static const passcodeRemoved = 'passcode_removed';
   static const missingAccount = 'missing_account';
   static const accountNameRequired = 'account_name_required';
   static const accountNotUpdated = 'account_not_updated';
-  static const accountUpdated = 'account_updated';
   static const accountUpdateFailed = 'account_update_failed';
   static const accountEmailVerificationTitle =
       'account_email_verification_title';
@@ -517,7 +391,6 @@ class AppKeys {
   static const profileUpdateFailed = 'profile_update_failed';
   static const deleteProfileTitle = 'delete_profile_title';
   static const deleteProfileMessage = 'delete_profile_message';
-  static const profileDeleted = 'profile_deleted';
   static const profileDeleteFailed = 'profile_delete_failed';
   static const username = 'username';
   static const fullName = 'full_name';
@@ -534,14 +407,10 @@ class AppKeys {
   static const chooseSchool = 'choose_school';
   static const chooseGrade = 'choose_grade';
   static const chooseProgram = 'choose_program';
-  static const chooseSemester = 'choose_semester';
   static const noSchools = 'no_schools';
-  static const active = 'active';
-  static const switchingProfile = 'switching_profile';
   static const switchingLanguage = 'switching_language';
   static const parentInfoTitle = 'parent_info_title';
   static const parentChildrenCount = 'parent_children_count';
-  static const profileRole = 'profile_role';
   static const roleStudent = 'role_student';
   static const roleParent = 'role_parent';
   static const roleTeacher = 'role_teacher';
@@ -556,16 +425,12 @@ class AppKeys {
   static const teacherHeroSubtitle = 'teacher_hero_subtitle';
   static const teacherYourClasses = 'teacher_your_classes';
   static const teacherRecentlyAssigned = 'teacher_recently_assigned';
-  static const teacherCreateNewClass = 'teacher_create_new_class';
   static const teacherCompleteProfile = 'teacher_complete_profile';
   static const teacherCompleteProfileDescription =
       'teacher_complete_profile_description';
   static const teacherClassFallback = 'teacher_class_fallback';
   static const teacherStudentCount = 'teacher_student_count';
   static const teacherEnterClass = 'teacher_enter_class';
-  static const teacherReportTitle = 'teacher_report_title';
-  static const teacherReportComingSoon = 'teacher_report_coming_soon';
-  static const teacherReportPlaceholder = 'teacher_report_placeholder';
   static const teacherCreateClassTitle = 'teacher_create_class_title';
   static const teacherCreateOptionsFailed = 'teacher_create_options_failed';
   static const teacherClassMissingInfo = 'teacher_class_missing_info';
@@ -580,14 +445,8 @@ class AppKeys {
   static const teacherNoOptions = 'teacher_no_options';
   static const teacherClassDetailTitle = 'teacher_class_detail_title';
   static const teacherProgramFallback = 'teacher_program_fallback';
-  static const teacherDescriptionFallback = 'teacher_description_fallback';
-  static const teacherClassInfoFallback = 'teacher_class_info_fallback';
   static const teacherClassHideLess = 'teacher_class_hide_less';
-  static const teacherCopiedClassLink = 'teacher_copied_class_link';
-  static const teacherCopiedClassCode = 'teacher_copied_class_code';
-  static const profileIdCopied = 'profile_id_copied';
   static const profileCodeLabel = 'profile_code_label';
-  static const profileCodeCopied = 'profile_code_copied';
   static const teacherMemberManagement = 'teacher_member_management';
   static const teacherMemberSummary = 'teacher_member_summary';
   static const teacherMemberSummaryNoRequests =
@@ -605,9 +464,6 @@ class AppKeys {
   static const teacherSearchStudentFailed = 'teacher_search_student_failed';
   static const teacherSelectedStudents = 'teacher_selected_students';
   static const teacherSendInviteRequest = 'teacher_send_invite_request';
-  static const teacherInviteRequestQueued = 'teacher_invite_request_queued';
-  static const teacherTwoMinutesAgo = 'teacher_two_minutes_ago';
-  static const teacherFiveMinutesAgo = 'teacher_five_minutes_ago';
   static const teacherClassFunctions = 'teacher_class_functions';
   static const teacherStudyTitle = 'teacher_study_title';
   static const teacherStudyAllClasses = 'teacher_study_all_classes';
@@ -634,23 +490,13 @@ class AppKeys {
       'teacher_assignment_create_failed';
   static const teacherAssessmentCreateFailed =
       'teacher_assessment_create_failed';
-  static const teacherAssignmentPickerSoon = 'teacher_assignment_picker_soon';
   static const teacherNoAssignments = 'teacher_no_assignments';
   static const teacherNoAssessments = 'teacher_no_assessments';
-  static const teacherAssignmentGeometryTitle =
-      'teacher_assignment_geometry_title';
   static const teacherAssignmentId = 'teacher_assignment_id';
   static const teacherCreateAssignmentSoon = 'teacher_create_assignment_soon';
-  static const teacherAssignmentClassName = 'teacher_assignment_class_name';
-  static const teacherAssignmentReviewTitle = 'teacher_assignment_review_title';
-  static const teacherAssignmentChapterRange =
-      'teacher_assignment_chapter_range';
   static const teacherAssignmentDueLabel = 'teacher_assignment_due_label';
-  static const teacherAssignmentDueValue = 'teacher_assignment_due_value';
   static const teacherAssignmentQuestionCountLabel =
       'teacher_assignment_question_count_label';
-  static const teacherAssignmentQuestionCountValue =
-      'teacher_assignment_question_count_value';
   static const teacherAssignmentQuestionCountFormat =
       'teacher_assignment_question_count_format';
   static const teacherAssignmentQuestionContent =
@@ -670,12 +516,6 @@ class AppKeys {
   static const teacherAssignmentClassStudentCountFormat =
       'teacher_assignment_class_student_count_format';
   static const teacherAssignmentClassGrade = 'teacher_assignment_class_grade';
-  static const teacherAssignmentClassProgram =
-      'teacher_assignment_class_program';
-  static const teacherAssignmentClassDescription =
-      'teacher_assignment_class_description';
-  static const teacherAssignmentVolumeOne = 'teacher_assignment_volume_one';
-  static const teacherAssignmentVolumeTwo = 'teacher_assignment_volume_two';
   static const teacherAssignmentTitleHint = 'teacher_assignment_title_hint';
   static const teacherAssessmentTitleHint = 'teacher_assessment_title_hint';
   static const teacherAssignmentTitleRequired =
@@ -684,8 +524,6 @@ class AppKeys {
       'teacher_assessment_title_required';
   static const teacherAssignmentProgramLabel =
       'teacher_assignment_program_label';
-  static const teacherAssignmentProgramValue =
-      'teacher_assignment_program_value';
   static const teacherAssignmentProgramRequired =
       'teacher_assignment_program_required';
   static const teacherAssignmentPublishLabel =
@@ -718,7 +556,6 @@ class AppKeys {
   static const teacherAssessmentDescriptionHint =
       'teacher_assessment_description_hint';
   static const teacherAssessmentCreated = 'teacher_assessment_created';
-  static const teacherJoinedStudents = 'teacher_joined_students';
   static const teacherNoJoinedStudents = 'teacher_no_joined_students';
   static const teacherStudentFallback = 'teacher_student_fallback';
   static const teacherJustJoined = 'teacher_just_joined';
@@ -735,7 +572,6 @@ class AppKeys {
 
   static const noAccountForGrades = 'no_account_for_grades';
   static const gradeLoadFailed = 'grade_load_failed';
-  static const gradeQuestionTitle = 'grade_question_title';
   static const assessmentGenerationFailed = 'assessment_generation_failed';
   static const noGrades = 'no_grades';
   static const gamesComingSoon = 'games_coming_soon';
@@ -748,27 +584,20 @@ class AppKeys {
   static const submitUpper = 'submit_upper';
   static const submittingForYou = 'submitting_for_you';
   static const generatingAssessment = 'generating_assessment';
-  static const aiChallenge = 'ai_challenge';
   static const assessmentHeaderTitle = 'assessment_header_title';
   static const questionProgress = 'question_progress';
   static const previousQuestionUpper = 'previous_question_upper';
   static const submittingUpper = 'submitting_upper';
-  static const testAgainCreateMissingExam = 'test_again_create_missing_exam';
   static const testAgainCreateFailed = 'test_again_create_failed';
   static const testAgainDialogTitle = 'test_again_dialog_title';
   static const excellentResultTitle = 'excellent_result_title';
   static const goodResultTitle = 'good_result_title';
   static const completedResultTitle = 'completed_result_title';
   static const incompleteResultTitle = 'incomplete_result_title';
-  static const noCompletedClassroomExerciseTitle =
-      'no_completed_homework_title';
-  static const noCompletedClassroomExerciseMessage =
-      'no_completed_homework_message';
   static const classroomExerciseExpiredCannotSubmit =
       'homework_expired_cannot_submit';
   static const classroomExerciseDueSoon = 'homework_due_soon';
   static const classroomExerciseFailed = 'homework_failed';
-  static const parentRoomAssignmentsTitle = 'parent_room_assignments_title';
   static const parentRoomUtilitiesTitle = 'parent_room_utilities_title';
   static const parentRoomUtilityMessages = 'parent_room_utility_messages';
   static const parentRoomUtilityClassroomExercise =
@@ -777,13 +606,10 @@ class AppKeys {
   static const parentRoomUtilityDocuments = 'parent_room_utility_documents';
   static const parentRoomUtilityProgress = 'parent_room_utility_progress';
   static const parentRoomUtilityMembers = 'parent_room_utility_members';
-  static const excellentResultMessage = 'excellent_result_message';
   static const generatingNewExam = 'generating_new_exam';
   static const assessmentResultTitle = 'assessment_result_title';
   static const assessmentResultHeaderTitle = 'assessment_result_header_title';
   static const practiceResultHeaderTitle = 'practice_result_header_title';
-  static const placementResultCongratulations =
-      'placement_result_congratulations';
   static const placementResultLevel = 'placement_result_level';
   static const placementResultGradeHeading = 'placement_result_grade_heading';
   static const placementResultKindergarten = 'placement_result_kindergarten';
@@ -797,18 +623,12 @@ class AppKeys {
   static const placementResultWeaknessesTitle =
       'placement_result_weaknesses_title';
   static const placementResultYouAreHere = 'placement_result_you_are_here';
-  static const placementResultRibbonGrade = 'placement_result_ribbon_grade';
   static const placementResultChartGrade = 'placement_result_chart_grade';
-  static const placementResultKindergartenShort =
-      'placement_result_kindergarten_short';
   static const placementResultActivity = 'placement_result_activity';
   static const examReviewRetryTab = 'exam_review_retry_tab';
   static const examReviewResultTab = 'exam_review_result_tab';
   static const examReviewPracticeBannerTitle =
       'exam_review_practice_banner_title';
-  static const examReviewTopicConjunction = 'exam_review_topic_conjunction';
-  static const examReviewPracticeBannerSubtitle =
-      'exam_review_practice_banner_subtitle';
   static const examReviewGradeLevelBadge = 'exam_review_grade_level_badge';
   static const examReviewWeakTopicsTitle = 'exam_review_weak_topics_title';
   static const examReviewPerfectScoreMessage =
@@ -823,7 +643,6 @@ class AppKeys {
   static const assessmentUpper = 'assessment_upper';
   static const practiceUpper = 'practice_upper';
   static const authPhoneCheckFailed = 'auth_phone_check_failed';
-  static const loginPhoneNotRegistered = 'login_phone_not_registered';
   static const authLoginNameCheckFailed = 'auth_login_name_check_failed';
   static const loginNameNotRegistered = 'login_name_not_registered';
   static const signupPhoneAlreadyRegistered = 'signup_phone_already_registered';
@@ -843,9 +662,6 @@ class AppKeys {
   static const missingExamIdShort = 'missing_exam_id_short';
   static const apiBaseUrlMissing = 'api_base_url_missing';
   static const invalidServerResponse = 'invalid_server_response';
-  static const apiConnectTimeout = 'api_connect_timeout';
-  static const apiReceiveTimeout = 'api_receive_timeout';
-  static const apiConnectFailed = 'api_connect_failed';
   static const apiBadCertificate = 'api_bad_certificate';
   static const apiRequestCanceled = 'api_request_canceled';
   static const apiConnectionFailed = 'api_connection_failed';
@@ -861,12 +677,6 @@ class AppKeys {
   static const welcomeParentTeacherSubtitle = 'welcome_parent_teacher_subtitle';
   static const welcomeGamesTitle = 'welcome_games_title';
   static const welcomeGamesSubtitle = 'welcome_games_subtitle';
-  static const studentClassroomExerciseReviewLabel =
-      'student_homework_review_label';
-  static const studentClassroomExercisePurposeExam =
-      'student_homework_purpose_exam';
-  static const studentClassroomExercisePurposeHomework =
-      'student_homework_purpose_homework';
   static const teacherAssignmentDefaultChapter =
       'teacher_assignment_default_chapter';
   static const teacherAssignmentDefaultLesson =

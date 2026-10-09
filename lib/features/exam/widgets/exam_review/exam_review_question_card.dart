@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_question_badge.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_question_font_size.dart';
+import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_math_text.dart';
+import 'package:numi/features/exam/widgets/exam_review/exam_review_question_badge.dart';
 
 class ExamReviewQuestionCard extends StatelessWidget {
   const ExamReviewQuestionCard({super.key, required this.question});
@@ -17,7 +16,7 @@ class ExamReviewQuestionCard extends StatelessWidget {
     final colors = context.themeColors;
     final questionStyle = TextStyle(
       color: colors.textPrimary,
-      fontSize: examReviewQuestionFontSize(question.questionName),
+      fontSize: _questionFontSize(question.questionName),
       fontWeight: FontWeight.w900,
       height: 1.08,
       letterSpacing: 0,
@@ -65,4 +64,15 @@ class ExamReviewQuestionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+double _questionFontSize(String text) {
+  final length = text.trim().length;
+  if (length <= 16) {
+    return 40;
+  }
+  if (length <= 28) {
+    return 31;
+  }
+  return 24;
 }

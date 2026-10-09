@@ -2,10 +2,6 @@ import '../../app_keys.dart';
 
 const welcomeStrings = <String, Map<String, String>>{
   'vi': {
-    AppKeys.welcomeTitlePrefix: 'Học Toán cùng\n',
-    AppKeys.welcomeTitleN: 'NUMI',
-    AppKeys.welcomeSubtitlePrefix: 'Hãy cùng Numi',
-    AppKeys.welcomeSubtitle: 'trở thành "phù thủy" tính toán nhé!',
     AppKeys.welcomeLogin: 'ĐĂNG NHẬP',
     AppKeys.welcomeSignup: 'ĐĂNG KÝ',
     AppKeys.welcomeTryIt: 'Thử Ngay!',
@@ -22,10 +18,6 @@ const welcomeStrings = <String, Map<String, String>>{
     AppKeys.welcomeGamesSubtitle: 'Chơi và học',
   },
   'en': {
-    AppKeys.welcomeTitlePrefix: 'Learn math with\n',
-    AppKeys.welcomeTitleN: 'NUMI',
-    AppKeys.welcomeSubtitlePrefix: 'Join Numi',
-    AppKeys.welcomeSubtitle: 'and become a math wizard!',
     AppKeys.welcomeLogin: 'LOGIN',
     AppKeys.welcomeSignup: 'SIGNUP',
     AppKeys.welcomeTryIt: 'Try It Now!',

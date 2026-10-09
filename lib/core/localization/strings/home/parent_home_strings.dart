@@ -18,7 +18,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.learningProgressTitle: 'Tiến độ học tập',
     AppKeys.learningProgressAllAssessments: 'Tất cả bài đánh giá',
     AppKeys.learningProgressFilterTime: 'Lọc thời gian',
-    AppKeys.learningProgressFilter: 'Bộ lọc',
     AppKeys.learningProgressScoreTitle: 'Kết quả đánh giá theo lớp',
     AppKeys.learningProgressTestLegend: 'Bài test',
     AppKeys.learningProgressTestLabel: 'Bài {number}',
@@ -54,10 +53,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentNoTeacher: 'Chưa có giáo viên',
     AppKeys.parentChildDashboardLoadFailed:
         'Chưa tải được đầy đủ thông tin học tập của các bé.',
-    AppKeys.parentTeacherFeedback:
-        'Chào phụ huynh, em gửi nhận xét tuần này của bé {student}. Bé đã có tiến bộ và hoàn thành tốt các hoạt động trên lớp.',
-    AppKeys.parentTeacherReminder:
-        'Bé {student} còn một số hoạt động cần hoàn thành. Nhờ gia đình nhắc bé ôn tập và làm bài đúng hạn.',
     AppKeys.parentTasksTitle: 'Nhiệm vụ',
     AppKeys.parentTasksCountTitle: 'Nhiệm vụ({count})',
     AppKeys.parentMessagesTitle: 'Tin nhắn',
@@ -70,12 +65,8 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentWeekdaySat: 'T7',
     AppKeys.homeMessageTeacherOne: 'Cô Nguyễn Anh',
     AppKeys.homeMessageTeacherTwo: 'Thầy Minh Hoàng',
-    AppKeys.homeMessageClassOne: 'Toán 2A1',
-    AppKeys.homeMessageClassTwo: 'Toán 3A1',
     AppKeys.homeMessageTimeOne: '10:45 AM',
     AppKeys.homeMessageTimeTwo: 'Hôm qua',
-    AppKeys.homeMessageStudentOne: 'UYENVO',
-    AppKeys.homeMessageStudentTwo: 'HENRY',
     AppKeys.homeMessageBodyOne:
         'Chào chị Jenny, em gửi nhận xét tuần này của bé uyenvo. Bé đã hoàn thành',
     AppKeys.homeMessageBodyTwo:
@@ -109,7 +100,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentCreateStudent: 'Tạo hồ sơ',
     AppKeys.parentInfoTitle: 'Hồ sơ',
     AppKeys.parentChildrenCount: 'Thành viên ({count})',
-    AppKeys.parentRoomAssignmentsTitle: 'Bài tập, kiểm tra',
     AppKeys.parentRoomUtilitiesTitle: 'Tính năng',
     AppKeys.parentRoomUtilityMessages: 'Tin nhắn',
     AppKeys.parentRoomUtilityClassroomExercise: 'Bài Tập',
@@ -136,7 +126,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.learningProgressTitle: 'Learning progress',
     AppKeys.learningProgressAllAssessments: 'All assessments',
     AppKeys.learningProgressFilterTime: 'Filter by time',
-    AppKeys.learningProgressFilter: 'Filter',
     AppKeys.learningProgressScoreTitle: 'Assessment results by grade',
     AppKeys.learningProgressTestLegend: 'Tests',
     AppKeys.learningProgressTestLabel: 'Test {number}',
@@ -172,10 +161,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentNoTeacher: 'No teacher yet',
     AppKeys.parentChildDashboardLoadFailed:
         'Some learning information could not be loaded.',
-    AppKeys.parentTeacherFeedback:
-        'Hello, here is this week\'s feedback for {student}. Your child has made progress and completed the classroom activities well.',
-    AppKeys.parentTeacherReminder:
-        '{student} still has a few activities to complete. Please remind your child to review and finish them on time.',
     AppKeys.parentTasksTitle: 'Tasks',
     AppKeys.parentTasksCountTitle: 'Tasks({count})',
     AppKeys.parentMessagesTitle: 'Messages',
@@ -188,12 +173,8 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentWeekdaySat: 'Sat',
     AppKeys.homeMessageTeacherOne: 'Ms. Nguyen Anh',
     AppKeys.homeMessageTeacherTwo: 'Mr. Minh Hoang',
-    AppKeys.homeMessageClassOne: 'Math 2A1',
-    AppKeys.homeMessageClassTwo: 'Math 3A1',
     AppKeys.homeMessageTimeOne: '10:45 AM',
     AppKeys.homeMessageTimeTwo: 'Yesterday',
-    AppKeys.homeMessageStudentOne: 'UYENVO',
-    AppKeys.homeMessageStudentTwo: 'HENRY',
     AppKeys.homeMessageBodyOne:
         "Hi Jenny, here is uyenvo's feedback for this week. They have completed",
     AppKeys.homeMessageBodyTwo:
@@ -227,7 +208,6 @@ const parentHomeStrings = <String, Map<String, String>>{
     AppKeys.parentCreateStudent: 'Create profile',
     AppKeys.parentInfoTitle: 'Profile',
     AppKeys.parentChildrenCount: 'Members ({count})',
-    AppKeys.parentRoomAssignmentsTitle: 'Assignments, tests',
     AppKeys.parentRoomUtilitiesTitle: 'Features',
     AppKeys.parentRoomUtilityMessages: 'Messages',
     AppKeys.parentRoomUtilityClassroomExercise: 'Homework',

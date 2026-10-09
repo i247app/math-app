@@ -2,20 +2,18 @@ import 'package:flutter/foundation.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
-import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom/data/classroom_exception.dart';
+import 'package:numi/features/classroom/data/classroom_service.dart';
+import 'package:numi/features/classroom_exercise/data/classroom_exercise_exception.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
+import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_history_classroom_exercise_cache.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
-import 'package:numi/features/exam/data/exam_exception.dart';
-import 'package:numi/features/exam/helpers/history_compare_classroom_exercise_descending.dart';
-import 'package:numi/features/exam/helpers/history_compare_exam_descending.dart';
-import 'package:numi/features/exam/helpers/history_is_assessment_exam.dart';
-import 'package:numi/features/exam/helpers/history_is_submitted_classroom_exercise.dart';
-import 'package:numi/features/classroom_exercise/data/classroom_exercise_exception.dart';
+import 'package:numi/features/exam/helpers/history_classroom_exercise_helpers.dart';
+import 'package:numi/features/exam/helpers/history_exam_helpers.dart';
+import 'package:numi/features/exam/models/exam.dart';
 
 class HistoryController extends ChangeNotifier {
   HistoryController({

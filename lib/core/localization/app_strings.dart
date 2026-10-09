@@ -1,66 +1,70 @@
 import 'app_language.dart';
 import 'strings/auth_strings.dart';
+import 'strings/classroom/student_classroom_strings.dart';
+import 'strings/classroom/teacher_classroom_strings.dart';
+import 'strings/classroom_exercise/student_classroom_exercise_strings.dart';
+import 'strings/classroom_exercise/teacher_classroom_exercise_strings.dart';
 import 'strings/common_strings.dart';
-import 'strings/network_strings.dart';
-import 'strings/welcome/welcome_strings.dart';
+import 'strings/exam/exam_strings.dart';
 import 'strings/games_strings.dart';
 import 'strings/home/home_common_strings.dart';
 import 'strings/home/parent_home_strings.dart';
 import 'strings/home/student_home_strings.dart';
 import 'strings/home/teacher_home_strings.dart';
-import 'strings/classroom/student_classroom_strings.dart';
-import 'strings/classroom/teacher_classroom_strings.dart';
-import 'strings/classroom_exercise/student_classroom_exercise_strings.dart';
-import 'strings/classroom_exercise/teacher_classroom_exercise_strings.dart';
+import 'strings/network_strings.dart';
 import 'strings/notification_strings.dart';
 import 'strings/profile/profile_strings.dart';
 import 'strings/settings/settings_strings.dart';
 import 'strings/study/study_strings.dart';
-import 'strings/exam/exam_strings.dart';
+import 'strings/welcome/welcome_strings.dart';
 
 class AppStrings {
+  static const _groups = [
+    authStrings,
+    commonStrings,
+    networkStrings,
+    welcomeStrings,
+    gamesStrings,
+    homeCommonStrings,
+    parentHomeStrings,
+    studentHomeStrings,
+    teacherHomeStrings,
+    studentClassroomStrings,
+    teacherClassroomStrings,
+    studentClassroomExerciseStrings,
+    teacherClassroomExerciseStrings,
+    notificationStrings,
+    profileStrings,
+    settingsStrings,
+    studyStrings,
+    examStrings,
+  ];
+
   static final Map<String, Map<String, String>> _localizedValues = {
-    'vi': {
-      ...authStrings['vi']!,
-      ...commonStrings['vi']!,
-      ...networkStrings['vi']!,
-      ...welcomeStrings['vi']!,
-      ...gamesStrings['vi']!,
-      ...homeCommonStrings['vi']!,
-      ...parentHomeStrings['vi']!,
-      ...studentHomeStrings['vi']!,
-      ...teacherHomeStrings['vi']!,
-      ...studentClassroomStrings['vi']!,
-      ...teacherClassroomStrings['vi']!,
-      ...studentClassroomExerciseStrings['vi']!,
-      ...teacherClassroomExerciseStrings['vi']!,
-      ...notificationStrings['vi']!,
-      ...profileStrings['vi']!,
-      ...settingsStrings['vi']!,
-      ...studyStrings['vi']!,
-      ...examStrings['vi']!,
-    },
-    'en': {
-      ...authStrings['en']!,
-      ...commonStrings['en']!,
-      ...networkStrings['en']!,
-      ...welcomeStrings['en']!,
-      ...gamesStrings['en']!,
-      ...homeCommonStrings['en']!,
-      ...parentHomeStrings['en']!,
-      ...studentHomeStrings['en']!,
-      ...teacherHomeStrings['en']!,
-      ...studentClassroomStrings['en']!,
-      ...teacherClassroomStrings['en']!,
-      ...studentClassroomExerciseStrings['en']!,
-      ...teacherClassroomExerciseStrings['en']!,
-      ...notificationStrings['en']!,
-      ...profileStrings['en']!,
-      ...settingsStrings['en']!,
-      ...studyStrings['en']!,
-      ...examStrings['en']!,
-    },
+    for (final language in AppLanguage.values)
+      language.lookupCode: _merge(language),
   };
+
+  static Map<String, String> _merge(AppLanguage language) {
+    final values = <String, String>{};
+    for (final group in _groups) {
+      final translations = group[language.lookupCode];
+      if (translations == null) {
+        throw StateError(
+          'Missing localization group for ${language.lookupCode}',
+        );
+      }
+      for (final entry in translations.entries) {
+        if (values.containsKey(entry.key)) {
+          throw StateError(
+            'Duplicate localization key ${entry.key} for ${language.lookupCode}',
+          );
+        }
+        values[entry.key] = entry.value;
+      }
+    }
+    return values;
+  }
 
   static Map<String, String> getAll(AppLanguage language) {
     return _localizedValues[language.lookupCode] ?? _localizedValues['vi']!;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:numi/features/exam/helpers/exam_review_answers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_answer_tile.dart';
-import 'package:numi/features/exam/widgets/exam_review/exam_review_correct_answer_label.dart';
 
 class ExamReviewAnswerList extends StatelessWidget {
   const ExamReviewAnswerList({
