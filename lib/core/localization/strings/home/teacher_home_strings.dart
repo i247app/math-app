@@ -14,6 +14,7 @@ const teacherHomeStrings = <String, Map<String, String>>{
         'Hồ sơ chưa hoàn tất. Nhấn để bổ sung thông tin.',
     AppKeys.teacherEnterClass: 'Vào Lớp',
     AppKeys.teacherCreateOptionsFailed: 'Tải lựa chọn tạo lớp thất bại.',
+    AppKeys.teacherCreateClassFailed: 'Tạo lớp thất bại. Vui lòng thử lại.',
     AppKeys.teacherCreateAssignmentSoon: 'Tính năng tạo bài tập sẽ sớm có.',
     AppKeys.teacherCreateAssignmentTitle: 'Tạo Bài Tập',
     AppKeys.teacherCreateAssessmentTitle: 'Tạo Đánh Giá',
@@ -32,6 +33,8 @@ const teacherHomeStrings = <String, Map<String, String>>{
         'Your profile is incomplete. Tap to add the missing details.',
     AppKeys.teacherEnterClass: 'Enter Class',
     AppKeys.teacherCreateOptionsFailed: 'Failed to load class options.',
+    AppKeys.teacherCreateClassFailed:
+        'Could not create the class. Please try again.',
     AppKeys.teacherCreateAssignmentSoon: 'Assignment creation is coming soon.',
     AppKeys.teacherCreateAssignmentTitle: 'Create Assignment',
     AppKeys.teacherCreateAssessmentTitle: 'Create Assessment',

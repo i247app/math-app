@@ -1,0 +1,30 @@
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+
+// Flutter's settings loader has already included the Android plugin projects.
+// Redirect only Android; Dart and other platforms keep the upstream package.
+def patchDirectory = new File(settingsDir, '../third_party/android_gradle').canonicalFile
+def patches = new JsonSlurper().parse(new File(patchDirectory, 'patches.json'))
+patches.each { name, patch ->
+    def descriptor = findProject(":${name}")
+    if (descriptor == null) {
+        return
+    }
+
+    def pubspec = new File(descriptor.projectDir.parentFile, 'pubspec.yaml')
+    def versionMatch = pubspec.getText('UTF-8') =~ /(?m)^version:\s*(\S+)/
+    def upstreamBuild = new File(descriptor.projectDir, patch.upstreamBuildFile ?: 'build.gradle')
+    // Normalize archive line endings for Windows, macOS and CI.
+    def upstreamText = upstreamBuild.getText('UTF-8').replace('\r\n', '\n')
+    def digest = MessageDigest.getInstance('SHA-256')
+        .digest(upstreamText.getBytes('UTF-8')).encodeHex().toString()
+    if (!versionMatch.find() || versionMatch.group(1) != patch.version ||
+        digest != patch.upstreamBuildSha256) {
+        throw new GradleException(
+            "Android Gradle patch for ${name} ${patch.version} does not match the resolved package. " +
+            'Review third_party/android_gradle/README.md before updating this dependency.'
+        )
+    }
+
+    descriptor.projectDir = new File(patchDirectory, "${name}/android")
+}

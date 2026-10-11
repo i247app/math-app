@@ -190,13 +190,15 @@ class _StudentClassroomTabState extends State<StudentClassroomTab> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                if (classroomError != null &&
-                                    _classrooms.isEmpty)
+                                if (classroomError != null)
                                   StudentInlineErrorPanel(
                                     message: classroomError,
                                     onRetry: _refreshClassrooms,
-                                  )
-                                else if (_classrooms.isNotEmpty)
+                                  ),
+                                if (classroomError != null &&
+                                    _classrooms.isNotEmpty)
+                                  const SizedBox(height: 16),
+                                if (_classrooms.isNotEmpty)
                                   LayoutBuilder(
                                     builder: (context, constraints) {
                                       final cardWidth =

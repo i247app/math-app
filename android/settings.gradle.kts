@@ -27,3 +27,6 @@ plugins {
 }
 
 include(":app")
+
+// Use versioned Android compatibility patches after Flutter includes its plugins.
+apply(from = "../third_party/android_gradle/settings.gradle")

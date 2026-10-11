@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:numi/core/data/session_cache_scope.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,11 +43,24 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
 
   final Set<int> _processingProfileIds = <int>{};
   bool _isSendingInvites = false;
+  int _identityRevision = 0;
 
   @override
   void initState() {
     super.initState();
     _loadMembers(forceRefresh: true);
+  }
+
+  @override
+  void didUpdateWidget(covariant TeacherClassMembersScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profileId != widget.profileId ||
+        oldWidget.classroomId != widget.classroomId) {
+      _identityRevision++;
+      _processingProfileIds.clear();
+      _isSendingInvites = false;
+      _loadMembers(forceRefresh: true);
+    }
   }
 
   Future<void> _loadMembers({bool forceRefresh = false}) {
@@ -62,43 +76,51 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     required bool approve,
   }) async {
     final targetProfileId = request.profileId;
-    if (targetProfileId == null) {
+    if (targetProfileId == null ||
+        _processingProfileIds.contains(targetProfileId)) {
       return;
     }
+    final identity = _identityRevision;
+    final scope = SessionCacheScope.current;
+    final profileId = widget.profileId;
+    final classroomId = widget.classroomId;
+    bool current() =>
+        mounted && identity == _identityRevision && scope.isCurrent;
     final cubit = context.read<ClassroomCubit>();
     setState(() => _processingProfileIds.add(targetProfileId));
     try {
       if (approve) {
         await _classroomService.approveJoinRequest(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
+          profileId: profileId,
+          classroomId: classroomId,
           targetProfileId: targetProfileId,
         );
       } else {
         await _classroomService.rejectJoinRequest(
-          profileId: widget.profileId,
-          classroomId: widget.classroomId,
+          profileId: profileId,
+          classroomId: classroomId,
           targetProfileId: targetProfileId,
         );
       }
+      if (!current()) return;
       cubit.invalidateClassroomData(
-        profileId: widget.profileId,
-        classroomId: widget.classroomId,
+        profileId: profileId,
+        classroomId: classroomId,
         detail: true,
-        members: false,
+        members: true,
       );
       await cubit.loadMembers(
-        profileId: widget.profileId,
-        classroomId: widget.classroomId,
+        profileId: profileId,
+        classroomId: classroomId,
         forceRefresh: true,
       );
     } on ClassroomException catch (error) {
-      if (!mounted) {
+      if (!mounted || !current()) {
         return;
       }
       context.showErrorDialog(error.message);
     } finally {
-      if (mounted) {
+      if (current()) {
         setState(() => _processingProfileIds.remove(targetProfileId));
       }
     }
@@ -117,7 +139,7 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
                   state.members(widget.profileId, widget.classroomId),
               builder: (context, membersState) {
                 return TeacherClassMembersContent(
-                  isLoading: membersState.isLoading,
+                  isLoading: membersState.isLoading && !membersState.hasLoaded,
                   isSendingInvites: _isSendingInvites,
                   error: membersState.errorMessage,
                   joinRequests: membersState.joinRequests,
@@ -141,6 +163,13 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
   }
 
   Future<void> _openStudentSearchSheet(BuildContext context) async {
+    if (_isSendingInvites) return;
+    final identity = _identityRevision;
+    final scope = SessionCacheScope.current;
+    final profileId = widget.profileId;
+    final classroomId = widget.classroomId;
+    bool current() =>
+        mounted && identity == _identityRevision && scope.isCurrent;
     final cubit = context.read<ClassroomCubit>();
     final selected = await showModalBottomSheet<List<UserProfile>>(
       context: context,
@@ -152,7 +181,10 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
             widget._profileService ?? context.read<ProfileService>(),
       ),
     );
-    if (selected == null || selected.isEmpty || !context.mounted) {
+    if (selected == null ||
+        selected.isEmpty ||
+        !context.mounted ||
+        !current()) {
       return;
     }
     final targetProfileIds = selected
@@ -165,26 +197,27 @@ class _TeacherClassMembersScreenState extends State<TeacherClassMembersScreen> {
     setState(() => _isSendingInvites = true);
     try {
       await _classroomService.sendInvitations(
-        inviterProfileId: widget.profileId,
-        classroomId: widget.classroomId,
+        inviterProfileId: profileId,
+        classroomId: classroomId,
         targetProfileIds: targetProfileIds,
       );
+      if (!current()) return;
       cubit.invalidateClassroomData(
-        profileId: widget.profileId,
-        classroomId: widget.classroomId,
+        profileId: profileId,
+        classroomId: classroomId,
       );
       await cubit.loadMembers(
-        profileId: widget.profileId,
-        classroomId: widget.classroomId,
+        profileId: profileId,
+        classroomId: classroomId,
         forceRefresh: true,
       );
     } on ClassroomException catch (error) {
-      if (!context.mounted) {
+      if (!context.mounted || !current()) {
         return;
       }
       context.showErrorDialog(error.message);
     } finally {
-      if (mounted) {
+      if (current()) {
         setState(() => _isSendingInvites = false);
       }
     }

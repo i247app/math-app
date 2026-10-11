@@ -18,7 +18,7 @@ class StudentClassLearningCategorySection extends StatelessWidget {
 
   final int classroomId;
   final int profileId;
-  final int classroomExerciseCount;
+  final int? classroomExerciseCount;
   final bool isLoadingClassroomExercise;
 
   @override
@@ -45,7 +45,9 @@ class StudentClassLearningCategorySection extends StatelessWidget {
                 iconAsset: 'assets/icons/student-class-assignment.svg',
                 title: context.getText(AppKeys.studentClassAssignments),
                 subtitle:
-                    isLoadingClassroomExercise && classroomExerciseCount == 0
+                    classroomExerciseCount == null ||
+                        (isLoadingClassroomExercise &&
+                            classroomExerciseCount == 0)
                     ? ''
                     : context.formatText(
                         AppKeys.studentClassAssignmentsCountFormat,

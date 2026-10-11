@@ -2,6 +2,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 
 import 'dart:async';
+import 'package:numi/core/data/session_cache_scope.dart';
 
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -79,6 +80,7 @@ class _StudentClassSearchContentState extends State<StudentClassSearchContent> {
   bool _hasLoadedFilters = false;
   int _searchRequestId = 0;
   int _filterRequestId = 0;
+  int _joinRequestId = 0;
   int? _joiningClassroomId;
   String? _lastSearch;
   Set<int> _lastGradeIds = const <int>{};

@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
+import 'package:numi/core/data/app_failure.dart';
+import 'package:numi/core/data/async_resource.dart';
+import 'package:numi/core/data/session_cache_scope.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
@@ -73,9 +77,11 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   final GuardedExitController<TeacherCreateClassResult> _exitController =
       GuardedExitController<TeacherCreateClassResult>();
 
-  bool _isLoadingOptions = true;
+  AsyncResource<TeacherClassroomLookupOptions> _optionsResource =
+      const AsyncResource.idle();
+  int _optionsRevision = 0;
+  int _identityRevision = 0;
   bool _isSubmitting = false;
-  String? _optionsError;
   String? _avatarPath;
   List<GradeModel> _grades = const <GradeModel>[];
   List<ProgramModel> _programs = const <ProgramModel>[];
@@ -95,6 +101,8 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
 
   @override
   void dispose() {
+    _identityRevision++;
+    _optionsRevision++;
     _nameController.removeListener(_markDraftDirty);
     _descriptionController.removeListener(_markDraftDirty);
     _nameController.dispose();
@@ -102,77 +110,133 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
     super.dispose();
   }
 
-  Future<void> _loadOptions({bool forceRefresh = false}) async {
-    final userId = widget.user?.id;
-    if (userId == null || userId <= 0) {
-      setState(() {
-        _isLoadingOptions = false;
-        _optionsError = context.readText(AppKeys.missingAccount);
-      });
+  @override
+  void didUpdateWidget(covariant TeacherCreateClassScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user?.id == widget.user?.id &&
+        profileStableId(oldWidget.activeProfile) ==
+            profileStableId(widget.activeProfile)) {
       return;
     }
+    _identityRevision++;
+    _optionsRevision++;
+    _optionsResource = const AsyncResource.idle();
+    _grades = const [];
+    _programs = const [];
+    _schools = const [];
+    _selectedGrade = null;
+    _selectedPrograms = const [];
+    _selectedSchool = null;
+    _avatarPath = null;
+    _nameController.clear();
+    _descriptionController.clear();
+    _isDraftDirty = false;
+    _isSubmitting = false;
+    _loadOptions();
+  }
 
+  Future<void> _loadOptions({bool forceRefresh = false}) async {
+    final revision = ++_optionsRevision;
+    final identity = _identityRevision;
+    final scope = SessionCacheScope.current;
+    final userId = widget.user?.id;
+    bool current() =>
+        mounted &&
+        revision == _optionsRevision &&
+        identity == _identityRevision &&
+        scope.isCurrent;
+    if (userId == null || userId <= 0) {
+      setState(
+        () => _optionsResource = AsyncResource.failed(
+          const AppFailure(
+            type: AppFailureType.validation,
+            code: AppKeys.missingAccount,
+          ),
+        ),
+      );
+      return;
+    }
     final cachedOptions = TeacherClassroomLookupCache.shared.get(userId);
     if (!forceRefresh && cachedOptions != null) {
-      setState(() {
-        _applyOptions(cachedOptions);
-        _isLoadingOptions = false;
-        _optionsError = null;
-      });
-      unawaited(_loadOptions(forceRefresh: true));
-      return;
+      _applyOptions(
+        cachedOptions,
+        preserveSelections: _optionsResource.hasData,
+      );
+      _optionsResource = AsyncResource.ready(
+        cachedOptions,
+        updatedAt: DateTime.now(),
+      );
     }
-
-    setState(() {
-      _isLoadingOptions = true;
-      _optionsError = null;
-    });
-
+    final previous = _optionsResource;
+    setState(() => _optionsResource = previous.refreshing());
     try {
       final options = await TeacherClassroomLookupCache.shared.load(
         userId: userId,
         gradeService: _gradeService,
         profileService: _profileService,
         schoolService: _schoolService,
-        forceRefresh: forceRefresh,
+        forceRefresh: forceRefresh || cachedOptions != null,
       );
-      if (!mounted) {
-        return;
-      }
-      setState(() => _applyOptions(options));
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!current()) return;
+      setState(() {
+        _applyOptions(options, preserveSelections: previous.hasData);
+        _optionsResource = AsyncResource.ready(
+          options,
+          updatedAt: DateTime.now(),
+        );
+      });
+    } catch (error) {
+      if (!current()) return;
       setState(
-        () => _optionsError = context.readText(
-          AppKeys.teacherCreateOptionsFailed,
+        () => _optionsResource = AsyncResource.failed(
+          AppFailure.fromException(error),
+          data: previous.data,
+          hasData: previous.hasData,
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingOptions = false);
-      }
     }
   }
 
-  void _applyOptions(TeacherClassroomLookupOptions options) {
+  void _applyOptions(
+    TeacherClassroomLookupOptions options, {
+    bool preserveSelections = false,
+  }) {
+    final gradeId = preserveSelections
+        ? gradeStableId(_selectedGrade)
+        : widget.activeProfile?.gradeId;
+    final schoolId = preserveSelections
+        ? schoolStableId(_selectedSchool)
+        : widget.activeProfile?.schoolId;
+    final programIds = _selectedPrograms
+        .map(programStableId)
+        .whereType<int>()
+        .toSet();
     _grades = options.grades;
     _programs = options.programs;
     _schools = options.schools;
     _selectedGrade =
-        matchGrade(_grades, widget.activeProfile?.gradeId) ??
+        matchGrade(_grades, gradeId) ??
         (_grades.isEmpty ? null : _grades.first);
-    _selectedPrograms = const <ProgramModel>[];
+    _selectedPrograms = preserveSelections
+        ? _programs
+              .where((program) => programIds.contains(programStableId(program)))
+              .toList(growable: false)
+        : const [];
     _selectedSchool =
-        matchSchool(_schools, widget.activeProfile?.schoolId) ??
+        matchSchool(_schools, schoolId) ??
         (_schools.isEmpty ? null : _schools.first);
   }
 
   Future<void> _pickAvatar() async {
+    final identity = _identityRevision;
+    final scope = SessionCacheScope.current;
     try {
       final avatarPath = await _avatarPicker.pickAvatarPath();
-      if (!mounted || avatarPath == null || avatarPath.isEmpty) {
+      if (!mounted ||
+          identity != _identityRevision ||
+          !scope.isCurrent ||
+          avatarPath == null ||
+          avatarPath.isEmpty) {
         return;
       }
       setState(() {
@@ -180,11 +244,17 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         _isDraftDirty = true;
       });
     } catch (_) {
+      if (!mounted || identity != _identityRevision || !scope.isCurrent) return;
       _showError(context.readText(AppKeys.imagePickFailed));
     }
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) return;
+    final identity = _identityRevision;
+    final scope = SessionCacheScope.current;
+    bool current() =>
+        mounted && identity == _identityRevision && scope.isCurrent;
     final profileId = profileStableId(widget.activeProfile);
     final gradeId = gradeStableId(_selectedGrade);
     final programIds = _selectedPrograms
@@ -218,7 +288,7 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         description: description.isEmpty ? null : description,
         filePath: _avatarPath,
       );
-      if (!mounted) {
+      if (!mounted || !current()) {
         return;
       }
       context.read<ClassroomCubit>().invalidateOwned(profileId);
@@ -226,9 +296,13 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         TeacherCreateClassResult(classroom: classroom),
       );
     } on ClassroomException catch (error) {
-      _showError(error.message);
+      if (current()) _showError(error.message);
+    } catch (_) {
+      if (mounted && current()) {
+        _showError(context.readText(AppKeys.teacherCreateClassFailed));
+      }
     } finally {
-      if (mounted) {
+      if (current()) {
         setState(() => _isSubmitting = false);
       }
     }
@@ -274,21 +348,28 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
   }
 
   Widget _buildContent() {
-    if (_isLoadingOptions) {
+    if (_optionsResource.isInitialLoading) {
       return Center(
         child: CircularProgressIndicator(
           color: context.themeColors.brandStrong,
         ),
       );
     }
-    final optionsError = _optionsError;
-    if (optionsError != null) {
+    final failure = _optionsResource.failure;
+    final optionsError = failure == null
+        ? null
+        : context.getText(
+            failure.code == AppKeys.missingAccount
+                ? AppKeys.missingAccount
+                : AppKeys.teacherCreateOptionsFailed,
+          );
+    if (optionsError != null && !_optionsResource.hasData) {
       return TeacherFullScreenError(
         message: optionsError,
         onRetry: () => _loadOptions(forceRefresh: true),
       );
     }
-    return TeacherCreateClassForm(
+    final form = TeacherCreateClassForm(
       avatarPath: _avatarPath,
       grades: _grades,
       programs: _programs,
@@ -319,6 +400,19 @@ class _TeacherCreateClassScreenState extends State<TeacherCreateClassScreen> {
         });
       },
       onSubmit: _submit,
+    );
+    if (optionsError == null) return form;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 12, 28, 0),
+          child: AppRetryPanel(
+            message: optionsError,
+            onRetry: () => _loadOptions(forceRefresh: true),
+          ),
+        ),
+        Expanded(child: form),
+      ],
     );
   }
 }

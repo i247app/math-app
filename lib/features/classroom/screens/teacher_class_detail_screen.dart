@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'package:numi/core/data/session_cache_scope.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,6 +68,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   late final SchoolService _schoolService =
       widget._schoolService ?? context.read<SchoolService>();
 
+  int _lookupRevision = 0;
   late bool _isInfoExpanded;
   List<GradeModel> _grades = const <GradeModel>[];
   List<ProgramModel> _programs = const <ProgramModel>[];
@@ -81,6 +82,23 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     _loadLookupOptions();
   }
 
+  @override
+  void didUpdateWidget(covariant TeacherClassDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userId != widget.userId) {
+      _lookupRevision++;
+      _grades = const [];
+      _programs = const [];
+      _schools = const [];
+      _loadLookupOptions();
+    }
+    if (oldWidget.profileId != widget.profileId ||
+        oldWidget.classroomId != widget.classroomId) {
+      _isInfoExpanded = widget.initiallyExpanded;
+      _loadDetail(forceRefresh: true);
+    }
+  }
+
   Future<void> _loadDetail({bool forceRefresh = false}) {
     return context.read<ClassroomCubit>().loadDetail(
       profileId: widget.profileId,
@@ -91,6 +109,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   }
 
   Future<void> _loadLookupOptions({bool forceRefresh = false}) async {
+    final revision = ++_lookupRevision;
+    final scope = SessionCacheScope.current;
     final userId = widget.userId;
     if (userId == null || userId <= 0) {
       return;
@@ -99,8 +119,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     final cachedOptions = TeacherClassroomLookupCache.shared.get(userId);
     if (!forceRefresh && cachedOptions != null) {
       setState(() => _applyLookupOptions(cachedOptions));
-      unawaited(_loadLookupOptions(forceRefresh: true));
-      return;
     }
 
     try {
@@ -109,9 +127,9 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
         gradeService: _gradeService,
         profileService: _profileService,
         schoolService: _schoolService,
-        forceRefresh: forceRefresh,
+        forceRefresh: forceRefresh || cachedOptions != null,
       );
-      if (!mounted) {
+      if (!mounted || revision != _lookupRevision || !scope.isCurrent) {
         return;
       }
       setState(() => _applyLookupOptions(options));
@@ -164,13 +182,13 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (detailState.errorMessage != null &&
-                              classroom == null)
+                          if (detailState.errorMessage != null)
                             AppRetryPanel(
                               message: detailState.errorMessage!,
                               onRetry: () => _loadDetail(forceRefresh: true),
-                            )
-                          else
+                            ),
+                          if (classroom != null ||
+                              detailState.errorMessage == null)
                             TeacherClassDetailInfoCard(
                               classroom: classroom,
                               grades: _grades,

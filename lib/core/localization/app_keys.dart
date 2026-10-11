@@ -433,6 +433,7 @@ class AppKeys {
   static const teacherEnterClass = 'teacher_enter_class';
   static const teacherCreateClassTitle = 'teacher_create_class_title';
   static const teacherCreateOptionsFailed = 'teacher_create_options_failed';
+  static const teacherCreateClassFailed = 'teacher_create_class_failed';
   static const teacherClassMissingInfo = 'teacher_class_missing_info';
   static const teacherClassImageLabel = 'teacher_class_image_label';
   static const teacherGradeLevel = 'teacher_grade_level';

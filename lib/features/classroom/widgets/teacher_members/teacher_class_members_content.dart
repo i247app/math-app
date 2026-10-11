@@ -88,12 +88,24 @@ class TeacherClassMembersContent extends StatelessWidget {
                               joinRequests.isEmpty &&
                               members.isEmpty
                         ? AppRetryPanel(message: error!, onRetry: onRefresh)
-                        : _TeacherClassMembersLists(
-                            joinRequests: joinRequests,
-                            members: members,
-                            processingProfileIds: processingProfileIds,
-                            onApprove: onApprove,
-                            onReject: onReject,
+                        : Column(
+                            children: [
+                              if (error != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: AppRetryPanel(
+                                    message: error!,
+                                    onRetry: onRefresh,
+                                  ),
+                                ),
+                              _TeacherClassMembersLists(
+                                joinRequests: joinRequests,
+                                members: members,
+                                processingProfileIds: processingProfileIds,
+                                onApprove: onApprove,
+                                onReject: onReject,
+                              ),
+                            ],
                           ),
                   ),
                 ],

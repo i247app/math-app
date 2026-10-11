@@ -3,16 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:numi/core/data/session_cache_scope.dart';
+import 'package:numi/core/data/async_resource.dart';
+import 'package:numi/features/classroom/controllers/parent_room_controller.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/data/home_layout_exception.dart';
-import 'package:numi/features/home/data/parent_home_snapshot.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -29,6 +28,7 @@ import 'package:numi/features/classroom/widgets/parent_tasks/parent_completed_ta
 import 'package:numi/features/classroom/widgets/parent_tasks/parent_pending_task_list_item.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
 import 'package:numi/shared/widgets/app_content_section.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 
 class ParentRoomTab extends StatefulWidget {
   const ParentRoomTab({
@@ -64,15 +64,27 @@ class ParentRoomTab extends StatefulWidget {
 }
 
 class _ParentRoomTabState extends State<ParentRoomTab> {
-  final _cacheScope = SessionCacheScope.current;
   late final HomeLayoutService _homeLayoutService = context
       .read<HomeLayoutService>();
 
-  HomeLayout? _layout;
-  bool _isLoading = true;
-  bool _hasLoaded = false;
-  String? _errorMessage;
-  int _requestId = 0;
+  late final ParentRoomController _controller = ParentRoomController(
+    loadLayout: (profileId) =>
+        _homeLayoutService.getLayout(profileId: profileId),
+  );
+  HomeLayout? get _layout => _controller.state.data;
+  bool get _isLoading =>
+      _controller.state.isInitialLoading ||
+      _controller.state.phase == AsyncPhase.idle;
+  bool get _hasLoaded => _controller.state.hasData;
+  String? get _errorMessage {
+    final failure = _controller.state.failure;
+    if (failure == null) return null;
+    final cause = failure.cause;
+    return cause is HomeLayoutException && cause.message.trim().isNotEmpty
+        ? cause.message
+        : context.getText(AppKeys.parentChildDashboardLoadFailed);
+  }
+
   bool _hasPlayedRoomEntrance = false;
 
   @override
@@ -86,20 +98,26 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
   @override
   void didUpdateWidget(covariant ParentRoomTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.isActive && widget.isActive) {
-      _loadLayout();
-      return;
-    }
-    if (!widget.isActive) {
-      return;
-    }
-    final oldProfileId = profileStableId(oldWidget.activeProfile);
-    final profileId = profileStableId(widget.activeProfile);
-    if (oldProfileId != profileId ||
-        oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+    final profileChanged =
+        profileStableId(oldWidget.activeProfile) !=
+        profileStableId(widget.activeProfile);
+    if (profileChanged) {
       _resetRoomEntrance();
-      _loadLayout(forceRefresh: true);
+      _controller.selectProfile(profileStableId(widget.activeProfile));
     }
+    if (!widget.isActive) return;
+    if (profileChanged ||
+        oldWidget.activeRefreshTick != widget.activeRefreshTick) {
+      _loadLayout(forceRefresh: true);
+    } else if (!oldWidget.isActive) {
+      _loadLayout();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _resetRoomEntrance() {
@@ -129,108 +147,18 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
     setState(() => _hasPlayedRoomEntrance = true);
   }
 
-  Future<void> _loadLayout({bool forceRefresh = false}) async {
-    final requestId = ++_requestId;
-    final profileId = profileStableId(widget.activeProfile);
-    if (profileId == null || profileId <= 0) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _layout = null;
-        _isLoading = false;
-        _hasLoaded = true;
-        _errorMessage = null;
-      });
-      return;
-    }
-
-    final cache = HomeProfileCache.instance;
-    final cachedSnapshot = cache.getParent(profileId);
-    if (!forceRefresh && cachedSnapshot != null) {
-      setState(() => _applySnapshot(cachedSnapshot));
-      if (!cachedSnapshot.isStale) {
-        return;
-      }
-    }
-
-    final hadRenderableContent = _hasLoaded;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final layout = await cache.loadLayout(
-        profileId: profileId,
-        loader: () => _homeLayoutService.getLayout(profileId: profileId),
-      );
-      if (!mounted || requestId != _requestId) {
-        return;
-      }
-      setState(() {
-        _layout = layout;
-        _isLoading = false;
-        _hasLoaded = true;
-        _errorMessage = null;
-      });
-      if (!_cacheScope.isCurrent) return;
-      cache.putParent(
-        ParentHomeSnapshot(
-          profileId: profileId,
-          homeLayout: layout,
-          completedAssessments: examsFromLayoutExams(layout.exams),
-          cachedAt: DateTime.now(),
-        ),
-      );
-    } on HomeLayoutException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      if (hadRenderableContent) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = error.message;
-        });
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-        _hasLoaded = true;
-        _errorMessage = error.message;
-      });
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      if (hadRenderableContent) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = context.readText(
-            AppKeys.parentChildDashboardLoadFailed,
-          );
-        });
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-        _hasLoaded = true;
-        _errorMessage = context.readText(
-          AppKeys.parentChildDashboardLoadFailed,
-        );
-      });
-    }
-  }
-
-  void _applySnapshot(ParentHomeSnapshot snapshot) {
-    _layout = snapshot.homeLayout;
-    _isLoading = false;
-    _hasLoaded = true;
-    _errorMessage = null;
-  }
+  Future<void> _loadLayout({bool forceRefresh = false}) => _controller.load(
+    profileId: profileStableId(widget.activeProfile),
+    forceRefresh: forceRefresh,
+  );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: _controller,
+    builder: (context, _) => _buildRoom(context),
+  );
+
+  Widget _buildRoom(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
     final parent = _layout?.parent;
     final entries = roomEntries(parent);
@@ -280,6 +208,7 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: minHeight),
                       child: AnimatedSwitcher(
+                        key: ValueKey(profileStableId(widget.activeProfile)),
                         duration: const Duration(milliseconds: 220),
                         child: _roomContent(
                           context,
@@ -337,6 +266,14 @@ class _ParentRoomTabState extends State<ParentRoomTab> {
       key: const ValueKey('room-content'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (_errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: AppRetryPanel(
+              message: _errorMessage!,
+              onRetry: () => _loadLayout(forceRefresh: true),
+            ),
+          ),
         _roomFadeIn(
           order: 0,
           markOnEnd:

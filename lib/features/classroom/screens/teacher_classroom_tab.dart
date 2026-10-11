@@ -291,6 +291,7 @@ class _TeacherClassroomTabState extends State<TeacherClassroomTab> {
                   const TeacherClassroomLoadingContent()
                 else
                   TeacherClassroomBody(
+                    onRetry: _refreshClassrooms,
                     error: _error,
                     classrooms: _classrooms,
                     displayedClassrooms: displayedClassrooms,

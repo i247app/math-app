@@ -5,6 +5,8 @@ extension _StudentClassSearchActions on _StudentClassSearchContentState {
     _debounce?.cancel();
     _searchRequestId++;
     _filterRequestId++;
+    _joinRequestId++;
+    _joiningClassroomId = null;
     _searchController.clear();
     _updateState(() {
       _results = const <ClassroomModel>[];

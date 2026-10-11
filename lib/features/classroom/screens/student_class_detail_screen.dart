@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
+import 'package:numi/features/classroom/controllers/student_class_exercises_controller.dart';
 import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/classroom/helpers/student_class_detail_helpers.dart';
@@ -38,24 +38,54 @@ class StudentClassDetailScreen extends StatefulWidget {
 }
 
 class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
-  late final ClassroomExerciseService _exerciseService =
-      widget._exerciseService ?? context.read<ClassroomExerciseService>();
+  late StudentClassExercisesController _exercisesController;
 
-  List<ClassroomExercise> _classroomExerciseExercises =
-      const <ClassroomExercise>[];
-  bool _isLoadingClassroomExercise = false;
+  StudentClassExercisesController _createExercisesController() =>
+      StudentClassExercisesController(
+        exerciseService:
+            widget._exerciseService ?? context.read<ClassroomExerciseService>(),
+      );
 
   @override
   void initState() {
     super.initState();
+    _exercisesController = _createExercisesController();
     _loadDetail(forceRefresh: true);
-    _loadClassroomExerciseExercises();
+    _loadExercises();
   }
+
+  @override
+  void didUpdateWidget(covariant StudentClassDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final serviceChanged =
+        oldWidget._exerciseService != widget._exerciseService;
+    if (serviceChanged) {
+      _exercisesController.dispose();
+      _exercisesController = _createExercisesController();
+    }
+    if (serviceChanged ||
+        oldWidget.profileId != widget.profileId ||
+        oldWidget.classroomId != widget.classroomId) {
+      _loadDetail(forceRefresh: true);
+      _loadExercises();
+    }
+  }
+
+  @override
+  void dispose() {
+    _exercisesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadExercises() => _exercisesController.load(
+    profileId: widget.profileId,
+    classroomId: widget.classroomId,
+  );
 
   Future<void> _refresh() {
     return Future.wait<void>([
       _loadDetail(forceRefresh: true),
-      _loadClassroomExerciseExercises(),
+      _loadExercises(),
     ]);
   }
 
@@ -68,33 +98,13 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
     );
   }
 
-  Future<void> _loadClassroomExerciseExercises() async {
-    setState(() => _isLoadingClassroomExercise = true);
-
-    try {
-      final exercises = await _exerciseService.listExercises(
-        classroomId: widget.classroomId,
-        profileId: widget.profileId,
-        visibility: 'PUBLIC',
-      );
-      if (!mounted) {
-        return;
-      }
-      setState(() => _classroomExerciseExercises = exercises);
-    } on ClassroomExerciseException {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _classroomExerciseExercises = const <ClassroomExercise>[]);
-    } finally {
-      if (mounted) {
-        setState(() => _isLoadingClassroomExercise = false);
-      }
-    }
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: _exercisesController,
+    builder: (context, _) => _buildClassroom(context),
+  );
+
+  Widget _buildClassroom(BuildContext context) {
     return BlocSelector<ClassroomCubit, ClassroomState, ClassroomDetailState>(
       selector: (state) => state.detail(widget.profileId, widget.classroomId),
       builder: (context, detailState) {
@@ -131,8 +141,7 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (detailState.errorMessage != null &&
-                              classroom == null)
+                          if (detailState.errorMessage != null)
                             AppRetryPanel(
                               padding: 17,
                               borderRadius: 16,
@@ -141,33 +150,15 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
                               filledAction: true,
                               message: detailState.errorMessage!,
                               onRetry: () => _loadDetail(forceRefresh: true),
-                            )
-                          else ...[
+                            ),
+                          if (classroom != null ||
+                              detailState.errorMessage == null) ...[
                             StudentClassTeacherProfileCard(
                               classroom: classroom,
                               isLoading:
                                   detailState.isLoading && classroom == null,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 26),
-                              child: StudentClassLearningCategorySection(
-                                classroomId: widget.classroomId,
-                                profileId: widget.profileId,
-                                classroomExerciseCount:
-                                    _classroomExerciseExercises.length,
-                                isLoadingClassroomExercise:
-                                    _isLoadingClassroomExercise &&
-                                    _classroomExerciseExercises.isEmpty,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 23),
-                              child: StudentClassUpcomingDeadlineSection(
-                                profileId: widget.profileId,
-                                exercises: _classroomExerciseExercises,
-                                isLoading: _isLoadingClassroomExercise,
-                              ),
-                            ),
+                            _buildExercises(context),
                           ],
                         ],
                       ),
@@ -179,6 +170,49 @@ class _StudentClassDetailScreenState extends State<StudentClassDetailScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildExercises(BuildContext context) {
+    final resource = _exercisesController.state;
+    final exercises = resource.data ?? const [];
+    final cause = resource.failure?.cause;
+    final error = resource.failure == null
+        ? null
+        : cause is ClassroomExerciseException && cause.message.trim().isNotEmpty
+        ? cause.message
+        : context.getText(AppKeys.studentClassroomExerciseLoadFailed);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 26),
+          child: StudentClassLearningCategorySection(
+            classroomId: widget.classroomId,
+            profileId: widget.profileId,
+            classroomExerciseCount: resource.hasData ? exercises.length : null,
+            isLoadingClassroomExercise: resource.isInitialLoading,
+          ),
+        ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 23),
+            child: AppRetryPanel(
+              key: const ValueKey('student-class-exercises-error'),
+              message: error,
+              onRetry: _loadExercises,
+            ),
+          ),
+        if (error == null || exercises.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 23),
+            child: StudentClassUpcomingDeadlineSection(
+              profileId: widget.profileId,
+              exercises: exercises,
+              isLoading: resource.isInitialLoading,
+            ),
+          ),
+      ],
     );
   }
 }

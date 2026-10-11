@@ -4,6 +4,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/shared/widgets/teacher_add_button.dart';
+import 'package:numi/shared/widgets/app_retry_panel.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_empty_state.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_list_card.dart';
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_search_field.dart';
@@ -17,6 +18,7 @@ class TeacherClassroomBody extends StatelessWidget {
     required this.searchController,
     required this.entranceBuilder,
     required this.onCreateClass,
+    required this.onRetry,
     required this.onOpenClassDetail,
   });
   final String? error;
@@ -26,6 +28,7 @@ class TeacherClassroomBody extends StatelessWidget {
   final Widget Function(int order, Widget child, bool markOnEnd)
   entranceBuilder;
   final VoidCallback onCreateClass;
+  final Future<void> Function() onRetry;
   final ValueChanged<ClassroomModel> onOpenClassDetail;
 
   @override
@@ -42,51 +45,53 @@ class TeacherClassroomBody extends StatelessWidget {
             false,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 24),
-          child: error != null && classrooms.isEmpty
-              ? entranceBuilder(
-                  2,
-                  TeacherClassroomEmptyState(message: error!),
-                  true,
-                )
-              : classrooms.isEmpty
-              ? entranceBuilder(
-                  2,
-                  TeacherClassroomEmptyState(
-                    message: context.getText(AppKeys.teacherEmptyClassroomList),
-                  ),
-                  true,
-                )
-              : displayedClassrooms.isEmpty
-              ? TeacherClassroomEmptyState(
-                  message: context.getText(AppKeys.teacherStudyNoResults),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemCount: displayedClassrooms.length,
-                  itemBuilder: (context, index) {
-                    final classroom = displayedClassrooms[index];
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        bottom: index == displayedClassrooms.length - 1
-                            ? 0
-                            : 16,
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: AppRetryPanel(message: error!, onRetry: onRetry),
+          ),
+        if (classrooms.isNotEmpty || error == null)
+          Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: classrooms.isEmpty
+                ? entranceBuilder(
+                    2,
+                    TeacherClassroomEmptyState(
+                      message: context.getText(
+                        AppKeys.teacherEmptyClassroomList,
                       ),
-                      child: entranceBuilder(
-                        2 + index,
-                        TeacherClassroomListCard(
-                          classroom: classroom,
-                          onTap: () => onOpenClassDetail(classroom),
+                    ),
+                    true,
+                  )
+                : displayedClassrooms.isEmpty
+                ? TeacherClassroomEmptyState(
+                    message: context.getText(AppKeys.teacherStudyNoResults),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: displayedClassrooms.length,
+                    itemBuilder: (context, index) {
+                      final classroom = displayedClassrooms[index];
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == displayedClassrooms.length - 1
+                              ? 0
+                              : 16,
                         ),
-                        index == displayedClassrooms.length - 1,
-                      ),
-                    );
-                  },
-                ),
-        ),
+                        child: entranceBuilder(
+                          2 + index,
+                          TeacherClassroomListCard(
+                            classroom: classroom,
+                            onTap: () => onOpenClassDetail(classroom),
+                          ),
+                          index == displayedClassrooms.length - 1,
+                        ),
+                      );
+                    },
+                  ),
+          ),
       ],
     );
   }
