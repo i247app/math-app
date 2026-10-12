@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/shared/layouts/app_form_field_layout.dart';
@@ -18,8 +19,8 @@ class ProfileFormFieldShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppFormFieldLayout(
       label: label,
-      labelStyle: GoogleFonts.andika(
-        color: const Color(0xFF604950),
+      labelStyle: (context.textStyles.bodyLarge ?? const TextStyle()).copyWith(
+        color: context.themeColors.textSecondary,
         fontSize: FontSize.small,
         fontWeight: FontWeight.w900,
         height: 1,

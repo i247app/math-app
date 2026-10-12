@@ -48,6 +48,7 @@ class TeacherDropdownField<T> extends StatelessWidget {
           child: InputDecorator(
             isEmpty: selectedLabel == null,
             decoration: teacherInputDecoration(
+              context,
               hintText: items.isEmpty
                   ? context.getText(AppKeys.teacherNoOptions)
                   : null,

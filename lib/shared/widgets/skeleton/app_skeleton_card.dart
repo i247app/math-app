@@ -36,7 +36,17 @@ class _AppSkeletonCardState extends State<AppSkeletonCard>
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: widget.animationDuration,
-  )..repeat();
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
 
   @override
   void dispose() {

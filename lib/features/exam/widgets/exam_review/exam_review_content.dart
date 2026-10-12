@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/review_detail_controller.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_inline_error.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_mode_tabs.dart';
@@ -88,13 +88,12 @@ class ExamReviewContent extends StatelessWidget {
         'level': exam.level,
       });
     }
-    final aiTextStyle = GoogleFonts.andika(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? colors.textPrimary
-          : Colors.black,
-      fontSize: 13,
-      fontWeight: FontWeight.w400,
-    );
+    final aiTextStyle = (context.textStyles.bodyLarge ?? const TextStyle())
+        .copyWith(
+          color: colors.textPrimary,
+          fontSize: FontSize.xs,
+          fontWeight: FontWeight.w400,
+        );
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -102,7 +101,7 @@ class ExamReviewContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (isLoading) const LinearProgressIndicator(color: AppColors.navy),
+          if (isLoading) LinearProgressIndicator(color: colors.info),
           if (errorMessage != null && errorMessage!.isNotEmpty) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 10),

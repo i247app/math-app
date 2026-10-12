@@ -27,7 +27,7 @@ class ExamReviewHeader extends StatelessWidget {
         },
         icon: Icon(
           Icons.arrow_back_rounded,
-          color: colors.brandStrong,
+          color: colors.primaryAction,
           size: 28,
         ),
         tooltip: context.getText(AppKeys.back),

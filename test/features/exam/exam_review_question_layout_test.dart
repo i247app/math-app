@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/exam_review_screen.dart';
@@ -150,14 +149,14 @@ void main() {
       for (var index = 0; index < 3; index++) {
         expect(
           decorationAt(index).border,
-          Border.all(color: AppColors.borderSoft),
+          Border.all(color: AppThemeColors.light.border),
         );
       }
     }
 
     await showAnswers(showCorrectAnswer: false);
     expectNeutralBorders();
-    expect(decorationAt(1).color, AppColors.redSoft);
+    expect(decorationAt(1).color, AppThemeColors.light.errorSurface);
     expect(decorationAt(2).color, Colors.white);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     expect(find.byIcon(Icons.check_rounded), findsNothing);
@@ -166,15 +165,15 @@ void main() {
     expectNeutralBorders();
     expect(decorationAt(0).color, Colors.white);
     expect(labelCircleColorAt(0), Colors.white);
-    expect(decorationAt(1).color, AppColors.redSoft);
-    expect(labelCircleColorAt(1), AppColors.red);
+    expect(decorationAt(1).color, AppThemeColors.light.errorSurface);
+    expect(labelCircleColorAt(1), AppThemeColors.light.error);
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
 
     await showAnswers(showCorrectAnswer: true, selectedLabel: 'A');
     expectNeutralBorders();
-    expect(decorationAt(0).color, AppColors.tealLightSurface);
-    expect(labelCircleColorAt(0), AppColors.tealAccent);
+    expect(decorationAt(0).color, AppThemeColors.light.successSurface);
+    expect(labelCircleColorAt(0), AppThemeColors.light.primaryAction);
     expect(decorationAt(1).color, Colors.white);
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);

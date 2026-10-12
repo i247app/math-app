@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ExamReviewModeTabButton extends StatelessWidget {
@@ -17,6 +17,7 @@ class ExamReviewModeTabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(9),
@@ -27,12 +28,12 @@ class ExamReviewModeTabButton extends StatelessWidget {
           duration: const Duration(milliseconds: 160),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? Colors.white : Colors.transparent,
+            color: selected ? colors.elevatedSurface : Colors.transparent,
             borderRadius: BorderRadius.circular(9),
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
+                      color: colors.shadow,
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -44,7 +45,7 @@ class ExamReviewModeTabButton extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: selected ? AppColors.teal600 : AppColors.textInk,
+              color: selected ? colors.primaryAction : colors.textPrimary,
               fontSize: FontSize.small,
               fontWeight: FontWeight.w900,
               height: 1,

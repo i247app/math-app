@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -17,11 +18,12 @@ class ExamReviewModeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Container(
       height: 44,
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF1F2),
+        color: colors.skeleton,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -60,27 +60,29 @@ class SettingsActionCard extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: isDestructive
-                        ? colors.accentStrong
-                        : colors.textPrimary,
-                    fontSize: FontSize.normal,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
+                  style: (context.textStyles.bodyLarge ?? const TextStyle())
+                      .copyWith(
+                        color: isDestructive
+                            ? colors.accentStrong
+                            : colors.textPrimary,
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
                 ),
                 Text(
                   subtitle,
                   maxLines: subtitleMaxLines,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: colors.textMuted,
-                    fontSize: FontSize.caption,
-                    fontWeight: FontWeight.w400,
-                    height: 1,
-                    letterSpacing: 0,
-                  ),
+                  style: (context.textStyles.bodyLarge ?? const TextStyle())
+                      .copyWith(
+                        color: colors.textMuted,
+                        fontSize: FontSize.caption,
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: 0,
+                      ),
                 ),
               ],
             ),

@@ -15,6 +15,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     required this.brand,
     required this.brandStrong,
     required this.onBrand,
+    required this.primaryAction,
+    required this.onPrimaryAction,
     required this.accent,
     required this.accentStrong,
     required this.onAccent,
@@ -54,6 +56,10 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color brand;
   final Color brandStrong;
   final Color onBrand;
+
+  /// Paired colors for filled actions and their labels.
+  final Color primaryAction;
+  final Color onPrimaryAction;
   final Color accent;
   final Color accentStrong;
   final Color onAccent;
@@ -93,6 +99,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     brand: AppColors.welcomeTeal,
     brandStrong: AppColors.tealIcon,
     onBrand: Colors.white,
+    primaryAction: AppColors.teal600,
+    onPrimaryAction: Colors.white,
     accent: AppColors.coral600,
     accentStrong: AppColors.coral500,
     onAccent: Colors.white,
@@ -133,6 +141,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     brand: AppColors.darkPrimaryTeal,
     brandStrong: Color(0xFF5EC7C2),
     onBrand: AppColors.darkOnPrimary,
+    primaryAction: Color(0xFF5EC7C2),
+    onPrimaryAction: AppColors.darkBackground,
     accent: AppColors.darkActionOrange,
     accentStrong: AppColors.darkActionOrange,
     onAccent: AppColors.darkBackground,
@@ -174,6 +184,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
     Color? brand,
     Color? brandStrong,
     Color? onBrand,
+    Color? primaryAction,
+    Color? onPrimaryAction,
     Color? accent,
     Color? accentStrong,
     Color? onAccent,
@@ -213,6 +225,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       brand: brand ?? this.brand,
       brandStrong: brandStrong ?? this.brandStrong,
       onBrand: onBrand ?? this.onBrand,
+      primaryAction: primaryAction ?? this.primaryAction,
+      onPrimaryAction: onPrimaryAction ?? this.onPrimaryAction,
       accent: accent ?? this.accent,
       accentStrong: accentStrong ?? this.accentStrong,
       onAccent: onAccent ?? this.onAccent,
@@ -264,6 +278,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
       brand: Color.lerp(brand, other.brand, t)!,
       brandStrong: Color.lerp(brandStrong, other.brandStrong, t)!,
       onBrand: Color.lerp(onBrand, other.onBrand, t)!,
+      primaryAction: Color.lerp(primaryAction, other.primaryAction, t)!,
+      onPrimaryAction: Color.lerp(onPrimaryAction, other.onPrimaryAction, t)!,
       accent: Color.lerp(accent, other.accent, t)!,
       accentStrong: Color.lerp(accentStrong, other.accentStrong, t)!,
       onAccent: Color.lerp(onAccent, other.onAccent, t)!,

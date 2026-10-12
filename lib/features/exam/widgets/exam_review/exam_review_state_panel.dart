@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_card.dart';
 
@@ -20,6 +20,7 @@ class ExamReviewStatePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -30,18 +31,14 @@ class ExamReviewStatePanel extends StatelessWidget {
             spacing: 14,
             children: [
               if (isLoading)
-                const CircularProgressIndicator(color: AppColors.navy)
+                CircularProgressIndicator(color: colors.info)
               else ...[
-                const Icon(
-                  Icons.assignment_outlined,
-                  color: AppColors.navy,
-                  size: 42,
-                ),
+                Icon(Icons.assignment_outlined, color: colors.info, size: 42),
                 Text(
                   message ?? context.getText(AppKeys.examDetailErrorTitle),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.textInk,
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: FontSize.compact,
                     fontWeight: FontWeight.w800,
                   ),

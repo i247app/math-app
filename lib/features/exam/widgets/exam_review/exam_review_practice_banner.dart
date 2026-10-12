@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -16,6 +18,7 @@ class ExamReviewPracticeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final radius = BorderRadius.circular(16);
 
     return LayoutBuilder(
@@ -35,10 +38,10 @@ class ExamReviewPracticeBanner extends StatelessWidget {
               child: Ink(
                 decoration: BoxDecoration(
                   borderRadius: radius,
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFFFFF6EC), Color(0xFFFFDED0)],
+                    colors: [colors.warningSurface, colors.errorSurface],
                   ),
                 ),
                 child: Stack(
@@ -68,12 +71,15 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                             context.getText(
                               AppKeys.examReviewPracticeBannerTitle,
                             ),
-                            style: GoogleFonts.andika(
-                              color: const Color(0xFF254443),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                            ),
+                            style:
+                                (context.textStyles.bodyLarge ??
+                                        const TextStyle())
+                                    .copyWith(
+                                      color: colors.textPrimary,
+                                      fontSize: FontSize.large,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.2,
+                                    ),
                           ),
                           const SizedBox(height: 12),
                           Container(
@@ -86,17 +92,17 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(24),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFF9B29), Color(0xFFFF4E28)],
+                              gradient: LinearGradient(
+                                colors: [colors.accentStrong, colors.accent],
                               ),
-                              boxShadow: const [
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFFD9421E),
-                                  offset: Offset(0, 5),
+                                  color: colors.accent.withValues(alpha: 0.65),
+                                  offset: const Offset(0, 5),
                                 ),
                                 BoxShadow(
-                                  color: Color(0x30FF792B),
-                                  offset: Offset(0, 7),
+                                  color: colors.accent.withValues(alpha: 0.19),
+                                  offset: const Offset(0, 7),
                                   blurRadius: 12,
                                 ),
                               ],
@@ -105,12 +111,12 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                               height: 28,
                               width: double.infinity,
                               child: isLoading
-                                  ? const Center(
+                                  ? Center(
                                       child: SizedBox.square(
                                         dimension: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Colors.white,
+                                          color: colors.onAccent,
                                         ),
                                       ),
                                     )
@@ -121,12 +127,15 @@ class ExamReviewPracticeBanner extends StatelessWidget {
                                           AppKeys
                                               .examReviewPracticeBannerAction,
                                         ),
-                                        style: GoogleFonts.andika(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.2,
-                                        ),
+                                        style:
+                                            (context.textStyles.bodyLarge ??
+                                                    const TextStyle())
+                                                .copyWith(
+                                                  color: colors.onAccent,
+                                                  fontSize: FontSize.normal,
+                                                  fontWeight: FontWeight.w800,
+                                                  height: 1.2,
+                                                ),
                                       ),
                                     ),
                             ),

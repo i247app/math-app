@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/helpers/exam_review_answers.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -23,11 +23,11 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final correctLabel = examReviewCorrectAnswerLabel(question);
     final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
-    final accent = isCorrect ? AppColors.teal600 : AppColors.red;
     final colors = context.themeColors;
+    final accent = isCorrect ? colors.primaryAction : colors.error;
     final questionStyle = TextStyle(
       color: colors.textPrimary,
-      fontSize: 23,
+      fontSize: FontSize.xxxl,
       fontWeight: FontWeight.w900,
       height: 1.15,
       letterSpacing: 0,
@@ -58,18 +58,20 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   spacing: 18,
                   children: [
-                    Row(
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      spacing: 12,
+                      runSpacing: 8,
                       children: [
                         ExamReviewQuestionBadge(
                           number: question.questionNumber,
                           color: isCorrect
-                              ? AppColors.aquaMist
-                              : const Color(0xFFFFD9DC),
+                              ? colors.successSurface
+                              : colors.errorSurface,
                           textColor: isCorrect
-                              ? AppColors.teal600
-                              : AppColors.red,
+                              ? colors.primaryAction
+                              : colors.error,
                         ),
-                        const Spacer(),
                         ExamReviewQuestionStatus(isCorrect: isCorrect),
                       ],
                     ),

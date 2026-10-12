@@ -18,7 +18,17 @@ class _AppSkeletonLoaderState extends State<AppSkeletonLoader>
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1100),
-  )..repeat();
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
 
   @override
   void dispose() {
@@ -28,10 +38,13 @@ class _AppSkeletonLoaderState extends State<AppSkeletonLoader>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return widget.builder(context, colors.skeleton);
+    }
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final colors = context.themeColors;
         final pulseValue =
             0.5 - 0.5 * math.cos(math.pi * 2 * _controller.value);
         final color = Color.lerp(colors.skeleton, colors.border, pulseValue)!;

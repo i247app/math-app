@@ -162,7 +162,9 @@ void main() {
               expect(style.fontWeight, FontWeight.w400);
               expect(
                 style.color,
-                dark ? AppThemeColors.dark.textPrimary : Colors.black,
+                dark
+                    ? AppThemeColors.dark.textPrimary
+                    : AppThemeColors.light.textPrimary,
               );
             }
             expect(

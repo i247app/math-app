@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/features/exam/widgets/exam_review/exam_review_skeleton_block.dart';
+import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 
 class ExamReviewQuestionSkeleton extends StatelessWidget {
-  const ExamReviewQuestionSkeleton({super.key, required this.progress});
+  const ExamReviewQuestionSkeleton({super.key, this.color});
 
-  final double progress;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -14,21 +14,13 @@ class ExamReviewQuestionSkeleton extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 23),
-          child: ExamReviewSkeletonBlock(
-            progress: progress,
-            height: 146,
-            borderRadius: 14,
-          ),
+          child: AppSkeletonBlock(color: color, height: 146, radius: 14),
         ),
         Column(
           spacing: 10,
           children: List.generate(
             4,
-            (_) => ExamReviewSkeletonBlock(
-              progress: progress,
-              height: 59,
-              borderRadius: 12,
-            ),
+            (_) => AppSkeletonBlock(color: color, height: 59, radius: 12),
             growable: false,
           ),
         ),
@@ -38,18 +30,10 @@ class ExamReviewQuestionSkeleton extends StatelessWidget {
             spacing: 28,
             children: [
               Expanded(
-                child: ExamReviewSkeletonBlock(
-                  progress: progress,
-                  height: 40,
-                  borderRadius: 9,
-                ),
+                child: AppSkeletonBlock(color: color, height: 40, radius: 9),
               ),
               Expanded(
-                child: ExamReviewSkeletonBlock(
-                  progress: progress,
-                  height: 40,
-                  borderRadius: 9,
-                ),
+                child: AppSkeletonBlock(color: color, height: 40, radius: 9),
               ),
             ],
           ),

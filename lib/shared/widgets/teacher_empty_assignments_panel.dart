@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/theme/app_theme_colors.dart';
 
@@ -22,7 +22,7 @@ class TeacherEmptyAssignmentsPanel extends StatelessWidget {
       child: Text(
         message,
         textAlign: TextAlign.center,
-        style: GoogleFonts.andika(
+        style: (context.textStyles.bodyLarge ?? const TextStyle()).copyWith(
           color: colors.textSecondary,
           fontSize: FontSize.small,
           fontWeight: FontWeight.w600,

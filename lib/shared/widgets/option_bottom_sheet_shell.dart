@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 /// Shared frame for option selectors. Features supply their title and content.
 class OptionBottomSheetShell extends StatelessWidget {
   const OptionBottomSheetShell({
     super.key,
     required this.children,
-    this.backgroundColor = Colors.white,
-    this.handleColor = const Color(0xFFE2E9EC),
-    this.shadowColor = const Color.fromRGBO(0, 0, 0, 0.10),
+    this.backgroundColor,
+    this.handleColor,
+    this.shadowColor,
   });
 
   final List<Widget> children;
-  final Color backgroundColor;
-  final Color handleColor;
-  final Color shadowColor;
+  final Color? backgroundColor;
+  final Color? handleColor;
+  final Color? shadowColor;
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +22,11 @@ class OptionBottomSheetShell extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 10, 20, bottomInset + 18),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor ?? context.themeColors.elevatedSurface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
-            color: shadowColor,
+            color: shadowColor ?? context.themeColors.shadow,
             blurRadius: 24,
             offset: const Offset(0, -8),
           ),
@@ -43,7 +44,7 @@ class OptionBottomSheetShell extends StatelessWidget {
                 height: 5,
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: handleColor,
+                  color: handleColor ?? context.themeColors.borderStrong,
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -62,12 +63,12 @@ class OptionBottomSheetList extends StatelessWidget {
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    this.dividerColor = const Color(0xFFEFF4F5),
+    this.dividerColor,
   });
 
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
-  final Color dividerColor;
+  final Color? dividerColor;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -78,7 +79,10 @@ class OptionBottomSheetList extends StatelessWidget {
         shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         itemCount: itemCount,
-        separatorBuilder: (_, _) => Divider(height: 1, color: dividerColor),
+        separatorBuilder: (_, _) => Divider(
+          height: 1,
+          color: dividerColor ?? context.themeColors.border,
+        ),
         itemBuilder: itemBuilder,
       ),
     ),

@@ -19,6 +19,45 @@ void main() {
       }
     });
 
+    test(
+      'filled primary actions retain readable paired labels in both themes',
+      () {
+        for (final colors in [AppThemeColors.light, AppThemeColors.dark]) {
+          final background = colors.primaryAction.computeLuminance();
+          final foreground = colors.onPrimaryAction.computeLuminance();
+          final lighter = background > foreground ? background : foreground;
+          final darker = background > foreground ? foreground : background;
+          expect((lighter + 0.05) / (darker + 0.05), greaterThanOrEqualTo(4.5));
+        }
+      },
+    );
+
+    test('action pairs support theme overrides and interpolation', () {
+      final changed = AppThemeColors.light.copyWith(
+        primaryAction: Colors.blue,
+        onPrimaryAction: Colors.yellow,
+      );
+      expect(changed.primaryAction, Colors.blue);
+      expect(changed.onPrimaryAction, Colors.yellow);
+      final middle = AppThemeColors.light.lerp(AppThemeColors.dark, 0.5);
+      expect(
+        middle.primaryAction,
+        Color.lerp(
+          AppThemeColors.light.primaryAction,
+          AppThemeColors.dark.primaryAction,
+          0.5,
+        ),
+      );
+      expect(
+        middle.onPrimaryAction,
+        Color.lerp(
+          AppThemeColors.light.onPrimaryAction,
+          AppThemeColors.dark.onPrimaryAction,
+          0.5,
+        ),
+      );
+    });
+
     test('installs matching semantic tokens in each application theme', () {
       final light = AppTheme.light().extension<AppThemeColors>();
       final dark = AppTheme.dark().extension<AppThemeColors>();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 class ExamReviewQuestionStatus extends StatelessWidget {
@@ -12,7 +12,8 @@ class ExamReviewQuestionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isCorrect ? AppColors.teal600 : AppColors.red;
+    final colors = context.themeColors;
+    final color = isCorrect ? colors.primaryAction : colors.error;
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 4,

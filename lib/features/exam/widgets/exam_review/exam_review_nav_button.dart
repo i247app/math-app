@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_centered_text.dart';
 
@@ -24,7 +24,8 @@ class ExamReviewNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = filled ? Colors.white : AppColors.teal600;
+    final colors = context.themeColors;
+    final foreground = filled ? colors.onPrimaryAction : colors.primaryAction;
     final child = Center(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -32,12 +33,14 @@ class ExamReviewNavButton extends StatelessWidget {
         spacing: 2,
         children: [
           if (!iconAfter) Icon(icon, color: foreground, size: 20),
-          ExamReviewCenteredText(
-            label,
-            color: foreground,
-            fontSize: FontSize.compact,
-            fontWeight: FontWeight.w900,
-            verticalOffset: 0.4,
+          Flexible(
+            child: ExamReviewCenteredText(
+              label,
+              color: foreground,
+              fontSize: FontSize.compact,
+              fontWeight: FontWeight.w900,
+              verticalOffset: 0.4,
+            ),
           ),
           if (iconAfter) Icon(icon, color: foreground, size: 20),
         ],
@@ -47,7 +50,7 @@ class ExamReviewNavButton extends StatelessWidget {
     return Opacity(
       opacity: enabled ? 1 : 0.45,
       child: Material(
-        color: filled ? AppColors.teal600 : Colors.white,
+        color: filled ? colors.primaryAction : colors.elevatedSurface,
         borderRadius: BorderRadius.circular(9),
         child: InkWell(
           onTap: enabled ? onTap : null,
@@ -57,11 +60,11 @@ class ExamReviewNavButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(9),
-              border: Border.all(color: AppColors.teal600, width: 1.2),
+              border: Border.all(color: colors.primaryAction, width: 1.2),
               boxShadow: filled
                   ? [
                       BoxShadow(
-                        color: AppColors.teal600.withValues(alpha: 0.24),
+                        color: colors.primaryAction.withValues(alpha: 0.24),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

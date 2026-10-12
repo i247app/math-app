@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/font_size.dart';
+import 'package:numi/core/theme/app_typography.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -44,19 +45,21 @@ class ExamReviewWeakTopicsCard extends StatelessWidget {
               children: [
                 Text(
                   context.getText(AppKeys.examReviewWeakTopicsTitle),
-                  style: GoogleFonts.andika(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colors.textPrimary,
-                  ),
+                  style: (context.textStyles.bodyLarge ?? const TextStyle())
+                      .copyWith(
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w700,
+                        color: colors.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 14),
                 Text(
                   reviewText,
-                  style: GoogleFonts.andika(
-                    fontSize: 14,
-                    color: colors.textPrimary,
-                  ),
+                  style: (context.textStyles.bodyLarge ?? const TextStyle())
+                      .copyWith(
+                        fontSize: FontSize.small,
+                        color: colors.textPrimary,
+                      ),
                 ),
               ],
             ),

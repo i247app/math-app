@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_centered_text.dart';
 import 'package:numi/features/exam/widgets/exam_math_text.dart';
@@ -26,6 +26,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     final label = answer.label.trim().toUpperCase();
     final isSelected = selectedLabel == label;
     final isCorrect = correctLabel == label;
@@ -34,13 +35,13 @@ class ExamReviewAnswerTile extends StatelessWidget {
     final isRevealedCorrect = isCorrect && (isSelected || showCorrectAnswer);
     final isHighlightedCorrect = isCorrect && isSelected;
     final background = isWrongSelected
-        ? AppColors.redSoft
+        ? colors.errorSurface
         : isHighlightedCorrect
-        ? AppColors.tealLightSurface
-        : Colors.white;
+        ? colors.successSurface
+        : colors.elevatedSurface;
     final foreground = isWrongSelected || isHighlightedCorrect
-        ? (isWrongSelected ? AppColors.red : AppColors.teal600)
-        : AppColors.textInk;
+        ? (isWrongSelected ? colors.error : colors.primaryAction)
+        : colors.textPrimary;
     final answerStyle = TextStyle(
       color: foreground,
       fontSize: FontSize.large,
@@ -62,7 +63,7 @@ class ExamReviewAnswerTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderSoft),
+            border: Border.all(color: colors.border),
           ),
           child: Row(
             spacing: 14,
@@ -73,22 +74,24 @@ class ExamReviewAnswerTile extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: isWrongSelected
-                      ? AppColors.red
+                      ? colors.error
                       : isHighlightedCorrect
-                      ? AppColors.tealAccent
-                      : Colors.white,
+                      ? colors.primaryAction
+                      : colors.elevatedSurface,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isWrongSelected || isHighlightedCorrect
                         ? Colors.transparent
-                        : const Color(0xFF9BB0B3),
+                        : colors.borderStrong,
                   ),
                 ),
                 child: ExamReviewCenteredText(
                   label,
                   color: isWrongSelected || isHighlightedCorrect
-                      ? Colors.white
-                      : AppColors.textInk,
+                      ? (isWrongSelected
+                            ? colors.onError
+                            : colors.onPrimaryAction)
+                      : colors.textPrimary,
                   fontSize: FontSize.xs,
                   fontWeight: FontWeight.w900,
                   verticalOffset: 1.2,
@@ -109,12 +112,16 @@ class ExamReviewAnswerTile extends StatelessWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: isWrongSelected ? AppColors.red : AppColors.teal600,
+                    color: isWrongSelected
+                        ? colors.error
+                        : colors.primaryAction,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     isWrongSelected ? Icons.close_rounded : Icons.check_rounded,
-                    color: Colors.white,
+                    color: isWrongSelected
+                        ? colors.onError
+                        : colors.onPrimaryAction,
                     size: 15,
                   ),
                 ),

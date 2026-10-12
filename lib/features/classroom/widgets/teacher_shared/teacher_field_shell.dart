@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/theme/font_size.dart';
 
@@ -21,8 +22,8 @@ class TeacherFieldShell extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFF564148),
+            style: TextStyle(
+              color: context.themeColors.textSecondary,
               fontSize: FontSize.small,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.7,

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_shell.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_primary_button.dart';
@@ -55,6 +55,7 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
               child: InputDecorator(
                 isEmpty: values.isEmpty,
                 decoration: teacherInputDecoration(
+                  context,
                   hintText: items.isEmpty
                       ? context.getText(AppKeys.teacherNoOptions)
                       : emptyText,
@@ -71,8 +72,8 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: values.isEmpty
-                              ? const Color(0x806B7280)
-                              : AppColors.textInkDark,
+                              ? context.themeColors.inputHint
+                              : context.themeColors.textPrimary,
                           fontSize: FontSize.normal,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
@@ -82,8 +83,8 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: canSelect
-                          ? AppColors.teal520
-                          : AppColors.textCoolMuted.withValues(alpha: 0.45),
+                          ? context.themeColors.brandStrong
+                          : context.themeColors.inputHint,
                       size: 22,
                     ),
                   ],
@@ -141,8 +142,8 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: AppColors.teal520,
+                    style: TextStyle(
+                      color: context.themeColors.brandStrong,
                       fontSize: FontSize.xxxl,
                       fontWeight: FontWeight.w700,
                       height: 1.15,
@@ -155,8 +156,10 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const BouncingScrollPhysics(),
                         itemCount: items.length,
-                        separatorBuilder: (_, _) =>
-                            const Divider(height: 1, color: Color(0xFFEFF4F5)),
+                        separatorBuilder: (_, _) => Divider(
+                          height: 1,
+                          color: context.themeColors.border,
+                        ),
                         itemBuilder: (context, index) {
                           final item = items[index];
                           final id = itemId(item);
@@ -172,8 +175,8 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                                 displayText(item),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: AppColors.textInkDark,
+                                style: TextStyle(
+                                  color: context.themeColors.textPrimary,
                                   fontSize: FontSize.normal,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -183,8 +186,8 @@ class TeacherMultiSelectField<T> extends StatelessWidget {
                                     ? Icons.check_circle_outline_rounded
                                     : Icons.radio_button_unchecked_rounded,
                                 color: isSelected
-                                    ? AppColors.teal520
-                                    : const Color(0xFFC4C6D2),
+                                    ? context.themeColors.brandStrong
+                                    : context.themeColors.borderStrong,
                                 size: 22,
                               ),
                               onTap: () {

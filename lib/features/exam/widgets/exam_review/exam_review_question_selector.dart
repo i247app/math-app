@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_centered_text.dart';
 
@@ -19,6 +19,7 @@ class ExamReviewQuestionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return Align(
       alignment: Alignment.center,
       child: SingleChildScrollView(
@@ -39,13 +40,17 @@ class ExamReviewQuestionSelector extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.teal600 : Colors.white,
+                    color: selected
+                        ? colors.primaryAction
+                        : colors.elevatedSurface,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.teal600, width: 1.2),
+                    border: Border.all(color: colors.primaryAction, width: 1.2),
                   ),
                   child: ExamReviewCenteredText(
                     '${index + 1}',
-                    color: selected ? Colors.white : AppColors.teal600,
+                    color: selected
+                        ? colors.onPrimaryAction
+                        : colors.primaryAction,
                     fontSize: FontSize.normal,
                     fontWeight: FontWeight.w900,
                   ),

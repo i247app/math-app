@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_field_shell.dart';
 import 'package:numi/features/classroom/widgets/teacher_shared/teacher_shared_helpers.dart';
@@ -27,12 +27,12 @@ class TeacherTextField extends StatelessWidget {
         controller: controller,
         maxLines: maxLines,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        style: const TextStyle(
-          color: AppColors.textInkDark,
+        style: TextStyle(
+          color: context.themeColors.textPrimary,
           fontSize: FontSize.normal,
           fontWeight: FontWeight.w400,
         ),
-        decoration: teacherInputDecoration(hintText: hintText),
+        decoration: teacherInputDecoration(context, hintText: hintText),
       ),
     );
   }

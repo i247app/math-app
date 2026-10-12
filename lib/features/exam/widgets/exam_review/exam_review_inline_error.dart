@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/exam/widgets/exam_review/exam_review_card.dart';
 
 class ExamReviewInlineError extends StatelessWidget {
@@ -17,6 +17,7 @@ class ExamReviewInlineError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
     return ExamReviewCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -24,8 +25,8 @@ class ExamReviewInlineError extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: AppColors.red,
+              style: TextStyle(
+                color: colors.error,
                 fontWeight: FontWeight.w800,
               ),
             ),

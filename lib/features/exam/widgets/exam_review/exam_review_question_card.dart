@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/font_size.dart';
 
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/widgets/exam_math_text.dart';
@@ -43,8 +43,8 @@ class ExamReviewQuestionCard extends StatelessWidget {
             alignment: Alignment.topLeft,
             child: ExamReviewQuestionBadge(
               number: question.questionNumber,
-              color: AppColors.aquaMist,
-              textColor: AppColors.teal600,
+              color: colors.successSurface,
+              textColor: colors.primaryAction,
             ),
           ),
           const SizedBox(height: 8),
@@ -69,10 +69,10 @@ class ExamReviewQuestionCard extends StatelessWidget {
 double _questionFontSize(String text) {
   final length = text.trim().length;
   if (length <= 16) {
-    return 40;
+    return FontSize.displayExtraLarge;
   }
   if (length <= 28) {
-    return 31;
+    return FontSize.displaySmall;
   }
-  return 24;
+  return FontSize.xxxl;
 }

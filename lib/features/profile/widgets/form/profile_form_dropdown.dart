@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_typography.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_field_shell.dart';
 import 'package:numi/features/profile/widgets/form/profile_form_keyboard.dart';
@@ -59,21 +59,22 @@ class ProfileFormDropdown<T> extends StatelessWidget {
                   selectedLabel ?? hintText,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.andika(
-                    color: selectedLabel == null
-                        ? const Color(0xFFA8B1B2)
-                        : AppColors.textPrimary,
-                    fontSize: FontSize.normal,
-                    fontWeight: selectedLabel == null
-                        ? FontWeight.w800
-                        : FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
+                  style: (context.textStyles.bodyLarge ?? const TextStyle())
+                      .copyWith(
+                        color: selectedLabel == null
+                            ? context.themeColors.inputHint
+                            : context.themeColors.textPrimary,
+                        fontSize: FontSize.normal,
+                        fontWeight: selectedLabel == null
+                            ? FontWeight.w800
+                            : FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: AppColors.tealIcon,
+                color: context.themeColors.brandStrong,
                 size: 24,
               ),
             ],
@@ -93,12 +94,13 @@ class ProfileFormDropdown<T> extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.andika(
-                color: AppColors.tealIcon,
-                fontSize: FontSize.xxxl,
-                fontWeight: FontWeight.w900,
-                height: 1.15,
-              ),
+              style: (context.textStyles.bodyLarge ?? const TextStyle())
+                  .copyWith(
+                    color: context.themeColors.brandStrong,
+                    fontSize: FontSize.xxxl,
+                    fontWeight: FontWeight.w900,
+                    height: 1.15,
+                  ),
             ),
             OptionBottomSheetList(
               itemCount: items.length + (allowEmpty ? 1 : 0),
@@ -122,19 +124,20 @@ class ProfileFormDropdown<T> extends StatelessWidget {
                       optionLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.andika(
-                        color: AppColors.textPrimary,
-                        fontSize: FontSize.normal,
-                        fontWeight: isSelected
-                            ? FontWeight.w900
-                            : FontWeight.w700,
-                        letterSpacing: 0,
-                      ),
+                      style: (context.textStyles.bodyLarge ?? const TextStyle())
+                          .copyWith(
+                            color: context.themeColors.textPrimary,
+                            fontSize: FontSize.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.w900
+                                : FontWeight.w700,
+                            letterSpacing: 0,
+                          ),
                     ),
                     trailing: isSelected
-                        ? const Icon(
+                        ? Icon(
                             Icons.check_circle_rounded,
-                            color: AppColors.tealIcon,
+                            color: context.themeColors.brandStrong,
                             size: 22,
                           )
                         : null,
