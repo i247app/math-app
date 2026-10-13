@@ -21,7 +21,7 @@ class GradeExamOutcome {
 class GradeExamFlowPolicy {
   const GradeExamFlowPolicy._();
 
-  static const int minimumLevel = 0;
+  static const int minimumLevel = 1;
   static const int defaultLevel = 1;
   static const int maximumLevel = 10;
 

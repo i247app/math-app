@@ -102,27 +102,35 @@ void main() {
     expect(exam.userExamId, 99);
   });
 
-  for (final level in [0, 7]) {
-    test('generates GRADE with requested level $level', () async {
-      late RequestOptions captured;
-      final api = _apiReturning((options) {
-        captured = options;
-        return _examResponse();
-      });
+  for (final level in [1, 2, 7, 10]) {
+    test(
+      'generates GRADE display level $level with API level ${level - 1}',
+      () async {
+        late RequestOptions captured;
+        final api = _apiReturning((options) {
+          captured = options;
+          final response = _examResponse();
+          (response['exam'] as Map<String, dynamic>)
+            ..['exam_type'] = examTypeGrade
+            ..['level'] = level - 1;
+          return response;
+        });
 
-      await api.generateAssessmentExam(
-        examType: examTypeGrade,
-        profileId: 21,
-        gradeLabel: 'Lớp 5',
-        level: level,
-      );
+        final exam = await api.generateAssessmentExam(
+          examType: examTypeGrade,
+          profileId: 21,
+          gradeLabel: 'Lớp 5',
+          level: level,
+        );
 
-      final body = _body(captured);
-      expect(body, containsPair('exam_type', examTypeGrade));
-      expect(body, containsPair('grade', 5));
-      expect(body, containsPair('level', level));
-      expect(body, isNot(contains('esess_id')));
-    });
+        final body = _body(captured);
+        expect(body, containsPair('exam_type', examTypeGrade));
+        expect(body, containsPair('grade', 5));
+        expect(body, containsPair('level', level - 1));
+        expect(body, isNot(contains('esess_id')));
+        expect(exam.level, level);
+      },
+    );
   }
 
   test('defaults an omitted assessment grade to kindergarten', () async {
@@ -136,6 +144,64 @@ void main() {
 
     expect(_body(captured), containsPair('grade', 0));
   });
+
+  for (final apiLevel in [0, 4, 9]) {
+    test(
+      'GRADE level $apiLevel round trips through submit and detail',
+      () async {
+        final api = _apiReturning((options) {
+          final response = _examResponse();
+          final exam = response['exam'] as Map<String, dynamic>;
+          exam
+            ..['exam_type'] = 'GRADE'
+            ..['level'] = apiLevel
+            ..['status'] = 'COMPLETE';
+          response['exam_session'] = {
+            'exam_type': 'GRADE',
+            'esess_id': 99,
+            'grade': 2,
+            'level': apiLevel,
+            'status': 'COMPLETE',
+            'total_questions': 1,
+            'correct_number': 1,
+            'skipped_number': 0,
+            'score_percentage': 100,
+          };
+          response['details'] = [
+            {
+              'question_number': 1,
+              'question_name': '1 + 1 = ?',
+              'selected_label': 'A',
+              'selected_content': '2',
+              'right_answer_label': 'A',
+              'right_answer_content': '2',
+            },
+          ];
+          return response;
+        });
+        final submitted = await api.submitExam(
+          examId: 2,
+          profileId: 21,
+          answers: const [SubmitExamAnswer(questionNumber: 1, label: 'A')],
+        );
+        final detailByLink = await api.getExamDetail(
+          2,
+          profileId: 21,
+          examType: examTypeGrade,
+        );
+        final detailBySession = await api.getExamDetail(
+          0,
+          userExamId: 99,
+          profileId: 21,
+          examType: examTypeGrade,
+        );
+        expect(submitted.level, apiLevel + 1);
+        expect(detailByLink.level, apiLevel + 1);
+        expect(detailBySession.level, apiLevel + 1);
+        expect(detailBySession.examType, examTypeGrade);
+      },
+    );
+  }
 
   test('maps the kindergarten label to grade zero', () async {
     late RequestOptions captured;
@@ -1113,7 +1179,7 @@ void main() {
           .toList();
       expect(learningItems.map((entry) => entry.userExamId), [101, 99]);
       expect(learningItems.every((entry) => entry.grade == 0), isTrue);
-      expect(learningItems.every((entry) => entry.level == 1), isTrue);
+      expect(learningItems.map((entry) => entry.level), [1, 2]);
     },
   );
 
@@ -1178,7 +1244,7 @@ void main() {
       expect(result.examType, examTypeGrade);
       expect(result.status, 'COMPLETE');
       expect(result.grade, 0);
-      expect(result.level, 1);
+      expect(result.level, 2);
       expect(result.passed, isTrue);
       expect(result.correctNumber, 5);
       expect(result.scorePercentage, 50);
@@ -1262,7 +1328,7 @@ void main() {
       expect(latest.examType, 'GRADE');
       expect(latest.status, 'COMPLETE');
       expect(latest.grade, 2);
-      expect(latest.level, 1);
+      expect(latest.level, 2);
       expect(latest.passed, isTrue);
       expect(latest.isLatest, isTrue);
       expect(latest.scorePercentage, 90);
@@ -1307,8 +1373,8 @@ void main() {
     expect(_body(captured), containsPair('profile_id', 21));
     expect(_body(captured), containsPair('grade', 2));
     expect(_body(captured), isNot(contains('exam_type')));
-    expect(levels.latestLevel, 1);
-    expect(levels.maxLevel, 3);
+    expect(levels.latestLevel, 2);
+    expect(levels.maxLevel, 4);
   });
 }
 

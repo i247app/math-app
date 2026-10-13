@@ -1,5 +1,6 @@
 import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/helpers/grade_exam_level.dart';
 
 extension SubmitExamAnswerConversion on SubmitExamAnswer {
   SubmitExamAnswerDto toDto() =>
@@ -97,7 +98,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     examId: userAiExamIdOverride ?? userAiExamId,
     profileId: profileId,
     examStatus: examStatusOverride ?? status,
-    examType: examType,
+    examType: examType ?? stats?.examType,
     title: title,
     shortText: shortText,
     createDt: createDt,
@@ -113,7 +114,10 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     aiReviewShort: stats?.aiReviewShort,
     aiReviewLong: stats?.aiReviewLong,
     practiceWeakTopics: practiceWeakTopics,
-    level: level,
+    level: GradeExamLevel.forExamType(
+      level ?? stats?.level,
+      examType ?? stats?.examType,
+    ),
     numQuestions: numQuestions,
     startedDt: startedDt,
     submittedDt: submittedDt,
@@ -176,7 +180,7 @@ extension ExamProgressPointDtoConversion on ExamProgressPointDto {
     examType: examType,
     status: status,
     grade: grade,
-    level: level,
+    level: GradeExamLevel.forExamType(level, examType),
   );
 }
 
@@ -221,12 +225,14 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       ...inProgressExams.map(
         (exam) => exam.toModel(
           userExamId: userExamId,
+          stats: this,
           questionNumberOffset: questionNumberOffset,
         ),
       ),
       if (inProgressExam != null)
         inProgressExam!.toModel(
           userExamId: userExamId,
+          stats: this,
           questionNumberOffset: questionNumberOffset,
         ),
     ];
@@ -239,7 +245,7 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       userExamId: userExamId,
       status: status,
       grade: grade,
-      level: level,
+      level: GradeExamLevel.forExamType(level, examType),
       lastSubmittedDt: lastSubmittedDt,
       endedDt: endedDt,
       createDt: createDt,

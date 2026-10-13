@@ -10,18 +10,21 @@ void main() {
     correctQuestionIndexes: correct,
   );
 
-  test('level zero pass advances to level one, not level two', () {
-    final outcome = GradeExamFlowPolicy.evaluate(
-      attemptedGrade: 2,
-      attemptedLevel: 0,
-      score: score({0, 1, 2, 3, 4, 5}),
-      savedProgress: const ProfileGradeProgress(grade: 2, level: 0),
-    );
-    expect(outcome.passed, isTrue);
-    expect(outcome.levelIncrease, 1);
-    expect(outcome.progress.grade, 2);
-    expect(outcome.progress.level, 1);
-  });
+  test(
+    'legacy level zero uses display level one and advances to level two',
+    () {
+      final outcome = GradeExamFlowPolicy.evaluate(
+        attemptedGrade: 2,
+        attemptedLevel: 0,
+        score: score({0, 1, 2, 3, 4, 5}),
+        savedProgress: const ProfileGradeProgress(grade: 2, level: 0),
+      );
+      expect(outcome.passed, isTrue);
+      expect(outcome.levelIncrease, 1);
+      expect(outcome.progress.grade, 2);
+      expect(outcome.progress.level, 2);
+    },
+  );
 
   test('level zero failure stays at level zero', () {
     final outcome = GradeExamFlowPolicy.evaluate(

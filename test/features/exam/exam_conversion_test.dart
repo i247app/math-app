@@ -1,8 +1,60 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/data/exam_conversion.dart';
+import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 
 void main() {
+  for (var apiLevel = 0; apiLevel <= 9; apiLevel++) {
+    test('GRADE API level $apiLevel maps to display level ${apiLevel + 1}', () {
+      final session = ExamStatsDto.fromJson({
+        'exam_type': 'GRADE',
+        'level': apiLevel,
+        'total_questions': 10,
+        'correct_number': 6,
+        'skipped_number': 0,
+        'score_percentage': 60,
+        'in_progress_exam': {
+          'level': apiLevel,
+          'questions': <Map<String, dynamic>>[],
+        },
+      });
+      final generated = GeneratedExamDto(
+        examType: 'GRADE',
+        level: apiLevel,
+        questions: const [],
+      ).toModel();
+      final fromSession = const GeneratedExamDto(
+        questions: [],
+      ).toModel(stats: session);
+      final stats = session.toModel();
+      final levels = GradeLevels.fromJson({
+        'latest_level': apiLevel,
+        'max_level': apiLevel,
+      });
+
+      expect(generated.level, apiLevel + 1);
+      expect(fromSession.examType, examTypeGrade);
+      expect(fromSession.level, apiLevel + 1);
+      expect(stats.level, apiLevel + 1);
+      expect(stats.inProgressExams.single.level, apiLevel + 1);
+      expect(stats.inProgressExams.single.examType, examTypeGrade);
+      expect(levels.latestLevel, apiLevel + 1);
+      expect(levels.maxLevel, apiLevel + 1);
+    });
+  }
+
+  for (final type in [examTypeAssessment, examTypePractice]) {
+    test('$type keeps the original API level', () {
+      final exam = GeneratedExamDto(
+        examType: type,
+        level: 5,
+        questions: const [],
+      ).toModel();
+      expect(exam.level, 5);
+    });
+  }
+
   test(
     'generate and detail preserve the question type for fraction rendering',
     () {

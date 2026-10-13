@@ -161,7 +161,7 @@ void main() {
     expect(controller.shouldAutoSubmitAssessment, isTrue);
   });
 
-  test('resumed GRADE Level 0 is not clamped to Level 1', () {
+  test('resumed GRADE legacy Level 0 is clamped to display Level 1', () {
     final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypeGrade,
@@ -174,7 +174,7 @@ void main() {
       ),
     );
     addTearDown(controller.dispose);
-    expect(controller.currentLevel, 0);
+    expect(controller.currentLevel, 1);
   });
 
   test('GRADE is ready to submit immediately after five wrong answers', () {

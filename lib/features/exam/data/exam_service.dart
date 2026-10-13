@@ -6,6 +6,7 @@ const examTypePractice = 'PRACTICE';
 const examTypeGrade = 'GRADE';
 
 abstract interface class ExamService {
+  /// For GRADE, [level] is the progress level (1-10); the API sends 0-9.
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
     String? gradeLabel,

@@ -6,6 +6,7 @@ import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/data/exam_conversion.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
+import 'package:numi/features/exam/helpers/grade_exam_level.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
@@ -49,10 +50,9 @@ class ExamApi implements ExamService {
           numQuestions: AssessmentFlowPolicy.generatedQuestionCount,
           examType: examType,
           grade: _gradeFromLabel(gradeLabel),
-          level: (level ?? 1).clamp(
-            normalizedExamType == examTypeGrade ? 0 : 1,
-            10,
-          ),
+          level: normalizedExamType == examTypeGrade
+              ? GradeExamLevel.toApi(level ?? 1)
+              : (level ?? 1).clamp(1, 10),
           userExamId: normalizedExamType == examTypePractice
               ? validUserExamId
               : null,
@@ -489,7 +489,10 @@ GeneratedExam _journeyDetailToModel(
     aiReviewShort: stats.aiReviewShort,
     aiReviewLong: stats.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
-    level: stats.level ?? lastExam?.level,
+    level: GradeExamLevel.forExamType(
+      stats.level ?? lastExam?.level,
+      stats.examType ?? lastExam?.examType,
+    ),
     numQuestions: stats.totalQuestions,
     title: lastExam?.title,
     shortText: stats.review ?? lastExam?.shortText,
@@ -581,7 +584,10 @@ GeneratedExam _activeJourneySetToModel({
     aiReviewShort: response.examSession?.aiReviewShort,
     aiReviewLong: response.examSession?.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
-    level: activeExam.level,
+    level: GradeExamLevel.forExamType(
+      activeExam.level,
+      activeExam.examType ?? response.examSession?.examType,
+    ),
     numQuestions: activeDetails.length,
     title: activeExam.title,
     shortText: activeExam.shortText,
