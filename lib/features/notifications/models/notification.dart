@@ -26,4 +26,14 @@ class NotificationModel {
   final String? modifyDt;
 
   int? get stableId => notificationId ?? id;
+
+  /// An explicit read flag takes precedence over the read timestamp.
+  /// Without a flag or a non-empty timestamp, treat the notification as unread.
+  bool get isUnread {
+    final readFlag = isRead;
+    if (readFlag != null) {
+      return !readFlag;
+    }
+    return readAt?.trim().isEmpty ?? true;
+  }
 }

@@ -23,7 +23,7 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final isUnread = notification.isRead == false;
+    final isUnread = notification.isUnread;
     final title = notification.title?.trim();
     final message = notificationMessage(notification);
     final radius = BorderRadius.circular(14);

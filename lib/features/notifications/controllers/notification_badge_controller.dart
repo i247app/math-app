@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:numi/features/notifications/models/notification.dart';
 import 'package:numi/features/notifications/data/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_list_service.dart';
 
@@ -31,7 +30,7 @@ class NotificationBadgeController extends ChangeNotifier {
     _started = true;
     final cached = NotificationCache.peek();
     if (cached != null) {
-      _updateHasUnread(cached.any(_isUnread));
+      _updateHasUnread(cached.any((notification) => notification.isUnread));
     }
     _messageSubscription = _incomingMessages?.listen((_) {
       _requestRevision++;
@@ -50,7 +49,9 @@ class NotificationBadgeController extends ChangeNotifier {
       if (_disposed || requestRevision != _requestRevision) {
         return;
       }
-      _updateHasUnread(notifications.any(_isUnread));
+      _updateHasUnread(
+        notifications.any((notification) => notification.isUnread),
+      );
     } catch (_) {
       // Keep the current badge state when the notification endpoint is
       // temporarily unavailable.
@@ -60,14 +61,6 @@ class NotificationBadgeController extends ChangeNotifier {
   void markViewed() {
     _requestRevision++;
     _updateHasUnread(false);
-  }
-
-  bool _isUnread(NotificationModel notification) {
-    final isRead = notification.isRead;
-    if (isRead != null) {
-      return !isRead;
-    }
-    return notification.readAt?.trim().isEmpty ?? true;
   }
 
   void _updateHasUnread(bool next) {
