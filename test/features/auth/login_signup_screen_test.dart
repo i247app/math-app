@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
@@ -15,6 +17,9 @@ void main() {
   testWidgets('login and signup screens share entry UI with distinct actions', (
     tester,
   ) async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final originalLanguage = AppLanguageState.current;
+    addTearDown(() => AppLanguageState.current = originalLanguage);
     tester.view.physicalSize = const Size(430, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -82,10 +87,18 @@ void main() {
       tester
           .widget<AuthEntryActionButton>(find.byType(AuthEntryActionButton))
           .label,
-      lingo.lookup(AppKeys.continueLabel),
+      lingo.lookup(AppKeys.welcomeSignup),
     );
     expect(find.text(lingo.lookup(AppKeys.loginWithPin)), findsNothing);
     await tester.tap(find.byType(ElevatedButton));
     expect(submitCount, 2);
+
+    await lingo.setLanguage(AppLanguage.en);
+    await showMode(AuthEntryMode.signup);
+    expect(find.text('SIGNUP'), findsOneWidget);
+    expect(find.text('CONTINUE'), findsNothing);
+
+    await showMode(AuthEntryMode.login);
+    expect(find.text('LOGIN'), findsOneWidget);
   });
 }

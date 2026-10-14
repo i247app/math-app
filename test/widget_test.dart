@@ -919,6 +919,102 @@ void main() {
       expect(authService.lookedUpNames, <String>['+84905666666']);
     });
 
+    for (final language in AppLanguage.values) {
+      for (final signup in [false, true]) {
+        testWidgets(
+          'phone validation updates on digit changes ($language, signup=$signup)',
+          (tester) async {
+            final originalLanguage = AppLanguageState.current;
+            addTearDown(() => AppLanguageState.current = originalLanguage);
+            FlutterSecureStorage.setMockInitialValues({
+              'app_language': language.apiCode,
+            });
+            final authService = _SignupLookupAuthService();
+            await tester.pumpWidget(NumiApp(authService: authService));
+            await tester.pumpAndSettle();
+            final strings = AppStrings.getAll(language);
+            final entryButton = find.text(
+              language == AppLanguage.en
+                  ? (signup ? 'SIGNUP' : 'LOGIN')
+                  : strings[signup ? AppKeys.signup : AppKeys.login]!
+                        .toUpperCase(),
+            );
+            await tester.ensureVisible(entryButton);
+            await tester.tap(entryButton);
+            await tester.pumpAndSettle();
+
+            final input = find.byType(EditableText);
+            await tester.enterText(input, '032580280');
+            await tester.pumpAndSettle();
+            expect(find.text(strings[AppKeys.invalidPhone]!), findsOneWidget);
+
+            await tester.enterText(input, '0325802809');
+            await tester.pumpAndSettle();
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
+            expect(authService.lookedUpNames, isEmpty);
+
+            await tester.enterText(input, '032580280');
+            await tester.pumpAndSettle();
+            expect(find.text(strings[AppKeys.invalidPhone]!), findsOneWidget);
+
+            await tester.enterText(input, '325802809');
+            await tester.pumpAndSettle();
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+    }
+
+    testWidgets(
+      'signup clears stale invalid phone error after editing a lookup',
+      (tester) async {
+        final originalLanguage = AppLanguageState.current;
+        addTearDown(() => AppLanguageState.current = originalLanguage);
+        FlutterSecureStorage.setMockInitialValues({'app_language': 'vi-VN'});
+        final authService = _SignupLookupAuthService(accountExists: true);
+        await tester.pumpWidget(NumiApp(authService: authService));
+        await tester.pumpAndSettle();
+        final signupButton = find.text('ĐĂNG KÝ');
+        await tester.ensureVisible(signupButton);
+        await tester.tap(signupButton);
+        await tester.pumpAndSettle();
+
+        final input = find.byType(EditableText);
+        final error = find.byKey(const ValueKey('auth-identifier-error'));
+        await tester.enterText(input, '0325802801');
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pumpAndSettle();
+        expect(authService.lookedUpNames, ['+84325802801']);
+        expect(
+          tester.widget<Text>(error).data,
+          AppStrings.current(AppKeys.signupPhoneAlreadyRegistered),
+        );
+
+        await tester.enterText(input, '032580280');
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<Text>(error).data,
+          AppStrings.current(AppKeys.invalidPhone),
+        );
+        await tester.enterText(input, '0325802809');
+        await tester.pumpAndSettle();
+        expect(error, findsNothing);
+        expect(authService.lookedUpNames, ['+84325802801']);
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pumpAndSettle();
+        expect(authService.lookedUpNames, ['+84325802801', '+84325802809']);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('signup with phone skips OTP when the API disables it', (
       tester,
     ) async {

@@ -72,7 +72,7 @@ class AuthEntryView extends StatelessWidget {
               onSubmitIdentifier: entry.onSubmitIdentifier,
               actionLabel: context.getText(
                 mode == AuthEntryMode.signup
-                    ? AppKeys.continueLabel
+                    ? AppKeys.welcomeSignup
                     : AppKeys.login,
               ),
               isSubmitting: entry.isSubmitting,

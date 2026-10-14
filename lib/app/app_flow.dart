@@ -43,7 +43,6 @@ class AppFlow extends StatefulWidget {
 class _AppFlowState extends State<AppFlow> {
   final loginNameController = TextEditingController();
   bool _loginNameHasInput = false;
-  LoginNameKind? _loginNameKind;
   bool _loginNameSubmitAttempted = false;
 
   LoginNameValidationResult _normalizedLoginNameInput(
@@ -74,9 +73,6 @@ class _AppFlowState extends State<AppFlow> {
 
     setState(() {
       _loginNameHasInput = hasInput;
-      if (!hasInput) {
-        _loginNameKind = null;
-      }
     });
   }
 
@@ -90,7 +86,6 @@ class _AppFlowState extends State<AppFlow> {
     loginNameController.clear();
     setState(() {
       _loginNameHasInput = false;
-      _loginNameKind = null;
       _loginNameSubmitAttempted = false;
     });
   }
@@ -102,16 +97,11 @@ class _AppFlowState extends State<AppFlow> {
     String value,
   ) {
     final hasInput = value.trim().isNotEmpty;
-    final kind = detectLoginNameKind(value);
-    if (_loginNameHasInput != hasInput ||
-        _loginNameKind != kind ||
-        _loginNameSubmitAttempted) {
-      setState(() {
-        _loginNameHasInput = hasInput;
-        _loginNameKind = kind;
-        _loginNameSubmitAttempted = false;
-      });
-    }
+    // Validation can change even while the identifier stays nonempty.
+    setState(() {
+      _loginNameHasInput = hasInput;
+      _loginNameSubmitAttempted = false;
+    });
 
     cubit.clearIdentifierLookup();
   }
