@@ -1,3 +1,4 @@
+import 'package:numi/features/auth/navigation/passcode_navigator.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,6 +38,9 @@ class AppServiceScope extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<PasscodeNavigator>.value(
+          value: services.passcodeNavigator,
+        ),
         RepositoryProvider<ClassroomExerciseNavigator>.value(
           value: services.classroomExerciseNavigator,
         ),

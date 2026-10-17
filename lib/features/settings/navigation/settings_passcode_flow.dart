@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/features/auth/screens/passcode_screen.dart';
+import 'package:numi/features/auth/navigation/passcode_navigator.dart';
 import 'package:numi/features/settings/controllers/settings_passcode_controller.dart';
 import 'package:numi/features/settings/widgets/menu/passcode_settings_sheet.dart';
 
@@ -56,23 +57,13 @@ class SettingsPasscodeFlow {
     int userId,
     SettingsPasscodeController controller,
   ) async {
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (routeContext) {
-          return PasscodeScreen(
-            mode: PasscodeScreenMode.setup,
-            titleKey: AppKeys.createPasscodeTitle,
-            onBack: () => Navigator.of(routeContext).pop(false),
-            onSubmit: (passcode) async {
-              await controller.setPasscode(userId: userId, passcode: passcode);
-              if (routeContext.mounted) {
-                Navigator.of(routeContext).pop(true);
-              }
-              return null;
-            },
-          );
-        },
-      ),
+    await context.read<PasscodeNavigator>().setup(
+      context: context,
+      titleKey: AppKeys.createPasscodeTitle,
+      onSubmit: (passcode) async {
+        await controller.setPasscode(userId: userId, passcode: passcode);
+        return null;
+      },
     );
   }
 
@@ -92,23 +83,13 @@ class SettingsPasscodeFlow {
       return;
     }
 
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (routeContext) {
-          return PasscodeScreen(
-            mode: PasscodeScreenMode.setup,
-            titleKey: AppKeys.changePasscodeTitle,
-            onBack: () => Navigator.of(routeContext).pop(false),
-            onSubmit: (passcode) async {
-              await controller.setPasscode(userId: userId, passcode: passcode);
-              if (routeContext.mounted) {
-                Navigator.of(routeContext).pop(true);
-              }
-              return null;
-            },
-          );
-        },
-      ),
+    await context.read<PasscodeNavigator>().setup(
+      context: context,
+      titleKey: AppKeys.changePasscodeTitle,
+      onSubmit: (passcode) async {
+        await controller.setPasscode(userId: userId, passcode: passcode);
+        return null;
+      },
     );
   }
 
@@ -145,31 +126,17 @@ class SettingsPasscodeFlow {
     required SettingsPasscodeController controller,
   }) async {
     final incorrectMessage = context.getText(AppKeys.passcodeIncorrect);
-    final verified = await Navigator.of(context).push<bool>(
-      MaterialPageRoute<bool>(
-        builder: (routeContext) {
-          return PasscodeScreen(
-            mode: PasscodeScreenMode.verify,
-            titleKey: titleKey,
-            primaryLabelKey: primaryLabelKey,
-            onBack: () => Navigator.of(routeContext).pop(false),
-            onSubmit: (passcode) async {
-              final isValid = await controller.verifyPasscode(
-                userId: userId,
-                passcode: passcode,
-              );
-              if (!isValid) {
-                return incorrectMessage;
-              }
-              if (routeContext.mounted) {
-                Navigator.of(routeContext).pop(true);
-              }
-              return null;
-            },
-          );
-        },
-      ),
+    return context.read<PasscodeNavigator>().verify(
+      context: context,
+      titleKey: titleKey,
+      primaryLabelKey: primaryLabelKey,
+      onSubmit: (passcode) async {
+        final isValid = await controller.verifyPasscode(
+          userId: userId,
+          passcode: passcode,
+        );
+        return isValid ? null : incorrectMessage;
+      },
     );
-    return verified == true;
   }
 }

@@ -36,8 +36,10 @@ The tab host receives grouped session, services, actions and presentation inputs
 For a flow opened from another feature, expose a callback or a destination-owned
 navigation interface and build concrete routes in `app/composition/`. Home and
 Room use callbacks; Classroom uses `ClassroomExerciseNavigator`, provided above
-the application Navigator. Keep result handling, refresh and guards in the
-calling feature. Stable feature models and service interfaces may be reused
+the application Navigator. Settings opens Auth PIN forms through
+`PasscodeNavigator`; `AppPasscodeNavigator` builds their routes while Settings
+keeps verification, save/remove actions and flow decisions. Keep result handling,
+refresh and guards in the calling feature. Stable feature models and service interfaces may be reused
 where their ownership is clear; they do not need copies in a shared folder.
 
 - Use `classroom_exercise` for file/folder names and `ClassroomExercise` in type

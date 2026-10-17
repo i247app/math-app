@@ -1,3 +1,5 @@
+import 'package:numi/features/auth/navigation/passcode_navigator.dart';
+import 'package:numi/app/composition/app_passcode_navigator.dart';
 import 'package:numi/features/classroom_exercise/navigation/classroom_exercise_navigator.dart';
 import 'package:numi/app/composition/app_classroom_exercise_navigator.dart';
 import 'package:numi/core/network/network_client.dart';
@@ -57,6 +59,7 @@ class AppServices {
     SessionDataCleaner sessionDataCleaner = const AppSessionDataCleaner(),
     ClassroomExerciseNavigator classroomExerciseNavigator =
         const AppClassroomExerciseNavigator(),
+    PasscodeNavigator passcodeNavigator = const AppPasscodeNavigator(),
     DashboardTabFactory? dashboardTabFactory,
     DashboardNavigator dashboardNavigator = const AppDashboardNavigator(),
     ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
@@ -93,6 +96,7 @@ class AppServices {
           dashboardTabFactory ?? const AppDashboardTabFactory(),
       dashboardNavigator: dashboardNavigator,
       classroomExerciseNavigator: classroomExerciseNavigator,
+      passcodeNavigator: passcodeNavigator,
       sessionDataCleaner: sessionDataCleaner,
       activeProfileSession: activeProfileSession,
       passcodeService: passcodeService,
@@ -121,6 +125,7 @@ class AppServices {
     required this.dashboardTabFactory,
     required this.dashboardNavigator,
     required this.classroomExerciseNavigator,
+    required this.passcodeNavigator,
     required this.activeProfileSession,
     required this.passcodeService,
     required this.profileSessionResolver,
@@ -143,6 +148,7 @@ class AppServices {
   final DashboardTabFactory dashboardTabFactory;
   final DashboardNavigator dashboardNavigator;
   final ClassroomExerciseNavigator classroomExerciseNavigator;
+  final PasscodeNavigator passcodeNavigator;
   final ActiveProfileSession activeProfileSession;
   final PasscodeService passcodeService;
   final ProfileSessionResolver profileSessionResolver;
