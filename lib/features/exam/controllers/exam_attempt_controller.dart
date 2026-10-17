@@ -1,72 +1,24 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
-import 'package:numi/features/exam/data/exam_cache.dart';
+import 'package:numi/features/exam/controllers/exam_attempt_flow.dart';
+import 'package:numi/features/exam/data/exam_attempt_requests.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
-import 'package:numi/features/exam/helpers/practice_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/exam_attempt_answers.dart';
+import 'package:numi/features/exam/models/exam_attempt_state.dart';
+
+export 'package:numi/features/exam/models/exam_attempt_state.dart';
 
 const assessmentCorrectAnswerTarget =
     AssessmentFlowPolicy.firstQuestionsUpgradeTarget;
 
-enum ExamAttemptRetryAction { generate, submit }
-
-enum ExamAttemptSubmitStatus {
-  submitted,
-  missingExam,
-  unanswered,
-  failed,
-  ignored,
-}
-
-class ExamAttemptSubmitResult {
-  const ExamAttemptSubmitResult._(this.status, [this.exam]);
-
-  const ExamAttemptSubmitResult.submitted(GeneratedExam exam)
-    : this._(ExamAttemptSubmitStatus.submitted, exam);
-
-  const ExamAttemptSubmitResult.missingExam()
-    : this._(ExamAttemptSubmitStatus.missingExam);
-
-  const ExamAttemptSubmitResult.unanswered()
-    : this._(ExamAttemptSubmitStatus.unanswered);
-
-  const ExamAttemptSubmitResult.failed()
-    : this._(ExamAttemptSubmitStatus.failed);
-
-  const ExamAttemptSubmitResult.ignored()
-    : this._(ExamAttemptSubmitStatus.ignored);
-
-  final ExamAttemptSubmitStatus status;
-  final GeneratedExam? exam;
-}
-
-class AssessmentSetRecord {
-  AssessmentSetRecord({
-    required this.exam,
-    required this.grade,
-    required this.mode,
-    required this.setNumber,
-    required Map<int, String> selectedAnswerLabels,
-    required this.correctAnswerCount,
-  }) : selectedAnswerLabels = Map<int, String>.unmodifiable(
-         selectedAnswerLabels,
-       );
-
-  final GeneratedExam exam;
-  final int grade;
-  final AssessmentFlowMode mode;
-  final int setNumber;
-  final Map<int, String> selectedAnswerLabels;
-  final int correctAnswerCount;
-}
-
+/// UI-facing facade for answer state, mode policies and asynchronous set work.
 class ExamAttemptController extends ChangeNotifier {
   ExamAttemptController({
     required ExamService examService,
@@ -76,223 +28,151 @@ class ExamAttemptController extends ChangeNotifier {
     this.level,
     this.profileId,
     this.startAtKindergarten = true,
-  }) : _examService = examService,
-       _exam = initialExam {
-    final fallbackGrade = _isAssessment ? 0 : 1;
-    _flowState = AssessmentFlowState(
-      grade: AssessmentFlowPolicy.clampGrade(
-        initialExam?.grade ??
-            AssessmentFlowPolicy.gradeFromLabel(
-              gradeLabel,
-              fallback: fallbackGrade,
-            ),
-      ),
+  }) : _exam = initialExam {
+    _flow = ExamAttemptFlow(
+      kind: _kind,
+      initialExam: initialExam,
+      gradeLabel: gradeLabel,
+      level: level,
     );
-    _currentLevel = (initialExam?.level ?? level ?? 1).clamp(
-      _isGrade ? GradeExamFlowPolicy.minimumLevel : 1,
-      GradeExamFlowPolicy.maximumLevel,
+    _requests = ExamAttemptRequests(
+      service: examService,
+      examType: examType,
+      profileId: profileId,
     );
-    _restoreInitialAttempt(initialExam);
+    _questionIndex = _answers.restore(initialExam);
   }
 
-  final _cacheScope = SessionCacheScope.current;
-  final ExamService _examService;
   final String examType;
   final String? gradeLabel;
   final int? level;
   final int? profileId;
   final bool startAtKindergarten;
-
+  final _answers = ExamAttemptAnswers();
+  late final ExamAttemptFlow _flow;
+  late final ExamAttemptRequests _requests;
   GeneratedExam? _exam;
-  late AssessmentFlowState _flowState;
-  late int _currentLevel;
   int _questionIndex = 0;
-  int _questionNumberOffset = 0;
-  final Map<int, String> _selectedAnswerLabels = <int, String>{};
-  final Map<int, String> _practiceSelectedAnswerLabels = <int, String>{};
-  final Map<int, bool?> _practiceFeedbackCorrectness = <int, bool?>{};
-  final List<AssessmentSetRecord> _completedSets = <AssessmentSetRecord>[];
-  final Map<int, GeneratedExam> _submittedSets = <int, GeneratedExam>{};
   String? _errorMessage;
   ExamAttemptRetryAction? _errorRetryAction;
   bool _isGeneratingExam = false;
   bool _isTransitioningSet = false;
   bool _isSubmittingExam = false;
   bool _isUpdatingExitStatus = false;
-  bool _allowsPartialSubmit = false;
-  int _generateRequestId = 0;
-  AssessmentFlowDecision? _pendingGenerationDecision;
-  GeneratedExam? _pendingGeneratedExam;
+  int _operationRevision = 0;
+  bool _disposed = false;
 
-  bool get _isAssessment {
-    return (_exam?.examType ?? examType).trim().toUpperCase() ==
-        examTypeAssessment;
-  }
+  ExamAttemptKind get _kind =>
+      ExamAttemptKind.fromType(_exam?.examType ?? examType);
+  bool get _isAssessment => _kind == ExamAttemptKind.assessment;
+  bool get _isPractice => _kind == ExamAttemptKind.practice;
+  bool get _isGrade => _kind == ExamAttemptKind.grade;
+  bool _canApply(int revision) =>
+      !_disposed && revision == _operationRevision && _requests.isActive;
 
-  bool get _isPractice {
-    return (_exam?.examType ?? examType).trim().toUpperCase() ==
-        examTypePractice;
-  }
-
-  bool get _isGrade {
-    return (_exam?.examType ?? examType).trim().toUpperCase() == examTypeGrade;
-  }
-
-  ExamService get examService => _examService;
+  ExamService get examService => _requests.service;
   GeneratedExam? get exam => _exam;
   bool get isAssessment => _isAssessment;
   bool get isPractice => _isPractice;
   bool get isGrade => _isGrade;
   int get questionIndex => _questionIndex;
-  int get questionNumberOffset => _questionNumberOffset;
+  int get questionNumberOffset => _flow.questionNumberOffset;
   int get progressQuestionIndex => _isTransitioningSet ? 1 : _questionIndex + 1;
-  int get progressQuestionNumberOffset => _isTransitioningSet
-      ? _questionNumberOffset + _selectedAnswerLabels.length
-      : _questionNumberOffset;
+  int get progressQuestionNumberOffset =>
+      _flow.questionNumberOffset +
+      (_isTransitioningSet ? _answers.answeredCount : 0);
   int get displayedQuestionNumber =>
       progressQuestionNumberOffset + progressQuestionIndex;
-  int get currentGrade => _flowState.grade;
-  int get currentLevel => _currentLevel;
+  int get currentGrade => _flow.state.grade;
+  int get currentLevel => _flow.currentLevel;
   String get currentGradeLabel => AssessmentFlowPolicy.gradeLabel(currentGrade);
-  int get setNumber => _flowState.setNumber;
-  AssessmentFlowMode get flowMode => _flowState.mode;
-  bool get isFailed => _flowState.isFailed;
-  List<AssessmentSetRecord> get completedSets =>
-      List<AssessmentSetRecord>.unmodifiable(_completedSets);
-  Map<int, String> get selectedAnswerLabels =>
-      Map<int, String>.unmodifiable(_selectedAnswerLabels);
+  int get setNumber => _flow.state.setNumber;
+  AssessmentFlowMode get flowMode => _flow.state.mode;
+  bool get isFailed => _flow.state.isFailed;
+  List<AssessmentSetRecord> get completedSets => _flow.completedSets;
+  Map<int, String> get selectedAnswerLabels => _answers.firstAttempts;
   String? get errorMessage => _errorMessage;
   ExamAttemptRetryAction? get errorRetryAction => _errorRetryAction;
   bool get isGeneratingExam => _isGeneratingExam || _isTransitioningSet;
   bool get isTransitioningSet => _isTransitioningSet;
   int? get transitioningGradeDelta {
-    final decision = _pendingGenerationDecision;
-    if (!_isAssessment || !_isTransitioningSet || decision == null) {
-      return null;
-    }
-    return decision.nextState.grade - _flowState.grade;
+    final decision = _flow.pendingDecision;
+    if (!_isAssessment || !_isTransitioningSet || decision == null) return null;
+    return decision.nextState.grade - currentGrade;
   }
 
   bool get isTransitioningToHigherGrade => (transitioningGradeDelta ?? 0) > 0;
   bool get isSubmittingExam => _isSubmittingExam;
   int? get userExamId {
-    final currentId = _exam?.userExamId;
-    if (currentId != null && currentId > 0) {
-      return currentId;
-    }
-    for (final submittedExam in _submittedSets.values.toList().reversed) {
-      final submittedId = submittedExam.userExamId;
-      if (submittedId != null && submittedId > 0) {
-        return submittedId;
-      }
-    }
-    for (final completedSet in _completedSets.reversed) {
-      final completedId = completedSet.exam.userExamId;
-      if (completedId != null && completedId > 0) {
-        return completedId;
-      }
+    final current = _exam?.userExamId;
+    if (current != null && current > 0) return current;
+    final submitted = _requests.latestUserExamId;
+    if (submitted != null) return submitted;
+    for (final set in completedSets.reversed) {
+      final id = set.exam.userExamId;
+      if (id != null && id > 0) return id;
     }
     return null;
   }
 
   ExamQuestion? get currentQuestion {
     final questions = _exam?.questions ?? const <ExamQuestion>[];
-    if (questions.isEmpty || _questionIndex >= questions.length) {
-      return null;
-    }
-    return questions[_questionIndex];
+    return _questionIndex >= questions.length
+        ? null
+        : questions[_questionIndex];
   }
 
-  String? get selectedAnswerLabel => _isPractice
-      ? _practiceSelectedAnswerLabels[_questionIndex]
-      : _selectedAnswerLabels[_questionIndex];
-
+  String? get selectedAnswerLabel =>
+      _answers.selectedLabel(_questionIndex, practice: _isPractice);
   bool? get selectedAnswerFeedbackCorrect =>
-      _isPractice ? _practiceFeedbackCorrectness[_questionIndex] : null;
-
+      _isPractice ? _answers.feedbackAt(_questionIndex) : null;
   bool get canContinue => selectedAnswerLabel != null;
-
-  int? get firstUnansweredQuestionIndex {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    return _firstUnansweredIndex(questions);
-  }
-
-  bool get allQuestionsAnswered {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    return questions.isNotEmpty && firstUnansweredQuestionIndex == null;
-  }
-
+  int? get firstUnansweredQuestionIndex =>
+      _answers.firstUnansweredIndex(_exam?.questions ?? const []);
+  bool get allQuestionsAnswered =>
+      (_exam?.questions.isNotEmpty ?? false) &&
+      firstUnansweredQuestionIndex == null;
+  AssessmentSetScore get _currentSetScore => _answers.score(_exam);
   int get correctAnswerCount => _currentSetScore.correctCount;
   int get totalCorrectAnswerCount =>
-      _completedSets.fold<int>(
+      completedSets.fold<int>(
         0,
         (total, set) => total + set.correctAnswerCount,
       ) +
       correctAnswerCount;
   int get totalAnsweredQuestionCount =>
-      _completedSets.fold<int>(
+      completedSets.fold<int>(
         0,
         (total, set) => total + set.selectedAnswerLabels.length,
       ) +
-      _selectedAnswerLabels.length;
-
-  bool get shouldAutoSubmitAssessment => _allowsPartialSubmit;
-
-  void _restoreInitialAttempt(GeneratedExam? initialExam) {
-    _questionNumberOffset = initialExam?.questionNumberOffset ?? 0;
-    final questions = initialExam?.questions ?? const <ExamQuestion>[];
-    final answers = initialExam?.answers ?? const <SubmitExamAnswer>[];
-    if (questions.isEmpty) {
-      return;
-    }
-
-    for (final answer in answers) {
-      final answerLabel = answer.label.trim();
-      if (answerLabel.isEmpty) {
-        continue;
-      }
-      final questionIndex = questions.indexWhere(
-        (question) => question.questionNumber == answer.questionNumber,
-      );
-      if (questionIndex >= 0) {
-        _selectedAnswerLabels[questionIndex] = answerLabel;
-      }
-    }
-
-    final resumeQuestionIndex = initialExam?.resumeQuestionIndex;
-    if (resumeQuestionIndex != null) {
-      _questionIndex = resumeQuestionIndex.clamp(0, questions.length - 1);
-      return;
-    }
-    final firstUnansweredIndex = _firstUnansweredIndex(questions);
-    _questionIndex = firstUnansweredIndex ?? questions.length - 1;
-  }
-
-  bool? get isSelectedAnswerCorrect {
+      _answers.answeredCount;
+  bool get shouldAutoSubmitAssessment => _flow.allowsPartialSubmit;
+  bool? get isSelectedAnswerCorrect => _answers.selectedIsCorrect(
+    currentQuestion,
+    _questionIndex,
+    practice: _isPractice,
+  );
+  bool? isAnswerCorrect(ExamAnswer answer) {
     final question = currentQuestion;
-    final selectedLabel = selectedAnswerLabel;
-    if (question == null || selectedLabel == null) {
-      return null;
-    }
-
-    for (final answer in question.answers) {
-      if (_normalizedAnswerValue(answer.label) ==
-          _normalizedAnswerValue(selectedLabel)) {
-        return isAnswerCorrect(answer);
-      }
-    }
-    return null;
+    return question == null
+        ? null
+        : ExamAttemptAnswers.isAnswerCorrect(question, answer);
   }
+
+  bool get isGeneratingQuestion =>
+      (_isGeneratingExam || currentQuestion == null) && _errorMessage == null;
+  bool get isLastQuestion =>
+      _questionIndex >= (_exam?.questions.length ?? 0) - 1;
 
   Future<void> updateCurrentUserExamStatus(String status) async {
-    final currentUserExamId = userExamId;
-    if (currentUserExamId == null) {
+    final id = userExamId;
+    if (id == null) {
       throw ExamException(AppStrings.current(AppKeys.missingExamIdShort));
     }
-    await _examService.updateUserExamStatus(
-      userExamId: currentUserExamId,
+    await _requests.updateStatus(
+      userExamId: id,
       status: status,
-      profileId: profileId ?? _exam?.profileId,
+      fallbackProfileId: _exam?.profileId,
     );
   }
 
@@ -302,156 +182,89 @@ class ExamAttemptController extends ChangeNotifier {
         AppStrings.current(AppKeys.assessmentStatusUpdateFailed),
       );
     }
-
     _isUpdatingExitStatus = true;
     try {
-      await _examService.updateUserExamStatus(
+      await _requests.updateStatus(
         userExamId: userExamId,
         status: status,
-        profileId: profileId ?? _exam?.profileId,
+        fallbackProfileId: _exam?.profileId,
       );
     } finally {
       _isUpdatingExitStatus = false;
     }
   }
 
-  bool? isAnswerCorrect(ExamAnswer answer) {
-    final question = currentQuestion;
-    if (question == null) {
-      return null;
-    }
-
-    return _isAnswerCorrect(question, answer);
-  }
-
-  bool? _isAnswerCorrect(ExamQuestion question, ExamAnswer answer) {
-    final correctValues = <String?>[
-      question.rightAnswer,
-      question.correctAnswer,
-    ].map(_normalizedAnswerValue).whereType<String>().toSet();
-    if (correctValues.isEmpty) {
-      return null;
-    }
-
-    return correctValues.contains(_normalizedAnswerValue(answer.label)) ||
-        correctValues.contains(_normalizedAnswerValue(answer.content));
-  }
-
-  bool get isGeneratingQuestion {
-    return (_isGeneratingExam || currentQuestion == null) &&
-        _errorMessage == null;
-  }
-
-  bool get isLastQuestion {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    return _questionIndex >= questions.length - 1;
-  }
-
   Future<bool> generateExam() async {
-    if (_isGeneratingExam || _isTransitioningSet) {
+    if (_disposed ||
+        !_requests.isActive ||
+        _isGeneratingExam ||
+        _isTransitioningSet) {
       return false;
     }
-
-    final requestId = ++_generateRequestId;
+    final revision = ++_operationRevision;
+    final kind = _kind;
     final initialGrade = _isAssessment && startAtKindergarten
         ? AssessmentFlowPolicy.minimumGrade
         : AssessmentFlowPolicy.gradeFromLabel(
             gradeLabel,
             fallback: _isAssessment ? 0 : 1,
           );
-    _flowState = AssessmentFlowState(grade: initialGrade);
-    _currentLevel = (level ?? 1).clamp(
-      _isGrade ? GradeExamFlowPolicy.minimumLevel : 1,
-      GradeExamFlowPolicy.maximumLevel,
-    );
+    _flow.reset(grade: initialGrade, level: level ?? 1, kind: kind);
+    _requests.reset();
+    _answers.clear();
     _exam = null;
     _questionIndex = 0;
-    _questionNumberOffset = 0;
-    _selectedAnswerLabels.clear();
-    _practiceSelectedAnswerLabels.clear();
-    _practiceFeedbackCorrectness.clear();
-    _completedSets.clear();
-    _submittedSets.clear();
-    _pendingGenerationDecision = null;
-    _pendingGeneratedExam = null;
-    _allowsPartialSubmit = false;
     _errorMessage = null;
     _errorRetryAction = null;
     _isGeneratingExam = true;
     _isSubmittingExam = false;
     notifyListeners();
-
-    try {
-      final generatedExam = await _generateInitialSet(initialGrade);
-      if (requestId != _generateRequestId) {
-        return false;
-      }
-
-      _exam = generatedExam;
-      _restoreInitialAttempt(generatedExam);
-      if (_isAssessment && generatedExam.questionNumberOffset > 0) {
-        _flowState = _flowState.copyWith(
-          grade: AssessmentFlowPolicy.clampGrade(
-            generatedExam.grade ?? initialGrade,
-          ),
-        );
-      }
-      _isGeneratingExam = false;
-      notifyListeners();
-      return true;
-    } on ExamException catch (error) {
-      if (requestId != _generateRequestId) {
-        return false;
-      }
-      _handleGenerationFailure(error.message);
-    } catch (_) {
-      if (requestId != _generateRequestId) {
-        return false;
-      }
-      _handleGenerationFailure(
-        AppStrings.current(AppKeys.createQuestionFailed),
-      );
+    final result = await _requests.generate(
+      gradeLabel: _isAssessment && startAtKindergarten
+          ? AssessmentFlowPolicy.gradeLabel(initialGrade)
+          : gradeLabel,
+      level: currentLevel,
+    );
+    if (!_canApply(revision)) return false;
+    final generated = result.exam;
+    _isGeneratingExam = false;
+    if (generated == null) {
+      _errorMessage = result.errorMessage;
+      _errorRetryAction = ExamAttemptRetryAction.generate;
+    } else {
+      _exam = generated;
+      _questionIndex = _answers.restore(generated);
+      _flow.restoreGenerated(generated, _kind);
     }
-
-    return false;
+    notifyListeners();
+    return generated != null;
   }
 
-  Future<bool> retryGeneration() async {
-    final decision = _pendingGenerationDecision;
-    if (decision == null) {
-      return generateExam();
-    }
-    return _transitionToNextSet(decision);
+  Future<bool> retryGeneration() {
+    final decision = _flow.pendingDecision;
+    return decision == null ? generateExam() : _transitionToNextSet(decision);
   }
 
   void selectAnswer(ExamAnswer answer) {
-    if (_isTransitioningSet || _isSubmittingExam) {
+    if (_disposed || _isTransitioningSet || _isSubmittingExam) return;
+    if (!_answers.select(
+      _questionIndex,
+      currentQuestion,
+      answer,
+      practice: _isPractice,
+    )) {
       return;
     }
-    if (_isPractice) {
-      _allowsPartialSubmit = false;
-      _selectedAnswerLabels.putIfAbsent(_questionIndex, () => answer.label);
-      final isCorrect = isAnswerCorrect(answer);
-      _practiceSelectedAnswerLabels[_questionIndex] = answer.label;
-      _practiceFeedbackCorrectness[_questionIndex] = isCorrect;
-      notifyListeners();
-      return;
-    }
-    if (_selectedAnswerLabels[_questionIndex] == answer.label) {
-      return;
-    }
-    _allowsPartialSubmit = false;
-    _selectedAnswerLabels[_questionIndex] = answer.label;
+    _flow.selectionChanged();
     notifyListeners();
   }
 
   void clearPracticeFeedback({int? questionIndex}) {
-    final targetIndex = questionIndex ?? _questionIndex;
-    if (!_isPractice ||
-        !_practiceFeedbackCorrectness.containsKey(targetIndex)) {
+    if (_disposed ||
+        !_isPractice ||
+        !_answers.clearFeedback(questionIndex ?? _questionIndex)) {
       return;
     }
-    _practiceFeedbackCorrectness.remove(targetIndex);
     notifyListeners();
   }
 
@@ -462,45 +275,24 @@ class ExamAttemptController extends ChangeNotifier {
         !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
-    final score = _currentPracticeSetScore;
-    if (!PracticeFlowPolicy.shouldSubmit(score)) {
-      return AssessmentFlowAction.continueSet;
-    }
-    _allowsPartialSubmit = !score.isComplete;
-    notifyListeners();
-    return AssessmentFlowAction.submit;
+    return _prepareSubmit();
   }
 
-  GradeExamOutcome gradeOutcome(ProfileGradeProgress savedProgress) {
-    return GradeExamFlowPolicy.evaluate(
-      attemptedGrade: currentGrade,
-      attemptedLevel: currentLevel,
-      score: _currentSetScore,
-      savedProgress: savedProgress,
-    );
-  }
-
-  bool get shouldSubmitGrade {
-    if (!_isGrade) {
-      return false;
-    }
-    final score = _currentSetScore;
-    return score.areFirstQuestionsWrong(
-          AssessmentFlowPolicy.earlyFailQuestionCount,
-        ) ||
-        score.areFirstQuestionsPerfect(
-          AssessmentFlowPolicy.firstQuestionsUpgradeTarget,
-        ) ||
-        score.isComplete;
-  }
-
+  GradeExamOutcome gradeOutcome(ProfileGradeProgress savedProgress) =>
+      _flow.gradeOutcome(_currentSetScore, savedProgress);
+  bool get shouldSubmitGrade =>
+      _isGrade && _flow.shouldSubmitGrade(_currentSetScore);
   AssessmentFlowAction prepareGradeFlow() {
     if (!shouldSubmitGrade || _isSubmittingExam || _isTransitioningSet) {
       return AssessmentFlowAction.continueSet;
     }
-    _allowsPartialSubmit = !_currentSetScore.isComplete;
-    notifyListeners();
-    return AssessmentFlowAction.submit;
+    return _prepareSubmit();
+  }
+
+  AssessmentFlowAction _prepareSubmit() {
+    final action = _flow.prepareSubmit(_kind, _currentSetScore);
+    if (action == AssessmentFlowAction.submit) notifyListeners();
+    return action;
   }
 
   Future<AssessmentFlowAction> advanceAssessmentFlow() async {
@@ -510,19 +302,16 @@ class ExamAttemptController extends ChangeNotifier {
         !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
-
     final score = _currentSetScore;
-    final decision = AssessmentFlowPolicy.decide(_flowState, score);
+    final decision = _flow.assessmentDecision(score);
     if (decision.action == AssessmentFlowAction.continueSet) {
       return decision.action;
     }
     if (decision.action == AssessmentFlowAction.submit) {
-      _flowState = decision.nextState;
-      _allowsPartialSubmit = !score.isComplete;
+      _flow.applySubmit(decision, score);
       notifyListeners();
       return decision.action;
     }
-
     final transitioned = await _transitionToNextSet(decision);
     return transitioned
         ? AssessmentFlowAction.generateSet
@@ -549,424 +338,131 @@ class ExamAttemptController extends ChangeNotifier {
         !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
-
-    final score = _currentSetScore;
-    final decision = AssessmentFlowPolicy.decide(_flowState, score);
-    if (decision.action != AssessmentFlowAction.submit) {
-      return AssessmentFlowAction.continueSet;
-    }
-
-    _flowState = decision.nextState;
-    _allowsPartialSubmit = !score.isComplete;
-    notifyListeners();
-    return AssessmentFlowAction.submit;
+    return _prepareSubmit();
   }
 
   bool goToPreviousQuestion() {
-    if (_questionIndex == 0 || _isTransitioningSet) {
-      return false;
-    }
+    if (_disposed || _questionIndex == 0 || _isTransitioningSet) return false;
     _questionIndex--;
     notifyListeners();
     return true;
   }
 
   bool goToQuestion(int index) {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    if (_isTransitioningSet ||
+    if (_disposed ||
+        _isTransitioningSet ||
         index < 0 ||
-        index >= questions.length ||
+        index >= (_exam?.questions.length ?? 0) ||
         index == _questionIndex) {
       return false;
     }
-
     _questionIndex = index;
     notifyListeners();
     return true;
   }
 
   bool goToNextQuestion() {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    if (_isTransitioningSet ||
-        ((_isAssessment || _isPractice || _isGrade) && !canContinue) ||
-        _questionIndex >= questions.length - 1) {
+    if (_disposed ||
+        _isTransitioningSet ||
+        (_kind != ExamAttemptKind.other && !canContinue) ||
+        _questionIndex >= (_exam?.questions.length ?? 0) - 1) {
       return false;
     }
-
     _questionIndex++;
     notifyListeners();
     return true;
   }
 
   Future<ExamAttemptSubmitResult> submitCurrentExam() async {
-    if (_isSubmittingExam) {
+    if (_disposed || !_requests.isActive || _isSubmittingExam) {
       return const ExamAttemptSubmitResult.ignored();
     }
-
-    final currentExam = _exam;
-    final questions = currentExam?.questions ?? const <ExamQuestion>[];
-    final examId = currentExam?.examId;
-    if (currentExam == null || questions.isEmpty || examId == null) {
+    final source = _exam;
+    if (source == null || source.questions.isEmpty || source.examId == null) {
       _errorMessage = AppStrings.current(AppKeys.missingExamToSubmit);
       _errorRetryAction = null;
       notifyListeners();
       return const ExamAttemptSubmitResult.missingExam();
     }
-
-    final firstUnansweredIndex = _firstUnansweredIndex(questions);
-    if (firstUnansweredIndex != null && !_allowsPartialSubmit) {
-      _questionIndex = firstUnansweredIndex;
+    final unanswered = firstUnansweredQuestionIndex;
+    if (unanswered != null && !_flow.allowsPartialSubmit) {
+      _questionIndex = unanswered;
       notifyListeners();
       return const ExamAttemptSubmitResult.unanswered();
     }
-
-    final answers = _answersForExam(currentExam);
-
+    final revision = _operationRevision;
     _errorMessage = null;
     _errorRetryAction = null;
     _isSubmittingExam = true;
     notifyListeners();
-
-    try {
-      final submittedExam = await _submitSet(currentExam, answers);
-      return ExamAttemptSubmitResult.submitted(submittedExam);
-    } on ExamException catch (error) {
-      _errorMessage = error.message;
-      _errorRetryAction = ExamAttemptRetryAction.submit;
-      return const ExamAttemptSubmitResult.failed();
-    } catch (_) {
-      _errorMessage = AppStrings.current(AppKeys.submitExamFailed);
-      _errorRetryAction = ExamAttemptRetryAction.submit;
-      return const ExamAttemptSubmitResult.failed();
-    } finally {
-      _isSubmittingExam = false;
-      notifyListeners();
-    }
-  }
-
-  AssessmentSetScore get _currentSetScore {
-    final questions = _exam?.questions ?? const <ExamQuestion>[];
-    final correctIndexes = <int>{};
-    for (final entry in _selectedAnswerLabels.entries) {
-      if (entry.key < 0 || entry.key >= questions.length) {
-        continue;
-      }
-      final question = questions[entry.key];
-      final selectedLabel = _normalizedAnswerValue(entry.value);
-      for (final answer in question.answers) {
-        if (_normalizedAnswerValue(answer.label) == selectedLabel &&
-            _isAnswerCorrect(question, answer) == true) {
-          correctIndexes.add(entry.key);
-          break;
-        }
-      }
-    }
-    return AssessmentSetScore(
-      totalQuestions: questions.length,
-      answeredQuestionIndexes: _selectedAnswerLabels.keys.toSet(),
-      correctQuestionIndexes: correctIndexes,
+    final result = await _requests.submit(
+      source,
+      _answers.submission(source),
+      kind: _kind,
     );
-  }
-
-  PracticeSetScore get _currentPracticeSetScore {
-    final assessmentScore = _currentSetScore;
-    return PracticeSetScore(
-      totalQuestions: assessmentScore.totalQuestions,
-      answeredQuestionIndexes: assessmentScore.answeredQuestionIndexes,
-      correctQuestionIndexes: assessmentScore.correctQuestionIndexes,
-    );
+    if (!_canApply(revision)) return const ExamAttemptSubmitResult.ignored();
+    _isSubmittingExam = false;
+    if (result.exam == null) {
+      _errorMessage = result.errorMessage;
+      _errorRetryAction = ExamAttemptRetryAction.submit;
+    }
+    notifyListeners();
+    return result.exam == null
+        ? const ExamAttemptSubmitResult.failed()
+        : ExamAttemptSubmitResult.submitted(result.exam!);
   }
 
   Future<bool> _transitionToNextSet(AssessmentFlowDecision decision) async {
-    _pendingGenerationDecision = decision;
-    if (decision.nextState.isFailed && !_flowState.isFailed) {
-      _flowState = _flowState.copyWith(isFailed: true);
+    if (_disposed ||
+        !_requests.isActive ||
+        _isTransitioningSet ||
+        _isGeneratingExam ||
+        _isSubmittingExam) {
+      return false;
     }
+    final revision = _operationRevision;
+    _flow.beginTransition(decision);
     _errorMessage = null;
     _errorRetryAction = null;
     _isTransitioningSet = true;
     notifyListeners();
-
-    final currentExam = _exam;
-    final currentExamId = currentExam?.examId;
-    if (currentExam == null || currentExamId == null) {
+    final source = _exam;
+    if (source == null || source.examId == null) {
       _isTransitioningSet = false;
       _errorMessage = AppStrings.current(AppKeys.missingExamToSubmit);
       _errorRetryAction = null;
       notifyListeners();
       return false;
     }
-
-    final targetGrade = decision.nextState.grade;
-    final submittedSetResult = await _requestSubmittedSet(
-      currentExam,
-      _answersForExam(currentExam),
-    );
-    if (submittedSetResult.exam == null) {
-      _isTransitioningSet = false;
-      _errorMessage =
-          submittedSetResult.errorMessage ??
-          AppStrings.current(AppKeys.submitExamFailed);
-      _errorRetryAction = ExamAttemptRetryAction.generate;
-      notifyListeners();
-      return false;
-    }
-
-    final generatedSetResult = _pendingGeneratedExam == null
-        ? await _requestSet(targetGrade)
-        : _GeneratedSetResult.success(_pendingGeneratedExam!);
-    if (generatedSetResult.exam != null) {
-      _pendingGeneratedExam = generatedSetResult.exam;
-    }
-
-    if (generatedSetResult.exam == null) {
-      _isTransitioningSet = false;
-      _errorMessage =
-          generatedSetResult.errorMessage ??
-          AppStrings.current(AppKeys.createQuestionFailed);
-      _errorRetryAction = ExamAttemptRetryAction.generate;
-      notifyListeners();
-      return false;
-    }
-
-    _completedSets.add(
-      AssessmentSetRecord(
-        exam: currentExam,
-        grade: _flowState.grade,
-        mode: _flowState.mode,
-        setNumber: _flowState.setNumber,
-        selectedAnswerLabels: _selectedAnswerLabels,
-        correctAnswerCount: correctAnswerCount,
-      ),
-    );
-
-    _questionNumberOffset += _selectedAnswerLabels.length;
-    _exam = generatedSetResult.exam;
-    _flowState = decision.nextState;
-    _questionIndex = 0;
-    _selectedAnswerLabels.clear();
-    _allowsPartialSubmit = false;
-    _pendingGenerationDecision = null;
-    _pendingGeneratedExam = null;
-    _isTransitioningSet = false;
-    notifyListeners();
-    return true;
-  }
-
-  Future<GeneratedExam> _generateSet(int grade) async {
-    final generatedExam = await _examService.generateAssessmentExam(
-      examType: examType,
+    final result = await _requests.transition(
+      source: source,
+      answers: _answers.submission(source),
+      kind: _kind,
       gradeLabel: _isAssessment
-          ? AssessmentFlowPolicy.gradeLabel(grade)
+          ? AssessmentFlowPolicy.gradeLabel(decision.nextState.grade)
           : gradeLabel,
-      profileId: profileId ?? _exam?.profileId,
-      level: _currentLevel,
+      level: currentLevel,
     );
-    if (_cacheScope.isCurrent) ExamCache.seedDetail(generatedExam);
-    return generatedExam;
-  }
-
-  Future<GeneratedExam> _generateInitialSet(int grade) async {
-    final generatedExam = await _examService.generateAssessmentExam(
-      examType: examType,
-      gradeLabel: _isAssessment && startAtKindergarten
-          ? AssessmentFlowPolicy.gradeLabel(grade)
-          : gradeLabel,
-      profileId: profileId,
-      level: _currentLevel,
-    );
-    if (_cacheScope.isCurrent) ExamCache.seedDetail(generatedExam);
-    return generatedExam;
-  }
-
-  Future<_GeneratedSetResult> _requestSet(int grade) async {
-    try {
-      return _GeneratedSetResult.success(await _generateSet(grade));
-    } on ExamException catch (error) {
-      return _GeneratedSetResult.failure(error.message);
-    } catch (_) {
-      return _GeneratedSetResult.failure(
-        AppStrings.current(AppKeys.createQuestionFailed),
-      );
-    }
-  }
-
-  List<SubmitExamAnswer> _answersForExam(GeneratedExam exam) {
-    return <SubmitExamAnswer>[
-      for (var index = 0; index < exam.questions.length; index++)
-        if (_selectedAnswerLabels[index] case final label?)
-          SubmitExamAnswer(
-            questionNumber: exam.questions[index].questionNumber,
-            label: label,
-          ),
-    ];
-  }
-
-  Future<GeneratedExam> _submitSet(
-    GeneratedExam exam,
-    List<SubmitExamAnswer> answers,
-  ) async {
-    final examId = exam.examId;
-    if (examId == null) {
-      throw ExamException(AppStrings.current(AppKeys.missingExamToSubmit));
-    }
-    final cached = _submittedSets[examId];
-    if (cached != null) {
-      return cached;
-    }
-
-    final submittedExam = await _examService.submitExam(
-      examId: examId,
-      answers: answers,
-      profileId: profileId ?? exam.profileId,
-    );
-    final cachedExam = _isPractice
-        ? _practiceReviewExam(
-            sourceExam: exam,
-            submittedExam: submittedExam,
-            answers: answers,
-          )
-        : submittedExam;
-    _submittedSets[examId] = cachedExam;
-    final submittedProfileId =
-        profileId ?? cachedExam.profileId ?? exam.profileId;
-    if (_cacheScope.isCurrent) {
-      ExamCache.seedDetail(cachedExam);
-      ExamCache.invalidateLists(profileId: submittedProfileId);
-    }
-    return cachedExam;
-  }
-
-  GeneratedExam _practiceReviewExam({
-    required GeneratedExam sourceExam,
-    required GeneratedExam submittedExam,
-    required List<SubmitExamAnswer> answers,
-  }) {
-    final correctNumber = _correctAnswerCountFor(sourceExam, answers);
-    final totalQuestions = answers.length;
-    final grading = ExamGrading(
-      aiDetectGrade: submittedExam.grading?.aiDetectGrade,
-      aiReview: submittedExam.grading?.aiReview,
-      correctNumber: correctNumber,
-      scorePercentage: totalQuestions == 0
-          ? 0
-          : ((correctNumber * 100) / totalQuestions).round(),
-      skippedNumber: 0,
-      totalQuestions: totalQuestions,
-    );
-    return GeneratedExam(
-      id: submittedExam.id ?? sourceExam.id,
-      examId: submittedExam.examId ?? sourceExam.examId,
-      profileId: submittedExam.profileId ?? sourceExam.profileId,
-      examStatus: submittedExam.examStatus ?? sourceExam.examStatus,
-      examType: sourceExam.examType ?? submittedExam.examType,
-      title: submittedExam.title ?? sourceExam.title,
-      shortText: submittedExam.shortText ?? sourceExam.shortText,
-      aiTitle: submittedExam.aiTitle ?? sourceExam.aiTitle,
-      aiShortText: submittedExam.aiShortText ?? sourceExam.aiShortText,
-      aiReviewShort: submittedExam.aiReviewShort ?? sourceExam.aiReviewShort,
-      aiReviewLong: submittedExam.aiReviewLong ?? sourceExam.aiReviewLong,
-      userId: submittedExam.userId ?? sourceExam.userId,
-      createDt: submittedExam.createDt ?? sourceExam.createDt,
-      modifyDt: submittedExam.modifyDt ?? sourceExam.modifyDt,
-      aiExamId: submittedExam.aiExamId ?? sourceExam.aiExamId,
-      userAiExamId: submittedExam.userAiExamId ?? sourceExam.userAiExamId,
-      userExamId: sourceExam.userExamId ?? submittedExam.userExamId,
-      grade: sourceExam.grade ?? submittedExam.grade,
-      practiceWeakTopics: sourceExam.practiceWeakTopics.isNotEmpty
-          ? sourceExam.practiceWeakTopics
-          : submittedExam.practiceWeakTopics,
-      level: submittedExam.level ?? sourceExam.level,
-      numQuestions: submittedExam.numQuestions ?? sourceExam.numQuestions,
-      startedDt: submittedExam.startedDt ?? sourceExam.startedDt,
-      submittedDt: submittedExam.submittedDt ?? sourceExam.submittedDt,
-      grading: grading,
-      answers: List<SubmitExamAnswer>.unmodifiable(answers),
-      questions: sourceExam.questions,
-    );
-  }
-
-  int _correctAnswerCountFor(
-    GeneratedExam exam,
-    List<SubmitExamAnswer> answers,
-  ) {
-    var correctCount = 0;
-    for (final submittedAnswer in answers) {
-      final question = exam.questions
-          .where(
-            (candidate) =>
-                candidate.questionNumber == submittedAnswer.questionNumber,
-          )
-          .firstOrNull;
-      if (question == null) {
-        continue;
-      }
-      final answer = question.answers
-          .where(
-            (candidate) =>
-                _normalizedAnswerValue(candidate.label) ==
-                _normalizedAnswerValue(submittedAnswer.label),
-          )
-          .firstOrNull;
-      if (answer != null && _isAnswerCorrect(question, answer) == true) {
-        correctCount++;
-      }
-    }
-    return correctCount;
-  }
-
-  Future<_SubmittedSetResult> _requestSubmittedSet(
-    GeneratedExam exam,
-    List<SubmitExamAnswer> answers,
-  ) async {
-    try {
-      return _SubmittedSetResult.success(await _submitSet(exam, answers));
-    } on ExamException catch (error) {
-      return _SubmittedSetResult.failure(error.message);
-    } catch (_) {
-      return _SubmittedSetResult.failure(
-        AppStrings.current(AppKeys.submitExamFailed),
-      );
-    }
-  }
-
-  void _handleGenerationFailure(String message) {
-    _isGeneratingExam = false;
+    if (!_canApply(revision)) return false;
     _isTransitioningSet = false;
-    _errorMessage = message;
-    _errorRetryAction = ExamAttemptRetryAction.generate;
-    notifyListeners();
-  }
-
-  int? _firstUnansweredIndex(List<ExamQuestion> questions) {
-    for (var index = 0; index < questions.length; index++) {
-      if (_selectedAnswerLabels[index] == null) {
-        return index;
-      }
+    if (result.exam == null) {
+      _errorMessage = result.errorMessage;
+      _errorRetryAction = ExamAttemptRetryAction.generate;
+    } else {
+      _flow.commitTransition(source, _answers, decision);
+      _exam = result.exam;
+      _questionIndex = 0;
+      _answers.clear();
     }
-    return null;
+    notifyListeners();
+    return result.exam != null;
   }
 
-  String? _normalizedAnswerValue(String? value) {
-    final normalized = value?.trim().toUpperCase();
-    return normalized == null || normalized.isEmpty ? null : normalized;
+  @override
+  void dispose() {
+    _disposed = true;
+    _operationRevision++;
+    _requests.dispose();
+    super.dispose();
   }
-}
-
-class _GeneratedSetResult {
-  const _GeneratedSetResult.success(this.exam) : errorMessage = null;
-
-  const _GeneratedSetResult.failure(this.errorMessage) : exam = null;
-
-  final GeneratedExam? exam;
-  final String? errorMessage;
-}
-
-class _SubmittedSetResult {
-  const _SubmittedSetResult.success(this.exam) : errorMessage = null;
-
-  const _SubmittedSetResult.failure(this.errorMessage) : exam = null;
-
-  final GeneratedExam? exam;
-  final String? errorMessage;
 }

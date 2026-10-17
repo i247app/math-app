@@ -25,6 +25,16 @@ class GradeExamFlowPolicy {
   static const int defaultLevel = 1;
   static const int maximumLevel = 10;
 
+  static bool shouldSubmit(AssessmentSetScore score) {
+    return score.areFirstQuestionsWrong(
+          AssessmentFlowPolicy.earlyFailQuestionCount,
+        ) ||
+        score.areFirstQuestionsPerfect(
+          AssessmentFlowPolicy.firstQuestionsUpgradeTarget,
+        ) ||
+        score.isComplete;
+  }
+
   static GradeExamOutcome evaluate({
     required int attemptedGrade,
     required int attemptedLevel,
