@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:numi/core/utils/avatar/avatar_upload.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/app_strings.dart';
 import 'package:numi/core/errors/http_status.dart';
@@ -286,7 +287,7 @@ class AuthApi implements AuthService {
       if (request.name?.isNotEmpty == true) 'name': request.name,
       if (request.role?.isNotEmpty == true) 'role': request.role,
       if (avatarPath?.isNotEmpty == true)
-        'avatar': await MultipartFile.fromFile(avatarPath!),
+        'avatar': await sanitizedAvatarUpload(avatarPath!),
     });
     final json = await _networkClient.postMultipart('/users/create', formData);
     NetworkClient.throwForApiStatus(json);
@@ -305,7 +306,7 @@ class AuthApi implements AuthService {
       if (request.phone?.isNotEmpty == true) 'phone': request.phone,
       if (request.email?.isNotEmpty == true) 'email': request.email,
       if (avatarPath?.isNotEmpty == true)
-        'avatar': await MultipartFile.fromFile(avatarPath!),
+        'avatar': await sanitizedAvatarUpload(avatarPath!),
     });
     final json = await _networkClient.postMultipart('/users/update', formData);
     NetworkClient.throwForApiStatus(json);

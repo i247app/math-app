@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:numi/core/utils/avatar/avatar_upload.dart';
 import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom/data/classroom_api_models.dart';
 import 'package:numi/features/classroom/data/classroom_conversion.dart';
@@ -380,7 +381,7 @@ class _ClassroomRemoteDataSource {
       if (request.description?.isNotEmpty == true)
         'description': request.description,
       if (filePath?.isNotEmpty == true)
-        'file': await MultipartFile.fromFile(filePath!),
+        'file': await sanitizedAvatarUpload(filePath!),
     });
     final json = await _client.postMultipart('/classrooms/create', formData);
     NetworkClient.throwForApiStatus(json);

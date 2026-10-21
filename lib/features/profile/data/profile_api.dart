@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:numi/core/utils/avatar/avatar_upload.dart';
 import 'package:numi/core/network/network_client.dart';
 import 'package:numi/features/profile/data/profile_service.dart';
 import 'package:numi/features/profile/data/profile_api_models.dart';
@@ -224,7 +225,7 @@ class ProfileApi implements ProfileService {
       if (request.teacherId?.isNotEmpty == true)
         'teacher_id': request.teacherId,
       if (avatarPath?.isNotEmpty == true)
-        'avatar': await MultipartFile.fromFile(avatarPath!),
+        'avatar': await sanitizedAvatarUpload(avatarPath!),
     });
     final json = await _networkClient.postMultipart(
       '/profiles/create',
@@ -256,7 +257,7 @@ class ProfileApi implements ProfileService {
       if (request.teacherId?.isNotEmpty == true)
         'teacher_id': request.teacherId,
       if (avatarPath?.isNotEmpty == true)
-        'avatar': await MultipartFile.fromFile(avatarPath!),
+        'avatar': await sanitizedAvatarUpload(avatarPath!),
     });
     final json = await _networkClient.postMultipart(
       '/profiles/update',
