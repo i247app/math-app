@@ -44,6 +44,7 @@ void main() {
     WidgetTester tester,
     _FakeExamService service, {
     Widget? home,
+    int initialGrade = 2,
     Size size = const Size(390, 844),
     TargetPlatform? platform,
     EdgeInsets? systemPadding,
@@ -78,7 +79,7 @@ void main() {
                 home ??
                 GradeRoadmapScreen(
                   profileId: 11,
-                  initialGrade: 2,
+                  initialGrade: initialGrade,
                   examService: service,
                   gradeProgressStore: const _FakeProgressStore(
                     ProfileGradeProgress.initial,
@@ -251,75 +252,98 @@ void main() {
     });
   }
 
-  for (final size in [
-    const Size(320, 700),
-    const Size(390, 844),
-    const Size(600, 960),
-  ]) {
-    testWidgets('background and checkpoints align at width ${size.width}', (
-      tester,
-    ) async {
-      final service = _FakeExamService(
-        levelsByGrade: const {2: GradeLevels(latestLevel: 4, maxLevel: 4)},
+  for (final grade in [0, 2]) {
+    for (final size in [
+      const Size(320, 700),
+      const Size(390, 844),
+      const Size(600, 960),
+    ]) {
+      testWidgets(
+        'grade $grade background and checkpoints align at width ${size.width}',
+        (tester) async {
+          final service = _FakeExamService(
+            levelsByGrade: const {
+              0: GradeLevels(latestLevel: 4, maxLevel: 4),
+              2: GradeLevels(latestLevel: 4, maxLevel: 4),
+            },
+          );
+          await pumpRoadmap(tester, service, size: size, initialGrade: grade);
+          final background = find.byKey(
+            const ValueKey('grade-roadmap-background'),
+          );
+          expect(
+            find.image(
+              AssetImage(GradeRoadmapLayout.backgroundAssetForGrade(grade)),
+            ),
+            findsOneWidget,
+          );
+          final rect = tester.getRect(background);
+          expect(rect.width, size.width);
+          expect(
+            rect.height / rect.width,
+            closeTo(grade == 2 ? 4945 / 863 : 4988 / 672, 0.001),
+          );
+          final firstLevel = tester.getRect(
+            find.byKey(const ValueKey('grade-roadmap-level-1')),
+          );
+          final firstLevelCenter =
+              rect.topLeft +
+              (grade == 2
+                  ? const Offset(203.5, 4750) * (rect.width / 863)
+                  : const Offset(187.5, 4760) * (rect.width / 672));
+          expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
+          expect(firstLevel.center.dy, closeTo(firstLevelCenter.dy, 0.01));
+          for (var level = 1; level <= 10; level++) {
+            final checkpoint = tester.getRect(
+              find.byKey(ValueKey('grade-roadmap-level-$level')),
+            );
+            final expected =
+                rect.topLeft +
+                GradeRoadmapLayout.centerForLevel(
+                  level,
+                  rect.width,
+                  grade: grade,
+                );
+            expect(checkpoint.center.dx, closeTo(expected.dx, 0.01));
+            expect(checkpoint.center.dy, closeTo(expected.dy, 0.01));
+            expect(checkpoint.left, greaterThanOrEqualTo(0));
+            expect(checkpoint.right, lessThanOrEqualTo(size.width));
+          }
+          final mascot = tester.getRect(
+            find.image(
+              const AssetImage('assets/images/grade-roadmap-mascot.png'),
+            ),
+          );
+          expect(mascot.left, greaterThanOrEqualTo(0));
+          expect(mascot.right, lessThanOrEqualTo(size.width));
+          expect(tester.takeException(), isNull);
+          if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
+            await _saveRoadmapPreview(
+              tester,
+              'roadmap-grade-$grade-${size.width.toInt()}-middle.png',
+            );
+            tester
+                .state<ScrollableState>(find.byType(Scrollable))
+                .position
+                .jumpTo(0);
+            await tester.pumpAndSettle();
+            await _saveRoadmapPreview(
+              tester,
+              'roadmap-grade-$grade-${size.width.toInt()}-top.png',
+            );
+            final position = tester
+                .state<ScrollableState>(find.byType(Scrollable))
+                .position;
+            position.jumpTo(position.maxScrollExtent);
+            await tester.pumpAndSettle();
+            await _saveRoadmapPreview(
+              tester,
+              'roadmap-grade-$grade-${size.width.toInt()}-bottom.png',
+            );
+          }
+        },
       );
-      await pumpRoadmap(tester, service, size: size);
-      final background = find.byKey(const ValueKey('grade-roadmap-background'));
-      expect(
-        find.image(const AssetImage(GradeRoadmapLayout.backgroundAsset)),
-        findsOneWidget,
-      );
-      final rect = tester.getRect(background);
-      expect(rect.width, size.width);
-      expect(rect.height / rect.width, closeTo(4988 / 672, 0.001));
-      final firstLevel = tester.getRect(
-        find.byKey(const ValueKey('grade-roadmap-level-1')),
-      );
-      final firstLevelCenter =
-          rect.topLeft + const Offset(187.5, 4760) * (rect.width / 672);
-      expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
-      expect(firstLevel.center.dy, closeTo(firstLevelCenter.dy, 0.01));
-      for (var level = 1; level <= 10; level++) {
-        final checkpoint = tester.getRect(
-          find.byKey(ValueKey('grade-roadmap-level-$level')),
-        );
-        final expected =
-            rect.topLeft + GradeRoadmapLayout.centerForLevel(level, rect.width);
-        expect(checkpoint.center.dx, closeTo(expected.dx, 0.01));
-        expect(checkpoint.center.dy, closeTo(expected.dy, 0.01));
-        expect(checkpoint.left, greaterThanOrEqualTo(0));
-        expect(checkpoint.right, lessThanOrEqualTo(size.width));
-      }
-      final mascot = tester.getRect(
-        find.image(const AssetImage('assets/images/grade-roadmap-mascot.png')),
-      );
-      expect(mascot.left, greaterThanOrEqualTo(0));
-      expect(mascot.right, lessThanOrEqualTo(size.width));
-      expect(tester.takeException(), isNull);
-      if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
-        await _saveRoadmapPreview(
-          tester,
-          'roadmap-${size.width.toInt()}-middle.png',
-        );
-        tester
-            .state<ScrollableState>(find.byType(Scrollable))
-            .position
-            .jumpTo(0);
-        await tester.pumpAndSettle();
-        await _saveRoadmapPreview(
-          tester,
-          'roadmap-${size.width.toInt()}-top.png',
-        );
-        final position = tester
-            .state<ScrollableState>(find.byType(Scrollable))
-            .position;
-        position.jumpTo(position.maxScrollExtent);
-        await tester.pumpAndSettle();
-        await _saveRoadmapPreview(
-          tester,
-          'roadmap-${size.width.toInt()}-bottom.png',
-        );
-      }
-    });
+    }
   }
 
   testWidgets('GRADE roadmap opens the matching grade and level detail', (
@@ -1209,6 +1233,10 @@ void main() {
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
     expect(find.text('LỚP 2'), findsOneWidget);
+    expect(
+      find.image(const AssetImage(GradeRoadmapLayout.grade2BackgroundAsset)),
+      findsOneWidget,
+    );
     expect(service.levelRequests, [2]);
     expect(
       find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
@@ -1617,6 +1645,14 @@ void main() {
     expect(find.byType(GradeSelectionScreen), findsNothing);
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(find.text('LỚP 3'), findsOneWidget);
+    expect(
+      find.image(const AssetImage(GradeRoadmapLayout.backgroundAsset)),
+      findsOneWidget,
+    );
+    expect(
+      find.image(const AssetImage(GradeRoadmapLayout.grade2BackgroundAsset)),
+      findsNothing,
+    );
   });
 
   testWidgets('selected grade uses API max_level directly', (tester) async {
@@ -1767,6 +1803,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(service.levelRequests, <int>[grade]);
+      expect(
+        find.image(
+          AssetImage(GradeRoadmapLayout.backgroundAssetForGrade(grade)),
+        ),
+        findsOneWidget,
+      );
       expect(service.roadmapRequests, [grade]);
       expect(service.statsRequests, 0);
       expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);

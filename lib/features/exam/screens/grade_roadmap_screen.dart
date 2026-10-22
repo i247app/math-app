@@ -205,6 +205,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       final center = GradeRoadmapLayout.centerForLevel(
         _controller.state.currentLevel,
         viewport.size.width,
+        grade: _controller.state.selectedGrade,
       );
       final target = (center.dy - position.viewportDimension * 0.55).clamp(
         0.0,
@@ -258,6 +259,7 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                         ),
                         padding: EdgeInsets.only(bottom: widget.bottomPadding),
                         child: _GradeRoadmapPath(
+                          grade: state.selectedGrade,
                           currentLevel: state.currentLevel,
                           openingLevel: state.openingLevel,
                           isCompleted: (level) =>
@@ -434,6 +436,7 @@ class _RoadmapError extends StatelessWidget {
 
 class _GradeRoadmapPath extends StatelessWidget {
   const _GradeRoadmapPath({
+    required this.grade,
     required this.currentLevel,
     required this.openingLevel,
     required this.isCompleted,
@@ -446,6 +449,7 @@ class _GradeRoadmapPath extends StatelessWidget {
   static const double _nodeSize = 112;
   static const double _mascotSize = 104;
 
+  final int grade;
   final int currentLevel;
   final int? openingLevel;
   final bool Function(int level) isCompleted;
@@ -459,7 +463,7 @@ class _GradeRoadmapPath extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final height = GradeRoadmapLayout.heightForWidth(width);
+        final height = GradeRoadmapLayout.heightForWidth(width, grade: grade);
         return SizedBox(
           height: height,
           child: Stack(
@@ -467,7 +471,7 @@ class _GradeRoadmapPath extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  GradeRoadmapLayout.backgroundAsset,
+                  GradeRoadmapLayout.backgroundAssetForGrade(grade),
                   key: const ValueKey('grade-roadmap-background'),
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high,
@@ -478,7 +482,11 @@ class _GradeRoadmapPath extends StatelessWidget {
                 _buildLevel(
                   context,
                   level: level,
-                  center: GradeRoadmapLayout.centerForLevel(level, width),
+                  center: GradeRoadmapLayout.centerForLevel(
+                    level,
+                    width,
+                    grade: grade,
+                  ),
                   width: width,
                 ),
             ],
