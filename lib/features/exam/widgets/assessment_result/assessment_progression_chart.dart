@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 // The first test sits on the Y axis; the last keeps room for its halo.
 const double _plotRightInset = 12;
@@ -109,13 +110,19 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   @override
   Widget build(BuildContext context) {
     final grade = widget.finalGrade.clamp(0, 5);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colors =
+        theme.extension<AppThemeColors>() ??
+        (isDark ? AppThemeColors.dark : AppThemeColors.light);
+    final textColor = isDark ? colors.textPrimary : const Color(0xFF1C3A43);
     final activityLabel =
         widget.activityTitle ??
         context.getText(AppKeys.placementResultActivity);
     final gradeDescription =
         widget.gradeTitle ?? context.getText(AppKeys.placementResultChartGrade);
     final headerTextStyle = GoogleFonts.andika(
-      color: const Color(0xFF1C3A43),
+      color: textColor,
       fontSize: 22,
       fontWeight: FontWeight.w800,
     );
@@ -138,8 +145,10 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
           key: const ValueKey('placement-progression-chart'),
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: const Color(0xFFD8E6EA)),
+            color: isDark ? colors.surface : Colors.white,
+            border: Border.all(
+              color: isDark ? colors.border : const Color(0xFFD8E6EA),
+            ),
             borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
@@ -147,7 +156,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
             children: [
               Row(
                 children: [
-                  const _StairsIcon(),
+                  _StairsIcon(
+                    color: isDark ? colors.info : const Color(0xFF2D9CC2),
+                  ),
                   const SizedBox(width: 12),
                   SizedBox(
                     width: 79,
@@ -198,7 +209,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                   'placement-progression-current-grade',
                                 ),
                                 style: GoogleFonts.andika(
-                                  color: const Color(0xFF1C3A43),
+                                  color: textColor,
                                   fontSize: 72,
                                   fontWeight: FontWeight.w900,
                                   height: 1,
@@ -244,7 +255,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                                 'placement-progression-axis-label-$value',
                                               ),
                                               style: GoogleFonts.andika(
-                                                color: const Color(0xFF61747B),
+                                                color: isDark
+                                                    ? colors.textSecondary
+                                                    : const Color(0xFF61747B),
                                                 fontSize: math.min(
                                                   14.0,
                                                   axisRowHeight * 0.7,
@@ -265,7 +278,13 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                             axisRowHeight * 0.5,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: _levelColor(value),
+                                            color: isDark
+                                                ? Color.lerp(
+                                                    _levelColor(value),
+                                                    colors.textPrimary,
+                                                    0.25,
+                                                  )
+                                                : _levelColor(value),
                                             borderRadius: BorderRadius.circular(
                                               4,
                                             ),
@@ -289,6 +308,21 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
                                   points: points,
                                   progress: _animation.value,
                                   axisInset: axisRowHeight / 2,
+                                  gridColor: isDark
+                                      ? colors.border.withValues(alpha: 0.55)
+                                      : const Color(0xFFE5ECEE),
+                                  lineColor: isDark
+                                      ? colors.textMuted
+                                      : const Color(0xFF93AEB2),
+                                  pointColor: isDark
+                                      ? colors.brandStrong
+                                      : const Color(0xFF2496AB),
+                                  haloColor: isDark
+                                      ? colors.successSurface
+                                      : const Color(0xFFD9EED5),
+                                  finalPointColor: isDark
+                                      ? colors.success
+                                      : const Color(0xFF3A9B44),
                                 ),
                                 size: Size.infinite,
                               ),
@@ -318,18 +352,24 @@ Color _levelColor(int value) => switch (value) {
 };
 
 class _StairsIcon extends StatelessWidget {
-  const _StairsIcon();
+  const _StairsIcon({required this.color});
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) =>
-      CustomPaint(size: const Size(24, 24), painter: _StairsPainter());
+      CustomPaint(size: const Size(24, 24), painter: _StairsPainter(color));
 }
 
 class _StairsPainter extends CustomPainter {
+  const _StairsPainter(this.color);
+
+  final Color color;
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF2D9CC2)
+      ..color = color
       ..strokeWidth = 3
       ..strokeJoin = StrokeJoin.round
       ..strokeCap = StrokeCap.round
@@ -349,7 +389,8 @@ class _StairsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _StairsPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _StairsPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _AssessmentChartPainter extends CustomPainter {
@@ -357,16 +398,26 @@ class _AssessmentChartPainter extends CustomPainter {
     required this.points,
     required this.progress,
     required this.axisInset,
+    required this.gridColor,
+    required this.lineColor,
+    required this.pointColor,
+    required this.haloColor,
+    required this.finalPointColor,
   });
 
   final List<double> points;
   final double progress;
   final double axisInset;
+  final Color gridColor;
+  final Color lineColor;
+  final Color pointColor;
+  final Color haloColor;
+  final Color finalPointColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = const Color(0xFFE5ECEE)
+      ..color = gridColor
       ..strokeWidth = 1;
     final plotHeight = math.max(0.0, size.height - 2 * axisInset);
     double yForGrade(double grade) => axisInset + plotHeight * (1 - grade / 5);
@@ -387,7 +438,7 @@ class _AssessmentChartPainter extends CustomPainter {
     final offsets = [for (var i = 0; i < points.length; i++) position(i)];
     final reveal = progress.clamp(0.0, 1.0);
     final linePaint = Paint()
-      ..color = const Color(0xFF93AEB2)
+      ..color = lineColor
       ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -403,25 +454,21 @@ class _AssessmentChartPainter extends CustomPainter {
         canvas.drawCircle(
           center,
           math.min(20.0 / 3, axisInset),
-          Paint()..color = const Color(0xFFD9EED5),
+          Paint()..color = haloColor,
         );
       }
-      canvas.drawCircle(
-        center,
-        12.2 / 3,
-        Paint()..color = color,
-      );
+      canvas.drawCircle(center, 12.2 / 3, Paint()..color = color);
     }
 
     for (var i = 0; i < offsets.length - 1; i++) {
-      drawDot(offsets[i], const Color(0xFF2496AB));
+      drawDot(offsets[i], pointColor);
     }
     if (offsets.length == 1 || reveal >= 1) {
-      drawDot(offsets.last, const Color(0xFF3A9B44), finalPoint: true);
+      drawDot(offsets.last, finalPointColor, finalPoint: true);
     } else if (reveal > 0) {
       drawDot(
         Offset.lerp(offsets[offsets.length - 2], offsets.last, reveal)!,
-        const Color(0xFF3A9B44),
+        finalPointColor,
       );
     }
   }
@@ -430,5 +477,10 @@ class _AssessmentChartPainter extends CustomPainter {
   bool shouldRepaint(covariant _AssessmentChartPainter oldDelegate) =>
       oldDelegate.progress != progress ||
       oldDelegate.axisInset != axisInset ||
+      oldDelegate.gridColor != gridColor ||
+      oldDelegate.lineColor != lineColor ||
+      oldDelegate.pointColor != pointColor ||
+      oldDelegate.haloColor != haloColor ||
+      oldDelegate.finalPointColor != finalPointColor ||
       !listEquals(oldDelegate.points, points);
 }

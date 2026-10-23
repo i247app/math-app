@@ -18,6 +18,7 @@ import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
 import 'package:numi/features/welcome/widgets/welcome_intro_loading.dart';
+import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
@@ -28,12 +29,10 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
     this.profileId,
   });
 
-  static const _backgroundAsset =
-      'assets/images/assessment_intro/assessment-intro-background.png';
   static const _mascotAsset =
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
-  static const _backgroundSize = Size(552, 1280);
-  static const _planetSurfaceY = 948.0;
+  static const _backgroundSize = WelcomeAssessmentBackground.canvasSize;
+  static const _planetSurfaceY = WelcomeAssessmentBackground.planetSurfaceY;
   // The mascot PNG includes transparent padding below its feet.
   static const _mascotFeetFraction = 1200 / 1254;
 
@@ -65,10 +64,8 @@ class _WelcomeAssessmentIntroScreenState
     if (!_isLoadingHistory) setState(() => _isLoadingHistory = true);
     // Load the artwork alongside history so the whole scene can fade in.
     final artworkReady = Future.wait<void>([
-      precacheImage(
-        const AssetImage(WelcomeAssessmentIntroScreen._backgroundAsset),
-        context,
-      ),
+      for (final asset in WelcomeAssessmentBackground.decorationAssets)
+        precacheImage(AssetImage(asset), context),
       precacheImage(
         const AssetImage(WelcomeAssessmentIntroScreen._mascotAsset),
         context,
@@ -160,7 +157,9 @@ class _WelcomeAssessmentIntroScreenState
         child: AppBackButton(
           key: const ValueKey('welcome-assessment-back'),
           onPressed: () => Navigator.of(context).pop(),
-          color: AppColors.welcomeTeal,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? context.themeColors.brandStrong
+              : AppColors.welcomeTeal,
         ),
       ),
     );
@@ -168,6 +167,8 @@ class _WelcomeAssessmentIntroScreenState
 
   Widget _buildTitle(BuildContext context, {required bool isTablet}) {
     final isVietnamese = LingoScope.of(context).language == AppLanguage.vi;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.themeColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -178,7 +179,7 @@ class _WelcomeAssessmentIntroScreenState
             textAlign: TextAlign.center,
             style: GoogleFonts.nunito(
               fontWeight: FontWeight.w900,
-              color: AppColors.brandTeal,
+              color: isDark ? colors.brandStrong : AppColors.brandTeal,
               fontSize: isTablet ? 52 : 42,
               height: 1.1,
             ),
@@ -191,7 +192,7 @@ class _WelcomeAssessmentIntroScreenState
               textAlign: TextAlign.center,
               style: GoogleFonts.nunito(
                 fontWeight: FontWeight.w900,
-                color: AppColors.brandOrange,
+                color: isDark ? colors.accent : AppColors.brandOrange,
                 fontSize: isTablet ? 38 : 32,
                 height: 1.1,
               ),
@@ -316,7 +317,7 @@ class _WelcomeAssessmentIntroScreenState
                 fitLabel: true,
               ),
               if (_isStarting)
-                const CircularProgressIndicator(color: Colors.white),
+                CircularProgressIndicator(color: context.themeColors.onAccent),
             ],
           ),
         ),
@@ -329,7 +330,8 @@ class _WelcomeAssessmentIntroScreenState
     final colors = context.themeColors;
     final screenSize = MediaQuery.sizeOf(context);
     final safeArea = MediaQuery.paddingOf(context);
-    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final overlayStyle = isDark
         ? SystemUiOverlayStyle.light
         : SystemUiOverlayStyle.dark;
 
@@ -370,13 +372,8 @@ class _WelcomeAssessmentIntroScreenState
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(
-                      WelcomeAssessmentIntroScreen._backgroundAsset,
-                      key: const ValueKey(
-                        'welcome-assessment-intro-background',
-                      ),
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.high,
+                    const WelcomeAssessmentBackground(
+                      key: ValueKey('welcome-assessment-intro-background'),
                     ),
                     SafeArea(
                       child: LayoutBuilder(

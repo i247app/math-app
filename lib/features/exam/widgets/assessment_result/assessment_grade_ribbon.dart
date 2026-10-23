@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class AssessmentGradeRibbon extends StatelessWidget {
   const AssessmentGradeRibbon({super.key, required this.currentGrade});
@@ -23,6 +24,11 @@ class AssessmentGradeRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeIndex = currentGrade.clamp(0, _gradeCenters.length - 1);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colors =
+        theme.extension<AppThemeColors>() ??
+        (isDark ? AppThemeColors.dark : AppThemeColors.light);
     final levelLabel = context
         .getText(AppKeys.placementResultChartGrade)
         .toUpperCase();
@@ -57,7 +63,9 @@ class AssessmentGradeRibbon extends StatelessWidget {
                                 'placement-current-grade-label',
                               ),
                               style: GoogleFonts.nunito(
-                                color: Colors.black,
+                                color: isDark
+                                    ? colors.textPrimary
+                                    : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w800,
                                 height: 1,
@@ -73,10 +81,14 @@ class AssessmentGradeRibbon extends StatelessWidget {
                             label: context.getText(
                               AppKeys.placementResultYouAreHere,
                             ),
-                            child: const ClipPath(
-                              key: ValueKey('placement-current-grade-marker'),
-                              clipper: _InvertedHouseClipper(),
-                              child: ColoredBox(color: AppColors.red),
+                            child: ClipPath(
+                              key: const ValueKey(
+                                'placement-current-grade-marker',
+                              ),
+                              clipper: const _InvertedHouseClipper(),
+                              child: ColoredBox(
+                                color: isDark ? colors.error : AppColors.red,
+                              ),
                             ),
                           ),
                         ),

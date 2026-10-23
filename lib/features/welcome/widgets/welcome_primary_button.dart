@@ -35,7 +35,7 @@ class WelcomePrimaryButton extends StatelessWidget {
     final label = Text(
       labelText ?? context.getText(labelKey),
       style: GoogleFonts.nunito(
-        color: Theme.of(context).colorScheme.onSecondary,
+        color: colors.onAccent,
         fontSize: fontSize,
         fontWeight: FontWeight.w900,
         height: 1.2,

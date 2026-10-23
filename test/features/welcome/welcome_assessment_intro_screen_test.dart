@@ -10,16 +10,188 @@ import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
+import 'package:numi/shared/widgets/app_back_button.dart';
 
 void main() {
   setUp(() {
     GoogleFonts.config.allowRuntimeFetching = false;
     FlutterSecureStorage.setMockInitialValues({});
+  });
+
+  testWidgets('dark loading uses a dark canvas and bright dots', (
+    tester,
+  ) async {
+    final progress = Completer<ExamProgressResponse>();
+    await _pumpIntro(
+      tester,
+      size: const Size(390, 844),
+      progress: progress.future,
+      dark: true,
+    );
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+      AppThemeColors.dark.pageBackground,
+    );
+    expect(_loading, findsOneWidget);
+    expect(find.byType(Image), findsNothing);
+    final dots = find.descendant(
+      of: _loading,
+      matching: find.byType(DecoratedBox),
+    );
+    expect(dots, findsNWidgets(3));
+    for (final dot in tester.widgetList<DecoratedBox>(dots)) {
+      expect(
+        (dot.decoration as BoxDecoration).color,
+        AppThemeColors.dark.brandStrong,
+      );
+    }
+    _expectBackVisible(tester);
+    progress.complete(_progress(false));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final hasHistory in [false, true]) {
+    testWidgets('dark intro has readable colors with history=$hasHistory', (
+      tester,
+    ) async {
+      await _pumpIntro(
+        tester,
+        size: const Size(390, 844),
+        progress: Future.value(_progress(hasHistory)),
+        dark: true,
+      );
+      await tester.pumpAndSettle();
+      const colors = AppThemeColors.dark;
+      final background = tester.widget<WelcomeAssessmentBackground>(
+        find.byKey(const ValueKey('welcome-assessment-intro-background')),
+      );
+      expect(background, isA<WelcomeAssessmentBackground>());
+      expect(
+        tester
+            .widget<ColoredBox>(find.byKey(const ValueKey('welcome-intro-sky')))
+            .color,
+        colors.pageBackground,
+      );
+      expect(
+        tester
+            .widget<Opacity>(find.byKey(const ValueKey('welcome-intro-saturn')))
+            .opacity,
+        0.78,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('welcome-intro-ground')),
+          matching: find.byType(ColorFiltered),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        tester.widget<Text>(find.text('TOÁN AI')).style!.color,
+        colors.brandStrong,
+      );
+      expect(
+        tester.widget<Text>(find.text('ĐÁNH GIÁ NĂNG LỰC')).style!.color,
+        colors.accent,
+      );
+      expect(
+        tester
+            .widget<AppBackButton>(
+              find.byKey(const ValueKey('welcome-assessment-back')),
+            )
+            .color,
+        colors.brandStrong,
+      );
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('placement-current-grade-label')),
+            )
+            .style!
+            .color,
+        colors.textPrimary,
+      );
+      expect(
+        tester.widget<Text>(find.text('START')).style!.color,
+        colors.onAccent,
+      );
+      if (hasHistory) {
+        final card = tester.widget<Container>(
+          find.byKey(const ValueKey('placement-progression-chart')),
+        );
+        expect((card.decoration as BoxDecoration).color, colors.surface);
+        expect(
+          tester
+              .widget<Text>(
+                find.byKey(
+                  const ValueKey('placement-progression-current-grade'),
+                ),
+              )
+              .style!
+              .color,
+          colors.textPrimary,
+        );
+        expect(
+          tester
+              .widget<Text>(
+                find.byKey(
+                  const ValueKey('placement-progression-axis-label-0'),
+                ),
+              )
+              .style!
+              .color,
+          colors.textSecondary,
+        );
+      } else {
+        expect(
+          tester
+              .widget<Image>(
+                find.byKey(const ValueKey('welcome-assessment-intro-mascot')),
+              )
+              .color,
+          isNull,
+        );
+      }
+      _expectStartVisible(tester, const Size(390, 844));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('changing theme preserves the chart and Start position', (
+    tester,
+  ) async {
+    Rect? lightAction;
+    for (final dark in [false, true, false]) {
+      await _pumpIntro(
+        tester,
+        size: const Size(390, 844),
+        progress: Future.value(_progress(true)),
+        dark: dark,
+      );
+      await tester.pumpAndSettle();
+      final sky = tester.widget<ColoredBox>(
+        find.byKey(const ValueKey('welcome-intro-sky')),
+      );
+      expect(
+        sky.color,
+        dark ? AppThemeColors.dark.pageBackground : Colors.white,
+      );
+      lightAction ??= tester.getRect(_action);
+      expect(tester.getRect(_action), lightAction);
+      expect(_loading, findsNothing);
+      expect(
+        find.byKey(const ValueKey('welcome-assessment-intro-chart')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    }
   });
 
   testWidgets(
@@ -394,6 +566,7 @@ Future<void> _pumpIntro(
   AppLanguage language = AppLanguage.vi,
   double textScale = 1,
   bool disableAnimations = false,
+  bool dark = false,
   Future<void> Function(BuildContext)? onAssessment,
 }) async {
   tester.view.physicalSize = size;
@@ -416,7 +589,9 @@ Future<void> _pumpIntro(
       child: LingoScope(
         lingo: lingo,
         child: MaterialApp(
-          theme: ThemeData(extensions: const [AppThemeColors.light]),
+          theme: dark
+              ? AppTheme.dark()
+              : ThemeData(extensions: const [AppThemeColors.light]),
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(
               textScaler: TextScaler.linear(textScale),
@@ -435,7 +610,7 @@ Future<void> _pumpIntro(
   await tester.runAsync(() async {
     final context = tester.element(find.byType(WelcomeAssessmentIntroScreen));
     for (final asset in [
-      'assets/images/assessment_intro/assessment-intro-background.png',
+      ...WelcomeAssessmentBackground.decorationAssets,
       'assets/images/assessment_intro/assessment-graduate-mascot.png',
       'assets/images/grade-ribbon-numbers.png',
     ]) {
