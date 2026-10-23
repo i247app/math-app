@@ -15,9 +15,8 @@ abstract class ApiMetadataProvider {
 class AppApiMetadataProvider implements ApiMetadataProvider {
   AppApiMetadataProvider({
     DeviceInfoPlugin? deviceInfoPlugin,
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin(),
-       _storage = storage;
+    this._storage = const FlutterSecureStorage(),
+  }) : _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
 
   static final instance = AppApiMetadataProvider();
 

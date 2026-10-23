@@ -17,12 +17,10 @@ import 'package:numi/features/exam/models/exam.dart';
 
 class HistoryController extends ChangeNotifier {
   HistoryController({
-    required ExamService examService,
-    required ClassroomService classroomService,
-    required ClassroomExerciseService assignmentService,
-  }) : _examService = examService,
-       _classroomService = classroomService,
-       _assignmentService = assignmentService;
+    required this._examService,
+    required this._classroomService,
+    required this._assignmentService,
+  });
 
   final ExamService _examService;
   final ClassroomService _classroomService;

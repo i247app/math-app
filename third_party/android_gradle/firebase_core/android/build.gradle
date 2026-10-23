@@ -1,8 +1,8 @@
-// Android Gradle migration for firebase_core 4.15.0.
+// Android Gradle migration for firebase_core 5.1.0.
 // Derived from the published package; see ../LICENSE and ../../README.md.
 
-group 'io.flutter.plugins.firebase.core'
-version '1.0-SNAPSHOT'
+group = 'io.flutter.plugins.firebase.core'
+version = '1.0-SNAPSHOT'
 
 apply plugin: 'com.android.library'
 apply from: file("local-config.gradle")
@@ -23,7 +23,7 @@ def getRootProjectExtOrDefaultProperty(name) {
 android {
     // Conditional for compatibility with AGP <4.2.
     if (project.android.hasProperty("namespace")) {
-      namespace 'io.flutter.plugins.firebase.core'
+      namespace = 'io.flutter.plugins.firebase.core'
     }
 
     compileSdk project.ext.compileSdk
@@ -44,7 +44,7 @@ android {
     }
 
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 
     lintOptions {

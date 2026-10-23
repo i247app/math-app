@@ -7,9 +7,8 @@ import 'package:numi/features/session/controllers/passcode_state.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 
 class PasscodeCubit extends Cubit<PasscodeState> {
-  PasscodeCubit({required PasscodeService passcodeService})
-    : _passcodeService = passcodeService,
-      super(const PasscodeState());
+  PasscodeCubit({required this._passcodeService})
+    : super(const PasscodeState());
 
   final PasscodeService _passcodeService;
   Future<void>? _availabilityCheck;

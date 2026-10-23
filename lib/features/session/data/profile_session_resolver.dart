@@ -8,10 +8,9 @@ import 'package:numi/features/session/models/profile_session_resolution.dart';
 
 class ProfileSessionResolver {
   ProfileSessionResolver({
-    required ProfileService profileService,
-    required ActiveProfileSession activeProfileSession,
-  }) : _profileService = profileService,
-       _activeProfileSession = activeProfileSession;
+    required this._profileService,
+    required this._activeProfileSession,
+  });
 
   final ProfileService _profileService;
   final ActiveProfileSession _activeProfileSession;

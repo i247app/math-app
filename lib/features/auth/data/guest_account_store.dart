@@ -4,9 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
 
 class GuestAccountStore {
-  const GuestAccountStore({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
+  const GuestAccountStore({this._storage = const FlutterSecureStorage()});
 
   static const guestUidKey = 'guest_uid';
 

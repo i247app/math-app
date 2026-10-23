@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// [DebugRequestMetricsInterceptor] is registered only in debug builds; this
 /// class remains independently usable in tests to characterize its accounting.
 class DebugRequestMetrics {
-  DebugRequestMetrics({void Function(String message)? log}) : _log = log;
+  DebugRequestMetrics({this._log});
 
   static final DebugRequestMetrics instance = DebugRequestMetrics();
 

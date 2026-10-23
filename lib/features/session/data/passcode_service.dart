@@ -30,9 +30,7 @@ abstract class PasscodeService {
 }
 
 class SecurePasscodeService implements PasscodeService {
-  const SecurePasscodeService({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
+  const SecurePasscodeService({this._storage = const FlutterSecureStorage()});
 
   static const _keyPrefix = 'local_passcode_v1_user_';
   static const _loginNameKeyPrefix = 'local_passcode_v1_login_name_user_';
@@ -60,9 +58,8 @@ class SecurePasscodeService implements PasscodeService {
     if (userId == null || userId <= 0 || !await hasPasscode(userId)) {
       return null;
     }
-    final loginName = (await _storage.read(
-      key: _loginNameStorageKey(userId),
-    ))?.trim();
+    final loginName = (await _storage.read(key: _loginNameStorageKey(userId)))
+        ?.trim();
     if (loginName == null || loginName.isEmpty) {
       return null;
     }

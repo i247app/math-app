@@ -2,6 +2,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
 
 import 'dart:async';
+
 import 'package:numi/core/data/session_cache_scope.dart';
 
 import 'package:flutter/material.dart';
@@ -40,12 +41,10 @@ class StudentClassSearchContent extends StatefulWidget {
     this.userId,
     this.onJoinRequested,
     this.activeRefreshTick = 0,
-    ClassroomService? classroomService,
-    GradeService? gradeService,
-    SchoolService? schoolService,
-  }) : _classroomService = classroomService,
-       _gradeService = gradeService,
-       _schoolService = schoolService;
+    this._classroomService,
+    this._gradeService,
+    this._schoolService,
+  });
 
   final int profileId;
   final int? userId;

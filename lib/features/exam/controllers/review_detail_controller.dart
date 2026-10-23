@@ -11,12 +11,11 @@ enum ExamReviewMode { retry, result }
 class ReviewDetailController extends ChangeNotifier {
   ReviewDetailController({
     required this.detailId,
-    required ExamDetailLoader loadDetail,
+    required this._loadDetail,
     GeneratedExam? initialExam,
     ExamReviewMode initialMode = ExamReviewMode.retry,
     Object? cacheKey,
-  }) : _loadDetail = loadDetail,
-       _cacheKey = cacheKey ?? detailId,
+  }) : _cacheKey = cacheKey ?? detailId,
        _exam = initialExam {
     _mode = initialMode;
     _seedSubmittedAnswers(initialExam);

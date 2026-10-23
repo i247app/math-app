@@ -70,8 +70,7 @@ class DashboardProfileState {
 ///
 /// This is a [ChangeNotifier] so the UI rebuilds cheaply via [ListenableBuilder].
 class DashboardProfileController extends ChangeNotifier {
-  DashboardProfileController({required GradeService gradeService})
-    : _gradeService = gradeService;
+  DashboardProfileController({required this._gradeService});
 
   final GradeService _gradeService;
 

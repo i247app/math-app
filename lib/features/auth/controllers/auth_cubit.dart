@@ -22,9 +22,8 @@ part 'auth_flow/signup.dart';
 part 'auth_flow/session.dart';
 
 class AuthFlowCubit extends Cubit<AuthFlowState> {
-  AuthFlowCubit({required AuthService authService, AuthFlowState? initialState})
-    : _authService = authService,
-      super(initialState ?? const AuthFlowState());
+  AuthFlowCubit({required this._authService, AuthFlowState? initialState})
+    : super(initialState ?? const AuthFlowState());
 
   final AuthService _authService;
   SignupFormData? _pendingSignupForm;

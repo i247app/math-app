@@ -18,13 +18,12 @@ import 'package:numi/features/exam/models/grade_levels.dart';
 class GradeRoadmapController extends ChangeNotifier {
   GradeRoadmapController({
     required this.profileId,
-    required ExamService examService,
+    required this._examService,
     required this.progressStore,
     List<GeneratedExam> initialExams = const [],
     int initialGrade = 0,
     GradeExamCompletion? initialCompletion,
-  }) : _examService = examService,
-       _exams = List.of(initialExams),
+  }) : _exams = List.of(initialExams),
        _selectedGrade = AssessmentFlowPolicy.clampGrade(initialGrade),
        _hasInitialCompletion = initialCompletion != null {
     if (initialCompletion != null) {

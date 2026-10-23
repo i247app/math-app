@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:numi/core/data/session_cache_scope.dart';
 
 import 'package:flutter/material.dart';
@@ -22,10 +23,9 @@ class TeacherClassMembersScreen extends StatefulWidget {
     super.key,
     required this.classroomId,
     required this.profileId,
-    ClassroomService? classroomService,
-    ProfileService? profileService,
-  }) : _classroomService = classroomService,
-       _profileService = profileService;
+    this._classroomService,
+    this._profileService,
+  });
 
   final int classroomId;
   final int profileId;

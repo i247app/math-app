@@ -29,8 +29,8 @@ class TeacherClassroomExerciseDetailScreen extends StatefulWidget {
     required this.profileId,
     this.initialExercise,
     this.purpose = classroomExercisePurposeHomework,
-    ClassroomExerciseService? exerciseService,
-  }) : _exerciseService = exerciseService;
+    this._exerciseService,
+  });
 
   final int exerciseId;
   final int profileId;

@@ -48,16 +48,12 @@ class TeacherCreateClassroomExerciseScreen extends StatefulWidget {
     this.userId,
     this.initialClassroom,
     this.purpose = classroomExercisePurposeHomework,
-    ClassroomExerciseService? exerciseService,
-    ClassroomService? classroomService,
-    GradeService? gradeService,
-    ProfileService? profileService,
-    SchoolService? schoolService,
-  }) : _exerciseService = exerciseService,
-       _classroomService = classroomService,
-       _gradeService = gradeService,
-       _profileService = profileService,
-       _schoolService = schoolService;
+    this._exerciseService,
+    this._classroomService,
+    this._gradeService,
+    this._profileService,
+    this._schoolService,
+  });
 
   final int classroomId;
   final int profileId;
@@ -210,9 +206,8 @@ class _TeacherCreateClassroomExerciseScreenState
                               controller: _titleController,
                               focusNode: _titleFocusNode,
                               errorText: _titleErrorText,
-                              hintKey: teacherExerciseCopy(
-                                widget.purpose,
-                              ).titleHintKey,
+                              hintKey: teacherExerciseCopy(widget.purpose)
+                                  .titleHintKey,
                               height: 62,
                               radius: 10,
                             ),
@@ -334,9 +329,8 @@ class _TeacherCreateClassroomExerciseScreenState
                             padding: const EdgeInsets.only(top: 17),
                             child: CreateClassroomExerciseInput(
                               controller: _descriptionController,
-                              hintKey: teacherExerciseCopy(
-                                widget.purpose,
-                              ).descriptionHintKey,
+                              hintKey: teacherExerciseCopy(widget.purpose)
+                                  .descriptionHintKey,
                               height: 167,
                               maxLines: 6,
                               textAlignVertical: TextAlignVertical.top,

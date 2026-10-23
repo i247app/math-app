@@ -6,11 +6,7 @@ import 'package:numi/features/notifications/data/notification_cache.dart';
 import 'package:numi/features/notifications/data/notification_list_service.dart';
 
 class NotificationBadgeController extends ChangeNotifier {
-  NotificationBadgeController({
-    required NotificationListService service,
-    Stream<Object?>? incomingMessages,
-  }) : _service = service,
-       _incomingMessages = incomingMessages;
+  NotificationBadgeController({required this._service, this._incomingMessages});
 
   final NotificationListService _service;
   final Stream<Object?>? _incomingMessages;

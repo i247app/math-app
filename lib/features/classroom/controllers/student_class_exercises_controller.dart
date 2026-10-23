@@ -7,9 +7,7 @@ import 'package:numi/features/classroom_exercise/data/classroom_exercise_service
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 
 class StudentClassExercisesController extends ChangeNotifier {
-  StudentClassExercisesController({
-    required ClassroomExerciseService exerciseService,
-  }) : _exerciseService = exerciseService;
+  StudentClassExercisesController({required this._exerciseService});
   final ClassroomExerciseService _exerciseService;
   AsyncResource<List<ClassroomExercise>> _state = const AsyncResource.idle();
   AsyncResource<List<ClassroomExercise>> get state => _state;

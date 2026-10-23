@@ -13,9 +13,9 @@ import 'package:numi/shared/layouts/page_header.dart';
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({
     super.key,
-    NotificationListService? notificationService,
+    this._notificationService,
     this.showMissingChildProfileNotice = false,
-  }) : _notificationService = notificationService;
+  });
 
   final NotificationListService? _notificationService;
   final bool showMissingChildProfileNotice;

@@ -36,16 +36,12 @@ class TeacherCreateClassScreen extends StatefulWidget {
     super.key,
     required this.user,
     required this.activeProfile,
-    ClassroomService? classroomService,
-    GradeService? gradeService,
-    ProfileService? profileService,
-    SchoolService? schoolService,
-    AvatarPickerService? avatarPicker,
-  }) : _classroomService = classroomService,
-       _gradeService = gradeService,
-       _profileService = profileService,
-       _schoolService = schoolService,
-       _avatarPicker = avatarPicker;
+    this._classroomService,
+    this._gradeService,
+    this._profileService,
+    this._schoolService,
+    this._avatarPicker,
+  });
 
   final LoginUser? user;
   final UserProfile? activeProfile;

@@ -7,8 +7,8 @@ import 'package:numi/features/classroom_exercise/data/classroom_exercise_excepti
 class ClassroomExerciseReviewAdapter {
   ClassroomExerciseReviewAdapter({
     required this.profileId,
-    required ClassroomExerciseService exerciseService,
-  }) : _exerciseService = exerciseService;
+    required this._exerciseService,
+  });
 
   final int profileId;
   final ClassroomExerciseService _exerciseService;

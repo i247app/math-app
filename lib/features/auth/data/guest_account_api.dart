@@ -11,12 +11,11 @@ class GuestAccountApi implements GuestAccountService {
   GuestAccountApi({
     NetworkClient? networkClient,
     ProfileService? profileService,
-    GuestAccountStore store = const GuestAccountStore(),
+    this._store = const GuestAccountStore(),
   }) : _networkClient = networkClient ?? NetworkClient.shared,
        _profileService =
            profileService ??
-           ProfileApi(networkClient: networkClient ?? NetworkClient.shared),
-       _store = store;
+           ProfileApi(networkClient: networkClient ?? NetworkClient.shared);
 
   final NetworkClient _networkClient;
   final ProfileService _profileService;

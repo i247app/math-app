@@ -45,7 +45,7 @@ class TeacherHomeTab extends StatefulWidget {
     required this.onCompleteProfile,
     this.onOpenClassroomTab,
     this.onOpenExercisesTab,
-    HomeLayoutService? homeLayoutService,
+    this._homeLayoutService,
     this.activeRefreshTick = 0,
     this.isActive = true,
     this.hasUnreadNotifications = false,
@@ -53,7 +53,7 @@ class TeacherHomeTab extends StatefulWidget {
     this.onCreateClass,
     this.onOpenClassDetail,
     this.onOpenAssignmentDetail,
-  }) : _homeLayoutService = homeLayoutService;
+  });
 
   final LoginUser? user;
   final UserProfile? activeProfile;

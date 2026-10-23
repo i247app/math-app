@@ -13,7 +13,7 @@ import 'package:numi/features/exam/models/placement_result_config.dart';
 /// Navigation, haptics and error presentation belong to the screen.
 class PlacementResultController extends ChangeNotifier {
   PlacementResultController({
-    required ExamService examService,
+    required this._examService,
     required this.grade,
     required int correctAnswers,
     required int totalQuestions,
@@ -22,8 +22,7 @@ class PlacementResultController extends ChangeNotifier {
     this.profileId,
     this.userExamId,
     this.previousGrade,
-  }) : _examService = examService,
-       totalQuestions = totalQuestions.clamp(0, 1000000),
+  }) : totalQuestions = totalQuestions.clamp(0, 1000000),
        correctAnswers = correctAnswers.clamp(
          0,
          totalQuestions.clamp(0, 1000000),

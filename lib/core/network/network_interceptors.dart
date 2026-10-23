@@ -259,12 +259,10 @@ class NetworkLogInterceptor extends Interceptor {
 
 class MetadataInterceptor extends QueuedInterceptor {
   MetadataInterceptor({
-    required ApiMetadataProvider metadataProvider,
-    required AuthTokenStore authTokenStore,
-    required AuthTokenStore guestTokenStore,
-  }) : _metadataProvider = metadataProvider,
-       _authTokenStore = authTokenStore,
-       _guestTokenStore = guestTokenStore;
+    required this._metadataProvider,
+    required this._authTokenStore,
+    required this._guestTokenStore,
+  });
 
   final ApiMetadataProvider _metadataProvider;
   final AuthTokenStore _authTokenStore;
@@ -343,10 +341,9 @@ class MetadataInterceptor extends QueuedInterceptor {
 /// metadata via [MetadataInterceptor].
 class AuthTokenResponseInterceptor extends QueuedInterceptor {
   AuthTokenResponseInterceptor({
-    required AuthTokenStore authTokenStore,
-    required AuthTokenStore guestTokenStore,
-  }) : _authTokenStore = authTokenStore,
-       _guestTokenStore = guestTokenStore;
+    required this._authTokenStore,
+    required this._guestTokenStore,
+  });
 
   static const _authTokenHeader = 'X-Auth-Token';
 

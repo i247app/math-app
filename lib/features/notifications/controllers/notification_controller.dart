@@ -7,9 +7,7 @@ import 'package:numi/features/notifications/data/notification_list_service.dart'
 import 'package:numi/features/notifications/data/notification_list_exception.dart';
 
 class NotificationController extends ChangeNotifier {
-  NotificationController({required NotificationListService service})
-    : _service = service,
-      _state = _initialState();
+  NotificationController({required this._service}) : _state = _initialState();
 
   final NotificationListService _service;
 

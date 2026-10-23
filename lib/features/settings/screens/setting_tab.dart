@@ -85,15 +85,12 @@ class SettingTab extends StatefulWidget {
     required this.bottomPadding,
     this.scale = 1,
     SettingPageView initialView = SettingPageView.settings,
-    UserProfile? initialEditingProfile,
-    bool isPushedPage = false,
-    bool openAddProfileOnStart = false,
+    this._initialEditingProfile,
+    this._isPushedPage = false,
+    this._openAddProfileOnStart = false,
     this.isActive = true,
   }) : openAddProfileRequestId = 0,
        _initialView = initialView,
-       _initialEditingProfile = initialEditingProfile,
-       _isPushedPage = isPushedPage,
-       _openAddProfileOnStart = openAddProfileOnStart,
        assert(initialView != SettingPageView.account);
 
   final LoginUser? user;

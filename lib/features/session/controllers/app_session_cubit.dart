@@ -15,15 +15,11 @@ import 'package:numi/features/session/data/profile_session_resolver.dart';
 class AppSessionCubit extends Cubit<AppSessionState> {
   AppSessionCubit({
     AuthenticatedSession? initialSession,
-    required AuthService authService,
-    required ProfileSessionResolver profileResolver,
-    required SessionDataCleaner sessionDataCleaner,
-    GuestAccountService? guestAccountService,
+    required this._authService,
+    required this._profileResolver,
+    required this._sessionDataCleaner,
+    this._guestAccountService,
   }) : _sessionEpoch = initialSession == null ? 0 : 1,
-       _authService = authService,
-       _profileResolver = profileResolver,
-       _sessionDataCleaner = sessionDataCleaner,
-       _guestAccountService = guestAccountService,
        super(
          initialSession == null
              ? const AppSessionState()

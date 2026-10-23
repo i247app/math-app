@@ -32,10 +32,9 @@ void numiLocalNotificationTapBackground(NotificationResponse response) {
 
 class NotificationService {
   NotificationService({
-    FirebaseMessaging? messaging,
+    this._messaging,
     FlutterLocalNotificationsPlugin? localNotifications,
-  }) : _messaging = messaging,
-       _localNotifications =
+  }) : _localNotifications =
            localNotifications ?? FlutterLocalNotificationsPlugin();
 
   static const AndroidNotificationChannel _foregroundChannel =
@@ -83,6 +82,8 @@ class NotificationService {
       final token = await resolveMessagingToken(
         requiresApnsToken: _requiresApnsToken,
         getApnsToken: messaging.getAPNSToken,
+        // The backend expects an FCM token; register()/onRegistered emit FIDs.
+        // ignore: deprecated_member_use
         getFcmToken: messaging.getToken,
       );
       if (token == null || token.isEmpty) {
@@ -305,6 +306,8 @@ class NotificationService {
   }
 
   void _listenForTokenRefresh() {
+    // Keep FCM token refreshes paired with currentToken(), rather than FIDs.
+    // ignore: deprecated_member_use
     _firebaseMessaging.onTokenRefresh.listen(
       (token) {
         _emitToken(token);

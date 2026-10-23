@@ -24,8 +24,8 @@ class StudentClassDetailScreen extends StatefulWidget {
     required this.classroomId,
     required this.profileId,
     this.initialClassroom,
-    ClassroomExerciseService? exerciseService,
-  }) : _exerciseService = exerciseService;
+    this._exerciseService,
+  });
 
   final int classroomId;
   final int profileId;

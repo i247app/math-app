@@ -45,12 +45,11 @@ class TeacherStudyTab extends StatefulWidget {
     required this.user,
     required this.activeProfile,
     required this.bottomPadding,
-    ClassroomService? classroomService,
-    ClassroomExerciseService? exerciseService,
+    this._classroomService,
+    this._exerciseService,
     this.activeRefreshTick = 0,
     this.isActive = true,
-  }) : _classroomService = classroomService,
-       _exerciseService = exerciseService;
+  });
 
   final LoginUser? user;
   final UserProfile? activeProfile;

@@ -30,16 +30,12 @@ class StartupBootstrapResult {
 class StartupBootstrap {
   const StartupBootstrap({
     this.sessionTimeout = const Duration(seconds: 8),
-    AppServices? services,
-    AuthService? authService,
-    ProfileService? profileService,
-    ActiveProfileSession activeProfileSession = const ActiveProfileSession(),
-    PasscodeService passcodeService = const SecurePasscodeService(),
-  }) : _services = services,
-       _authService = authService,
-       _profileService = profileService,
-       _activeProfileSession = activeProfileSession,
-       _passcodeService = passcodeService;
+    this._services,
+    this._authService,
+    this._profileService,
+    this._activeProfileSession = const ActiveProfileSession(),
+    this._passcodeService = const SecurePasscodeService(),
+  });
 
   final Duration sessionTimeout;
   final AppServices? _services;

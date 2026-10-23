@@ -77,8 +77,8 @@ abstract interface class ProfileGradeProgressStore {
 
 class SecureProfileGradeProgressStore implements ProfileGradeProgressStore {
   const SecureProfileGradeProgressStore({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
+    this._storage = const FlutterSecureStorage(),
+  });
 
   static const _storageKey = 'profile_grade_progress_v1';
 

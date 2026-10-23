@@ -29,8 +29,8 @@ class StudentClassroomExerciseAttemptScreen extends StatefulWidget {
     required this.exerciseId,
     required this.profileId,
     this.initialExercise,
-    ClassroomExerciseService? exerciseService,
-  }) : _exerciseService = exerciseService;
+    this._exerciseService,
+  });
 
   final int exerciseId;
   final int profileId;

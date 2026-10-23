@@ -8,10 +8,9 @@ import 'app_strings.dart';
 
 class LingoProvider extends ChangeNotifier {
   LingoProvider({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-    Locale? deviceLocale,
-  }) : _storage = storage,
-       _deviceLocale = deviceLocale;
+    this._storage = const FlutterSecureStorage(),
+    this._deviceLocale,
+  });
 
   static const _storageKey = 'app_language';
 

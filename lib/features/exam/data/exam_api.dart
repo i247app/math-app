@@ -16,9 +16,8 @@ class ExamApi implements ExamService {
   ExamApi({
     String? baseUrl,
     NetworkClient? networkClient,
-    GuestAccountService? guestAccountService,
-  }) : _guestAccountService = guestAccountService,
-       _networkClient =
+    this._guestAccountService,
+  }) : _networkClient =
            networkClient ??
            (baseUrl == null
                ? NetworkClient.shared
@@ -118,13 +117,16 @@ class ExamApi implements ExamService {
     bool? esessFlag,
   }) async {
     await _runExamRequest(() async {
-      final json = await _networkClient
-          .postJson('/exams/sessions/mark', <String, dynamic>{
-            'profile_id': profileId,
-            'esess_id': userExamId,
-            'status': status,
-            'esess_flag': ?esessFlag,
-          }, useGuestToken: _guestAccountService?.current != null);
+      final json = await _networkClient.postJson(
+        '/exams/sessions/mark',
+        <String, dynamic>{
+          'profile_id': profileId,
+          'esess_id': userExamId,
+          'status': status,
+          'esess_flag': ?esessFlag,
+        },
+        useGuestToken: _guestAccountService?.current != null,
+      );
       NetworkClient.throwForApiStatus(json);
     });
   }
@@ -169,15 +171,16 @@ class ExamApi implements ExamService {
     }
 
     return _runExamRequest(
-      () =>
-          _postResponse('/exams/journey/progress', <String, dynamic>{
-            'profile_id': profileId,
-            'exam_type': examType,
-            'from_dt': _journeyDateTime(fromDt),
-            'to_dt': _journeyDateTime(toDt),
-          }, ExamProgressResponseDto.fromJson).then(
-            (response) => response.toModel(),
-          ),
+      () => _postResponse(
+        '/exams/journey/progress',
+        <String, dynamic>{
+          'profile_id': profileId,
+          'exam_type': examType,
+          'from_dt': _journeyDateTime(fromDt),
+          'to_dt': _journeyDateTime(toDt),
+        },
+        ExamProgressResponseDto.fromJson,
+      ).then((response) => response.toModel()),
     );
   }
 
@@ -346,9 +349,8 @@ class ExamApi implements ExamService {
           final session = json['exam_session'];
           return session == null
               ? null
-              : ExamStatsDto.fromJson(
-                  Map<String, dynamic>.from(session as Map),
-                ).toModel();
+              : ExamStatsDto.fromJson(Map<String, dynamic>.from(session as Map))
+                    .toModel();
         },
       ),
     );

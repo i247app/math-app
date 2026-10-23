@@ -53,18 +53,13 @@ class DashboardScreen extends StatefulWidget {
     required this.onLogout,
     this.showChildProfileDialogOnStart = false,
     this.onChildProfileDialogShown,
-    GradeService? gradeService,
-    ClassroomService? classroomService,
-    ClassroomExerciseService? assignmentService,
-    ExamService? examService,
-    NotificationListService? notificationService,
-    Stream<Object?>? notificationMessages,
-  }) : _gradeService = gradeService,
-       _classroomService = classroomService,
-       _assignmentService = assignmentService,
-       _examService = examService,
-       _notificationService = notificationService,
-       _notificationMessages = notificationMessages;
+    this._gradeService,
+    this._classroomService,
+    this._assignmentService,
+    this._examService,
+    this._notificationService,
+    this._notificationMessages,
+  });
 
   final LoginUser? user;
   final List<UserProfile> profiles;

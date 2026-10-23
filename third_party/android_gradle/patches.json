@@ -1,7 +1,7 @@
 {
   "firebase_core": {
-    "version": "4.15.0",
+    "version": "5.1.0",
     "upstreamBuildFile": "build.gradle",
-    "upstreamBuildSha256": "126477af6da6a970ea438007e07a6eea967640c38ffab92eede591e861f444f0"
+    "upstreamBuildSha256": "827a96ea46790e5675641d027f0b42dd82170e5bc47f07fa12373ec4348448c1"
   }
 }

@@ -34,14 +34,11 @@ class TeacherClassDetailScreen extends StatefulWidget {
     this.userId,
     this.initialClassroom,
     this.initiallyExpanded = false,
-    ClassroomService? classroomService,
-    GradeService? gradeService,
-    ProfileService? profileService,
-    SchoolService? schoolService,
-  }) : _classroomService = classroomService,
-       _gradeService = gradeService,
-       _profileService = profileService,
-       _schoolService = schoolService;
+    this._classroomService,
+    this._gradeService,
+    this._profileService,
+    this._schoolService,
+  });
 
   final int classroomId;
   final int profileId;

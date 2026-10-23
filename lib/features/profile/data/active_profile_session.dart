@@ -3,9 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:numi/features/profile/models/profile.dart';
 
 class ActiveProfileSession {
-  const ActiveProfileSession({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
-  }) : _storage = storage;
+  const ActiveProfileSession({this._storage = const FlutterSecureStorage()});
 
   final FlutterSecureStorage _storage;
 

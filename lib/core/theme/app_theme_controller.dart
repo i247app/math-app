@@ -4,10 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AppThemeController extends ChangeNotifier {
   AppThemeController({
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
+    this._storage = const FlutterSecureStorage(),
     PlatformDispatcher? platformDispatcher,
-  }) : _storage = storage,
-       _platformDispatcher = platformDispatcher ?? PlatformDispatcher.instance;
+  }) : _platformDispatcher = platformDispatcher ?? PlatformDispatcher.instance;
 
   static const _storageKey = 'app_theme_mode';
   static const _darkValue = 'dark';

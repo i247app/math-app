@@ -8,9 +8,7 @@ import 'package:numi/features/home/helpers/home_layout_helpers.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 
 class ParentRoomController extends ChangeNotifier {
-  ParentRoomController({
-    required Future<HomeLayout> Function(int profileId) loadLayout,
-  }) : _loadLayout = loadLayout;
+  ParentRoomController({required this._loadLayout});
   final Future<HomeLayout> Function(int profileId) _loadLayout;
   AsyncResource<HomeLayout> _state = const AsyncResource.idle();
   AsyncResource<HomeLayout> get state => _state;

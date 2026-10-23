@@ -39,10 +39,9 @@ class StudentClassroomExerciseAttemptController extends ChangeNotifier {
   StudentClassroomExerciseAttemptController({
     required this.exerciseId,
     required this.profileId,
-    required ClassroomExerciseService exerciseService,
+    required this._exerciseService,
     ClassroomExercise? initialExercise,
-  }) : _exerciseService = exerciseService,
-       _exercise = initialExercise {
+  }) : _exercise = initialExercise {
     if (initialExercise != null) {
       StudentClassroomExerciseCache.seedDetail(
         profileId: profileId,

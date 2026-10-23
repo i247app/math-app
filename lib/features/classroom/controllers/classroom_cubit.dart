@@ -5,9 +5,8 @@ import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom/data/classroom_exception.dart';
 
 class ClassroomCubit extends Cubit<ClassroomState> {
-  ClassroomCubit({required ClassroomService classroomService})
-    : _classroomService = classroomService,
-      super(const ClassroomState());
+  ClassroomCubit({required this._classroomService})
+    : super(const ClassroomState());
 
   final ClassroomService _classroomService;
   final Map<String, Future<ClassroomCollectionState>> _pendingLoads =
