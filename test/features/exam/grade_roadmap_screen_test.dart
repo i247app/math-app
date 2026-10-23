@@ -252,7 +252,7 @@ void main() {
     });
   }
 
-  for (final grade in [0, 2]) {
+  for (final grade in [0, 1, 2]) {
     for (final size in [
       const Size(320, 700),
       const Size(390, 844),
@@ -281,16 +281,22 @@ void main() {
           expect(rect.width, size.width);
           expect(
             rect.height / rect.width,
-            closeTo(grade == 2 ? 4945 / 863 : 4988 / 672, 0.001),
+            closeTo(switch (grade) {
+              0 => 4948 / 863,
+              2 => 4945 / 863,
+              _ => 4988 / 672,
+            }, 0.001),
           );
           final firstLevel = tester.getRect(
             find.byKey(const ValueKey('grade-roadmap-level-1')),
           );
           final firstLevelCenter =
               rect.topLeft +
-              (grade == 2
-                  ? const Offset(203.5, 4750) * (rect.width / 863)
-                  : const Offset(187.5, 4760) * (rect.width / 672));
+              switch (grade) {
+                0 => const Offset(414, 4750) * (rect.width / 863),
+                2 => const Offset(203.5, 4750) * (rect.width / 863),
+                _ => const Offset(187.5, 4760) * (rect.width / 672),
+              };
           expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
           expect(firstLevel.center.dy, closeTo(firstLevelCenter.dy, 0.01));
           for (var level = 1; level <= 10; level++) {
