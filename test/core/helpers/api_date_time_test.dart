@@ -88,14 +88,8 @@ void main() {
       'exam_session': session,
       'stats': {...session, 'esess_id': 1},
     };
-    expect(
-      SubmitExamResponseDto.fromJson(response).examSession?.userExamId,
-      99,
-    );
-    expect(
-      ExamDetailResponseDto.fromJson(response).examSession?.userExamId,
-      99,
-    );
+    expect(SubmitExamResponseDto.fromJson(response).examSession?.esessId, 99);
+    expect(ExamDetailResponseDto.fromJson(response).examSession?.esessId, 99);
     expect(
       SubmitExamResponseDto.fromJson(response).toJson(),
       contains('exam_session'),

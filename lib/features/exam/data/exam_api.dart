@@ -53,7 +53,7 @@ class ExamApi implements ExamService {
           level: normalizedExamType == examTypeGrade
               ? GradeExamLevel.toApi(level ?? 1)
               : (level ?? 1).clamp(1, 10),
-          userExamId: normalizedExamType == examTypePractice
+          esessId: normalizedExamType == examTypePractice
               ? validUserExamId
               : null,
           guestUid: _guestAccountService?.current?.uid,
@@ -71,9 +71,7 @@ class ExamApi implements ExamService {
         : 0;
     return exam.toModel(
       userExamId:
-          response.examSession?.userExamId ??
-          response.userExamId ??
-          validUserExamId,
+          response.examSession?.esessId ?? response.esessId ?? validUserExamId,
       stats: response.examSession,
       questionNumberOffset: answeredQuestionCount > 0
           ? answeredQuestionCount
@@ -94,7 +92,7 @@ class ExamApi implements ExamService {
       () => _submitExam(
         SubmitExamRequest(
           profileId: validProfileId,
-          userAiExamId: examId,
+          elinkId: examId,
           answers: submittedAnswers,
         ),
       ),
@@ -108,7 +106,7 @@ class ExamApi implements ExamService {
     return exam.toModel(
       submittedAnswers: submittedAnswers,
       stats: response.examSession,
-      userExamId: response.userExamId,
+      userExamId: response.esessId,
     );
   }
 
@@ -251,7 +249,7 @@ class ExamApi implements ExamService {
         activeExam,
         activeExam,
       );
-      final activeUserAiExamId = activeExam?.userAiExamId;
+      final activeUserAiExamId = activeExam?.elinkId;
       if (activeExam != null &&
           detailedActiveExam == null &&
           activeUserAiExamId != null &&
@@ -313,7 +311,7 @@ class ExamApi implements ExamService {
         ),
       ),
     );
-    return response.stats.map((stats) => stats.toModel()).toList();
+    return response.examSessions.map((session) => session.toModel()).toList();
   }
 
   @override
@@ -368,7 +366,7 @@ class ExamApi implements ExamService {
         'grade': grade,
       }, ExamStatsResponseDto.fromJson),
     );
-    return response.stats.map((session) => session.toModel()).toList();
+    return response.examSessions.map((session) => session.toModel()).toList();
   }
 
   Future<GenerateExamResponseDto> _generateExam(GenerateExamRequest request) {
@@ -447,7 +445,7 @@ GeneratedExam _journeyDetailToModel(
     return _activeJourneySetToModel(
       response: response,
       activeExam: detailedActiveExam ?? activeExam,
-      activeUserAiExamId: activeExam.userAiExamId,
+      activeUserAiExamId: activeExam.elinkId,
       activeStatus: stats?.status ?? activeExam.status,
       expectedQuestionCount:
           activeExam.numQuestions ??
@@ -527,8 +525,8 @@ GeneratedExam _activeJourneySetToModel({
         if (activeUserAiExamId == null) {
           return response.exams.length == 1;
         }
-        return detail.userAiExamId == activeUserAiExamId ||
-            (detail.userAiExamId == null && response.exams.length == 1);
+        return detail.elinkId == activeUserAiExamId ||
+            (detail.elinkId == null && response.exams.length == 1);
       })
       .toList(growable: false);
   final hasOnlyExitPlaceholder = isAssessmentExitPlaceholderAnswer(
@@ -571,7 +569,7 @@ GeneratedExam _activeJourneySetToModel({
 
   return GeneratedExam(
     examId: activeUserAiExamId,
-    aiExamId: activeExam.aiExamId,
+    aiExamId: activeExam.examId,
     userAiExamId: activeUserAiExamId,
     userExamId: userExamId,
     profileId: activeExam.profileId,
@@ -661,8 +659,8 @@ GeneratedExamDto? _matchingDetailedActiveExam(
   if (detailedExam.questions.length < expectedQuestionCount) {
     return null;
   }
-  final detailedId = detailedExam.userAiExamId;
-  final activeId = activeExam?.userAiExamId;
+  final detailedId = detailedExam.elinkId;
+  final activeId = activeExam?.elinkId;
   if (detailedId != null && activeId != null && detailedId != activeId) {
     return null;
   }

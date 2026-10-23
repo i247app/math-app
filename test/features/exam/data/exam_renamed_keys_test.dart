@@ -11,11 +11,11 @@ void main() {
       'questions': <Map<String, dynamic>>[],
     });
 
-    expect(exam.aiExamId, 7);
-    expect(exam.userAiExamId, 41);
-    expect(exam.userExamId, 99);
+    expect(exam.examId, 7);
+    expect(exam.elinkId, 41);
+    expect(exam.esessId, 99);
     expect(exam.status, 'ACTIVE');
-    expect(exam.toJson(), containsPair('elink_status', 'ACTIVE'));
+    expect(exam.toJson(), containsPair('status', 'ACTIVE'));
   });
 
   test('journey stats and detail lines read renamed fields', () {
@@ -34,9 +34,9 @@ void main() {
       'esess_ln_status': 'SUBMITTED',
     });
 
-    expect(stats.userExamId, 99);
+    expect(stats.esessId, 99);
     expect(stats.status, 'COMPLETE');
-    expect(detail.userAiExamId, 41);
+    expect(detail.elinkId, 41);
     expect(detail.userExamDetailId, 18);
     expect(detail.detailStatus, 'SUBMITTED');
   });

@@ -1,0 +1,332 @@
+{
+  "cursor": {
+    "start_cursor": "eyJjcmVhdGVfZHQiOiIyMDI2LTEwLTIzVDA5OjA5OjA5LjEyNjE3OVoiLCJlc2Vzc19pZCI6Nn0",
+    "end_cursor": "eyJjcmVhdGVfZHQiOiIyMDI2LTEwLTIzVDA2OjQ1OjIwLjY0MTU5N1oiLCJlc2Vzc19pZCI6M30",
+    "has_next": false,
+    "has_prev": false
+  },
+  "exam_sessions": [
+    {
+      "esess_id": 6,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 0,
+      "correct_number": 0,
+      "skipped_number": 0,
+      "esess_flag": null,
+      "ai_title": "Toán Đánh Giá - Mẫu giáo",
+      "ai_short_text": "Đếm, cộng trừ và quy luật số",
+      "grade": 0,
+      "level": 1,
+      "create_dt": "20261023090909.126179",
+      "in_progress_exams": [
+        {
+          "elink_id": 8,
+          "exam_id": 8,
+          "profile_id": 7,
+          "exam_type": "ASSESSMENT",
+          "grade": 0,
+          "level": 1,
+          "ai_title": "Toán Đánh Giá - Mẫu giáo",
+          "ai_short_text": "Đếm, cộng trừ và quy luật số",
+          "num_questions": 10,
+          "questions": [
+            {
+              "question_number": 1,
+              "question_type": "COUNT",
+              "question_name": "🍎🍎",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "1"
+                },
+                {
+                  "label": "B",
+                  "content": "3"
+                },
+                {
+                  "label": "C",
+                  "content": "2"
+                },
+                {
+                  "label": "D",
+                  "content": "4"
+                }
+              ],
+              "right_answer_label": "C",
+              "right_answer_content": "2",
+              "question_topic": "Đếm số lượng",
+              "question_grade": 0
+            },
+            {
+              "question_number": 2,
+              "question_type": "ARITHMETIC",
+              "question_name": "4",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "🐶🐶🐶"
+                },
+                {
+                  "label": "B",
+                  "content": "🐶🐶🐶🐶🐶"
+                },
+                {
+                  "label": "C",
+                  "content": "🐶🐶"
+                },
+                {
+                  "label": "D",
+                  "content": "🐶🐶🐶🐶"
+                }
+              ],
+              "right_answer_label": "D",
+              "right_answer_content": "🐶🐶🐶🐶",
+              "question_topic": "Ghép số với số lượng",
+              "question_grade": 0
+            },
+            {
+              "question_number": 3,
+              "question_type": "ARITHMETIC",
+              "question_name": "9 - 5",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "4"
+                },
+                {
+                  "label": "B",
+                  "content": "3"
+                },
+                {
+                  "label": "C",
+                  "content": "5"
+                },
+                {
+                  "label": "D",
+                  "content": "6"
+                }
+              ],
+              "right_answer_label": "A",
+              "right_answer_content": "4",
+              "question_topic": "Phép trừ",
+              "question_grade": 1
+            },
+            {
+              "question_number": 4,
+              "question_type": "ARITHMETIC",
+              "question_name": "🍓 🐰 🍇 🍒",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "🍓"
+                },
+                {
+                  "label": "B",
+                  "content": "🐰"
+                },
+                {
+                  "label": "C",
+                  "content": "🍇"
+                },
+                {
+                  "label": "D",
+                  "content": "🍒"
+                }
+              ],
+              "right_answer_label": "B",
+              "right_answer_content": "🐰",
+              "question_topic": "Tìm hình khác nhóm",
+              "question_grade": 0
+            },
+            {
+              "question_number": 5,
+              "question_type": "ARITHMETIC",
+              "question_name": "4 ? 6",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "2"
+                },
+                {
+                  "label": "B",
+                  "content": "5"
+                },
+                {
+                  "label": "C",
+                  "content": "3"
+                },
+                {
+                  "label": "D",
+                  "content": "4"
+                }
+              ],
+              "right_answer_label": "B",
+              "right_answer_content": "5",
+              "question_topic": "Số liền trước và liền sau",
+              "question_grade": 0
+            },
+            {
+              "question_number": 6,
+              "question_type": "ARITHMETIC",
+              "question_name": "34 + 25",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "58"
+                },
+                {
+                  "label": "B",
+                  "content": "60"
+                },
+                {
+                  "label": "C",
+                  "content": "59"
+                },
+                {
+                  "label": "D",
+                  "content": "61"
+                }
+              ],
+              "right_answer_label": "C",
+              "right_answer_content": "59",
+              "question_topic": "Phép cộng",
+              "question_grade": 1
+            },
+            {
+              "question_number": 7,
+              "question_type": "ARITHMETIC",
+              "question_name": "10 9 ? 7 6",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "8"
+                },
+                {
+                  "label": "B",
+                  "content": "7"
+                },
+                {
+                  "label": "C",
+                  "content": "9"
+                },
+                {
+                  "label": "D",
+                  "content": "6"
+                }
+              ],
+              "right_answer_label": "A",
+              "right_answer_content": "8",
+              "question_topic": "Dãy số",
+              "question_grade": 0
+            },
+            {
+              "question_number": 8,
+              "question_type": "ARITHMETIC",
+              "question_name": "🐞🐞🐞 + 🐞🐞🐞🐞",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "6"
+                },
+                {
+                  "label": "B",
+                  "content": "8"
+                },
+                {
+                  "label": "C",
+                  "content": "7"
+                },
+                {
+                  "label": "D",
+                  "content": "5"
+                }
+              ],
+              "right_answer_label": "C",
+              "right_answer_content": "7",
+              "question_topic": "Cộng bằng hình",
+              "question_grade": 0
+            },
+            {
+              "question_number": 9,
+              "question_type": "ARITHMETIC",
+              "question_name": "🚗🚗🚲🚗🚗?🚗🚗🚲",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "🚲"
+                },
+                {
+                  "label": "B",
+                  "content": "🚗"
+                },
+                {
+                  "label": "C",
+                  "content": "🚌"
+                },
+                {
+                  "label": "D",
+                  "content": "🚕"
+                }
+              ],
+              "right_answer_label": "A",
+              "right_answer_content": "🚲",
+              "question_topic": "Quy luật",
+              "question_grade": 0
+            },
+            {
+              "question_number": 10,
+              "question_type": "ARITHMETIC",
+              "question_name": "🧸🧸🧸🧸 = 🧸 + ?",
+              "answers": [
+                {
+                  "label": "A",
+                  "content": "2"
+                },
+                {
+                  "label": "B",
+                  "content": "4"
+                },
+                {
+                  "label": "C",
+                  "content": "3"
+                },
+                {
+                  "label": "D",
+                  "content": "5"
+                }
+              ],
+              "right_answer_label": "C",
+              "right_answer_content": "3",
+              "question_topic": "Tìm số còn thiếu",
+              "question_grade": 0
+            }
+          ],
+          "status": "IN_PROGRESS",
+          "started_dt": "20261023090909.130066",
+          "create_dt": "20261023090909.130066"
+        }
+      ]
+    },
+    {
+      "esess_id": 3,
+      "exam_type": "ASSESSMENT",
+      "status": "COMPLETE",
+      "total_questions": 15,
+      "correct_number": 2,
+      "skipped_number": 5,
+      "score_percentage": 13,
+      "review": "Đã trả lời (2/15) câu đúng (13%).",
+      "esess_flag": null,
+      "ai_title": "Toán Đánh Giá - Mẫu giáo",
+      "ai_short_text": "Đếm, cộng trừ và nhận biết quy luật",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261023064714.261060",
+      "ended_dt": "20261023064714.516961",
+      "create_dt": "20261023064520.641597"
+    }
+  ],
+  "mstatus": 200,
+  "status": "Success"
+}

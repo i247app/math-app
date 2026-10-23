@@ -11,7 +11,7 @@ class GenerateExamRequest {
     required this.examType,
     required this.grade,
     required this.level,
-    this.userExamId,
+    this.esessId,
     this.guestUid,
   });
 
@@ -21,7 +21,7 @@ class GenerateExamRequest {
   final int grade;
   final int level;
   @JsonKey(name: 'esess_id')
-  final int? userExamId;
+  final int? esessId;
   @JsonKey(name: 'uid')
   final int? guestUid;
 
@@ -39,13 +39,13 @@ class GenerateExamRequest {
 class SubmitExamRequest {
   const SubmitExamRequest({
     required this.profileId,
-    required this.userAiExamId,
+    required this.elinkId,
     required this.answers,
   });
 
   final int profileId;
   @JsonKey(name: 'elink_id')
-  final int userAiExamId;
+  final int elinkId;
   final List<SubmitExamAnswerDto> answers;
 
   factory SubmitExamRequest.fromJson(Map<String, dynamic> json) =>
@@ -111,7 +111,7 @@ class GenerateExamResponseDto {
     required this.mstatus,
     this.exam,
     this.examSession,
-    this.userExamId,
+    this.esessId,
     this.resumed,
     this.status,
     this.mmessage,
@@ -123,7 +123,7 @@ class GenerateExamResponseDto {
   @JsonKey(name: 'exam_session')
   final ExamStatsDto? examSession;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? userExamId;
+  final int? esessId;
   final bool? resumed;
   final String? status;
   final String? mmessage;
@@ -141,7 +141,7 @@ class SubmitExamResponseDto {
     required this.mstatus,
     this.exam,
     this.examSession,
-    this.userExamId,
+    this.esessId,
     this.status,
     this.mmessage,
     this.debug,
@@ -152,7 +152,7 @@ class SubmitExamResponseDto {
   @JsonKey(name: 'exam_session')
   final ExamStatsDto? examSession;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? userExamId;
+  final int? esessId;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -219,20 +219,20 @@ class ExamDetailResponseDto {
 
 class ExamPracticePreviewDto {
   const ExamPracticePreviewDto({
-    this.baseUserAiExamId,
+    this.baseElinkId,
     this.mode,
     this.strongTopics = const <ExamPracticeTopicDto>[],
     this.weakTopics = const <ExamPracticeTopicDto>[],
   });
 
-  final int? baseUserAiExamId;
+  final int? baseElinkId;
   final String? mode;
   final List<ExamPracticeTopicDto> strongTopics;
   final List<ExamPracticeTopicDto> weakTopics;
 
   factory ExamPracticePreviewDto.fromJson(Map<String, dynamic> json) {
     return ExamPracticePreviewDto(
-      baseUserAiExamId: _intFromJson(json['base_elink_id']),
+      baseElinkId: _intFromJson(json['base_elink_id']),
       mode: json['mode']?.toString(),
       strongTopics: _practiceTopicsFromJson(json['strong_topics']),
       weakTopics: _practiceTopicsFromJson(json['weak_topics']),
@@ -240,7 +240,7 @@ class ExamPracticePreviewDto {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'base_elink_id': baseUserAiExamId,
+    'base_elink_id': baseElinkId,
     'mode': mode,
     'strong_topics': strongTopics.map((topic) => topic.toJson()).toList(),
     'weak_topics': weakTopics.map((topic) => topic.toJson()).toList(),
@@ -292,7 +292,7 @@ class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
     required this.questionNumber,
     this.answers = const <ExamAnswerDto>[],
-    this.userAiExamId,
+    this.elinkId,
     this.userExamDetailId,
     this.detailStatus,
     this.questionGrade,
@@ -310,7 +310,7 @@ class ExamDetailAnswerDto {
   final int questionNumber;
   final List<ExamAnswerDto> answers;
   @JsonKey(name: 'elink_id', fromJson: _intFromJson)
-  final int? userAiExamId;
+  final int? elinkId;
   @JsonKey(name: 'esess_ln_id', fromJson: _intFromJson)
   final int? userExamDetailId;
   @JsonKey(name: 'esess_ln_status')
@@ -338,15 +338,16 @@ class ExamDetailAnswerDto {
 class ExamStatsResponseDto {
   const ExamStatsResponseDto({
     required this.mstatus,
-    this.stats = const <ExamStatsDto>[],
+    this.cursor,
+    this.examSessions = const <ExamStatsDto>[],
     this.status,
     this.mmessage,
     this.debug,
   });
 
   final int mstatus;
-  @JsonKey(name: 'exam_sessions')
-  final List<ExamStatsDto> stats;
+  final ExamSessionCursorDto? cursor;
+  final List<ExamStatsDto> examSessions;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -357,6 +358,26 @@ class ExamStatsResponseDto {
   Map<String, dynamic> toJson() => _$ExamStatsResponseDtoToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
+class ExamSessionCursorDto {
+  const ExamSessionCursorDto({
+    this.startCursor,
+    this.endCursor,
+    this.hasNext,
+    this.hasPrev,
+  });
+
+  final String? startCursor;
+  final String? endCursor;
+  final bool? hasNext;
+  final bool? hasPrev;
+
+  factory ExamSessionCursorDto.fromJson(Map<String, dynamic> json) =>
+      _$ExamSessionCursorDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExamSessionCursorDtoToJson(this);
+}
+
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamStatsDto {
   const ExamStatsDto({
@@ -365,14 +386,14 @@ class ExamStatsDto {
     required this.skippedNumber,
     required this.totalQuestions,
     this.examType,
-    this.userExamId,
+    this.esessId,
     this.status,
     this.grade,
     this.level,
     this.lastSubmittedDt,
     this.endedDt,
     this.createDt,
-    this.passed,
+    this.esessFlag,
     this.isLatest,
     this.review,
     this.aiTitle,
@@ -390,8 +411,8 @@ class ExamStatsDto {
   final int totalQuestions;
   final String? examType;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? userExamId;
-  @JsonKey(name: 'esess_status', readValue: _readEsessStatus)
+  final int? esessId;
+  @JsonKey(readValue: _readEsessStatus)
   final String? status;
   final int? grade;
   final int? level;
@@ -402,7 +423,7 @@ class ExamStatsDto {
   @JsonKey(fromJson: tryParseApiDateTime)
   final DateTime? createDt;
   @JsonKey(name: 'esess_flag')
-  final bool? passed;
+  final bool? esessFlag;
   final bool? isLatest;
   final String? review;
   final String? aiTitle;
@@ -461,7 +482,7 @@ class ExamProgressPointDto {
   const ExamProgressPointDto({
     required this.lastSubmittedDt,
     required this.correctNumber,
-    required this.userExamId,
+    required this.esessId,
     required this.score,
     required this.scorePct,
     required this.sequence,
@@ -476,7 +497,7 @@ class ExamProgressPointDto {
   final DateTime lastSubmittedDt;
   final int correctNumber;
   @JsonKey(name: 'esess_id')
-  final int userExamId;
+  final int esessId;
   @JsonKey(fromJson: _doubleFromJson)
   final double score;
   @JsonKey(fromJson: _doubleFromJson)
@@ -505,7 +526,7 @@ class ExamProgressSummaryDto {
     required this.highestScorePct,
     required this.lowestScore,
     required this.trend,
-    this.highestUserExamId,
+    this.highestEsessId,
   });
 
   @JsonKey(fromJson: _nullableDoubleFromJson)
@@ -516,7 +537,7 @@ class ExamProgressSummaryDto {
   final double averageScorePct;
   final int count;
   @JsonKey(name: 'highest_esess_id')
-  final int? highestUserExamId;
+  final int? highestEsessId;
   @JsonKey(fromJson: _doubleFromJson)
   final double highestScore;
   @JsonKey(fromJson: _doubleFromJson)
@@ -562,9 +583,9 @@ class ExamPaginationDto {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class GeneratedExamDto {
   const GeneratedExamDto({
-    this.aiExamId,
-    this.userAiExamId,
-    this.userExamId,
+    this.examId,
+    this.elinkId,
+    this.esessId,
     this.profileId,
     this.status,
     this.examType,
@@ -573,6 +594,8 @@ class GeneratedExamDto {
     this.numQuestions,
     this.title,
     this.shortText,
+    this.aiTitle,
+    this.aiShortText,
     this.createDt,
     this.startedDt,
     this.submittedDt,
@@ -581,14 +604,14 @@ class GeneratedExamDto {
   });
 
   @JsonKey(name: 'exam_id', fromJson: _intFromJson)
-  final int? aiExamId;
+  final int? examId;
   @JsonKey(name: 'elink_id', fromJson: _intFromJson)
-  final int? userAiExamId;
+  final int? elinkId;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? userExamId;
+  final int? esessId;
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
-  @JsonKey(name: 'elink_status', readValue: _readElinkStatus)
+  @JsonKey(readValue: _readElinkStatus)
   final String? status;
   final String? examType;
   @JsonKey(fromJson: _intFromJson)
@@ -599,6 +622,8 @@ class GeneratedExamDto {
   final int? numQuestions;
   final String? title;
   final String? shortText;
+  final String? aiTitle;
+  final String? aiShortText;
   final String? createDt;
   final String? startedDt;
   final String? submittedDt;
@@ -700,7 +725,7 @@ double? _nullableDoubleFromJson(Object? value) {
 }
 
 Object? _readEsessStatus(Map<dynamic, dynamic> json, String key) =>
-    json[key] ?? json['status'];
+    json[key] ?? json['esess_status'];
 
 Object? _readElinkStatus(Map<dynamic, dynamic> json, String key) =>
-    json[key] ?? json['exam_status'] ?? json['status'];
+    json[key] ?? json['elink_status'] ?? json['exam_status'];
