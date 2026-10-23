@@ -22,6 +22,139 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
   });
 
+  testWidgets(
+    'loading shows only Back and three animated dots, then fades in',
+    (tester) async {
+      final progress = Completer<ExamProgressResponse>();
+      await _pumpIntro(
+        tester,
+        size: const Size(390, 844),
+        progress: progress.future,
+      );
+      expect(_loading, findsOneWidget);
+      expect(find.byType(Image), findsNothing);
+      expect(find.byType(Text), findsNothing);
+      expect(_action, findsNothing);
+      expect(
+        find.byKey(const ValueKey('placement-grade-ribbon')),
+        findsNothing,
+      );
+      _expectBackVisible(tester);
+      final back = find.byKey(const ValueKey('welcome-assessment-back'));
+      final backRect = tester.getRect(back);
+      expect(backRect.top, 26);
+      final dots = find.descendant(
+        of: _loading,
+        matching: find.byType(Transform),
+      );
+      expect(dots, findsNWidgets(3));
+      final before = tester
+          .widgetList<Transform>(dots)
+          .map((dot) => dot.transform.storage[13])
+          .toList();
+      await tester.pump(const Duration(milliseconds: 160));
+      expect(
+        tester
+            .widgetList<Transform>(dots)
+            .map((dot) => dot.transform.storage[13]),
+        isNot(orderedEquals(before)),
+      );
+
+      progress.complete(_progress(false));
+      await tester.pump();
+      expect(_loading, findsNothing);
+      expect(tester.widget<Opacity>(_content).opacity, 0);
+      expect(
+        find.descendant(
+          of: _content,
+          matching: find.byKey(
+            const ValueKey('welcome-assessment-intro-background'),
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(tester.getRect(back), backRect);
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(tester.widget<Opacity>(_content).opacity, inExclusiveRange(0, 1));
+      await tester.pumpAndSettle();
+      expect(tester.widget<Opacity>(_content).opacity, 1);
+      _expectStartVisible(tester, const Size(390, 844));
+    },
+  );
+
+  testWidgets('history failure reveals the mascot and Start', (tester) async {
+    final progress = Completer<ExamProgressResponse>();
+    await _pumpIntro(
+      tester,
+      size: const Size(390, 844),
+      progress: progress.future,
+    );
+    progress.completeError(StateError('History unavailable'));
+    await tester.pumpAndSettle();
+    expect(_loading, findsNothing);
+    expect(
+      find.byKey(const ValueKey('welcome-assessment-intro-mascot')),
+      findsOneWidget,
+    );
+    _expectStartVisible(tester, const Size(390, 844));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Back works while history is pending', (tester) async {
+    final progress = Completer<ExamProgressResponse>();
+    await _pumpIntro(
+      tester,
+      size: const Size(390, 844),
+      progress: progress.future,
+    );
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+    navigator.push<void>(
+      MaterialPageRoute(
+        builder: (_) =>
+            WelcomeAssessmentIntroScreen(onAssessment: (_) async {}),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(navigator.canPop(), isTrue);
+    await tester.tap(
+      find.byKey(const ValueKey('welcome-assessment-back')).last,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(navigator.canPop(), isFalse);
+    progress.complete(_progress(false));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'reduced motion keeps dots still and reveals content immediately',
+    (tester) async {
+      final progress = Completer<ExamProgressResponse>();
+      await _pumpIntro(
+        tester,
+        size: const Size(390, 844),
+        progress: progress.future,
+        disableAnimations: true,
+      );
+      await tester.pumpAndSettle();
+      final dots = find.descendant(
+        of: _loading,
+        matching: find.byType(Transform),
+      );
+      expect(dots, findsNWidgets(3));
+      for (final dot in tester.widgetList<Transform>(dots)) {
+        expect(dot.transform.storage[13], 0);
+      }
+      progress.complete(_progress(false));
+      await tester.pumpAndSettle();
+      expect(_loading, findsNothing);
+      expect(tester.widget<Opacity>(_content).opacity, 1);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('mascot stands on the planet with Start below it', (
     tester,
   ) async {
@@ -54,17 +187,55 @@ void main() {
     Size(800, 1024),
     Size(844, 390),
   ]) {
+    for (final textScale in [1.0, 2.0]) {
+      testWidgets('Start stays in the same place at $size / $textScale', (
+        tester,
+      ) async {
+        Rect? mascotAction;
+        double? mascotScrollExtent;
+        for (final hasHistory in [false, true]) {
+          await tester.pumpWidget(const SizedBox.shrink());
+          await _pumpIntro(
+            tester,
+            size: size,
+            progress: Future.value(_progress(hasHistory)),
+            textScale: textScale,
+          );
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+          await tester.scrollUntilVisible(
+            _action,
+            120,
+            scrollable: _scrollable,
+          );
+          await tester.pumpAndSettle();
+          final action = tester.getRect(_action);
+          final scrollExtent = tester
+              .state<ScrollableState>(_scrollable)
+              .position
+              .maxScrollExtent;
+          if (!hasHistory) {
+            mascotAction = action;
+            mascotScrollExtent = scrollExtent;
+          } else {
+            expect(action, mascotAction);
+            expect(scrollExtent, closeTo(mascotScrollExtent!, 0.1));
+            final chart = tester.getRect(
+              find.byKey(const ValueKey('welcome-assessment-intro-chart')),
+            );
+            expect(action.top - chart.bottom, greaterThanOrEqualTo(24));
+          }
+        }
+      });
+    }
     for (final hasHistory in [false, true]) {
       testWidgets('fits $size with history=$hasHistory', (tester) async {
         final progress = Completer<ExamProgressResponse>();
         await _pumpIntro(tester, size: size, progress: progress.future);
 
-        expect(
-          find.byKey(
-            const ValueKey('welcome-assessment-intro-history-skeleton'),
-          ),
-          findsOneWidget,
-        );
+        expect(_loading, findsOneWidget);
+        expect(_action, findsNothing);
+        expect(find.byType(Image), findsNothing);
         _expectBackVisible(tester);
         expect(tester.takeException(), isNull);
 
@@ -188,6 +359,10 @@ void main() {
 }
 
 final _action = find.byKey(const ValueKey('welcome-assessment-intro-action'));
+final _loading = find.byKey(const ValueKey('welcome-assessment-intro-loading'));
+final _content = find.byKey(
+  const ValueKey('welcome-assessment-intro-history-content'),
+);
 final _scrollable = find.descendant(
   of: find.byKey(const ValueKey('welcome-assessment-intro-scroll')),
   matching: find.byType(Scrollable),
@@ -218,6 +393,7 @@ Future<void> _pumpIntro(
   required Future<ExamProgressResponse> progress,
   AppLanguage language = AppLanguage.vi,
   double textScale = 1,
+  bool disableAnimations = false,
   Future<void> Function(BuildContext)? onAssessment,
 }) async {
   tester.view.physicalSize = size;
@@ -242,9 +418,10 @@ Future<void> _pumpIntro(
         child: MaterialApp(
           theme: ThemeData(extensions: const [AppThemeColors.light]),
           builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(textScale)),
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(textScale),
+              disableAnimations: disableAnimations,
+            ),
             child: child!,
           ),
           home: WelcomeAssessmentIntroScreen(
@@ -254,6 +431,17 @@ Future<void> _pumpIntro(
       ),
     ),
   );
+  await tester.pump();
+  await tester.runAsync(() async {
+    final context = tester.element(find.byType(WelcomeAssessmentIntroScreen));
+    for (final asset in [
+      'assets/images/assessment_intro/assessment-intro-background.png',
+      'assets/images/assessment_intro/assessment-graduate-mascot.png',
+      'assets/images/grade-ribbon-numbers.png',
+    ]) {
+      await precacheImage(AssetImage(asset), context);
+    }
+  });
   await tester.pump();
 }
 

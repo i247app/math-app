@@ -17,9 +17,8 @@ import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ri
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
+import 'package:numi/features/welcome/widgets/welcome_intro_loading.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
-import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
-import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
 class WelcomeAssessmentIntroScreen extends StatefulWidget {
@@ -64,6 +63,21 @@ class _WelcomeAssessmentIntroScreenState
   Future<void> _loadChart() async {
     final requestId = ++_chartRequestId;
     if (!_isLoadingHistory) setState(() => _isLoadingHistory = true);
+    // Load the artwork alongside history so the whole scene can fade in.
+    final artworkReady = Future.wait<void>([
+      precacheImage(
+        const AssetImage(WelcomeAssessmentIntroScreen._backgroundAsset),
+        context,
+      ),
+      precacheImage(
+        const AssetImage(WelcomeAssessmentIntroScreen._mascotAsset),
+        context,
+      ),
+      precacheImage(
+        const AssetImage('assets/images/grade-ribbon-numbers.png'),
+        context,
+      ),
+    ]);
     try {
       var profileId = widget.profileId;
       if (profileId == null) {
@@ -89,6 +103,7 @@ class _WelcomeAssessmentIntroScreenState
     } catch (_) {
       // Keep the last rendered state if progress cannot be refreshed.
     } finally {
+      await artworkReady;
       if (mounted && requestId == _chartRequestId) {
         setState(() => _isLoadingHistory = false);
       }
@@ -141,6 +156,7 @@ class _WelcomeAssessmentIntroScreenState
       padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
       child: Align(
         alignment: Alignment.centerLeft,
+        heightFactor: 1,
         child: AppBackButton(
           key: const ValueKey('welcome-assessment-back'),
           onPressed: () => Navigator.of(context).pop(),
@@ -187,18 +203,6 @@ class _WelcomeAssessmentIntroScreenState
   }
 
   Widget _buildHistoryHeader(double contentWidth) {
-    if (_isLoadingHistory) {
-      return AppSkeletonLoader(
-        builder: (context, color) => AppSkeletonBlock(
-          key: const ValueKey('welcome-assessment-intro-history-skeleton'),
-          width: contentWidth,
-          height: 90,
-          radius: 28,
-          color: color,
-        ),
-      );
-    }
-
     // The ribbon PNG has 72 transparent pixels on each side.
     // Expand its width so the visible colors align with the chart.
     final ribbonWidth = contentWidth * 2172 / 2028;
@@ -215,16 +219,6 @@ class _WelcomeAssessmentIntroScreenState
   }
 
   Widget _buildHistoryVisual(double contentWidth, double mascotWidth) {
-    if (_isLoadingHistory) {
-      return AppSkeletonLoader(
-        builder: (context, color) => AppSkeletonBlock(
-          width: contentWidth,
-          height: 240,
-          radius: 20,
-          color: color,
-        ),
-      );
-    }
     if (_chart.hasProgress) return _buildProgressChart(contentWidth);
     return Image.asset(
       WelcomeAssessmentIntroScreen._mascotAsset,
@@ -244,8 +238,7 @@ class _WelcomeAssessmentIntroScreenState
     required double viewportWidth,
     required double planetSurfaceY,
   }) {
-    final showsMascot = !_isLoadingHistory && !_chart.hasProgress;
-    final content = CustomScrollView(
+    return CustomScrollView(
       key: const ValueKey('welcome-assessment-intro-scroll'),
       slivers: [
         SliverToBoxAdapter(
@@ -263,24 +256,27 @@ class _WelcomeAssessmentIntroScreenState
         SliverLayoutBuilder(
           builder: (context, constraints) {
             // Set the feet slightly inside the curved planet surface.
-            final mascotTopPadding = showsMascot
-                ? math.max(
-                    0.0,
-                    planetSurfaceY +
-                        12 -
-                        constraints.precedingScrollExtent -
-                        mascotWidth *
-                            WelcomeAssessmentIntroScreen._mascotFeetFraction,
-                  )
-                : 0.0;
+            final mascotTopPadding = math.max(
+              0.0,
+              planetSurfaceY +
+                  12 -
+                  constraints.precedingScrollExtent -
+                  mascotWidth *
+                      WelcomeAssessmentIntroScreen._mascotFeetFraction,
+            );
+            // Both visuals share the mascot's space and button baseline.
             return SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: mascotTopPadding,
-                  bottom: showsMascot ? 0 : 16,
-                ),
-                child: Center(
-                  child: _buildHistoryVisual(contentWidth, mascotWidth),
+              child: SizedBox(
+                // Leave enough room for the chart on compact screens too.
+                height: math.max(320.0, mascotTopPadding + mascotWidth),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: _chart.hasProgress ? 0 : mascotTopPadding,
+                    ),
+                    child: _buildHistoryVisual(contentWidth, mascotWidth),
+                  ),
                 ),
               ),
             );
@@ -289,9 +285,7 @@ class _WelcomeAssessmentIntroScreenState
         SliverFillRemaining(
           hasScrollBody: false,
           child: Column(
-            mainAxisAlignment: showsMascot
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
               _buildStartButton(viewportWidth),
@@ -300,18 +294,6 @@ class _WelcomeAssessmentIntroScreenState
           ),
         ),
       ],
-    );
-    if (_isLoadingHistory) return content;
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeOut,
-      builder: (context, opacity, child) => Opacity(
-        key: const ValueKey('welcome-assessment-intro-history-content'),
-        opacity: opacity,
-        child: child,
-      ),
-      child: content,
     );
   }
 
@@ -355,55 +337,88 @@ class _WelcomeAssessmentIntroScreenState
       value: overlayStyle,
       child: Scaffold(
         backgroundColor: colors.pageBackground,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              WelcomeAssessmentIntroScreen._backgroundAsset,
-              key: const ValueKey('welcome-assessment-intro-background'),
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.high,
-            ),
-            SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  final isTablet =
-                      MediaQuery.sizeOf(context).shortestSide >= 600;
-                  final mascotWidth = math.min(
-                    width * (isTablet ? 0.58 : 0.7),
-                    isTablet ? 390.0 : 310.0,
-                  );
-                  final contentWidth = math.min(width - 32, 430.0);
-                  final backgroundSize =
-                      WelcomeAssessmentIntroScreen._backgroundSize;
-                  final backgroundScale = math.max(
-                    screenSize.width / backgroundSize.width,
-                    screenSize.height / backgroundSize.height,
-                  );
-                  // Match the centered BoxFit.cover background, then express
-                  // the planet surface relative to the SafeArea scroll view.
-                  final planetSurfaceY =
-                      (screenSize.height -
-                              backgroundSize.height * backgroundScale) /
-                          2 +
-                      WelcomeAssessmentIntroScreen._planetSurfaceY *
-                          backgroundScale -
-                      safeArea.top;
+        body: _isLoadingHistory
+            ? SafeArea(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    const Center(
+                      child: WelcomeIntroLoading(
+                        key: ValueKey('welcome-assessment-intro-loading'),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: _buildToolbar(context),
+                    ),
+                  ],
+                ),
+              )
+            : TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                builder: (context, opacity, child) => Opacity(
+                  key: const ValueKey(
+                    'welcome-assessment-intro-history-content',
+                  ),
+                  opacity: opacity,
+                  child: child,
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      WelcomeAssessmentIntroScreen._backgroundAsset,
+                      key: const ValueKey(
+                        'welcome-assessment-intro-background',
+                      ),
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                    ),
+                    SafeArea(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final width = constraints.maxWidth;
+                          final isTablet =
+                              MediaQuery.sizeOf(context).shortestSide >= 600;
+                          final mascotWidth = math.min(
+                            width * (isTablet ? 0.58 : 0.7),
+                            isTablet ? 390.0 : 310.0,
+                          );
+                          final contentWidth = math.min(width - 32, 430.0);
+                          final backgroundSize =
+                              WelcomeAssessmentIntroScreen._backgroundSize;
+                          final backgroundScale = math.max(
+                            screenSize.width / backgroundSize.width,
+                            screenSize.height / backgroundSize.height,
+                          );
+                          // Match the centered BoxFit.cover background, then express
+                          // the planet surface relative to the SafeArea scroll view.
+                          final planetSurfaceY =
+                              (screenSize.height -
+                                      backgroundSize.height * backgroundScale) /
+                                  2 +
+                              WelcomeAssessmentIntroScreen._planetSurfaceY *
+                                  backgroundScale -
+                              safeArea.top;
 
-                  return _buildContent(
-                    context,
-                    isTablet: isTablet,
-                    contentWidth: contentWidth,
-                    mascotWidth: mascotWidth,
-                    viewportWidth: width,
-                    planetSurfaceY: planetSurfaceY,
-                  );
-                },
+                          return _buildContent(
+                            context,
+                            isTablet: isTablet,
+                            contentWidth: contentWidth,
+                            mascotWidth: mascotWidth,
+                            viewportWidth: width,
+                            planetSurfaceY: planetSurfaceY,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
