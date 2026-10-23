@@ -22,6 +22,32 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
   });
 
+  testWidgets('mascot stands on the planet with Start below it', (
+    tester,
+  ) async {
+    const size = Size(390, 844);
+    await _pumpIntro(
+      tester,
+      size: size,
+      progress: Future.value(_progress(false)),
+    );
+    await tester.pumpAndSettle();
+
+    final mascot = tester.getRect(
+      find.byKey(const ValueKey('welcome-assessment-intro-mascot')),
+    );
+    // The feet sit 12 pixels inside the planet surface around y=640.
+    // The image also has 12 logical pixels of transparent padding below them.
+    expect(mascot.bottom - 12, closeTo(652, 4));
+    expect(tester.getRect(_action).top - mascot.bottom, closeTo(24, 0.1));
+    expect(
+      tester.state<ScrollableState>(_scrollable).position.maxScrollExtent,
+      0,
+    );
+    _expectStartVisible(tester, size);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final size in const [
     Size(320, 568),
     Size(390, 844),

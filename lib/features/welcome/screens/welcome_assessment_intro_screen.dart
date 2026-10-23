@@ -33,6 +33,10 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
       'assets/images/assessment_intro/assessment-intro-background.png';
   static const _mascotAsset =
       'assets/images/assessment_intro/assessment-graduate-mascot.png';
+  static const _backgroundSize = Size(552, 1280);
+  static const _planetSurfaceY = 948.0;
+  // The mascot PNG includes transparent padding below its feet.
+  static const _mascotFeetFraction = 1200 / 1254;
 
   final Future<void> Function(BuildContext context) onAssessment;
   final int? profileId;
@@ -238,8 +242,9 @@ class _WelcomeAssessmentIntroScreenState
     required double contentWidth,
     required double mascotWidth,
     required double viewportWidth,
-    required double viewportHeight,
+    required double planetSurfaceY,
   }) {
+    final showsMascot = !_isLoadingHistory && !_chart.hasProgress;
     final content = CustomScrollView(
       key: const ValueKey('welcome-assessment-intro-scroll'),
       slivers: [
@@ -255,22 +260,42 @@ class _WelcomeAssessmentIntroScreenState
             ],
           ),
         ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Center(
-              child: _buildHistoryVisual(contentWidth, mascotWidth),
-            ),
-          ),
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            // Set the feet slightly inside the curved planet surface.
+            final mascotTopPadding = showsMascot
+                ? math.max(
+                    0.0,
+                    planetSurfaceY +
+                        12 -
+                        constraints.precedingScrollExtent -
+                        mascotWidth *
+                            WelcomeAssessmentIntroScreen._mascotFeetFraction,
+                  )
+                : 0.0;
+            return SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: mascotTopPadding,
+                  bottom: showsMascot ? 0 : 16,
+                ),
+                child: Center(
+                  child: _buildHistoryVisual(contentWidth, mascotWidth),
+                ),
+              ),
+            );
+          },
         ),
         SliverFillRemaining(
           hasScrollBody: false,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: showsMascot
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.end,
             children: [
               const SizedBox(height: 24),
               _buildStartButton(viewportWidth),
-              SizedBox(height: viewportHeight < 700 ? 32 : 96),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -304,7 +329,7 @@ class _WelcomeAssessmentIntroScreenState
                 onPressed: () => _startAssessment(),
                 labelText: 'START',
                 fontSize: 32,
-                cornerRadius: 16,
+                cornerRadius: 20,
                 verticalPadding: 14,
                 fitLabel: true,
               ),
@@ -320,6 +345,8 @@ class _WelcomeAssessmentIntroScreenState
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final screenSize = MediaQuery.sizeOf(context);
+    final safeArea = MediaQuery.paddingOf(context);
     final overlayStyle = Theme.of(context).brightness == Brightness.dark
         ? SystemUiOverlayStyle.light
         : SystemUiOverlayStyle.dark;
@@ -348,6 +375,21 @@ class _WelcomeAssessmentIntroScreenState
                     isTablet ? 390.0 : 310.0,
                   );
                   final contentWidth = math.min(width - 32, 430.0);
+                  final backgroundSize =
+                      WelcomeAssessmentIntroScreen._backgroundSize;
+                  final backgroundScale = math.max(
+                    screenSize.width / backgroundSize.width,
+                    screenSize.height / backgroundSize.height,
+                  );
+                  // Match the centered BoxFit.cover background, then express
+                  // the planet surface relative to the SafeArea scroll view.
+                  final planetSurfaceY =
+                      (screenSize.height -
+                              backgroundSize.height * backgroundScale) /
+                          2 +
+                      WelcomeAssessmentIntroScreen._planetSurfaceY *
+                          backgroundScale -
+                      safeArea.top;
 
                   return _buildContent(
                     context,
@@ -355,7 +397,7 @@ class _WelcomeAssessmentIntroScreenState
                     contentWidth: contentWidth,
                     mascotWidth: mascotWidth,
                     viewportWidth: width,
-                    viewportHeight: constraints.maxHeight,
+                    planetSurfaceY: planetSurfaceY,
                   );
                 },
               ),
