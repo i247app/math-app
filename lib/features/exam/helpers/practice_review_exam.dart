@@ -30,6 +30,7 @@ GeneratedExam buildPracticeReviewExam({
     examType: sourceExam.examType ?? submittedExam.examType,
     title: submittedExam.title ?? sourceExam.title,
     shortText: submittedExam.shortText ?? sourceExam.shortText,
+    review: submittedExam.review ?? sourceExam.review,
     aiTitle: submittedExam.aiTitle ?? sourceExam.aiTitle,
     aiShortText: submittedExam.aiShortText ?? sourceExam.aiShortText,
     aiReviewShort: submittedExam.aiReviewShort ?? sourceExam.aiReviewShort,

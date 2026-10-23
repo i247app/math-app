@@ -495,7 +495,8 @@ GeneratedExam _journeyDetailToModel(
     ),
     numQuestions: stats.totalQuestions,
     title: lastExam?.title,
-    shortText: stats.review ?? lastExam?.shortText,
+    shortText: lastExam?.shortText,
+    review: stats.review,
     createDt: firstExam?.createDt ?? firstExam?.startedDt,
     modifyDt: stats.lastSubmittedDt?.toIso8601String() ?? lastExam?.submittedDt,
     startedDt: firstExam?.startedDt,
@@ -591,6 +592,7 @@ GeneratedExam _activeJourneySetToModel({
     numQuestions: activeDetails.length,
     title: activeExam.title,
     shortText: activeExam.shortText,
+    review: response.examSession?.review,
     createDt: activeExam.createDt,
     startedDt: activeExam.startedDt,
     answers: submittedAnswers

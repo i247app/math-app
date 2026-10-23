@@ -73,7 +73,7 @@ GeneratedExam completedAssessmentFromStats(
     level: stats.level,
     createDt: submittedAt,
     modifyDt: submittedAt,
-    shortText: stats.review,
+    review: stats.review,
     aiTitle: stats.aiTitle,
     aiShortText: stats.aiShortText,
     aiReviewShort: stats.aiReviewShort,
@@ -250,7 +250,7 @@ String homeExamTitle(BuildContext context, GeneratedExam exam) {
   return context.getText(AppKeys.mathAssessment);
 }
 
-String? homeExamShortText(GeneratedExam exam) {
-  final value = exam.shortText?.trim();
-  return value == null || value.isEmpty ? null : value;
+String? homeExamReview(GeneratedExam exam) {
+  final review = (exam.review ?? exam.shortText)?.trim();
+  return review == null || review.isEmpty ? null : review;
 }

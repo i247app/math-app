@@ -140,6 +140,7 @@ class GeneratedExam {
     this.examType,
     this.title,
     this.shortText,
+    this.review,
     this.userId,
     this.createDt,
     this.modifyDt,
@@ -172,6 +173,7 @@ class GeneratedExam {
   final String? examType;
   final String? title;
   final String? shortText;
+  final String? review;
   final int? userId;
   final String? createDt;
   final String? modifyDt;

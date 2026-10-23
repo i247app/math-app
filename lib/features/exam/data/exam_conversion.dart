@@ -101,6 +101,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     examType: examType ?? stats?.examType,
     title: title,
     shortText: shortText,
+    review: stats?.review,
     createDt: createDt,
     modifyDt: submittedDt,
     aiExamId: aiExamId,

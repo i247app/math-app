@@ -26,7 +26,7 @@ class HomeAssessmentResultCard extends StatelessWidget {
     final percent = exam.grading?.scorePercentage;
     final scoreStyle = parentAssessmentScoreStyle(context, percent);
     final dateParts = parentAssessmentDateParts(exam.createDt);
-    final shortText = homeExamShortText(exam);
+    final review = homeExamReview(exam);
     final radius = BorderRadius.circular(24);
 
     return Material(
@@ -91,11 +91,11 @@ class HomeAssessmentResultCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (shortText != null)
+                      if (review != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            shortText,
+                            review,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

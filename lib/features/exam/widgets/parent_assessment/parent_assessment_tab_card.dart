@@ -24,7 +24,7 @@ class AssessmentResultListItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final dateParts = parentAssessmentDateParts(exam.createDt);
-    final shortText = homeExamShortText(exam);
+    final aiShortText = exam.aiShortText?.trim() ?? '';
     final radius = BorderRadius.circular(24);
 
     return Material(
@@ -92,11 +92,11 @@ class AssessmentResultListItemCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (shortText != null)
+                      if (aiShortText.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            shortText,
+                            aiShortText,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

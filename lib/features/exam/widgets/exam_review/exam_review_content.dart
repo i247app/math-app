@@ -73,8 +73,8 @@ class ExamReviewContent extends StatelessWidget {
         : selectedIndex.clamp(0, questions.length - 1);
     final question = questions.isEmpty ? null : questions[safeIndex];
     final hasAiReview = aiReviewShort?.trim().isNotEmpty ?? false;
-    final title = aiTitle?.trim() ?? '';
-    final shortText = aiShortText?.trim() ?? '';
+    final aiTitle = this.aiTitle?.trim() ?? '';
+    final aiShortText = this.aiShortText?.trim() ?? '';
     final colors = context.themeColors;
     String? gradeLevelText;
     if (exam.grade != null && exam.level != null) {
@@ -113,8 +113,8 @@ class ExamReviewContent extends StatelessWidget {
           ],
           if (onPractice != null) ...[
             if (gradeLevelText != null ||
-                title.isNotEmpty ||
-                shortText.isNotEmpty)
+                aiTitle.isNotEmpty ||
+                aiShortText.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Container(
@@ -135,19 +135,19 @@ class ExamReviewContent extends StatelessWidget {
                           style: aiTextStyle,
                         ),
                       if (gradeLevelText != null &&
-                          (title.isNotEmpty || shortText.isNotEmpty))
+                          (aiTitle.isNotEmpty || aiShortText.isNotEmpty))
                         const SizedBox(height: 8),
-                      if (title.isNotEmpty)
+                      if (aiTitle.isNotEmpty)
                         Text(
-                          title,
+                          aiTitle,
                           key: const ValueKey('exam-review-ai-title'),
                           style: aiTextStyle,
                         ),
-                      if (title.isNotEmpty && shortText.isNotEmpty)
+                      if (aiTitle.isNotEmpty && aiShortText.isNotEmpty)
                         const SizedBox(height: 8),
-                      if (shortText.isNotEmpty)
+                      if (aiShortText.isNotEmpty)
                         Text(
-                          shortText,
+                          aiShortText,
                           key: const ValueKey('exam-review-ai-short-text'),
                           style: aiTextStyle,
                         ),
