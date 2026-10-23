@@ -252,7 +252,7 @@ void main() {
     });
   }
 
-  for (final grade in [0, 1, 2]) {
+  for (final grade in [0, 1, 2, 3]) {
     for (final size in [
       const Size(320, 700),
       const Size(390, 844),
@@ -265,6 +265,7 @@ void main() {
             levelsByGrade: const {
               0: GradeLevels(latestLevel: 4, maxLevel: 4),
               2: GradeLevels(latestLevel: 4, maxLevel: 4),
+              3: GradeLevels(latestLevel: 4, maxLevel: 4),
             },
           );
           await pumpRoadmap(tester, service, size: size, initialGrade: grade);
@@ -284,6 +285,7 @@ void main() {
             closeTo(switch (grade) {
               0 => 4948 / 863,
               2 => 4945 / 863,
+              3 => 4951 / 861,
               _ => 4988 / 672,
             }, 0.001),
           );
@@ -295,6 +297,7 @@ void main() {
               switch (grade) {
                 0 => const Offset(414, 4750) * (rect.width / 863),
                 2 => const Offset(203.5, 4750) * (rect.width / 863),
+                3 => const Offset(224.5, 4500) * (rect.width / 861),
                 _ => const Offset(187.5, 4760) * (rect.width / 672),
               };
           expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
@@ -1652,7 +1655,7 @@ void main() {
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(find.text('LỚP 3'), findsOneWidget);
     expect(
-      find.image(const AssetImage(GradeRoadmapLayout.backgroundAsset)),
+      find.image(const AssetImage(GradeRoadmapLayout.grade3BackgroundAsset)),
       findsOneWidget,
     );
     expect(
