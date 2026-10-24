@@ -12,6 +12,8 @@ class GradeRoadmapLayout {
       'assets/images/grade-roadmap-background-2.png';
   static const grade3BackgroundAsset =
       'assets/images/grade-roadmap-background-3.png';
+  static const grade4BackgroundAsset =
+      'assets/images/grade-roadmap-background-4.png';
 
   // Road-center coordinates in the source image, ordered from Level 10 to 1.
   static const _roadCenters = <Offset>[
@@ -42,16 +44,16 @@ class GradeRoadmapLayout {
   ];
 
   static const _grade2RoadCenters = <Offset>[
-    Offset(419, 880),
-    Offset(390, 1310),
-    Offset(397, 1740),
-    Offset(310.5, 2170),
-    Offset(535.5, 2600),
-    Offset(191.5, 3030),
-    Offset(574, 3460),
-    Offset(214, 3890),
-    Offset(641.5, 4320),
-    Offset(203.5, 4750),
+    Offset(418.5, 1000),
+    Offset(707, 1400),
+    Offset(557.5, 1800),
+    Offset(382.5, 2200),
+    Offset(539, 2600),
+    Offset(522, 3000),
+    Offset(302.5, 3400),
+    Offset(703, 3800),
+    Offset(417, 4200),
+    Offset(181, 4600),
   ];
 
   static const _grade3RoadCenters = <Offset>[
@@ -67,17 +69,32 @@ class GradeRoadmapLayout {
     Offset(224.5, 4500),
   ];
 
+  static const _grade4RoadCenters = <Offset>[
+    Offset(593, 900),
+    Offset(443, 1300),
+    Offset(427.5, 1700),
+    Offset(639, 2100),
+    Offset(176, 2500),
+    Offset(695.5, 2900),
+    Offset(203, 3300),
+    Offset(663.5, 3700),
+    Offset(305.5, 4100),
+    Offset(451, 4500),
+  ];
+
   static String backgroundAssetForGrade(int grade) => switch (grade) {
     0 => kindergartenBackgroundAsset,
     2 => grade2BackgroundAsset,
     3 => grade3BackgroundAsset,
+    4 => grade4BackgroundAsset,
     _ => backgroundAsset,
   };
 
   static Size imageSizeForGrade(int grade) => switch (grade) {
     0 => const Size(863, 4948),
-    2 => const Size(863, 4945),
+    2 => const Size(863, 4917),
     3 => const Size(861, 4951),
+    4 => const Size(863, 4942),
     _ => const Size(imageWidth, imageHeight),
   };
 
@@ -91,6 +108,7 @@ class GradeRoadmapLayout {
       0 => _kindergartenRoadCenters,
       2 => _grade2RoadCenters,
       3 => _grade3RoadCenters,
+      4 => _grade4RoadCenters,
       _ => _roadCenters,
     };
     return centers[10 - level.clamp(1, 10)] *

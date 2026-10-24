@@ -252,7 +252,7 @@ void main() {
     });
   }
 
-  for (final grade in [0, 1, 2, 3]) {
+  for (final grade in [0, 1, 2, 3, 4]) {
     for (final size in [
       const Size(320, 700),
       const Size(390, 844),
@@ -266,6 +266,7 @@ void main() {
               0: GradeLevels(latestLevel: 4, maxLevel: 4),
               2: GradeLevels(latestLevel: 4, maxLevel: 4),
               3: GradeLevels(latestLevel: 4, maxLevel: 4),
+              4: GradeLevels(latestLevel: 4, maxLevel: 4),
             },
           );
           await pumpRoadmap(tester, service, size: size, initialGrade: grade);
@@ -284,8 +285,9 @@ void main() {
             rect.height / rect.width,
             closeTo(switch (grade) {
               0 => 4948 / 863,
-              2 => 4945 / 863,
+              2 => 4917 / 863,
               3 => 4951 / 861,
+              4 => 4942 / 863,
               _ => 4988 / 672,
             }, 0.001),
           );
@@ -296,8 +298,9 @@ void main() {
               rect.topLeft +
               switch (grade) {
                 0 => const Offset(414, 4750) * (rect.width / 863),
-                2 => const Offset(203.5, 4750) * (rect.width / 863),
+                2 => const Offset(181, 4600) * (rect.width / 863),
                 3 => const Offset(224.5, 4500) * (rect.width / 861),
+                4 => const Offset(451, 4500) * (rect.width / 863),
                 _ => const Offset(187.5, 4760) * (rect.width / 672),
               };
           expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
@@ -2284,9 +2287,8 @@ Future<void> _saveRoadmapPreview(WidgetTester tester, String name) async {
     final image = await boundary.toImage(pixelRatio: 2);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
     await Directory('build/roadmap-preview').create(recursive: true);
-    await File(
-      'build/roadmap-preview/$name',
-    ).writeAsBytes(bytes!.buffer.asUint8List());
+    await File('build/roadmap-preview/$name')
+        .writeAsBytes(bytes!.buffer.asUint8List());
     image.dispose();
   });
 }
