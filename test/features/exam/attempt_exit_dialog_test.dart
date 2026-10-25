@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_language.dart';
+import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -11,8 +12,13 @@ import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
 
-  for (final language in AppLanguage.values) {
-    testWidgets('exit actions are uppercase and fit in $language', (
+  for (final (language, isRoadmap) in [
+    for (final language in AppLanguage.values) ...[
+      (language, false),
+      (language, true),
+    ],
+  ]) {
+    testWidgets('localized exit dialog in $language (roadmap: $isRoadmap)', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(320, 700);
@@ -36,6 +42,9 @@ void main() {
                 body: TextButton(
                   onPressed: () => showAssessmentExitDialog(
                     context,
+                    titleKey: isRoadmap
+                        ? AppKeys.lessonExitTitle
+                        : AppKeys.assessmentExitTitle,
                     onUpdateStatus: (status) async => updates.add(status),
                   ),
                   child: const Text('Open'),
@@ -49,8 +58,16 @@ void main() {
       await tester.pumpAndSettle();
 
       final labels = language == AppLanguage.en
-          ? ['CANCEL ATTEMPT', 'LEAVE']
-          : ['HỦY BÀI LÀM', 'THOÁT'];
+          ? ['Discard', 'Save']
+          : ['Hủy', 'Lưu'];
+      final message = language == AppLanguage.en
+          ? 'Do you want to save your progress to continue later, or discard this session?'
+          : 'Bạn muốn lưu tiến trình để tiếp tục sau hay hủy phiên này?';
+      expect(find.text(message), findsOneWidget);
+      final title = language == AppLanguage.en
+          ? (isRoadmap ? 'Leave test' : 'Leave assessment')
+          : 'Thoát bài';
+      expect(find.text(title), findsOneWidget);
       final keys = ['assessment-cancel-attempt', 'assessment-leave-active'];
       final cancelStyle = tester.widget<Text>(find.text(labels.first)).style!;
       for (var index = 0; index < labels.length; index++) {

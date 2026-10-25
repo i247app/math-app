@@ -13,6 +13,7 @@ class AppKeys {
   static const attemptExitTitle = 'attempt_exit_title';
   static const attemptExitMessage = 'attempt_exit_message';
   static const assessmentExitTitle = 'assessment_exit_title';
+  static const lessonExitTitle = 'lesson_exit_title';
   static const assessmentExitMessage = 'assessment_exit_message';
   static const assessmentCancelAttempt = 'assessment_cancel_attempt';
   static const assessmentLeaveAttempt = 'assessment_leave_attempt';

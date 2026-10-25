@@ -24,19 +24,27 @@ Future<bool> showAttemptExitDialog(BuildContext context) async {
 Future<bool> showAssessmentExitDialog(
   BuildContext context, {
   required Future<void> Function(String status) onUpdateStatus,
+  String titleKey = AppKeys.assessmentExitTitle,
 }) async {
   final shouldExit = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => _AssessmentExitDialog(onUpdateStatus: onUpdateStatus),
+    builder: (_) => _AssessmentExitDialog(
+      onUpdateStatus: onUpdateStatus,
+      titleKey: titleKey,
+    ),
   );
   return shouldExit ?? false;
 }
 
 class _AssessmentExitDialog extends StatefulWidget {
-  const _AssessmentExitDialog({required this.onUpdateStatus});
+  const _AssessmentExitDialog({
+    required this.onUpdateStatus,
+    required this.titleKey,
+  });
 
   final Future<void> Function(String status) onUpdateStatus;
+  final String titleKey;
 
   @override
   State<_AssessmentExitDialog> createState() => _AssessmentExitDialogState();
@@ -98,7 +106,7 @@ class _AssessmentExitDialogState extends State<_AssessmentExitDialog> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  context.getText(AppKeys.assessmentExitTitle),
+                  context.getText(widget.titleKey),
                   style: textStyles.titleLarge?.copyWith(
                     color: colors.textPrimary,
                     fontWeight: FontWeight.w900,
@@ -222,7 +230,7 @@ class _AssessmentExitButton extends StatelessWidget {
               const SizedBox(width: 5),
               Flexible(
                 child: Text(
-                  label.toUpperCase(),
+                  label,
                   softWrap: true,
                   textAlign: TextAlign.center,
                   style: context.textStyles.labelMedium?.copyWith(

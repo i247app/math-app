@@ -573,6 +573,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
     }
     return showAssessmentExitDialog(
       dialogContext,
+      titleKey: _controller.isGrade
+          ? AppKeys.lessonExitTitle
+          : AppKeys.assessmentExitTitle,
       onUpdateStatus: (status) {
         if (status == assessmentActiveStatus) {
           return Future<void>.value();

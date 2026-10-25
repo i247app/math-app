@@ -16,13 +16,14 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.attemptExitTitle: 'Thoát bài đang làm?',
     AppKeys.attemptExitMessage:
         'Các câu trả lời đã chọn sẽ bị mất. Bạn có chắc muốn thoát không?',
-    AppKeys.assessmentExitTitle: 'Bạn muốn rời bài đánh giá?',
+    AppKeys.assessmentExitTitle: 'Thoát bài',
+    AppKeys.lessonExitTitle: 'Thoát bài',
     AppKeys.assessmentExitMessage:
-        'Chọn cách xử lý bài làm hiện tại trước khi rời đi.',
-    AppKeys.assessmentCancelAttempt: 'Hủy bài làm',
-    AppKeys.assessmentLeaveAttempt: 'Thoát',
+        'Bạn muốn lưu tiến trình để tiếp tục sau hay hủy phiên này?',
+    AppKeys.assessmentCancelAttempt: 'Hủy',
+    AppKeys.assessmentLeaveAttempt: 'Lưu',
     AppKeys.assessmentStatusUpdateFailed:
-        'Không thể cập nhật trạng thái bài đánh giá. Vui lòng thử lại.',
+        'Không thể cập nhật trạng thái bài làm. Vui lòng thử lại.',
     AppKeys.exitUpper: 'THOÁT',
     AppKeys.unsavedChangesExitTitle: 'Bỏ nội dung đang nhập?',
     AppKeys.unsavedChangesExitMessage:
@@ -50,13 +51,13 @@ const commonStrings = <String, Map<String, String>>{
     AppKeys.attemptExitTitle: 'Leave this attempt?',
     AppKeys.attemptExitMessage:
         'Your selected answers will be lost. Are you sure you want to leave?',
-    AppKeys.assessmentExitTitle: 'Leave this assessment?',
-    AppKeys.assessmentExitMessage:
-        'Choose what to do with your current attempt before leaving.',
-    AppKeys.assessmentCancelAttempt: 'Cancel attempt',
-    AppKeys.assessmentLeaveAttempt: 'Leave',
+    AppKeys.assessmentExitTitle: 'Leave assessment',
+    AppKeys.lessonExitTitle: 'Leave test',
+    AppKeys.assessmentExitMessage: 'Do you want to save your progress to continue later, or discard this session?',
+    AppKeys.assessmentCancelAttempt: 'Discard',
+    AppKeys.assessmentLeaveAttempt: 'Save',
     AppKeys.assessmentStatusUpdateFailed:
-        'Unable to update the assessment status. Please try again.',
+        'Unable to update the session status. Please try again.',
     AppKeys.exitUpper: 'LEAVE',
     AppKeys.unsavedChangesExitTitle: 'Discard your changes?',
     AppKeys.unsavedChangesExitMessage:
