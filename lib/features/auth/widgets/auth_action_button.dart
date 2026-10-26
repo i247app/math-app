@@ -13,6 +13,8 @@ class AuthActionButton extends StatelessWidget {
     this.layout = AuthActionButtonLayout.fullWidth,
     this.isBusy = false,
     this.uppercase = true,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   static const _compactWidth = 230.0;
@@ -23,10 +25,14 @@ class AuthActionButton extends StatelessWidget {
   final AuthActionButtonLayout layout;
   final bool isBusy;
   final bool uppercase;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final labelColor =
+        foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
     final button = SizedBox(
       width: layout == AuthActionButtonLayout.fullWidth
           ? double.infinity
@@ -35,9 +41,11 @@ class AuthActionButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isBusy ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.brandStrong,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          disabledBackgroundColor: colors.disabledBackground,
+          backgroundColor: backgroundColor ?? colors.brandStrong,
+          foregroundColor: labelColor,
+          disabledBackgroundColor: isBusy
+              ? backgroundColor ?? colors.disabledBackground
+              : colors.disabledBackground,
           disabledForegroundColor: colors.disabledForeground,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -53,7 +61,7 @@ class AuthActionButton extends StatelessWidget {
                   height: 22,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.4,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: labelColor,
                   ),
                 )
               : _AuthActionButtonLabel(

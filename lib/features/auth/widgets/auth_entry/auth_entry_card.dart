@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
@@ -195,6 +196,8 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
         AuthEntryActionButton(
           key: _actionKey,
           label: widget.actionLabel,
+          backgroundColor: AppColors.brandLogoOrange,
+          foregroundColor: Colors.white,
           onPressed:
               widget.canSubmit &&
                   !widget.isCheckingIdentifier &&

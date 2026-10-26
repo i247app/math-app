@@ -8,11 +8,15 @@ class AuthEntryActionButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isBusy = false,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isBusy;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +26,8 @@ class AuthEntryActionButton extends StatelessWidget {
       layout: AuthActionButtonLayout.compact,
       isBusy: isBusy,
       uppercase: true,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
     );
   }
 }
