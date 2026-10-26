@@ -4,6 +4,8 @@ abstract final class AppColors {
   // Brand vibrant mid-tones for
   static const brandTeal = Color(0xFF339395); // Based on tealIcon
   static const brandOrange = Color(0xFFFC6128); // Based on coral600
+  static const brandLogoTeal = Color(0xFF00B1BB);
+  static const brandLogoOrange = Color(0xFFFD5924);
 
   // brand deep mid-tones for button background, avatar background, etc
   static const brandTealSolid = Color(0xFF007A78); // Based on teal600

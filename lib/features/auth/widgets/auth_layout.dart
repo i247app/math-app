@@ -10,6 +10,7 @@ class AuthLayout extends StatelessWidget {
     required this.bodyBuilder,
     this.title,
     this.titleWidget,
+    this.mascotAsset = 'assets/images/numi-mascot.png',
     this.bodyGap = 46,
     this.fillRemainingBody = false,
     this.hasScrollableBody = false,
@@ -19,6 +20,7 @@ class AuthLayout extends StatelessWidget {
   final WidgetBuilder bodyBuilder;
   final String? title;
   final Widget? titleWidget;
+  final String mascotAsset;
   final double bodyGap;
   final bool fillRemainingBody;
   final bool hasScrollableBody;
@@ -45,6 +47,7 @@ class AuthLayout extends StatelessWidget {
                   onBack: onBack,
                   title: title,
                   titleWidget: titleWidget,
+                  mascotAsset: mascotAsset,
                 ),
                 SizedBox(height: bodyGap),
                 if (fillRemainingBody)

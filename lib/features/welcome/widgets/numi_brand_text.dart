@@ -7,12 +7,16 @@ class NumiBrandText extends StatelessWidget {
   final double? fontSize;
   final double? height;
   final double letterSpacing;
+  final Color firstColor;
+  final Color secondColor;
 
   const NumiBrandText({
     super.key,
     this.fontSize,
     this.height,
     this.letterSpacing = 1,
+    this.firstColor = AppColors.brandLogoTeal,
+    this.secondColor = AppColors.brandLogoOrange,
   });
 
   @override
@@ -31,13 +35,13 @@ class NumiBrandText extends StatelessWidget {
               letterSpacing: letterSpacing,
             ),
             children: [
-              const TextSpan(
+              TextSpan(
                 text: 'NUMI',
-                style: TextStyle(color: AppColors.brandTeal),
+                style: TextStyle(color: firstColor),
               ),
-              const TextSpan(
+              TextSpan(
                 text: 'NUMI',
-                style: TextStyle(color: AppColors.brandOrange),
+                style: TextStyle(color: secondColor),
               ),
             ],
           ),

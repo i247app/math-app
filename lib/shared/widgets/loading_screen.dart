@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/app_typography.dart';
 
@@ -48,11 +49,21 @@ class LoadingScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: width * 0.11),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(
-                      'NUMINUMI',
+                    child: Text.rich(
+                      const TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'NUMI',
+                            style: TextStyle(color: AppColors.brandLogoTeal),
+                          ),
+                          TextSpan(
+                            text: 'NUMI',
+                            style: TextStyle(color: AppColors.brandLogoOrange),
+                          ),
+                        ],
+                      ),
                       maxLines: 1,
                       style: context.textStyles.displaySmall?.copyWith(
-                        color: colors.brandStrong,
                         fontSize: logoFontSize,
                         fontWeight: FontWeight.w700,
                         height: 0.62,

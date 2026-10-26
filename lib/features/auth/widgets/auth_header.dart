@@ -11,14 +11,15 @@ class AuthHeader extends StatelessWidget {
     required this.onBack,
     this.title,
     this.titleWidget,
+    this.mascotAsset = 'assets/images/numi-mascot.png',
   });
 
   final VoidCallback onBack;
   final String? title;
   final Widget? titleWidget;
+  final String mascotAsset;
 
   static const _backIconAsset = 'assets/icons/pin-figma-back.svg';
-  static const _mascotAsset = 'assets/images/numi-mascot.png';
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,9 @@ class AuthHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 74),
-            const RepaintBoundary(child: Center(child: _AuthMascot())),
+            RepaintBoundary(
+              child: Center(child: _AuthMascot(asset: mascotAsset)),
+            ),
             if (titleWidget != null || title != null) ...[
               const SizedBox(height: 4),
               Center(
@@ -73,7 +76,9 @@ class AuthHeader extends StatelessWidget {
 }
 
 class _AuthMascot extends StatelessWidget {
-  const _AuthMascot();
+  const _AuthMascot({required this.asset});
+
+  final String asset;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +101,7 @@ class _AuthMascot extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(11),
-          child: Image.asset(AuthHeader._mascotAsset, fit: BoxFit.contain),
+          child: Image.asset(asset, fit: BoxFit.contain),
         ),
       ),
     );

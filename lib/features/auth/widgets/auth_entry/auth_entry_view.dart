@@ -56,6 +56,7 @@ class AuthEntryView extends StatelessWidget {
     return AuthLayout(
       onBack: entry.onBack,
       titleWidget: const NumiBrandText(fontSize: FontSize.displayLarge),
+      mascotAsset: 'assets/images/auth-entry-mascot.png',
       fillRemainingBody: true,
       bodyGap: 54,
       bodyBuilder: (context) => Column(
