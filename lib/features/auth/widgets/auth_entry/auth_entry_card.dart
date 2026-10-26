@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/extension/localization_extension.dart';
@@ -198,6 +199,11 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
           label: widget.actionLabel,
           backgroundColor: AppColors.brandLogoOrange,
           foregroundColor: Colors.white,
+          textStyle: GoogleFonts.nunito(
+            fontSize: FontSize.large,
+            fontWeight: FontWeight.w900,
+            height: 1.2,
+          ),
           onPressed:
               widget.canSubmit &&
                   !widget.isCheckingIdentifier &&

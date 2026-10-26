@@ -10,6 +10,7 @@ class AuthEntryActionButton extends StatelessWidget {
     this.isBusy = false,
     this.backgroundColor,
     this.foregroundColor,
+    this.textStyle,
   });
 
   final String label;
@@ -17,6 +18,7 @@ class AuthEntryActionButton extends StatelessWidget {
   final bool isBusy;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class AuthEntryActionButton extends StatelessWidget {
       uppercase: true,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
+      textStyle: textStyle,
     );
   }
 }

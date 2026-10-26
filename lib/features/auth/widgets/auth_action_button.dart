@@ -15,6 +15,7 @@ class AuthActionButton extends StatelessWidget {
     this.uppercase = true,
     this.backgroundColor,
     this.foregroundColor,
+    this.textStyle,
   });
 
   static const _compactWidth = 230.0;
@@ -27,6 +28,7 @@ class AuthActionButton extends StatelessWidget {
   final bool uppercase;
   final Color? backgroundColor;
   final Color? foregroundColor;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,7 @@ class AuthActionButton extends StatelessWidget {
               : _AuthActionButtonLabel(
                   key: ValueKey(label),
                   label: uppercase ? label.toUpperCase() : label,
+                  textStyle: textStyle,
                 ),
         ),
       ),
@@ -81,9 +84,14 @@ class AuthActionButton extends StatelessWidget {
 }
 
 class _AuthActionButtonLabel extends StatelessWidget {
-  const _AuthActionButtonLabel({super.key, required this.label});
+  const _AuthActionButtonLabel({
+    super.key,
+    required this.label,
+    this.textStyle,
+  });
 
   final String label;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +101,16 @@ class _AuthActionButtonLabel extends StatelessWidget {
         label,
         maxLines: 1,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: DefaultTextStyle.of(context).style.color,
-          fontSize: FontSize.large,
-          fontWeight: FontWeight.w700,
-          height: 1.1,
-          letterSpacing: 0,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium!
+            .copyWith(
+              color: DefaultTextStyle.of(context).style.color,
+              fontSize: FontSize.large,
+              fontWeight: FontWeight.w700,
+              height: 1.1,
+              letterSpacing: 0,
+            )
+            .merge(textStyle)
+            .copyWith(color: DefaultTextStyle.of(context).style.color),
       ),
     );
   }
