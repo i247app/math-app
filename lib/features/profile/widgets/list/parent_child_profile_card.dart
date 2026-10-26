@@ -37,12 +37,18 @@ class ParentChildProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark && !isActive
+        ? colors.surface
+        : colors.elevatedSurface;
     final radius = BorderRadius.circular(16);
     final borderColor = isActive ? colors.brandStrong : colors.border;
-    final textColor = isActive ? colors.textPrimary : colors.textSecondary;
+    final textColor = isDark || isActive
+        ? colors.textPrimary
+        : colors.textSecondary;
 
     return Material(
-      color: colors.elevatedSurface,
+      color: surface,
       borderRadius: radius,
       child: InkWell(
         onTap: isSwitching ? null : onSelect,
@@ -50,7 +56,7 @@ class ParentChildProfileCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: colors.elevatedSurface,
+            color: surface,
             borderRadius: radius,
             border: Border.all(color: borderColor, width: isActive ? 1.4 : 1),
             boxShadow: [
@@ -79,6 +85,12 @@ class ParentChildProfileCard extends StatelessWidget {
                               ? colors.brandStrong
                               : colors.border,
                           borderWidth: 3,
+                          backgroundColor: isDark
+                              ? colors.elevatedSurface
+                              : const Color(0xFFE2EAED),
+                          foregroundColor: isDark
+                              ? colors.brandStrong
+                              : const Color(0xFF2A7D75),
                         ),
                       ),
                       Expanded(
@@ -124,6 +136,12 @@ class ParentChildProfileCard extends StatelessWidget {
                         height: 18,
                         child: SvgPicture.asset(
                           'assets/icons/parent-profile-manage-grade.svg',
+                          colorFilter: isDark
+                              ? ColorFilter.mode(
+                                  colors.brandStrong,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
                       ),
                       label: context.getText(AppKeys.grade),
@@ -141,6 +159,12 @@ class ParentChildProfileCard extends StatelessWidget {
                         height: 18,
                         child: SvgPicture.asset(
                           'assets/icons/parent-profile-manage-program.svg',
+                          colorFilter: isDark
+                              ? ColorFilter.mode(
+                                  colors.brandStrong,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
                       ),
                       label: context.getText(AppKeys.learningProgram),
@@ -157,7 +181,9 @@ class ParentChildProfileCard extends StatelessWidget {
                       spacing: 12,
                       children: [
                         ProfileActionButton(
-                          backgroundColor: colors.brand.withValues(alpha: 0.12),
+                          backgroundColor: isDark
+                              ? colors.pageBackground
+                              : colors.brand.withValues(alpha: 0.12),
                           width: 42,
                           height: 42,
                           borderRadius: BorderRadius.circular(10),
@@ -166,10 +192,18 @@ class ParentChildProfileCard extends StatelessWidget {
                             'assets/icons/parent-profile-manage-edit.svg',
                             width: 20,
                             height: 20,
+                            colorFilter: isDark
+                                ? ColorFilter.mode(
+                                    colors.brandStrong,
+                                    BlendMode.srcIn,
+                                  )
+                                : null,
                           ),
                         ),
                         ProfileActionButton(
-                          backgroundColor: const Color(0xFFFFE4E4),
+                          backgroundColor: isDark
+                              ? colors.errorSurface
+                              : const Color(0xFFFFE4E4),
                           width: 42,
                           height: 42,
                           borderRadius: BorderRadius.circular(10),
@@ -178,6 +212,12 @@ class ParentChildProfileCard extends StatelessWidget {
                             'assets/icons/parent-profile-manage-delete.svg',
                             width: 20,
                             height: 20,
+                            colorFilter: isDark
+                                ? ColorFilter.mode(
+                                    colors.error,
+                                    BlendMode.srcIn,
+                                  )
+                                : null,
                           ),
                         ),
                       ],

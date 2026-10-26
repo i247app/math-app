@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/theme/font_size.dart';
 
@@ -30,7 +31,9 @@ class ProfileDetailLine extends StatelessWidget {
         Text(
           '$label : ',
           style: GoogleFonts.andika(
-            color: color,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? context.themeColors.textSecondary
+                : color,
             fontSize: FontSize.small,
             fontWeight: labelWeight,
             height: 1,
@@ -42,7 +45,9 @@ class ProfileDetailLine extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: color,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? context.themeColors.textPrimary
+                  : color,
               fontSize: FontSize.small,
               fontWeight: valueWeight,
               height: 1,

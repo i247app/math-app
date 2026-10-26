@@ -1,4 +1,4 @@
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -29,7 +29,7 @@ class ProfileFormTextField extends StatelessWidget {
         textInputAction: TextInputAction.next,
         onTapOutside: (_) => FocusScope.of(context).unfocus(),
         style: GoogleFonts.andika(
-          color: AppColors.textPrimary,
+          color: context.themeColors.textPrimary,
           fontSize: FontSize.normal,
           fontWeight: FontWeight.w800,
           height: 1,
@@ -39,7 +39,9 @@ class ProfileFormTextField extends StatelessWidget {
           hintText: hintText,
           filled: false,
           hintStyle: GoogleFonts.andika(
-            color: const Color(0xFFA8B1B2),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? context.themeColors.inputHint
+                : const Color(0xFFA8B1B2),
             fontSize: FontSize.small,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,

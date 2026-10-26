@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,6 +29,8 @@ class ProfileFormAvatar extends StatelessWidget {
     final url = avatarUrl?.trim();
     final hasCatalogAvatar = ProfileAvatarCatalog.urlForKey(key) != null;
     const size = 124.0;
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
       child: Semantics(
@@ -60,8 +63,13 @@ class ProfileFormAvatar extends StatelessWidget {
                     size: size,
                     avatarKey: key,
                     avatarUrl: hasCatalogAvatar ? null : url,
-                    foregroundColor: const Color(0xFFD3DEE1),
-                    borderColor: Colors.white,
+                    backgroundColor: isDark
+                        ? colors.elevatedSurface
+                        : const Color(0xFFE2EAED),
+                    foregroundColor: isDark
+                        ? colors.brandStrong
+                        : const Color(0xFFD3DEE1),
+                    borderColor: isDark ? colors.brandStrong : Colors.white,
                     borderWidth: 4,
                   ),
                 ),
@@ -73,9 +81,8 @@ class ProfileFormAvatar extends StatelessWidget {
                   child: Material(
                     color: const Color(0xFFFFD8D8),
                     elevation: 5,
-                    shadowColor: const Color(
-                      0xFFE83434,
-                    ).withValues(alpha: 0.16),
+                    shadowColor: const Color(0xFFE83434)
+                        .withValues(alpha: 0.16),
                     shape: const CircleBorder(),
                     child: InkWell(
                       customBorder: const CircleBorder(),
@@ -96,19 +103,19 @@ class ProfileFormAvatar extends StatelessWidget {
                 right: 10,
                 bottom: 18,
                 child: Material(
-                  color: AppColors.tealIcon,
+                  color: isDark ? colors.primaryAction : AppColors.tealIcon,
                   elevation: 5,
                   shadowColor: AppColors.tealIcon.withValues(alpha: 0.24),
                   shape: const CircleBorder(),
                   child: InkWell(
                     customBorder: const CircleBorder(),
                     onTap: () => _openAvatarSheet(context, key),
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 36,
                       height: 36,
                       child: Icon(
                         Icons.photo_camera_outlined,
-                        color: Colors.white,
+                        color: isDark ? colors.onPrimaryAction : Colors.white,
                         size: 18,
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 
 class AccountEditButton extends StatelessWidget {
@@ -13,10 +14,12 @@ class AccountEditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return IgnorePointer(
       ignoring: !enabled,
       child: Material(
-        color: const Color(0xFFF7FBFD),
+        color: isDark ? colors.elevatedSurface : const Color(0xFFF7FBFD),
         elevation: 1,
         shadowColor: Colors.black.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
@@ -28,11 +31,14 @@ class AccountEditButton extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.tealIcon, width: 1.2),
+              border: Border.all(
+                color: isDark ? colors.brandStrong : AppColors.tealIcon,
+                width: 1.2,
+              ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.edit_rounded,
-              color: AppColors.tealIcon,
+              color: isDark ? colors.brandStrong : AppColors.tealIcon,
               size: 19,
             ),
           ),

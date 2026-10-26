@@ -19,6 +19,9 @@ class ProfileFormFieldShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppFormFieldLayout(
       label: label,
+      borderColor: Theme.of(context).brightness == Brightness.dark
+          ? context.themeColors.borderStrong
+          : null,
       labelStyle: (context.textStyles.bodyLarge ?? const TextStyle()).copyWith(
         color: context.themeColors.textSecondary,
         fontSize: FontSize.small,

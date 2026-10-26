@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,7 +33,13 @@ class ProfileIdLine extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final color = isActive ? const Color(0xFF604950) : AppColors.textSubtle;
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark
+        ? colors.textSecondary
+        : isActive
+        ? const Color(0xFF604950)
+        : AppColors.textSubtle;
 
     return Row(
       spacing: 8,
@@ -52,27 +59,31 @@ class ProfileIdLine extends StatelessWidget {
           ),
         ),
         Material(
-          color: const Color(0xFFE9ECEF),
+          color: isDark ? colors.pageBackground : const Color(0xFFE9ECEF),
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             onTap: () => _copyProfileCode(context, profileCode),
             borderRadius: BorderRadius.circular(8),
-            child: const SizedBox(
+            child: SizedBox(
               height: 24,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: 7,
                   children: [
                     Icon(
                       Icons.copy_rounded,
-                      color: Color(0xFF5E6A70),
+                      color: isDark
+                          ? colors.textSecondary
+                          : const Color(0xFF5E6A70),
                       size: 15,
                     ),
                     Icon(
                       Icons.qr_code_2_rounded,
-                      color: Color(0xFF5E6A70),
+                      color: isDark
+                          ? colors.textSecondary
+                          : const Color(0xFF5E6A70),
                       size: 15,
                     ),
                   ],

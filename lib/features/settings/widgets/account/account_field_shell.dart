@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/shared/layouts/app_form_field_layout.dart';
@@ -25,10 +26,14 @@ class AccountFieldShell extends StatelessWidget {
       height: 60,
       horizontalPadding: 20,
       borderRadius: 12,
-      borderColor: const Color(0xFFCFCFCF),
+      borderColor: Theme.of(context).brightness == Brightness.dark
+          ? context.themeColors.borderStrong
+          : const Color(0xFFCFCFCF),
       borderWidth: 1.2,
       labelStyle: GoogleFonts.andika(
-        color: const Color(0xFF604950),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? context.themeColors.textSecondary
+            : const Color(0xFF604950),
         fontSize: FontSize.normal,
         fontWeight: FontWeight.w900,
         height: 1,

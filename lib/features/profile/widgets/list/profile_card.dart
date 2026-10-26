@@ -36,6 +36,7 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = isActive ? colors.brandStrong : colors.textSecondary;
     final radius = BorderRadius.circular(18);
     final role = ProfileRole.fromProfile(profile);
@@ -149,7 +150,9 @@ class ProfileCard extends StatelessWidget {
                   spacing: 12,
                   children: [
                     ProfileActionButton(
-                      backgroundColor: colors.brand.withValues(alpha: 0.12),
+                      backgroundColor: isDark
+                          ? colors.pageBackground
+                          : colors.brand.withValues(alpha: 0.12),
                       width: 42,
                       height: 42,
                       borderRadius: BorderRadius.circular(10),
@@ -161,14 +164,16 @@ class ProfileCard extends StatelessWidget {
                       ),
                     ),
                     ProfileActionButton(
-                      backgroundColor: const Color(0xFFFFD8D8),
+                      backgroundColor: isDark
+                          ? colors.errorSurface
+                          : const Color(0xFFFFD8D8),
                       width: 42,
                       height: 42,
                       borderRadius: BorderRadius.circular(10),
                       onTap: onDelete,
-                      child: const Icon(
+                      child: Icon(
                         Icons.delete_outline_rounded,
-                        color: Color(0xFFE83434),
+                        color: isDark ? colors.error : const Color(0xFFE83434),
                         size: 23,
                       ),
                     ),

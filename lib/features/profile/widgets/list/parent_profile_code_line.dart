@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
@@ -33,7 +34,9 @@ class ParentProfileCodeLine extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.andika(
-              color: isActive
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? context.themeColors.textSecondary
+                  : isActive
                   ? const Color(0xFF604950)
                   : const Color(0xFF6B7280),
               fontSize: FontSize.caption,

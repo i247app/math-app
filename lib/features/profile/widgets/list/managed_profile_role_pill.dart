@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
@@ -15,13 +16,17 @@ class ManagedProfileRolePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDEEE7),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? context.themeColors.pageBackground
+            : const Color(0xFFFDEEE7),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         localizedProfileRole(context, role),
         style: GoogleFonts.andika(
-          color: const Color(0xFF008080),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? context.themeColors.brandStrong
+              : const Color(0xFF008080),
           fontSize: FontSize.caption,
           fontWeight: FontWeight.w900,
           height: 1,

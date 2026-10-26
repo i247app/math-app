@@ -1,4 +1,5 @@
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,14 +23,18 @@ class ProfileStatePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       constraints: const BoxConstraints(minHeight: 360),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.74),
+        color: isDark ? colors.surface : Colors.white.withValues(alpha: 0.74),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFA2B1A3).withValues(alpha: 0.12),
+          color: isDark
+              ? colors.border
+              : const Color(0xFFA2B1A3).withValues(alpha: 0.12),
         ),
       ),
       child: Column(
@@ -37,13 +42,17 @@ class ProfileStatePanel extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 18),
-            child: Icon(icon, color: AppColors.tealIcon, size: 54),
+            child: Icon(
+              icon,
+              color: isDark ? colors.brandStrong : AppColors.tealIcon,
+              size: 54,
+            ),
           ),
           Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.andika(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               fontSize: FontSize.xxxl,
               fontWeight: FontWeight.w900,
               letterSpacing: 0,
@@ -55,7 +64,7 @@ class ProfileStatePanel extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.andika(
-                color: AppColors.textSubtle,
+                color: isDark ? colors.textSecondary : AppColors.textSubtle,
                 fontSize: FontSize.small,
                 fontWeight: FontWeight.w700,
                 height: 1.35,
@@ -67,7 +76,7 @@ class ProfileStatePanel extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Material(
-                color: AppColors.tealIcon,
+                color: isDark ? colors.primaryAction : AppColors.tealIcon,
                 borderRadius: BorderRadius.circular(999),
                 child: InkWell(
                   onTap: onTap,
@@ -80,7 +89,7 @@ class ProfileStatePanel extends StatelessWidget {
                     child: Text(
                       buttonLabel!,
                       style: GoogleFonts.andika(
-                        color: Colors.white,
+                        color: isDark ? colors.onPrimaryAction : Colors.white,
                         fontSize: FontSize.small,
                         fontWeight: FontWeight.w900,
                         height: 1,

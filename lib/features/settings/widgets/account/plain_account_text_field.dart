@@ -1,4 +1,4 @@
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -25,7 +25,7 @@ class PlainAccountTextField extends StatelessWidget {
     final style =
         textStyle ??
         GoogleFonts.andika(
-          color: AppColors.textPrimary,
+          color: context.themeColors.textPrimary,
           fontSize: FontSize.large,
           fontWeight: FontWeight.w700,
           height: 1,
@@ -44,7 +44,9 @@ class PlainAccountTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: style.copyWith(
-          color: style.color?.withValues(alpha: 0.45),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? context.themeColors.inputHint
+              : style.color?.withValues(alpha: 0.45),
           fontWeight: FontWeight.w500,
         ),
         filled: false,

@@ -1,4 +1,4 @@
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,6 +35,8 @@ class ParentInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final email = _displayEmail(context, user);
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -42,9 +44,14 @@ class ParentInfoCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark
+              ? (isActive ? colors.elevatedSurface : colors.surface)
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF008080), width: 1.3),
+          border: Border.all(
+            color: isDark ? colors.brandStrong : const Color(0xFF008080),
+            width: 1.3,
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,7 +75,7 @@ class ParentInfoCard extends StatelessWidget {
                               _displayParentName(context, profile, user),
                               softWrap: true,
                               style: GoogleFonts.andika(
-                                color: AppColors.textPrimary,
+                                color: colors.textPrimary,
                                 fontSize: FontSize.large,
                                 fontWeight: FontWeight.w900,
                                 height: 1.1,
@@ -81,7 +88,9 @@ class ParentInfoCard extends StatelessWidget {
                         ),
                       ),
                       ProfileActionButton(
-                        backgroundColor: const Color(0xFFE6F5F5),
+                        backgroundColor: isDark
+                            ? colors.pageBackground
+                            : const Color(0xFFE6F5F5),
                         width: 34,
                         height: 34,
                         borderRadius: BorderRadius.circular(10),
@@ -90,6 +99,12 @@ class ParentInfoCard extends StatelessWidget {
                           'assets/icons/parent-profile-manage-edit.svg',
                           width: 19,
                           height: 19,
+                          colorFilter: isDark
+                              ? ColorFilter.mode(
+                                  colors.brandStrong,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
                       ),
                       ProfileRadio(isActive: isActive, isLoading: isSwitching),
@@ -104,6 +119,12 @@ class ParentInfoCard extends StatelessWidget {
                           'assets/icons/parent-profile-manage-mail.svg',
                           width: 16,
                           height: 16,
+                          colorFilter: isDark
+                              ? ColorFilter.mode(
+                                  colors.textSecondary,
+                                  BlendMode.srcIn,
+                                )
+                              : null,
                         ),
                         Expanded(
                           child: Text(
@@ -111,7 +132,9 @@ class ParentInfoCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.andika(
-                              color: const Color(0xFF6B7280),
+                              color: isDark
+                                  ? colors.textSecondary
+                                  : const Color(0xFF6B7280),
                               fontSize: FontSize.caption,
                               fontWeight: FontWeight.w700,
                               height: 1.1,

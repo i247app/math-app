@@ -1,4 +1,4 @@
-import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -49,7 +49,7 @@ class ParentProfileManagePanel extends StatelessWidget {
         Text(
           context.getText(AppKeys.parentInfoTitle),
           style: GoogleFonts.andika(
-            color: AppColors.textPrimary,
+            color: context.themeColors.textPrimary,
             fontSize: FontSize.large,
             fontWeight: FontWeight.w900,
             height: 1,
@@ -75,7 +75,7 @@ class ParentProfileManagePanel extends StatelessWidget {
                   <String, Object?>{'count': children.length},
                 ),
                 style: GoogleFonts.andika(
-                  color: AppColors.textPrimary,
+                  color: context.themeColors.textPrimary,
                   fontSize: FontSize.large,
                   fontWeight: FontWeight.w900,
                   height: 1,

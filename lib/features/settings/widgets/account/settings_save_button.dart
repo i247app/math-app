@@ -23,12 +23,13 @@ class SettingsSaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final usesActiveStyle = enabled || isLoading;
     final backgroundColor = usesActiveStyle
-        ? colors.brandStrong
+        ? (isDark ? colors.primaryAction : colors.brandStrong)
         : colors.disabledBackground;
     final foregroundColor = usesActiveStyle
-        ? colors.onBrand
+        ? (isDark ? colors.onPrimaryAction : colors.onBrand)
         : colors.disabledForeground;
 
     return Material(

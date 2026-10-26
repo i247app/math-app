@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 import 'package:numi/shared/widgets/profile_avatar_image.dart';
 import 'package:numi/features/settings/widgets/account/settings_round_icon_button.dart';
@@ -22,6 +23,8 @@ class AccountAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const size = 126.0;
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
       child: SizedBox(
@@ -46,6 +49,12 @@ class AccountAvatar extends StatelessWidget {
                 size: size,
                 avatarPath: avatarPath,
                 avatarUrl: avatarUrl,
+                backgroundColor: isDark
+                    ? colors.elevatedSurface
+                    : const Color(0xFFE2EAED),
+                foregroundColor: isDark
+                    ? colors.brandStrong
+                    : const Color(0xFF2A7D75),
                 borderColor: const Color(0xFFFF7451),
                 borderWidth: 3.8,
                 padding: const EdgeInsets.all(6),
@@ -75,9 +84,13 @@ class AccountAvatar extends StatelessWidget {
                   icon: Icons.photo_camera_outlined,
                   size: 38,
                   iconSize: 20,
-                  borderColor: const Color(0xFFC21873),
-                  foregroundColor: const Color(0xFF253228),
-                  backgroundColor: Colors.white,
+                  borderColor: isDark
+                      ? colors.brandStrong
+                      : const Color(0xFFC21873),
+                  foregroundColor: isDark
+                      ? colors.onPrimaryAction
+                      : const Color(0xFF253228),
+                  backgroundColor: isDark ? colors.primaryAction : Colors.white,
                   onTap: onPickAvatar,
                 ),
               ),
