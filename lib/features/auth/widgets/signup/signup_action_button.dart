@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/widgets/auth_action_button.dart';
 
 class SignupActionButton extends StatelessWidget {
@@ -16,6 +19,16 @@ class SignupActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final cleanLabel = label.replaceAll('→', '').trim();
 
-    return AuthActionButton(label: cleanLabel, onPressed: onPressed);
+    return AuthActionButton(
+      label: cleanLabel,
+      onPressed: onPressed,
+      backgroundColor: AppColors.brandLogoOrange,
+      foregroundColor: Colors.white,
+      textStyle: GoogleFonts.nunito(
+        fontSize: FontSize.large,
+        fontWeight: FontWeight.w900,
+        height: 1.2,
+      ),
+    );
   }
 }
