@@ -140,6 +140,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       },
       child: AuthLayout(
         onBack: widget.onBack,
+        mascotAsset: widget.mode == PasscodeScreenMode.verify
+            ? 'assets/images/numi-mascot.png'
+            : 'assets/images/auth-entry-mascot.png',
         title: widget.mode == PasscodeScreenMode.unlock
             ? null
             : context.getText(_titleKey),
