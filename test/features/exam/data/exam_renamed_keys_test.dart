@@ -59,16 +59,39 @@ void main() {
     final exam = GeneratedExamDto.fromJson(<String, dynamic>{
       'exam_id': 7,
       'elink_id': 41,
-      'esess_id': 99,
-      'elink_status': 'ACTIVE',
+      'status': 'ACTIVE',
       'questions': <Map<String, dynamic>>[],
     });
 
     expect(exam.examId, 7);
     expect(exam.elinkId, 41);
-    expect(exam.esessId, 99);
     expect(exam.status, 'ACTIVE');
     expect(exam.toJson(), containsPair('status', 'ACTIVE'));
+  });
+
+  test('old status aliases and singular active exam are ignored', () {
+    final exam = GeneratedExamDto.fromJson({
+      'elink_status': 'IN_PROGRESS',
+      'exam_status': 'ACTIVE',
+      'esess_id': 99,
+      'questions': [],
+    });
+    final session = ExamStatsDto.fromJson({
+      'esess_status': 'ACTIVE',
+      'correct_number': 0,
+      'skipped_number': 0,
+      'total_questions': 0,
+      'in_progress_exam': {
+        'elink_id': 41,
+        'status': 'IN_PROGRESS',
+        'questions': [],
+      },
+    });
+    expect(exam.status, isNull);
+    expect(exam.toJson(), isNot(contains('esess_id')));
+    expect(session.status, isNull);
+    expect(session.inProgressExams, isEmpty);
+    expect(session.toJson(), isNot(contains('in_progress_exam')));
   });
 
   test('journey stats and detail lines read renamed fields', () {
@@ -78,7 +101,7 @@ void main() {
       'skipped_number': 0,
       'total_questions': 2,
       'esess_id': 99,
-      'esess_status': 'COMPLETE',
+      'status': 'COMPLETE',
     });
     final detail = ExamDetailAnswerDto.fromJson(<String, dynamic>{
       'question_number': 1,

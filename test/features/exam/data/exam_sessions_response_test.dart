@@ -39,7 +39,7 @@ void main() {
     expect(complete.review, 'Đã trả lời (2/15) câu đúng (13%).');
   });
 
-  test('prefers canonical status and the active exam own AI text', () {
+  test('uses canonical status and keeps each sitting own text', () {
     final session = ExamStatsDto.fromJson({
       'esess_id': 6,
       'status': 'ACTIVE',
@@ -60,7 +60,7 @@ void main() {
       'short_text': 'Exam description',
       'questions': <Map<String, dynamic>>[],
     });
-    final exam = dto.toModel(stats: session);
+    final exam = dto.toModel(stats: session, userExamId: session.esessId);
     expect(session.status, 'ACTIVE');
     expect(session.esessId, 6);
     expect(session.esessFlag, isFalse);
@@ -77,10 +77,12 @@ void main() {
     expect(exam.shortText, 'Exam description');
     expect(dto.toJson(), containsPair('short_text', 'Exam description'));
 
-    final fallback = const GeneratedExamDto(questions: [])
+    final missingSittingFields = const GeneratedExamDto(questions: [])
         .toModel(stats: session);
-    expect(fallback.title, 'Session title');
-    expect(fallback.shortText, 'Session description');
+    expect(missingSittingFields.title, isNull);
+    expect(missingSittingFields.shortText, isNull);
+    expect(missingSittingFields.examStatus, isNull);
+    expect(missingSittingFields.userExamId, isNull);
   });
 
   test('request DTOs serialize session and assigned-set IDs separately', () {

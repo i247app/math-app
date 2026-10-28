@@ -91,7 +91,6 @@ class GenerateExamResponseDto {
     required this.mstatus,
     this.exam,
     this.examSession,
-    this.esessId,
     this.resumed,
     this.status,
     this.mmessage,
@@ -102,8 +101,6 @@ class GenerateExamResponseDto {
   final GeneratedExamDto? exam;
   @JsonKey(name: 'exam_session')
   final ExamStatsDto? examSession;
-  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? esessId;
   final bool? resumed;
   final String? status;
   final String? mmessage;
@@ -121,7 +118,6 @@ class SubmitExamResponseDto {
     required this.mstatus,
     this.exam,
     this.examSession,
-    this.esessId,
     this.status,
     this.mmessage,
     this.debug,
@@ -131,8 +127,6 @@ class SubmitExamResponseDto {
   final GeneratedExamDto? exam;
   @JsonKey(name: 'exam_session')
   final ExamStatsDto? examSession;
-  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? esessId;
   final String? status;
   final String? mmessage;
   final String? debug;
@@ -361,7 +355,6 @@ class ExamStatsDto {
     this.shortText,
     this.aiReviewShort,
     this.aiReviewLong,
-    this.inProgressExam,
     this.inProgressExams = const <GeneratedExamDto>[],
   });
 
@@ -373,7 +366,6 @@ class ExamStatsDto {
   final String? examType;
   @JsonKey(name: 'esess_id', fromJson: _intFromJson)
   final int? esessId;
-  @JsonKey(readValue: _readEsessStatus)
   final String? status;
   final int? grade;
   final int? level;
@@ -391,7 +383,6 @@ class ExamStatsDto {
   final String? shortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
-  final GeneratedExamDto? inProgressExam;
   final List<GeneratedExamDto> inProgressExams;
 
   factory ExamStatsDto.fromJson(Map<String, dynamic> json) =>
@@ -518,7 +509,6 @@ class GeneratedExamDto {
   const GeneratedExamDto({
     this.examId,
     this.elinkId,
-    this.esessId,
     this.profileId,
     this.status,
     this.examType,
@@ -538,11 +528,8 @@ class GeneratedExamDto {
   final int? examId;
   @JsonKey(name: 'elink_id', fromJson: _intFromJson)
   final int? elinkId;
-  @JsonKey(name: 'esess_id', fromJson: _intFromJson)
-  final int? esessId;
   @JsonKey(fromJson: _intFromJson)
   final int? profileId;
-  @JsonKey(readValue: _readElinkStatus)
   final String? status;
   final String? examType;
   @JsonKey(fromJson: _intFromJson)
@@ -670,9 +657,3 @@ double? _nullableDoubleFromJson(Object? value) {
   if (value is num) return value.toDouble();
   return double.tryParse(value.toString());
 }
-
-Object? _readEsessStatus(Map<dynamic, dynamic> json, String key) =>
-    json[key] ?? json['esess_status'];
-
-Object? _readElinkStatus(Map<dynamic, dynamic> json, String key) =>
-    json[key] ?? json['elink_status'] ?? json['exam_status'];

@@ -12,6 +12,37 @@ import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 void main() {
+  for (final hasCanonicalSessionId in [true, false]) {
+    test(
+      'generate and submit use only the nested session ID (present: $hasCanonicalSessionId)',
+      () async {
+        final api = _apiReturning((_) {
+          final response = _examResponse();
+          response['esess_id'] = 11;
+          (response['exam'] as Map<String, dynamic>)['esess_id'] = 22;
+          if (!hasCanonicalSessionId) {
+            (response['exam_session'] as Map<String, dynamic>).remove(
+              'esess_id',
+            );
+          }
+          return response;
+        });
+        final generated = await api.generateAssessmentExam(
+          examType: examTypePractice,
+          profileId: 21,
+          userExamId: 33,
+        );
+        final submitted = await api.submitExam(
+          examId: 2,
+          profileId: 21,
+          answers: const [],
+        );
+        expect(generated.userExamId, hasCanonicalSessionId ? 99 : isNull);
+        expect(submitted.userExamId, hasCanonicalSessionId ? 99 : isNull);
+      },
+    );
+  }
+
   test(
     'rogue-v2 submits IDs and numeric values without legacy labels',
     () async {
@@ -264,7 +295,6 @@ void main() {
         ..._examResponse(),
         'exam': <String, dynamic>{
           ...(_examResponse()['exam']! as Map<String, dynamic>),
-          'esess_id': null,
           'status': 'SUBMITTED',
           'result': <String, dynamic>{
             'correct_number': 1,
@@ -274,6 +304,7 @@ void main() {
           },
         },
         'exam_session': <String, dynamic>{
+          'esess_id': 99,
           'correct_number': 13,
           'score_percentage': 65,
           'skipped_number': 0,
@@ -690,7 +721,10 @@ void main() {
             exam.title,
             entireJourney ? 'Number skills' : 'Lớp 2 - Cấp độ 1',
           );
-          expect(exam.shortText, 'Numbers and arithmetic within 100');
+          expect(
+            exam.shortText,
+            entireJourney ? 'Numbers and arithmetic within 100' : isNull,
+          );
           expect(
             exam.aiReviewShort,
             'Practice subtraction and ordering numbers.',
@@ -833,6 +867,39 @@ void main() {
     expect(exam.questions.last.correctOptionIds, ['A']);
     expect(exam.answers.last.selectedOptionIds.single, 'B');
   });
+
+  test(
+    'does not infer an active sitting from session status or review rows',
+    () async {
+      final api = _apiReturning(
+        (_) => {
+          'mstatus': 200,
+          'exam_session': {
+            'esess_id': 99,
+            'status': 'ACTIVE',
+            'correct_number': 0,
+            'skipped_number': 0,
+            'total_questions': 1,
+          },
+          'exams': [
+            {'elink_id': 41, 'status': 'SUBMITTED', 'num_questions': 1},
+          ],
+          'details': [
+            {
+              'elink_id': 41,
+              'question_number': 1,
+              'question_text': 'A saved review question',
+              'child_option_ids': ['A'],
+            },
+          ],
+        },
+      );
+      await expectLater(
+        api.getExamDetail(99, profileId: 21, userExamId: 99),
+        throwsA(isA<ExamException>()),
+      );
+    },
+  );
 
   test('loads only the active set with its saved answers for resume', () async {
     late RequestOptions captured;
@@ -997,8 +1064,8 @@ void main() {
                 'exam_type': 'ASSESSMENT',
                 'grade': 0,
                 'num_questions': 10,
-                // Submitting Q1/A creates the journey but leaves it ACTIVE.
-                'status': 'SUBMITTED',
+                // The journey points to a canonical in-progress sitting.
+                'status': 'IN_PROGRESS',
               },
             ],
             'exam_session': <String, dynamic>{
@@ -1033,7 +1100,7 @@ void main() {
             'exam_type': 'ASSESSMENT',
             'grade': 0,
             'num_questions': 10,
-            'status': 'SUBMITTED',
+            'status': 'IN_PROGRESS',
             'questions': List<Map<String, dynamic>>.generate(
               10,
               (index) => <String, dynamic>{
@@ -1058,7 +1125,7 @@ void main() {
       expect(requests, hasLength(2));
       expect(exam.examId, 41);
       expect(exam.userExamId, 99);
-      expect(exam.examStatus, 'ACTIVE');
+      expect(exam.examStatus, 'IN_PROGRESS');
       expect(exam.questions, hasLength(10));
       expect(exam.answers.single.selectedOptionIds, ['A']);
       expect(exam.resumeQuestionIndex, 1);
@@ -1090,7 +1157,7 @@ void main() {
             <String, dynamic>{
               'correct_number': 13,
               'exam_type': 'ASSESSMENT',
-              'esess_status': 'COMPLETE',
+              'status': 'COMPLETE',
               'esess_id': 99,
               'grade': 1,
               'level': 5,
@@ -1108,7 +1175,7 @@ void main() {
                   'exam_type': 'ASSESSMENT',
                   'grade': 2,
                   'num_questions': 1,
-                  'elink_status': 'IN_PROGRESS',
+                  'status': 'IN_PROGRESS',
                   'title': 'Lớp 2',
                   'questions': <Map<String, dynamic>>[
                     <String, dynamic>{
@@ -1475,11 +1542,20 @@ Map<String, dynamic> _body(RequestOptions options) =>
 Map<String, dynamic> _examResponse() => <String, dynamic>{
   'mstatus': 200,
   'status': 'Success',
-  'esess_id': 99,
+  'exam_session': <String, dynamic>{
+    'esess_id': 99,
+    'exam_type': 'ASSESSMENT',
+    'status': 'ACTIVE',
+    'correct_number': 0,
+    'score_percentage': 0,
+    'skipped_number': 0,
+    'total_questions': 0,
+    'grade': 2,
+    'level': 1,
+  },
   'exam': <String, dynamic>{
     'exam_id': 7,
     'elink_id': 2,
-    'esess_id': 99,
     'profile_id': 21,
     'exam_type': 'ASSESSMENT',
     'grade': 2,

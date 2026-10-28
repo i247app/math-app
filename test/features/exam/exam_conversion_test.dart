@@ -14,10 +14,13 @@ void main() {
         'correct_number': 6,
         'skipped_number': 0,
         'score_percentage': 60,
-        'in_progress_exam': {
-          'level': apiLevel,
-          'questions': <Map<String, dynamic>>[],
-        },
+        'in_progress_exams': [
+          {
+            'exam_type': 'GRADE',
+            'level': apiLevel,
+            'questions': <Map<String, dynamic>>[],
+          },
+        ],
       });
       final generated = GeneratedExamDto(
         examType: 'GRADE',
@@ -33,8 +36,8 @@ void main() {
       });
 
       expect(generated.level, apiLevel + 1);
-      expect(fromSession.examType, examTypeGrade);
-      expect(fromSession.level, apiLevel + 1);
+      expect(fromSession.examType, isNull);
+      expect(fromSession.level, isNull);
       expect(stats.level, apiLevel + 1);
       expect(stats.inProgressExams.single.level, apiLevel + 1);
       expect(stats.inProgressExams.single.examType, examTypeGrade);

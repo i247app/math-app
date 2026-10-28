@@ -71,8 +71,7 @@ class ExamApi implements ExamService {
         ? response.examSession?.totalQuestions ?? 0
         : 0;
     return exam.toModel(
-      userExamId:
-          response.examSession?.esessId ?? response.esessId ?? validUserExamId,
+      userExamId: response.examSession?.esessId,
       stats: response.examSession,
       questionNumberOffset: answeredQuestionCount > 0
           ? answeredQuestionCount
@@ -107,7 +106,7 @@ class ExamApi implements ExamService {
     return exam.toModel(
       submittedAnswers: submittedAnswers,
       stats: response.examSession,
-      userExamId: response.esessId,
+      userExamId: response.examSession?.esessId,
     );
   }
 
@@ -199,10 +198,6 @@ class ExamApi implements ExamService {
     if (isEntireJourney) {
       final activeExam = _activeJourneyExam(response);
       var detailedActiveExam = _matchingDetailedActiveExam(
-        response.exam,
-        activeExam,
-      );
-      detailedActiveExam ??= _matchingDetailedActiveExam(
         activeExam,
         activeExam,
       );
@@ -226,8 +221,8 @@ class ExamApi implements ExamService {
       }
       return _journeyDetailToModel(
         response,
-        validUserExamId,
         detailedActiveExam: detailedActiveExam,
+        profileId: validProfileId,
       );
     }
 
@@ -243,7 +238,7 @@ class ExamApi implements ExamService {
       submittedAnswers: submittedAnswers,
       stats: response.examSession,
       useSequentialQuestionNumbers: isEntireJourney,
-      userExamId: validUserExamId,
+      userExamId: response.examSession?.esessId,
       practiceWeakTopics: _practiceWeakTopics(response),
     );
   }
@@ -376,26 +371,26 @@ class ExamApi implements ExamService {
 }
 
 GeneratedExam _journeyDetailToModel(
-  ExamDetailResponseDto response,
-  int userExamId, {
+  ExamDetailResponseDto response, {
   GeneratedExamDto? detailedActiveExam,
+  required int profileId,
 }) {
   final stats = response.examSession;
   final activeExam = _activeJourneyExam(response);
   if (activeExam != null) {
+    if (detailedActiveExam == null) {
+      throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
+    }
     return _activeJourneySetToModel(
       response: response,
-      activeExam: detailedActiveExam ?? activeExam,
-      activeUserAiExamId: activeExam.elinkId,
-      activeStatus: stats?.status ?? activeExam.status,
-      expectedQuestionCount:
-          activeExam.numQuestions ??
-          AssessmentFlowPolicy.generatedQuestionCount,
-      userExamId: userExamId,
+      activeExam: detailedActiveExam,
+      userExamId: stats?.esessId,
     );
   }
 
-  if (stats == null || response.details.isEmpty) {
+  if (stats == null ||
+      _isActiveExamStatus(stats.status) ||
+      response.details.isEmpty) {
     throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
   }
 
@@ -416,26 +411,23 @@ GeneratedExam _journeyDetailToModel(
   ];
 
   return GeneratedExam(
-    profileId: lastExam?.profileId ?? firstExam?.profileId,
+    profileId: profileId,
     examStatus: stats.status,
-    examType: stats.examType ?? lastExam?.examType ?? examTypeAssessment,
-    userExamId: userExamId,
-    grade: stats.grade ?? lastExam?.grade,
-    lastSetGrade: lastExam?.grade ?? stats.grade,
+    examType: stats.examType,
+    userExamId: stats.esessId,
+    grade: stats.grade,
+    lastSetGrade: lastExam?.grade,
     lastSetShortText: lastExam?.shortText,
     aiReviewShort: stats.aiReviewShort,
     aiReviewLong: stats.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
-    level: GradeExamLevel.forExamType(
-      stats.level ?? lastExam?.level,
-      stats.examType ?? lastExam?.examType,
-    ),
+    level: GradeExamLevel.forExamType(stats.level, stats.examType),
     numQuestions: stats.totalQuestions,
-    title: stats.title ?? lastExam?.title,
-    shortText: stats.shortText ?? lastExam?.shortText,
+    title: stats.title,
+    shortText: stats.shortText,
     review: stats.review,
-    createDt: firstExam?.createDt ?? firstExam?.startedDt,
-    modifyDt: stats.lastSubmittedDt?.toIso8601String() ?? lastExam?.submittedDt,
+    createDt: firstExam?.createDt,
+    modifyDt: stats.lastSubmittedDt?.toIso8601String(),
     startedDt: firstExam?.startedDt,
     submittedDt: lastExam?.submittedDt,
     grading: ExamGrading(
@@ -455,82 +447,22 @@ GeneratedExam _journeyDetailToModel(
 GeneratedExam _activeJourneySetToModel({
   required ExamDetailResponseDto response,
   required GeneratedExamDto activeExam,
-  required int? activeUserAiExamId,
-  required String? activeStatus,
-  required int expectedQuestionCount,
-  required int userExamId,
+  required int? userExamId,
 }) {
   final activeDetails = response.details
-      .where((detail) {
-        if (activeUserAiExamId == null) {
-          return response.exams.length == 1;
-        }
-        return detail.elinkId == activeUserAiExamId ||
-            (detail.elinkId == null && response.exams.length == 1);
-      })
+      .where((detail) => detail.elinkId == activeExam.elinkId)
       .toList(growable: false);
-  final submittedAnswers = <SubmitExamAnswerDto>[
-    for (final detail in activeDetails) ?detail.toSubmittedAnswer(),
-  ];
-  final resumeQuestionIndex = _activeResumeQuestionIndex(
-    details: activeDetails,
-    questions: activeExam.questions,
-  );
-
-  if (activeExam.questions.length >= expectedQuestionCount) {
-    return activeExam.toModel(
-      submittedAnswers: submittedAnswers,
-      stats: response.examSession,
-      userExamId: userExamId,
-      userAiExamIdOverride: activeUserAiExamId,
-      examStatusOverride: activeStatus,
-      resumeQuestionIndex: resumeQuestionIndex,
-      practiceWeakTopics: _practiceWeakTopics(response),
-    );
-  }
-  if (activeDetails.length < expectedQuestionCount) {
-    throw ExamException(AppStrings.current(AppKeys.examDetailLoadFailed));
-  }
-
-  return GeneratedExam(
-    examId: activeUserAiExamId,
-    aiExamId: activeExam.examId,
-    userAiExamId: activeUserAiExamId,
+  return activeExam.toModel(
+    submittedAnswers: [
+      for (final detail in activeDetails) ?detail.toSubmittedAnswer(),
+    ],
+    stats: response.examSession,
     userExamId: userExamId,
-    profileId: activeExam.profileId,
-    examStatus: activeStatus,
-    examType: activeExam.examType ?? examTypeAssessment,
-    grade: activeExam.grade,
-    lastSetGrade: activeExam.grade,
-    lastSetShortText: activeExam.shortText,
-    aiReviewShort: response.examSession?.aiReviewShort,
-    aiReviewLong: response.examSession?.aiReviewLong,
-    practiceWeakTopics: _practiceWeakTopics(response),
-    level: GradeExamLevel.forExamType(
-      activeExam.level,
-      activeExam.examType ?? response.examSession?.examType,
-    ),
-    numQuestions: activeDetails.length,
-    title: activeExam.title ?? response.examSession?.title,
-    shortText: activeExam.shortText ?? response.examSession?.shortText,
-    review: response.examSession?.review,
-    createDt: activeExam.createDt,
-    startedDt: activeExam.startedDt,
-    answers: submittedAnswers
-        .map((answer) => answer.toModel())
-        .toList(growable: false),
     resumeQuestionIndex: _activeResumeQuestionIndex(
       details: activeDetails,
-      questions: const <ExamQuestionDto>[],
-      questionCount: activeDetails.length,
+      questions: activeExam.questions,
     ),
-    imageUrlsFetchedAt: DateTime.now(),
-    questions: activeDetails
-        .map(
-          (detail) =>
-              detail.toQuestionModel(questionNumber: detail.questionNumber),
-        )
-        .toList(growable: false),
+    practiceWeakTopics: _practiceWeakTopics(response),
   );
 }
 
@@ -551,17 +483,7 @@ GeneratedExamDto? _activeJourneyExam(ExamDetailResponseDto response) {
     }
   }
 
-  if (_isActiveExamStatus(response.exam?.status)) {
-    return response.exam;
-  }
-
-  if (!_isActiveExamStatus(response.examSession?.status)) {
-    return null;
-  }
-  if (response.exams.isNotEmpty) {
-    return response.exams.last;
-  }
-  return response.exam;
+  return null;
 }
 
 GeneratedExamDto? _matchingDetailedActiveExam(
@@ -572,15 +494,13 @@ GeneratedExamDto? _matchingDetailedActiveExam(
     return null;
   }
   final expectedQuestionCount =
-      activeExam?.numQuestions ??
-      detailedExam.numQuestions ??
-      AssessmentFlowPolicy.generatedQuestionCount;
+      activeExam?.numQuestions ?? AssessmentFlowPolicy.generatedQuestionCount;
   if (detailedExam.questions.length < expectedQuestionCount) {
     return null;
   }
   final detailedId = detailedExam.elinkId;
   final activeId = activeExam?.elinkId;
-  if (detailedId != null && activeId != null && detailedId != activeId) {
+  if (detailedId == null || activeId == null || detailedId != activeId) {
     return null;
   }
   return detailedExam;
@@ -594,12 +514,11 @@ bool _isActiveExamStatus(String? status) {
 int? _activeResumeQuestionIndex({
   required List<ExamDetailAnswerDto> details,
   required List<ExamQuestionDto> questions,
-  int? questionCount,
 }) {
   if (details.isEmpty) {
     return null;
   }
-  final totalQuestions = questionCount ?? questions.length;
+  final totalQuestions = questions.length;
   if (totalQuestions <= 0) {
     return null;
   }
