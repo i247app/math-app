@@ -1,3 +1,6 @@
+import 'package:numi/features/exam/data/exam_image_refresher.dart';
+import 'package:numi/features/exam/models/exam_answer_selection.dart';
+import 'package:numi/features/exam/helpers/exam_review_answers.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
@@ -17,6 +20,15 @@ class ReviewDetailController extends ChangeNotifier {
     Object? cacheKey,
   }) : _cacheKey = cacheKey ?? detailId,
        _exam = initialExam {
+    _imageRefresher = ExamImageRefresher(
+      load: (_) => _loadDetail(detailId),
+      isCurrent: (source) => !_disposed && identical(_exam, source),
+      apply: (fresh) {
+        _exam = fresh;
+        notifyListeners();
+      },
+    );
+    _imageRefresher.schedule(initialExam);
     _mode = initialMode;
     _seedSubmittedAnswers(initialExam);
     if (initialExam != null) {
@@ -28,6 +40,7 @@ class ReviewDetailController extends ChangeNotifier {
   final ExamDetailLoader _loadDetail;
   final Object _cacheKey;
 
+  late final ExamImageRefresher _imageRefresher;
   GeneratedExam? _exam;
   bool _isLoading = true;
   String? _errorMessage;
@@ -55,6 +68,7 @@ class ReviewDetailController extends ChangeNotifier {
     final cachedExamHasDetail = cachedExam?.questions.isNotEmpty == true;
     if (cachedExam != null && (!initialExamHasDetail && cachedExamHasDetail)) {
       _exam = cachedExam;
+      _imageRefresher.schedule(cachedExam);
       _seedSubmittedAnswers(cachedExam);
     }
 
@@ -85,6 +99,7 @@ class ReviewDetailController extends ChangeNotifier {
       }
 
       _exam = exam;
+      _imageRefresher.schedule(exam);
       _seedSubmittedAnswers(exam);
       _isLoading = false;
       if (_selectedIndex >= exam.questions.length) {
@@ -126,7 +141,33 @@ class ReviewDetailController extends ChangeNotifier {
   }
 
   void selectAnswer(int questionNumber, String label) {
-    _retryAnswers[questionNumber] = label.trim().toUpperCase();
+    final question = _exam?.questions
+        .where((q) => q.questionNumber == questionNumber)
+        .firstOrNull;
+    if (question == null) return;
+    if (question.isMultipleChoice) {
+      final state = _retryAnswers[questionNumber];
+      final ids = state == null
+          ? <String>[]
+          : [...ExamAnswerSelection.fromState(question, state).optionIds];
+      if (ids.contains(label)) {
+        ids.remove(label);
+      } else {
+        ids.add(label);
+      }
+      if (ids.isEmpty) {
+        _retryAnswers.remove(questionNumber);
+      } else {
+        _retryAnswers[questionNumber] = ExamAnswerSelection(
+          optionIds: ids,
+          multiple: true,
+        ).stateValue;
+      }
+    } else if (label.isEmpty) {
+      _retryAnswers.remove(questionNumber);
+    } else {
+      _retryAnswers[questionNumber] = label;
+    }
     notifyListeners();
   }
 
@@ -164,8 +205,8 @@ class ReviewDetailController extends ChangeNotifier {
       return;
     }
     for (final answer in exam.answers) {
-      final label = answer.label.trim().toUpperCase();
-      if (label.isNotEmpty) {
+      final label = examReviewSelectedAnswerLabel(exam, answer.questionNumber);
+      if (label != null && label.isNotEmpty) {
         _submittedAnswers[answer.questionNumber] = label;
       }
     }
@@ -180,6 +221,7 @@ class ReviewDetailController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _imageRefresher.dispose();
     super.dispose();
   }
 }

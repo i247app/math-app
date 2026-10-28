@@ -115,15 +115,16 @@ void main() {
   });
 
   const answers = <ExamAnswer>[
-    ExamAnswer(label: 'A', content: r'\frac{1}{3}'),
-    ExamAnswer(label: 'B', content: r'\frac{2}{3}'),
+    ExamAnswer(id: 'A', text: r'\frac{1}{3}'),
+    ExamAnswer(id: 'B', text: r'\frac{2}{3}'),
   ];
   const fractionQuestion = ExamQuestion(
-    questionName: r'So sánh \frac{1}{3} và \frac{2}{3}',
+    questionText: r'So sánh \frac{1}{3} và \frac{2}{3}',
     questionNumber: 1,
-    questionType: 'FRACTION',
-    answers: answers,
-    rightAnswer: 'A',
+    renderType: 'FRACTION',
+    options: answers,
+
+    correctOptionIds: ['A'],
   );
 
   testWidgets('attempt renders both question and answers for fractions', (
@@ -135,14 +136,14 @@ void main() {
       Column(
         children: [
           AssessmentQuestionCard(
-            question: fractionQuestion.questionName,
+            question: fractionQuestion.questionText,
             renderLatex: true,
           ),
           AssessmentAnswerGrid(
-            answers: answers,
+            options: answers,
             renderLatex: true,
             selectedAnswerLabel: null,
-            onSelected: (answer) => selections.add(answer.label),
+            onSelected: (answer) => selections.add(answer.id),
           ),
         ],
       ),
@@ -165,7 +166,7 @@ void main() {
         children: [
           const AssessmentQuestionCard(question: r'\frac{1}{3}'),
           AssessmentAnswerGrid(
-            answers: answers,
+            options: answers,
             selectedAnswerLabel: null,
             onSelected: (_) {},
           ),

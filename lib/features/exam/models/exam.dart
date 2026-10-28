@@ -1,26 +1,15 @@
 class SubmitExamAnswer {
-  const SubmitExamAnswer({required this.questionNumber, required this.label});
+  const SubmitExamAnswer({
+    required this.questionNumber,
+    this.optionIds,
+    this.value,
+  }) : assert((optionIds == null) != (value == null));
 
   final int questionNumber;
-  final String label;
-}
+  final List<String>? optionIds;
+  final String? value;
 
-class ExamListResponse {
-  const ExamListResponse({
-    required this.mstatus,
-    this.pagination,
-    this.exams = const <GeneratedExam>[],
-    this.status,
-    this.mmessage,
-    this.debug,
-  });
-
-  final int mstatus;
-  final ExamPagination? pagination;
-  final List<GeneratedExam> exams;
-  final String? status;
-  final String? mmessage;
-  final String? debug;
+  List<String> get selectedOptionIds => optionIds ?? const [];
 }
 
 class ExamProgressResponse {
@@ -150,8 +139,6 @@ class GeneratedExam {
     this.grade,
     this.lastSetGrade,
     this.lastSetShortText,
-    this.aiTitle,
-    this.aiShortText,
     this.aiReviewShort,
     this.aiReviewLong,
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
@@ -163,6 +150,7 @@ class GeneratedExam {
     this.answers = const <SubmitExamAnswer>[],
     this.resumeQuestionIndex,
     this.questionNumberOffset = 0,
+    this.imageUrlsFetchedAt,
     required this.questions,
   });
 
@@ -183,8 +171,6 @@ class GeneratedExam {
   final int? grade;
   final int? lastSetGrade;
   final String? lastSetShortText;
-  final String? aiTitle;
-  final String? aiShortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
   final List<ExamPracticeTopic> practiceWeakTopics;
@@ -196,7 +182,59 @@ class GeneratedExam {
   final List<SubmitExamAnswer> answers;
   final int? resumeQuestionIndex;
   final int questionNumberOffset;
+  final DateTime? imageUrlsFetchedAt;
   final List<ExamQuestion> questions;
+
+  bool get hasImages => questions.any(
+    (q) =>
+        q.questionImageUrl != null || q.options.any((a) => a.imageUrl != null),
+  );
+  bool get hasFreshImageUrls =>
+      !hasImages ||
+      imageUrlsFetchedAt == null ||
+      DateTime.now().difference(imageUrlsFetchedAt!) <
+          const Duration(minutes: 55);
+
+  GeneratedExam withRefreshedImages(GeneratedExam fresh) => GeneratedExam(
+    id: id,
+    examId: examId,
+    profileId: profileId,
+    examStatus: examStatus,
+    examType: examType,
+    title: title,
+    shortText: shortText,
+    review: review,
+    userId: userId,
+    createDt: createDt,
+    modifyDt: modifyDt,
+    aiExamId: aiExamId,
+    userAiExamId: userAiExamId,
+    userExamId: userExamId,
+    grade: grade,
+    lastSetGrade: lastSetGrade,
+    lastSetShortText: lastSetShortText,
+    aiReviewShort: aiReviewShort,
+    aiReviewLong: aiReviewLong,
+    practiceWeakTopics: practiceWeakTopics,
+    level: level,
+    numQuestions: numQuestions,
+    startedDt: startedDt,
+    submittedDt: submittedDt,
+    grading: grading,
+    answers: answers,
+    resumeQuestionIndex: resumeQuestionIndex,
+    questionNumberOffset: questionNumberOffset,
+    imageUrlsFetchedAt: DateTime.now(),
+    questions: questions
+        .map(
+          (q) => q.withRefreshedImages(
+            fresh.questions
+                .where((f) => f.questionNumber == q.questionNumber)
+                .firstOrNull,
+          ),
+        )
+        .toList(growable: false),
+  );
 }
 
 class ExamPracticeTopic {
@@ -228,8 +266,8 @@ class ExamStats {
     this.passed,
     this.isLatest,
     this.review,
-    this.aiTitle,
-    this.aiShortText,
+    this.title,
+    this.shortText,
     this.aiReviewShort,
     this.aiReviewLong,
     this.inProgressExams = const <GeneratedExam>[],
@@ -250,8 +288,8 @@ class ExamStats {
   final bool? passed;
   final bool? isLatest;
   final String? review;
-  final String? aiTitle;
-  final String? aiShortText;
+  final String? title;
+  final String? shortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
   final List<GeneratedExam> inProgressExams;
@@ -277,31 +315,74 @@ class ExamGrading {
 
 class ExamQuestion {
   const ExamQuestion({
-    required this.questionName,
+    required this.questionText,
     required this.questionNumber,
-    required this.answers,
-    this.rightAnswer,
-    this.correctAnswer,
+    required this.options,
     this.difficulty,
     this.topic,
-    this.questionType,
+    this.renderType,
+    this.questionKind = 'SINGLE_CHOICE',
+    this.correctOptionIds = const [],
+    this.correctValues = const [],
+    this.questionImageUrl,
+    this.reviewCorrectText,
+    this.reviewChildText,
+    this.reviewIsCorrect,
   });
 
-  final String questionName;
+  final String questionText;
   final int questionNumber;
-  final List<ExamAnswer> answers;
-  final String? rightAnswer;
-  final String? correctAnswer;
+  final List<ExamAnswer> options;
   final int? difficulty;
   final String? topic;
-  final String? questionType;
+  final String? renderType;
+  final String questionKind;
+  final List<String> correctOptionIds;
+  final List<String> correctValues;
+  final String? questionImageUrl;
+  final String? reviewCorrectText;
+  final String? reviewChildText;
+  final bool? reviewIsCorrect;
 
-  bool get isFraction => questionType?.trim().toUpperCase() == 'FRACTION';
+  bool get isMultipleChoice => questionKind == 'MULTIPLE_CHOICE';
+  bool get isNumericInput => questionKind == 'NUMERIC_INPUT';
+  bool get isTrueFalse => questionKind == 'TRUE_FALSE';
+
+  bool get isFraction => renderType?.trim().toUpperCase() == 'FRACTION';
+
+  ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
+    questionText: questionText,
+    questionNumber: questionNumber,
+    options: options
+        .map(
+          (a) => ExamAnswer(
+            id: a.id,
+            text: a.text,
+            imageUrl: fresh?.options
+                .where((f) => f.id == a.id)
+                .firstOrNull
+                ?.imageUrl,
+          ),
+        )
+        .toList(growable: false),
+    difficulty: difficulty,
+    topic: topic,
+    renderType: renderType,
+    questionKind: questionKind,
+    correctOptionIds: correctOptionIds,
+    correctValues: correctValues,
+    questionImageUrl: fresh?.questionImageUrl,
+    reviewCorrectText: reviewCorrectText,
+    reviewChildText: reviewChildText,
+    reviewIsCorrect: reviewIsCorrect,
+  );
 }
 
 class ExamAnswer {
-  const ExamAnswer({required this.content, required this.label});
+  const ExamAnswer({required this.text, required this.id, this.imageUrl});
 
-  final String content;
-  final String label;
+  final String text;
+  // Stable server ID. Display letters are computed from the option position.
+  final String id;
+  final String? imageUrl;
 }

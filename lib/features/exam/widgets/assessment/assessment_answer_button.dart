@@ -1,3 +1,4 @@
+import 'package:numi/features/exam/widgets/shared/exam_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:numi/features/exam/models/exam.dart';
@@ -15,9 +16,11 @@ class AssessmentAnswerButton extends StatelessWidget {
     this.feedbackCorrect,
     this.compact = false,
     this.renderLatex = false,
+    this.displayLabel,
   });
 
   final ExamAnswer answer;
+  final String? displayLabel;
   final bool selected;
   final VoidCallback onTap;
   final bool? feedbackCorrect;
@@ -29,7 +32,7 @@ class AssessmentAnswerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final displayContent = normalizeAssessmentText(answer.content);
+    final displayContent = normalizeAssessmentText(answer.text);
     final feedbackColor = switch (feedbackCorrect) {
       true => colors.success,
       false => colors.error,
@@ -79,30 +82,47 @@ class AssessmentAnswerButton extends StatelessWidget {
             ),
             child: Row(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? feedbackColor ?? colors.brandStrong
-                        : const Color(0xFFEFFFFC),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    answer.label,
-                    style: TextStyle(
-                      color: selected ? colors.onBrand : colors.brandStrong,
-                      fontSize: FontSize.normal,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
+                if (displayLabel != '')
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? feedbackColor ?? colors.brandStrong
+                          : const Color(0xFFEFFFFC),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      displayLabel ?? answer.id,
+                      style: TextStyle(
+                        color: selected ? colors.onBrand : colors.brandStrong,
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: compact ? 10 : 18),
+                if (displayLabel != '') SizedBox(width: compact ? 10 : 18),
                 Expanded(
-                  child: renderLatex
+                  child: answer.imageUrl != null
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ExamImage(url: answer.imageUrl),
+                            if (displayContent.isNotEmpty)
+                              ExamMathText(
+                                displayContent,
+                                style: _answerTextStyle(
+                                  textColor,
+                                  isNumeric,
+                                  displayContent,
+                                ),
+                              ),
+                          ],
+                        )
+                      : renderLatex
                       ? ExamMathText(
                           displayContent,
                           style: TextStyle(

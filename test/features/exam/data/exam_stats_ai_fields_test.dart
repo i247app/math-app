@@ -15,19 +15,19 @@ void main() {
   test('stats AI strings round-trip and map to the app model', () {
     final dto = ExamStatsDto.fromJson({
       ...baseStats,
-      'ai_short_text': 'Keep practicing',
+      'short_text': 'Keep practicing',
       'ai_review_short': 'You are making progress.',
       'ai_review_long': 'You are making progress.\nPractice subtraction next.',
     });
     final model = dto.toModel();
-    expect(model.aiShortText, 'Keep practicing');
+    expect(model.shortText, 'Keep practicing');
     expect(model.aiReviewShort, 'You are making progress.');
     expect(
       model.aiReviewLong,
       'You are making progress.\nPractice subtraction next.',
     );
     expect(model.review, 'Existing review');
-    expect(dto.toJson()['ai_short_text'], model.aiShortText);
+    expect(dto.toJson()['short_text'], model.shortText);
     expect(dto.toJson()['ai_review_short'], model.aiReviewShort);
     expect(dto.toJson()['ai_review_long'], model.aiReviewLong);
   });
@@ -35,7 +35,7 @@ void main() {
   for (final fields in [
     <String, dynamic>{},
     <String, dynamic>{
-      'ai_short_text': null,
+      'short_text': null,
       'ai_review_short': null,
       'ai_review_long': null,
     },
@@ -43,10 +43,10 @@ void main() {
     test('stats accept missing or null AI strings: $fields', () {
       final dto = ExamStatsDto.fromJson({...baseStats, ...fields});
       final model = dto.toModel();
-      expect(dto.aiShortText, isNull);
+      expect(dto.shortText, isNull);
       expect(dto.aiReviewShort, isNull);
       expect(dto.aiReviewLong, isNull);
-      expect(model.aiShortText, isNull);
+      expect(model.shortText, isNull);
       expect(model.aiReviewShort, isNull);
       expect(model.aiReviewLong, isNull);
       expect(model.review, 'Existing review');
@@ -56,12 +56,12 @@ void main() {
   test('stats preserve empty AI strings', () {
     final dto = ExamStatsDto.fromJson({
       ...baseStats,
-      'ai_short_text': '',
+      'short_text': '',
       'ai_review_short': '',
       'ai_review_long': '',
     });
     final model = dto.toModel();
-    expect(model.aiShortText, '');
+    expect(model.shortText, '');
     expect(model.aiReviewShort, '');
     expect(model.aiReviewLong, '');
   });

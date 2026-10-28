@@ -1,4 +1,12 @@
 class AppKeys {
+  static const examNumericAnswer = 'exam_numeric_answer';
+  static const examNumericHint = 'exam_numeric_hint';
+  static const examNumericInvalid = 'exam_numeric_invalid';
+  static const examChooseMultiple = 'exam_choose_multiple';
+  static const examBankInsufficient = 'exam_bank_insufficient';
+  static const examStartNewPaper = 'exam_start_new_paper';
+  static const examPaperUnavailable = 'exam_paper_unavailable';
+  static const examYourAnswer = 'exam_your_answer';
   static const appName = 'app_name';
   static const loading = 'loading';
   static const close = 'close';

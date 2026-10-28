@@ -15,16 +15,6 @@ abstract interface class ExamService {
     int? userExamId,
   });
 
-  Future<List<GeneratedExam>> listExams({int? userId, int? profileId});
-
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
-  });
-
   Future<ExamProgressResponse> getExamProgress({
     required int profileId,
     required DateTime fromDt,

@@ -11,8 +11,10 @@ class AssessmentErrorState extends StatelessWidget {
     super.key,
     required this.message,
     required this.onRetry,
+    this.retryLabel,
   });
   final String message;
+  final String? retryLabel;
   final VoidCallback onRetry;
 
   @override
@@ -53,7 +55,7 @@ class AssessmentErrorState extends StatelessWidget {
               child: SizedBox(
                 width: 168,
                 child: AssessmentBottomActionButton(
-                  label: context.getText(AppKeys.retryUpper),
+                  label: retryLabel ?? context.getText(AppKeys.retryUpper),
                   icon: Icons.refresh_rounded,
                   foreground: const Color(0xFFBEFFF9),
                   onTap: onRetry,

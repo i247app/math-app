@@ -1,3 +1,4 @@
+import 'package:numi/features/exam/widgets/shared/exam_image.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -16,7 +17,7 @@ class ExamReviewQuestionCard extends StatelessWidget {
     final colors = context.themeColors;
     final questionStyle = TextStyle(
       color: colors.textPrimary,
-      fontSize: _questionFontSize(question.questionName),
+      fontSize: _questionFontSize(question.questionText),
       fontWeight: FontWeight.w900,
       height: 1.08,
       letterSpacing: 0,
@@ -50,16 +51,17 @@ class ExamReviewQuestionCard extends StatelessWidget {
           const SizedBox(height: 8),
           if (question.isFraction)
             ExamMathText(
-              question.questionName,
+              question.questionText,
               textAlign: TextAlign.center,
               style: questionStyle,
             )
           else
             Text(
-              question.questionName,
+              question.questionText,
               textAlign: TextAlign.center,
               style: questionStyle,
             ),
+          ExamImage(url: question.questionImageUrl),
         ],
       ),
     );

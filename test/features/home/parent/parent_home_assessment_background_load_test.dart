@@ -215,15 +215,11 @@ void main() {
     expect(examService.requestedExamTypes, const [
       [examTypeAssessment],
     ]);
-    expect(examService.listCalls, 0);
-    expect(examService.listPageCalls, 0);
 
     await pumpParentHome(isActive: false);
     await pumpParentHome(isActive: true);
     await tester.pump();
     expect(examService.profileRequests, const <int?>[profileId, profileId]);
-    expect(examService.listCalls, 0);
-    expect(examService.listPageCalls, 0);
 
     await tester.pumpAndSettle();
     expect(find.byType(HomeAssessmentResultCard), findsOneWidget);
@@ -254,14 +250,6 @@ class _EmptyParentHomeService implements HomeLayoutService {
 class _RecordingExamService implements ExamService {
   final List<int?> profileRequests = <int?>[];
   final List<List<String>> requestedExamTypes = [];
-  int listCalls = 0;
-  int listPageCalls = 0;
-
-  @override
-  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) async {
-    listCalls++;
-    return const <GeneratedExam>[];
-  }
 
   @override
   Future<List<ExamStats>> getExamStats({
@@ -301,38 +289,10 @@ class _RecordingExamService implements ExamService {
   }
 
   @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
-  }) async {
-    listPageCalls++;
-    return const ExamListResponse(mstatus: 200);
-  }
-
-  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _EmptyExamService implements ExamService {
-  @override
-  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) async {
-    return const <GeneratedExam>[];
-  }
-
-  @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
-  }) async {
-    return const ExamListResponse(mstatus: 200, exams: <GeneratedExam>[]);
-  }
-
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -381,36 +341,39 @@ const _homeActiveExam = GeneratedExam(
   examType: examTypeAssessment,
   grade: 1,
   answers: <SubmitExamAnswer>[
-    SubmitExamAnswer(questionNumber: 1, label: 'A'),
-    SubmitExamAnswer(questionNumber: 2, label: 'B'),
+    SubmitExamAnswer(questionNumber: 1, optionIds: ['A']),
+    SubmitExamAnswer(questionNumber: 2, optionIds: ['B']),
   ],
   questions: <ExamQuestion>[
     ExamQuestion(
-      questionName: 'Resume question 1',
+      questionText: 'Resume question 1',
       questionNumber: 1,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '1'),
-        ExamAnswer(label: 'B', content: '2'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '1'),
+        ExamAnswer(id: 'B', text: '2'),
       ],
+
+      correctOptionIds: ['A'],
     ),
     ExamQuestion(
-      questionName: 'Resume question 2',
+      questionText: 'Resume question 2',
       questionNumber: 2,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '2'),
-        ExamAnswer(label: 'B', content: '3'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '2'),
+        ExamAnswer(id: 'B', text: '3'),
       ],
+
+      correctOptionIds: ['A'],
     ),
     ExamQuestion(
-      questionName: 'Resume question 3',
+      questionText: 'Resume question 3',
       questionNumber: 3,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '3'),
-        ExamAnswer(label: 'B', content: '4'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '3'),
+        ExamAnswer(id: 'B', text: '4'),
       ],
+
+      correctOptionIds: ['A'],
     ),
   ],
 );

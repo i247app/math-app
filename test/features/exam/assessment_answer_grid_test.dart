@@ -108,8 +108,8 @@ Future<void> _pumpAnswers(
   final answers = List<ExamAnswer>.generate(
     contents.length,
     (index) => ExamAnswer(
-      label: String.fromCharCode('A'.codeUnitAt(0) + index),
-      content: contents[index],
+      id: String.fromCharCode('A'.codeUnitAt(0) + index),
+      text: contents[index],
     ),
   );
   await tester.pumpWidget(
@@ -121,10 +121,10 @@ Future<void> _pumpAnswers(
         body: SizedBox(
           width: width,
           child: AssessmentAnswerGrid(
-            answers: answers,
+            options: answers,
             selectedAnswerLabel: selectedAnswerLabel,
             selectedAnswerFeedbackCorrect: selectedAnswerFeedbackCorrect,
-            onSelected: (answer) => onSelected(answer.label),
+            onSelected: (answer) => onSelected(answer.id),
           ),
         ),
       ),

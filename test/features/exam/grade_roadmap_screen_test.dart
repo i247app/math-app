@@ -2394,13 +2394,14 @@ class _FakeExamService implements ExamService {
       questions: List.generate(
         questionCount,
         (index) => ExamQuestion(
-          questionName: '1 + 1 = ?',
+          questionText: '1 + 1 = ?',
           questionNumber: index + 1,
-          rightAnswer: 'A',
-          answers: const <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '2'),
-            ExamAnswer(label: 'B', content: '3'),
+          options: const <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '2'),
+            ExamAnswer(id: 'B', text: '3'),
           ],
+
+          correctOptionIds: ['A'],
         ),
       ),
     );
@@ -2427,13 +2428,14 @@ class _FakeExamService implements ExamService {
       ),
       questions: <ExamQuestion>[
         ExamQuestion(
-          questionName: '1 + 1 = ?',
+          questionText: '1 + 1 = ?',
           questionNumber: 1,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '2'),
-            ExamAnswer(label: 'B', content: '3'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '2'),
+            ExamAnswer(id: 'B', text: '3'),
           ],
+
+          correctOptionIds: ['A'],
         ),
       ],
     );
@@ -2470,9 +2472,7 @@ class _FakeExamService implements ExamService {
       userExamId: 600,
       profileId: profileId,
       submittedDt: submittedDt,
-      grading: ExamGrading(
-        scorePercentage: answers.first.label == 'A' ? 100 : 0,
-      ),
+      grading: ExamGrading(scorePercentage: answers.first.selectedOptionIds.single == 'A' ? 100 : 0),
       questions: const <ExamQuestion>[],
     );
   }

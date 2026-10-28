@@ -3,67 +3,78 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/helpers/grade_exam_level.dart';
 
 extension SubmitExamAnswerConversion on SubmitExamAnswer {
-  SubmitExamAnswerDto toDto() =>
-      SubmitExamAnswerDto(questionNumber: questionNumber, label: label);
-}
-
-extension ExamAnswerDtoConversion on ExamAnswerDto {
-  ExamAnswer toModel() => ExamAnswer(content: content, label: label);
-}
-
-extension ExamQuestionDtoConversion on ExamQuestionDto {
-  ExamQuestion toModel({int? questionNumberOverride}) => ExamQuestion(
-    questionName: questionName,
-    questionNumber: questionNumberOverride ?? questionNumber,
-    answers: answers.map((answer) => answer.toModel()).toList(),
-    rightAnswer: rightAnswerLabel,
-    correctAnswer: rightAnswerContent,
-    difficulty: questionLevel,
-    topic: questionTopic,
-    questionType: questionType,
+  SubmitExamAnswerDto toDto() => SubmitExamAnswerDto(
+    questionNumber: questionNumber,
+    optionIds: value == null ? selectedOptionIds : null,
+    value: value,
   );
 }
 
-extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
-  ExamQuestion toQuestionModel({required int questionNumber}) {
-    final answersByLabel = <String, String>{
-      for (final answer in this.answers)
-        if (answer.label.trim().isNotEmpty)
-          answer.label.trim().toUpperCase(): answer.content.trim(),
-    };
+extension SubmitExamAnswerDtoConversion on SubmitExamAnswerDto {
+  SubmitExamAnswer toModel() => SubmitExamAnswer(
+    questionNumber: questionNumber,
+    optionIds: optionIds,
+    value: value,
+  );
+}
 
-    void addAnswer(String? label, String? content) {
-      final normalizedLabel = label?.trim().toUpperCase();
-      if (normalizedLabel == null || normalizedLabel.isEmpty) {
-        return;
-      }
-      final normalizedContent = content?.trim();
-      if (normalizedContent == null ||
-          normalizedContent.isEmpty ||
-          answersByLabel[normalizedLabel]?.isNotEmpty == true) {
-        return;
-      }
-      answersByLabel[normalizedLabel] = normalizedContent;
-    }
+extension ExamAnswerDtoConversion on ExamAnswerDto {
+  ExamAnswer toModel() => ExamAnswer(text: text, id: id, imageUrl: imageUrl);
+}
 
-    addAnswer(rightAnswerLabel, rightAnswerContent);
-    addAnswer(selectedLabel, selectedContent);
-    final answers = answersByLabel.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-
+extension ExamQuestionDtoConversion on ExamQuestionDto {
+  ExamQuestion toModel({int? questionNumberOverride}) {
+    final ids =
+        correctAnswer?.optionIds ??
+        (correctAnswer?.value == null
+            ? const <String>[]
+            : [correctAnswer!.value.toString()]);
     return ExamQuestion(
-      questionName: questionName?.trim() ?? '',
-      questionNumber: questionNumber,
-      answers: answers
-          .map((answer) => ExamAnswer(label: answer.key, content: answer.value))
-          .toList(growable: false),
-      rightAnswer: rightAnswerLabel,
-      correctAnswer: rightAnswerContent,
+      questionText: questionText,
+      questionNumber: questionNumberOverride ?? questionNumber,
+      options: options.map((answer) => answer.toModel()).toList(),
+      correctOptionIds: ids,
+      correctValues: correctAnswer?.values ?? const [],
+      questionKind: questionKind,
+      questionImageUrl: questionImageUrl,
       difficulty: questionLevel,
       topic: questionTopic,
-      questionType: questionType,
+      renderType: renderType,
     );
   }
+}
+
+extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
+  SubmitExamAnswerDto? toSubmittedAnswer({int? questionNumberOverride}) {
+    if (questionKind == 'NUMERIC_INPUT') {
+      final value = childAnswerText;
+      if (value == null || value.trim().isEmpty) return null;
+      return SubmitExamAnswerDto(
+        questionNumber: questionNumberOverride ?? questionNumber,
+        value: value,
+      );
+    }
+    if (childOptionIds.isEmpty) return null;
+    return SubmitExamAnswerDto(
+      questionNumber: questionNumberOverride ?? questionNumber,
+      optionIds: childOptionIds,
+    );
+  }
+
+  ExamQuestion toQuestionModel({required int questionNumber}) => ExamQuestion(
+    questionText: questionText?.trim() ?? '',
+    questionNumber: questionNumber,
+    options: options.map((answer) => answer.toModel()).toList(growable: false),
+    correctOptionIds: rightOptionIds,
+    questionKind: questionKind,
+    questionImageUrl: questionImageUrl,
+    reviewCorrectText: rightAnswerText,
+    reviewChildText: childAnswerText,
+    reviewIsCorrect: isCorrect,
+    difficulty: questionLevel,
+    topic: questionTopic,
+    renderType: renderType,
+  );
 }
 
 extension ExamResultDtoConversion on ExamResultDto {
@@ -100,8 +111,8 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     profileId: profileId,
     examStatus: examStatusOverride ?? status,
     examType: examType ?? stats?.examType,
-    title: title,
-    shortText: shortText,
+    title: title ?? stats?.title,
+    shortText: shortText ?? stats?.shortText,
     review: stats?.review,
     createDt: createDt,
     modifyDt: submittedDt,
@@ -111,8 +122,6 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     grade: grade,
     lastSetGrade: grade,
     lastSetShortText: shortText,
-    aiTitle: aiTitle ?? stats?.aiTitle,
-    aiShortText: aiShortText ?? stats?.aiShortText,
     aiReviewShort: stats?.aiReviewShort,
     aiReviewLong: stats?.aiReviewLong,
     practiceWeakTopics: practiceWeakTopics,
@@ -124,16 +133,10 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     startedDt: startedDt,
     submittedDt: submittedDt,
     grading: result?.toModel(review: stats?.review, grade: grade),
-    answers: submittedAnswers
-        .map(
-          (answer) => SubmitExamAnswer(
-            questionNumber: answer.questionNumber,
-            label: answer.label,
-          ),
-        )
-        .toList(),
+    answers: submittedAnswers.map((answer) => answer.toModel()).toList(),
     resumeQuestionIndex: resumeQuestionIndex,
     questionNumberOffset: questionNumberOffset,
+    imageUrlsFetchedAt: DateTime.now(),
     questions: questions.indexed
         .map(
           (entry) => entry.$2.toModel(
@@ -143,30 +146,6 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
           ),
         )
         .toList(),
-  );
-}
-
-extension ExamPaginationDtoConversion on ExamPaginationDto {
-  ExamPagination toModel() => ExamPagination(
-    hasNext: hasNext,
-    hasPrevious: hasPrevious,
-    page: page,
-    size: size,
-    skip: skip,
-    takeAll: takeAll,
-    totalCount: totalCount,
-    totalPages: totalPages,
-  );
-}
-
-extension ExamListResponseDtoConversion on ExamListResponseDto {
-  ExamListResponse toModel() => ExamListResponse(
-    mstatus: mstatus,
-    pagination: pagination?.toModel(),
-    exams: exams.map((exam) => exam.toModel()).toList(),
-    status: status,
-    mmessage: mmessage,
-    debug: debug,
   );
 }
 
@@ -254,8 +233,8 @@ extension ExamStatsDtoConversion on ExamStatsDto {
       passed: esessFlag,
       isLatest: isLatest,
       review: review,
-      aiTitle: aiTitle,
-      aiShortText: aiShortText,
+      title: title,
+      shortText: shortText,
       aiReviewShort: aiReviewShort,
       aiReviewLong: aiReviewLong,
       inProgressExams: activeExams,

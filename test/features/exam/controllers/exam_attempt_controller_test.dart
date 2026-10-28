@@ -24,23 +24,25 @@ void main() {
   });
 
   const answers = <ExamAnswer>[
-    ExamAnswer(label: 'A', content: '18'),
-    ExamAnswer(label: 'B', content: '20'),
+    ExamAnswer(id: 'A', text: '18'),
+    ExamAnswer(id: 'B', text: '20'),
   ];
   const exam = GeneratedExam(
     examId: 7,
     questions: <ExamQuestion>[
       ExamQuestion(
-        questionName: '12 + 8 = ?',
+        questionText: '12 + 8 = ?',
         questionNumber: 1,
-        answers: answers,
-        rightAnswer: 'B',
+        options: answers,
+
+        correctOptionIds: ['B'],
       ),
       ExamQuestion(
-        questionName: '10 + 5 = ?',
+        questionText: '10 + 5 = ?',
         questionNumber: 2,
-        answers: answers,
-        correctAnswer: '20',
+        options: answers,
+
+        correctOptionIds: ['B'],
       ),
     ],
   );
@@ -113,20 +115,20 @@ void main() {
     addTearDown(controller.dispose);
 
     controller.selectAnswer(answers.first);
-    expect(controller.selectedAnswerLabel, answers.first.label);
+    expect(controller.selectedAnswerLabel, answers.first.id);
     expect(controller.canContinue, isTrue);
 
     controller.selectAnswer(answers.first);
-    expect(controller.selectedAnswerLabel, answers.first.label);
+    expect(controller.selectedAnswerLabel, answers.first.id);
     expect(controller.canContinue, isTrue);
     expect(controller.firstUnansweredQuestionIndex, 1);
 
     controller.selectAnswer(answers.last);
-    expect(controller.selectedAnswerLabel, answers.last.label);
+    expect(controller.selectedAnswerLabel, answers.last.id);
   });
 
   test('GRADE is ready to submit immediately after six perfect answers', () {
-    const correctAnswer = ExamAnswer(label: 'A', content: '1');
+    const correctAnswer = ExamAnswer(id: 'A', text: '1');
     final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypeGrade,
@@ -137,10 +139,11 @@ void main() {
         questions: List<ExamQuestion>.generate(
           10,
           (index) => ExamQuestion(
-            questionName: 'Question ${index + 1}',
+            questionText: 'Question ${index + 1}',
             questionNumber: index + 1,
-            answers: const <ExamAnswer>[correctAnswer],
-            rightAnswer: 'A',
+            options: const <ExamAnswer>[correctAnswer],
+
+            correctOptionIds: ['A'],
           ),
         ),
       ),
@@ -178,7 +181,7 @@ void main() {
   });
 
   test('GRADE is ready to submit immediately after five wrong answers', () {
-    const wrongAnswer = ExamAnswer(label: 'B', content: '2');
+    const wrongAnswer = ExamAnswer(id: 'B', text: '2');
     final controller = ExamAttemptController(
       examService: _UnusedExamService(),
       examType: examTypeGrade,
@@ -189,10 +192,11 @@ void main() {
         questions: List<ExamQuestion>.generate(
           10,
           (index) => ExamQuestion(
-            questionName: 'Question ${index + 1}',
+            questionText: 'Question ${index + 1}',
             questionNumber: index + 1,
-            answers: const <ExamAnswer>[wrongAnswer],
-            rightAnswer: 'A',
+            options: const <ExamAnswer>[wrongAnswer],
+
+            correctOptionIds: ['A'],
           ),
         ),
       ),
@@ -247,9 +251,9 @@ void main() {
       const examWithoutCorrectAnswer = GeneratedExam(
         questions: <ExamQuestion>[
           ExamQuestion(
-            questionName: '12 + 8 = ?',
+            questionText: '12 + 8 = ?',
             questionNumber: 1,
-            answers: answers,
+            options: answers,
           ),
         ],
       );
@@ -274,16 +278,17 @@ void main() {
           userExamId: 501,
           examType: examTypeAssessment,
           answers: const <SubmitExamAnswer>[
-            SubmitExamAnswer(questionNumber: 1, label: 'B'),
-            SubmitExamAnswer(questionNumber: 2, label: 'A'),
+            SubmitExamAnswer(questionNumber: 1, optionIds: ['B']),
+            SubmitExamAnswer(questionNumber: 2, optionIds: ['A']),
           ],
           questions: List<ExamQuestion>.generate(
             4,
             (index) => ExamQuestion(
-              questionName: 'Resume question ${index + 1}',
+              questionText: 'Resume question ${index + 1}',
               questionNumber: index + 1,
-              answers: answers,
-              rightAnswer: 'B',
+              options: answers,
+
+              correctOptionIds: ['B'],
             ),
           ),
         ),
@@ -292,7 +297,7 @@ void main() {
 
       expect(controller.selectedAnswerLabels, <int, String>{0: 'B', 1: 'A'});
       expect(controller.questionIndex, 2);
-      expect(controller.currentQuestion?.questionName, 'Resume question 3');
+      expect(controller.currentQuestion?.questionText, 'Resume question 3');
     },
   );
 
@@ -309,14 +314,15 @@ void main() {
           questions: List<ExamQuestion>.generate(
             4,
             (index) => ExamQuestion(
-              questionName: 'Question ${index + 1}',
+              questionText: 'Question ${index + 1}',
               questionNumber: index + 1,
-              answers: answers,
-              rightAnswer: 'B',
+              options: answers,
+
+              correctOptionIds: ['B'],
             ),
           ),
           answers: const <SubmitExamAnswer>[
-            SubmitExamAnswer(questionNumber: 2, label: 'A'),
+            SubmitExamAnswer(questionNumber: 2, optionIds: ['A']),
           ],
         ),
       );
@@ -601,10 +607,11 @@ void main() {
         questions: List<ExamQuestion>.generate(
           10,
           (index) => ExamQuestion(
-            questionName: 'Question ${index + 1}',
+            questionText: 'Question ${index + 1}',
             questionNumber: index + 1,
-            answers: answers,
-            rightAnswer: 'B',
+            options: answers,
+
+            correctOptionIds: ['B'],
           ),
         ),
       ),
@@ -693,7 +700,7 @@ void main() {
     expect(result.status, ExamAttemptSubmitStatus.submitted);
     expect(service.submittedAnswers, hasLength(6));
     expect(
-      service.submittedAnswers!.every((answer) => answer.label == 'B'),
+      service.submittedAnswers!.every((answer) => answer.selectedOptionIds.single == 'B'),
       isTrue,
     );
     expect(service.statusUpdates, isEmpty);
@@ -738,7 +745,7 @@ void main() {
       expect(result.status, ExamAttemptSubmitStatus.submitted);
       expect(service.submittedAnswers, hasLength(6));
       expect(
-        service.submittedAnswers!.every((answer) => answer.label == 'A'),
+        service.submittedAnswers!.every((answer) => answer.selectedOptionIds.single == 'A'),
         isTrue,
       );
       expect(result.exam?.grading?.correctNumber, 0);
@@ -870,13 +877,14 @@ GeneratedExam _tenQuestionExam({
     questions: List<ExamQuestion>.generate(
       10,
       (index) => ExamQuestion(
-        questionName: 'Question ${index + 1}',
+        questionText: 'Question ${index + 1}',
         questionNumber: index + 1,
-        answers: const <ExamAnswer>[
-          ExamAnswer(label: 'A', content: '18'),
-          ExamAnswer(label: 'B', content: '20'),
+        options: const <ExamAnswer>[
+          ExamAnswer(id: 'A', text: '18'),
+          ExamAnswer(id: 'B', text: '20'),
         ],
-        rightAnswer: 'B',
+
+        correctOptionIds: ['B'],
       ),
     ),
   );

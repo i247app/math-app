@@ -76,16 +76,17 @@ class ClassroomExerciseReviewAdapter {
         answerIndex++
       )
         ExamAnswer(
-          label: _answerLabel(answerIndex),
-          content: question.answers[answerIndex],
+          id: _answerLabel(answerIndex),
+          text: question.answers[answerIndex],
         ),
     ];
     final correctLabel = _answerLabelForValue(question.correctAnswer, answers);
     return ExamQuestion(
-      questionName: question.displayPrompt ?? '',
+      questionText: question.displayPrompt ?? '',
       questionNumber: question.questionNumber ?? index + 1,
-      answers: answers,
-      correctAnswer: correctLabel,
+      options: answers,
+
+      correctOptionIds: correctLabel == null ? const [] : [correctLabel],
     );
   }
 
@@ -112,7 +113,7 @@ class ClassroomExerciseReviewAdapter {
     if (number == null || label == null || label.isEmpty) {
       return null;
     }
-    return SubmitExamAnswer(questionNumber: number, label: label);
+    return SubmitExamAnswer(questionNumber: number, optionIds: [label]);
   }
 
   static String? _answerLabelForValue(String? value, List<ExamAnswer> answers) {
@@ -122,9 +123,8 @@ class ClassroomExerciseReviewAdapter {
     }
     final upper = normalized.toUpperCase();
     for (final answer in answers) {
-      if (answer.label == upper ||
-          answer.content.trim().toUpperCase() == upper) {
-        return answer.label;
+      if (answer.id == upper || answer.text.trim().toUpperCase() == upper) {
+        return answer.id;
       }
     }
     return upper;

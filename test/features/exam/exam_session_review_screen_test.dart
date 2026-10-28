@@ -155,8 +155,8 @@ void main() {
             id,
             shortReview: 'Updated short review.',
             longReview: 'Updated long review.',
-            aiShortText: 'Updated AI description.',
-            aiTitle: 'Updated AI title.',
+            shortText: 'Updated AI description.',
+            title: 'Updated AI title.',
           );
           await tester.tap(find.byIcon(Icons.arrow_back_rounded));
           await tester.pumpAndSettle();
@@ -549,16 +549,16 @@ GeneratedExam _detail(
   int total = 10,
   String? shortReview = 'Detail short review.',
   String? longReview,
-  String aiShortText = 'Detail AI description.',
-  String? aiTitle,
+  String shortText = 'Detail AI description.',
+  String? title,
   bool withTopics = false,
 }) => GeneratedExam(
   userExamId: sessionId,
   profileId: profileId,
   grade: 1,
   level: 3,
-  aiShortText: aiShortText,
-  aiTitle: aiTitle,
+  shortText: shortText,
+  title: title,
   aiReviewShort: shortReview,
   aiReviewLong: longReview,
   grading: ExamGrading(correctNumber: correct, totalQuestions: total),
@@ -571,9 +571,10 @@ GeneratedExam _detail(
   questions: const [
     ExamQuestion(
       questionNumber: 1,
-      questionName: '1 + 1 = ?',
-      rightAnswer: 'A',
-      answers: [ExamAnswer(label: 'A', content: '2')],
+      questionText: '1 + 1 = ?',
+      options: [ExamAnswer(id: 'A', text: '2')],
+
+      correctOptionIds: ['A'],
     ),
   ],
 );
@@ -587,7 +588,7 @@ ExamStats _review({
   skippedNumber: 0,
   totalQuestions: 10,
   aiReviewShort: shortText,
-  aiShortText: 'Generated AI description.',
+  shortText: 'Generated AI description.',
   aiReviewLong: longText,
 );
 

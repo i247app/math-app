@@ -1,6 +1,5 @@
 import 'package:numi/core/data/session_cache_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/data/exam_service.dart';
 
 typedef ExamDetailLoader = Future<GeneratedExam> Function(int detailId);
 
@@ -9,84 +8,10 @@ class ExamCache {
 
   static const _emptyDetailRetryDelay = Duration(milliseconds: 450);
 
-  static final Map<_ExamListKey, List<GeneratedExam>> _lists =
-      <_ExamListKey, List<GeneratedExam>>{};
-  static final Map<_ExamListKey, DateTime> _listLoadedAt =
-      <_ExamListKey, DateTime>{};
-  static final Map<_ExamListKey, Future<List<GeneratedExam>>> _pendingLists =
-      <_ExamListKey, Future<List<GeneratedExam>>>{};
   static final Map<Object, GeneratedExam> _details = <Object, GeneratedExam>{};
   static final Map<Object, DateTime> _detailLoadedAt = <Object, DateTime>{};
   static final Map<Object, Future<GeneratedExam>> _pendingDetails =
       <Object, Future<GeneratedExam>>{};
-
-  static Future<List<GeneratedExam>> loadList({
-    required ExamService service,
-    int? userId,
-    int? profileId,
-    bool forceRefresh = false,
-  }) {
-    final key = _ExamListKey(userId: userId, profileId: profileId);
-    if (!forceRefresh) {
-      final cached = _lists[key];
-      if (cached != null) {
-        return Future<List<GeneratedExam>>.value(cached);
-      }
-      final pending = _pendingLists[key];
-      if (pending != null) {
-        return pending;
-      }
-    }
-
-    late final Future<List<GeneratedExam>> request;
-    request = service
-        .listExams(userId: userId, profileId: profileId)
-        .then((exams) {
-          final cachedExams = List<GeneratedExam>.unmodifiable(exams);
-          if (!identical(_pendingLists[key], request)) return cachedExams;
-          _lists[key] = cachedExams;
-          _listLoadedAt[key] = DateTime.now();
-          for (final exam in cachedExams) {
-            seedDetail(exam);
-          }
-          return cachedExams;
-        })
-        .whenComplete(() {
-          if (identical(_pendingLists[key], request)) {
-            _pendingLists.remove(key);
-          }
-        });
-    _pendingLists[key] = request;
-    return request;
-  }
-
-  static List<GeneratedExam>? peekList({int? userId, int? profileId}) {
-    return _lists[_ExamListKey(userId: userId, profileId: profileId)];
-  }
-
-  static void seedList({
-    required List<GeneratedExam> exams,
-    int? userId,
-    int? profileId,
-  }) {
-    final key = _ExamListKey(userId: userId, profileId: profileId);
-    final cachedExams = List<GeneratedExam>.unmodifiable(exams);
-    _lists[key] = cachedExams;
-    _listLoadedAt[key] = DateTime.now();
-    for (final exam in cachedExams) {
-      seedDetail(exam);
-    }
-  }
-
-  static bool isListFresh({
-    int? userId,
-    int? profileId,
-    Duration maxAge = const Duration(seconds: 45),
-  }) {
-    final loadedAt =
-        _listLoadedAt[_ExamListKey(userId: userId, profileId: profileId)];
-    return loadedAt != null && DateTime.now().difference(loadedAt) <= maxAge;
-  }
 
   static Future<GeneratedExam> loadDetail({
     required ExamDetailLoader loadDetail,
@@ -96,7 +21,9 @@ class ExamCache {
   }) {
     if (!forceRefresh) {
       final cached = _details[cacheKey];
-      if (cached != null && _hasUsefulDetail(cached)) {
+      if (cached != null &&
+          cached.hasFreshImageUrls &&
+          _hasUsefulDetail(cached)) {
         return Future<GeneratedExam>.value(cached);
       }
       final pending = _pendingDetails[cacheKey];
@@ -140,7 +67,8 @@ class ExamCache {
   }
 
   static GeneratedExam? peekDetail(Object cacheKey) {
-    return _details[cacheKey];
+    final cached = _details[cacheKey];
+    return cached?.hasFreshImageUrls == true ? cached : null;
   }
 
   static bool isDetailFresh(
@@ -151,6 +79,7 @@ class ExamCache {
     final cached = _details[cacheKey];
     return loadedAt != null &&
         cached != null &&
+        cached.hasFreshImageUrls &&
         _hasUsefulDetail(cached) &&
         DateTime.now().difference(loadedAt) <= maxAge;
   }
@@ -170,85 +99,14 @@ class ExamCache {
     _detailLoadedAt[cacheKey] = DateTime.now();
   }
 
-  static void markSubmitted({
-    required GeneratedExam exam,
-    int? userId,
-    int? profileId,
-  }) {
-    seedDetail(exam);
-    final examId = exam.examId ?? exam.id;
-    if (examId == null) {
-      invalidateLists(userId: userId, profileId: profileId);
-      return;
-    }
-
-    final updatedLists = <_ExamListKey, List<GeneratedExam>>{};
-    for (final entry in _lists.entries) {
-      final key = entry.key;
-      if ((userId != null && key.userId != userId) ||
-          (profileId != null && key.profileId != profileId)) {
-        continue;
-      }
-      final hasExam = entry.value.any(
-        (item) => (item.examId ?? item.id) == examId,
-      );
-      if (!hasExam) {
-        continue;
-      }
-      updatedLists[key] = List<GeneratedExam>.unmodifiable(
-        entry.value.map((item) {
-          return (item.examId ?? item.id) == examId ? exam : item;
-        }),
-      );
-      _listLoadedAt[key] = DateTime.now();
-    }
-    _lists.addAll(updatedLists);
-  }
-
   /// Drops all session data, including in-flight cache writes.
   static void clear() {
-    _lists.clear();
-    _listLoadedAt.clear();
-    _pendingLists.clear();
     _details.clear();
     _detailLoadedAt.clear();
     _pendingDetails.clear();
   }
 
-  static void invalidateLists({int? userId, int? profileId}) {
-    _lists.removeWhere((key, _) {
-      return (userId == null || key.userId == userId) &&
-          (profileId == null || key.profileId == profileId);
-    });
-    _listLoadedAt.removeWhere((key, _) {
-      return (userId == null || key.userId == userId) &&
-          (profileId == null || key.profileId == profileId);
-    });
-    _pendingLists.removeWhere((key, _) {
-      return (userId == null || key.userId == userId) &&
-          (profileId == null || key.profileId == profileId);
-    });
-  }
-
   static bool _hasUsefulDetail(GeneratedExam exam) {
     return exam.questions.isNotEmpty;
   }
-}
-
-class _ExamListKey {
-  const _ExamListKey({this.userId, this.profileId});
-
-  final int? userId;
-  final int? profileId;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is _ExamListKey &&
-            other.userId == userId &&
-            other.profileId == profileId;
-  }
-
-  @override
-  int get hashCode => Object.hash(userId, profileId);
 }

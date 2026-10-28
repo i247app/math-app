@@ -26,13 +26,14 @@ void main() {
       'Một đoạn dây dài 45 cm, đoạn dây khác dài hơn 18 cm. '
       'Hỏi đoạn dây thứ hai dài bao nhiêu xăng-ti-mét?';
   const question = ExamQuestion(
-    questionName: longQuestion,
+    questionText: longQuestion,
     questionNumber: 5,
-    answers: <ExamAnswer>[
-      ExamAnswer(label: 'A', content: '63'),
-      ExamAnswer(label: 'B', content: '57'),
+    options: <ExamAnswer>[
+      ExamAnswer(id: 'A', text: '63'),
+      ExamAnswer(id: 'B', text: '57'),
     ],
-    correctAnswer: 'A',
+
+    correctOptionIds: ['A'],
   );
 
   Widget testApp(Widget child, LingoProvider lingo) {
@@ -102,14 +103,15 @@ void main() {
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
     const reviewQuestion = ExamQuestion(
-      questionName: '1 + 1 = ?',
+      questionText: '1 + 1 = ?',
       questionNumber: 1,
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '2'),
-        ExamAnswer(label: 'B', content: '3'),
-        ExamAnswer(label: 'C', content: '4'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '2'),
+        ExamAnswer(id: 'B', text: '3'),
+        ExamAnswer(id: 'C', text: '4'),
       ],
-      correctAnswer: 'A',
+
+      correctOptionIds: ['A'],
     );
 
     Future<void> showAnswers({
@@ -138,7 +140,7 @@ void main() {
     }
 
     Color? labelCircleColorAt(int index) {
-      final label = reviewQuestion.answers[index].label;
+      final label = reviewQuestion.options[index].id;
       final circle = tester.widget<Container>(
         find.byKey(ValueKey('exam-review-answer-circle-$label')),
       );
@@ -523,20 +525,20 @@ class _JourneyDetailService implements ExamService {
       ],
       grading: ExamGrading(correctNumber: 1, totalQuestions: 1),
       answers: <SubmitExamAnswer>[
-        SubmitExamAnswer(questionNumber: 1, label: 'A'),
+        SubmitExamAnswer(questionNumber: 1, optionIds: ['A']),
       ],
       questions: <ExamQuestion>[
         ExamQuestion(
-          questionName: '1 + 1 = ?',
+          questionText: '1 + 1 = ?',
           questionNumber: 1,
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '2'),
-            ExamAnswer(label: 'B', content: '1'),
-            ExamAnswer(label: 'C', content: '3'),
-            ExamAnswer(label: 'D', content: '4'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '2'),
+            ExamAnswer(id: 'B', text: '1'),
+            ExamAnswer(id: 'C', text: '3'),
+            ExamAnswer(id: 'D', text: '4'),
           ],
-          rightAnswer: 'A',
-          correctAnswer: '2',
+
+          correctOptionIds: ['A'],
         ),
       ],
     );

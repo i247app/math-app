@@ -366,15 +366,16 @@ const _testExam = GeneratedExam(
   examId: 7001,
   questions: <ExamQuestion>[
     ExamQuestion(
-      questionName: '12 + 8 = ?',
+      questionText: '12 + 8 = ?',
       questionNumber: 1,
-      rightAnswer: 'C',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '18'),
-        ExamAnswer(label: 'B', content: '19'),
-        ExamAnswer(label: 'C', content: '20'),
-        ExamAnswer(label: 'D', content: '21'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '18'),
+        ExamAnswer(id: 'B', text: '19'),
+        ExamAnswer(id: 'C', text: '20'),
+        ExamAnswer(id: 'D', text: '21'),
       ],
+
+      correctOptionIds: ['C'],
     ),
   ],
 );
@@ -387,36 +388,39 @@ const _activeResumeExam = GeneratedExam(
   examType: examTypeAssessment,
   grade: 1,
   answers: <SubmitExamAnswer>[
-    SubmitExamAnswer(questionNumber: 1, label: 'A'),
-    SubmitExamAnswer(questionNumber: 2, label: 'B'),
+    SubmitExamAnswer(questionNumber: 1, optionIds: ['A']),
+    SubmitExamAnswer(questionNumber: 2, optionIds: ['B']),
   ],
   questions: <ExamQuestion>[
     ExamQuestion(
-      questionName: 'Resume question 1',
+      questionText: 'Resume question 1',
       questionNumber: 1,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '1'),
-        ExamAnswer(label: 'B', content: '2'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '1'),
+        ExamAnswer(id: 'B', text: '2'),
       ],
+
+      correctOptionIds: ['A'],
     ),
     ExamQuestion(
-      questionName: 'Resume question 2',
+      questionText: 'Resume question 2',
       questionNumber: 2,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '2'),
-        ExamAnswer(label: 'B', content: '3'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '2'),
+        ExamAnswer(id: 'B', text: '3'),
       ],
+
+      correctOptionIds: ['A'],
     ),
     ExamQuestion(
-      questionName: 'Resume question 3',
+      questionText: 'Resume question 3',
       questionNumber: 3,
-      rightAnswer: 'A',
-      answers: <ExamAnswer>[
-        ExamAnswer(label: 'A', content: '3'),
-        ExamAnswer(label: 'B', content: '4'),
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '3'),
+        ExamAnswer(id: 'B', text: '4'),
       ],
+
+      correctOptionIds: ['A'],
     ),
   ],
 );

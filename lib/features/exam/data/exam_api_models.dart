@@ -54,42 +54,22 @@ class SubmitExamRequest {
   Map<String, dynamic> toJson() => _$SubmitExamRequestToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
 class SubmitExamAnswerDto {
   const SubmitExamAnswerDto({
     required this.questionNumber,
-    required this.label,
-  });
+    this.optionIds,
+    this.value,
+  }) : assert((optionIds == null) != (value == null));
 
   final int questionNumber;
-  final String label;
+  final List<String>? optionIds;
+  final String? value;
 
   factory SubmitExamAnswerDto.fromJson(Map<String, dynamic> json) =>
       _$SubmitExamAnswerDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubmitExamAnswerDtoToJson(this);
-}
-
-@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
-class ExamListRequest {
-  const ExamListRequest({
-    required this.profileId,
-    this.page,
-    this.size,
-    this.takeAll,
-    required this.examType,
-  });
-
-  final int profileId;
-  final int? page;
-  final int? size;
-  final bool? takeAll;
-  final String examType;
-
-  factory ExamListRequest.fromJson(Map<String, dynamic> json) =>
-      _$ExamListRequestFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExamListRequestToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -161,30 +141,6 @@ class SubmitExamResponseDto {
       _$SubmitExamResponseDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubmitExamResponseDtoToJson(this);
-}
-
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class ExamListResponseDto {
-  const ExamListResponseDto({
-    required this.mstatus,
-    this.pagination,
-    this.exams = const <GeneratedExamDto>[],
-    this.status,
-    this.mmessage,
-    this.debug,
-  });
-
-  final int mstatus;
-  final ExamPaginationDto? pagination;
-  final List<GeneratedExamDto> exams;
-  final String? status;
-  final String? mmessage;
-  final String? debug;
-
-  factory ExamListResponseDto.fromJson(Map<String, dynamic> json) =>
-      _$ExamListResponseDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExamListResponseDtoToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -291,24 +247,27 @@ List<ExamPracticeTopicDto> _practiceTopicsFromJson(Object? value) {
 class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
     required this.questionNumber,
-    this.answers = const <ExamAnswerDto>[],
+    this.options = const <ExamAnswerDto>[],
     this.elinkId,
     this.userExamDetailId,
     this.detailStatus,
     this.questionGrade,
     this.questionLevel,
-    this.questionName,
+    this.questionText,
     this.questionTopic,
-    this.questionType,
-    this.rightAnswerContent,
-    this.rightAnswerLabel,
-    this.selectedLabel,
-    this.selectedContent,
+    this.renderType,
+    this.rightAnswerText,
+    this.childAnswerText,
     this.isCorrect,
+    this.questionKind = 'SINGLE_CHOICE',
+    this.rightOptionIds = const [],
+    this.childOptionIds = const [],
+    this.questionImageUrl,
   });
 
   final int questionNumber;
-  final List<ExamAnswerDto> answers;
+  @JsonKey(name: 'options')
+  final List<ExamAnswerDto> options;
   @JsonKey(name: 'elink_id', fromJson: _intFromJson)
   final int? elinkId;
   @JsonKey(name: 'esess_ln_id', fromJson: _intFromJson)
@@ -319,14 +278,16 @@ class ExamDetailAnswerDto {
   final int? questionGrade;
   @JsonKey(fromJson: _intFromJson)
   final int? questionLevel;
-  final String? questionName;
+  final String? questionText;
   final String? questionTopic;
-  final String? questionType;
-  final String? rightAnswerContent;
-  final String? rightAnswerLabel;
-  final String? selectedLabel;
-  final String? selectedContent;
+  final String? renderType;
+  final String? rightAnswerText;
+  final String? childAnswerText;
   final bool? isCorrect;
+  final String questionKind;
+  final List<String> rightOptionIds;
+  final List<String> childOptionIds;
+  final String? questionImageUrl;
 
   factory ExamDetailAnswerDto.fromJson(Map<String, dynamic> json) =>
       _$ExamDetailAnswerDtoFromJson(json);
@@ -396,8 +357,8 @@ class ExamStatsDto {
     this.esessFlag,
     this.isLatest,
     this.review,
-    this.aiTitle,
-    this.aiShortText,
+    this.title,
+    this.shortText,
     this.aiReviewShort,
     this.aiReviewLong,
     this.inProgressExam,
@@ -426,8 +387,8 @@ class ExamStatsDto {
   final bool? esessFlag;
   final bool? isLatest;
   final String? review;
-  final String? aiTitle;
-  final String? aiShortText;
+  final String? title;
+  final String? shortText;
   final String? aiReviewShort;
   final String? aiReviewLong;
   final GeneratedExamDto? inProgressExam;
@@ -552,34 +513,6 @@ class ExamProgressSummaryDto {
   Map<String, dynamic> toJson() => _$ExamProgressSummaryDtoToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
-class ExamPaginationDto {
-  const ExamPaginationDto({
-    this.hasNext,
-    this.hasPrevious,
-    this.page,
-    this.size,
-    this.skip,
-    this.takeAll,
-    this.totalCount,
-    this.totalPages,
-  });
-
-  final bool? hasNext;
-  final bool? hasPrevious;
-  final int? page;
-  final int? size;
-  final int? skip;
-  final bool? takeAll;
-  final int? totalCount;
-  final int? totalPages;
-
-  factory ExamPaginationDto.fromJson(Map<String, dynamic> json) =>
-      _$ExamPaginationDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExamPaginationDtoToJson(this);
-}
-
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class GeneratedExamDto {
   const GeneratedExamDto({
@@ -594,8 +527,6 @@ class GeneratedExamDto {
     this.numQuestions,
     this.title,
     this.shortText,
-    this.aiTitle,
-    this.aiShortText,
     this.createDt,
     this.startedDt,
     this.submittedDt,
@@ -622,8 +553,6 @@ class GeneratedExamDto {
   final int? numQuestions;
   final String? title;
   final String? shortText;
-  final String? aiTitle;
-  final String? aiShortText;
   final String? createDt;
   final String? startedDt;
   final String? submittedDt;
@@ -664,29 +593,31 @@ class ExamResultDto {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamQuestionDto {
   const ExamQuestionDto({
-    required this.questionName,
+    required this.questionText,
     required this.questionNumber,
-    required this.answers,
-    this.rightAnswerLabel,
-    this.rightAnswerContent,
+    required this.options,
+    this.correctAnswer,
+    this.questionKind = 'SINGLE_CHOICE',
+    this.questionImageUrl,
     this.questionGrade,
     this.questionLevel,
     this.questionTopic,
-    this.questionType,
+    this.renderType,
   });
 
-  final String questionName;
+  final String questionText;
   final int questionNumber;
   @JsonKey(defaultValue: <ExamAnswerDto>[])
-  final List<ExamAnswerDto> answers;
-  final String? rightAnswerLabel;
-  final String? rightAnswerContent;
+  final List<ExamAnswerDto> options;
+  final ExamCorrectAnswerDto? correctAnswer;
+  final String questionKind;
+  final String? questionImageUrl;
   @JsonKey(fromJson: _intFromJson)
   final int? questionGrade;
   @JsonKey(fromJson: _intFromJson)
   final int? questionLevel;
   final String? questionTopic;
-  final String? questionType;
+  final String? renderType;
 
   factory ExamQuestionDto.fromJson(Map<String, dynamic> json) =>
       _$ExamQuestionDtoFromJson(json);
@@ -694,12 +625,28 @@ class ExamQuestionDto {
   Map<String, dynamic> toJson() => _$ExamQuestionDtoToJson(this);
 }
 
-@JsonSerializable()
-class ExamAnswerDto {
-  const ExamAnswerDto({required this.content, required this.label});
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
+class ExamCorrectAnswerDto {
+  const ExamCorrectAnswerDto({this.optionIds, this.value, this.values});
 
-  final String content;
-  final String label;
+  final List<String>? optionIds;
+  final bool? value;
+  final List<String>? values;
+
+  factory ExamCorrectAnswerDto.fromJson(Map<String, dynamic> json) =>
+      _$ExamCorrectAnswerDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExamCorrectAnswerDtoToJson(this);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake, includeIfNull: false)
+class ExamAnswerDto {
+  const ExamAnswerDto({required this.text, required this.id, this.imageUrl});
+
+  @JsonKey(defaultValue: '')
+  final String text;
+  final String id;
+  final String? imageUrl;
 
   factory ExamAnswerDto.fromJson(Map<String, dynamic> json) =>
       _$ExamAnswerDtoFromJson(json);

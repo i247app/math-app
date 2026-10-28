@@ -6,29 +6,40 @@ import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.d
 class AssessmentAnswerGrid extends StatelessWidget {
   const AssessmentAnswerGrid({
     super.key,
-    required this.answers,
+    required this.options,
     required this.selectedAnswerLabel,
     this.selectedAnswerFeedbackCorrect,
     required this.onSelected,
     this.renderLatex = false,
+    this.selectedOptionIds,
+    this.showLetters = true,
   });
-  final List<ExamAnswer> answers;
+  final List<ExamAnswer> options;
   final String? selectedAnswerLabel;
   final bool? selectedAnswerFeedbackCorrect;
   final ValueChanged<ExamAnswer> onSelected;
   final bool renderLatex;
+  final Set<String>? selectedOptionIds;
+  final bool showLetters;
+
+  bool _selected(ExamAnswer answer) =>
+      selectedOptionIds?.contains(answer.id) ??
+      answer.id == selectedAnswerLabel;
+  String _displayLabel(int index) =>
+      showLetters ? String.fromCharCode(65 + index) : '';
 
   @override
   Widget build(BuildContext context) {
     final hasOnlyCompactAnswers =
-        answers.isNotEmpty &&
-        answers.every(
+        options.isNotEmpty &&
+        options.every(
           (answer) =>
-              isNumericAssessmentContent(answer.content) ||
-              isIconAssessmentContent(answer.content),
+              answer.imageUrl == null &&
+              (isNumericAssessmentContent(answer.text) ||
+                  isIconAssessmentContent(answer.text)),
         );
-    final hasLongNumericAnswer = answers.any(
-      (answer) => RegExp(r'\d').allMatches(answer.content).length >= 4,
+    final hasLongNumericAnswer = options.any(
+      (answer) => RegExp(r'\d').allMatches(answer.text).length >= 4,
     );
     final useCompactGrid =
         !renderLatex && hasOnlyCompactAnswers && !hasLongNumericAnswer;
@@ -37,17 +48,18 @@ class AssessmentAnswerGrid extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (var index = 0; index < answers.length; index++) ...[
+          for (var index = 0; index < options.length; index++) ...[
             AssessmentAnswerButton(
-              answer: answers[index],
+              answer: options[index],
+              displayLabel: _displayLabel(index),
               renderLatex: renderLatex,
-              selected: answers[index].label == selectedAnswerLabel,
-              feedbackCorrect: answers[index].label == selectedAnswerLabel
+              selected: _selected(options[index]),
+              feedbackCorrect: _selected(options[index])
                   ? selectedAnswerFeedbackCorrect
                   : null,
-              onTap: () => onSelected(answers[index]),
+              onTap: () => onSelected(options[index]),
             ),
-            if (index < answers.length - 1) const SizedBox(height: 8),
+            if (index < options.length - 1) const SizedBox(height: 8),
           ],
         ],
       );
@@ -56,7 +68,7 @@ class AssessmentAnswerGrid extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: answers.length,
+      itemCount: options.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 16,
@@ -64,12 +76,13 @@ class AssessmentAnswerGrid extends StatelessWidget {
         mainAxisExtent: 90,
       ),
       itemBuilder: (context, index) {
-        final answer = answers[index];
+        final answer = options[index];
         return AssessmentAnswerButton(
           answer: answer,
+          displayLabel: _displayLabel(index),
           compact: true,
-          selected: answer.label == selectedAnswerLabel,
-          feedbackCorrect: answer.label == selectedAnswerLabel
+          selected: _selected(answer),
+          feedbackCorrect: _selected(answer)
               ? selectedAnswerFeedbackCorrect
               : null,
           onTap: () => onSelected(answer),

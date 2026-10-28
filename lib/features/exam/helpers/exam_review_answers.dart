@@ -1,39 +1,43 @@
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/exam_answer_selection.dart';
 
 String? examReviewCorrectAnswerLabel(ExamQuestion question) {
-  final rightAnswer = question.rightAnswer?.trim();
-  if (rightAnswer != null && rightAnswer.isNotEmpty) {
-    return rightAnswer.toUpperCase();
-  }
-
-  final correctAnswer = question.correctAnswer?.trim();
-  if (correctAnswer != null && correctAnswer.isNotEmpty) {
-    return correctAnswer.toUpperCase();
-  }
-
-  return null;
+  final ids = ExamAnswerSelection.correctIds(question);
+  if (ids.isEmpty) return null;
+  return ExamAnswerSelection(
+    optionIds: ids,
+    multiple: question.isMultipleChoice,
+  ).stateValue;
 }
 
 String? examReviewSelectedAnswerLabel(GeneratedExam exam, int questionNumber) {
-  for (final answer in exam.answers) {
-    if (answer.questionNumber == questionNumber) {
-      return answer.label.trim().toUpperCase();
-    }
-  }
-  return null;
+  final question = exam.questions
+      .where((q) => q.questionNumber == questionNumber)
+      .firstOrNull;
+  if (question == null) return null;
+  final answer = exam.answers
+      .where((a) => a.questionNumber == questionNumber)
+      .firstOrNull;
+  return answer == null
+      ? null
+      : ExamAnswerSelection.fromSubmitted(question, answer).stateValue;
 }
 
-int examReviewComputedCorrectCount(GeneratedExam exam) {
-  var count = 0;
-  for (final question in exam.questions) {
-    final selected = examReviewSelectedAnswerLabel(
-      exam,
-      question.questionNumber,
-    );
-    final correct = examReviewCorrectAnswerLabel(question);
-    if (selected != null && selected == correct) {
-      count++;
-    }
-  }
-  return count;
+bool examReviewIsCorrect(ExamQuestion question, String? selected) {
+  if (question.reviewIsCorrect != null) return question.reviewIsCorrect!;
+  if (selected == null) return false;
+  return ExamAnswerSelection.fromState(
+        question,
+        selected,
+      ).isCorrect(question) ==
+      true;
 }
+
+int examReviewComputedCorrectCount(GeneratedExam exam) => exam.questions
+    .where(
+      (question) => examReviewIsCorrect(
+        question,
+        examReviewSelectedAnswerLabel(exam, question.questionNumber),
+      ),
+    )
+    .length;

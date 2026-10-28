@@ -39,14 +39,15 @@ void main() {
         examType: examType,
         questions: const <ExamQuestion>[
           ExamQuestion(
-            questionName: r'Tính $\frac{1}{3} + \frac{1}{3}$',
+            questionText: r'Tính $\frac{1}{3} + \frac{1}{3}$',
             questionNumber: 1,
-            questionType: 'FRACTION',
-            rightAnswer: 'B',
-            answers: <ExamAnswer>[
-              ExamAnswer(label: 'A', content: r'\frac{1}{3}'),
-              ExamAnswer(label: 'B', content: r'\frac{2}{3}'),
+            renderType: 'FRACTION',
+            options: <ExamAnswer>[
+              ExamAnswer(id: 'A', text: r'\frac{1}{3}'),
+              ExamAnswer(id: 'B', text: r'\frac{2}{3}'),
             ],
+
+            correctOptionIds: ['B'],
           ),
         ],
       );
@@ -185,22 +186,24 @@ void main() {
       tester,
       questions: const <ExamQuestion>[
         ExamQuestion(
-          questionName: '2 + 2 = ?',
+          questionText: '2 + 2 = ?',
           questionNumber: 1,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '4'),
-            ExamAnswer(label: 'B', content: '5'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '4'),
+            ExamAnswer(id: 'B', text: '5'),
           ],
+
+          correctOptionIds: ['A'],
         ),
         ExamQuestion(
-          questionName: '3 + 3 = ?',
+          questionText: '3 + 3 = ?',
           questionNumber: 2,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '6'),
-            ExamAnswer(label: 'B', content: '7'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '6'),
+            ExamAnswer(id: 'B', text: '7'),
           ],
+
+          correctOptionIds: ['A'],
         ),
       ],
     );
@@ -271,23 +274,23 @@ void main() {
         tester,
         questions: const <ExamQuestion>[
           ExamQuestion(
-            questionName: '12 + 8 = ?',
+            questionText: '12 + 8 = ?',
             questionNumber: 1,
-            answers: <ExamAnswer>[
-              ExamAnswer(label: 'A', content: '18'),
-              ExamAnswer(label: 'B', content: '19'),
-              ExamAnswer(label: 'C', content: '20'),
-              ExamAnswer(label: 'D', content: '21'),
+            options: <ExamAnswer>[
+              ExamAnswer(id: 'A', text: '18'),
+              ExamAnswer(id: 'B', text: '19'),
+              ExamAnswer(id: 'C', text: '20'),
+              ExamAnswer(id: 'D', text: '21'),
             ],
           ),
           ExamQuestion(
-            questionName: '20 + 10 = ?',
+            questionText: '20 + 10 = ?',
             questionNumber: 2,
-            answers: <ExamAnswer>[
-              ExamAnswer(label: 'A', content: '28'),
-              ExamAnswer(label: 'B', content: '29'),
-              ExamAnswer(label: 'C', content: '30'),
-              ExamAnswer(label: 'D', content: '31'),
+            options: <ExamAnswer>[
+              ExamAnswer(id: 'A', text: '28'),
+              ExamAnswer(id: 'B', text: '29'),
+              ExamAnswer(id: 'C', text: '30'),
+              ExamAnswer(id: 'D', text: '31'),
             ],
           ),
         ],
@@ -327,13 +330,13 @@ void main() {
     final questions = List<ExamQuestion>.generate(
       10,
       (index) => ExamQuestion(
-        questionName: '${index + 1} + 1 = ?',
+        questionText: '${index + 1} + 1 = ?',
         questionNumber: index + 1,
-        answers: const <ExamAnswer>[
-          ExamAnswer(label: 'A', content: '1'),
-          ExamAnswer(label: 'B', content: '2'),
-          ExamAnswer(label: 'C', content: '3'),
-          ExamAnswer(label: 'D', content: '4'),
+        options: const <ExamAnswer>[
+          ExamAnswer(id: 'A', text: '1'),
+          ExamAnswer(id: 'B', text: '2'),
+          ExamAnswer(id: 'C', text: '3'),
+          ExamAnswer(id: 'D', text: '4'),
         ],
       ),
     );
@@ -379,19 +382,19 @@ void main() {
       allowQuestionNavigation: false,
       questions: const <ExamQuestion>[
         ExamQuestion(
-          questionName: 'First question',
+          questionText: 'First question',
           questionNumber: 1,
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '1'),
-            ExamAnswer(label: 'B', content: '2'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '1'),
+            ExamAnswer(id: 'B', text: '2'),
           ],
         ),
         ExamQuestion(
-          questionName: 'Second question',
+          questionText: 'Second question',
           questionNumber: 2,
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '3'),
-            ExamAnswer(label: 'B', content: '4'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '3'),
+            ExamAnswer(id: 'B', text: '4'),
           ],
         ),
       ],
@@ -642,13 +645,14 @@ void main() {
       final questions = List<ExamQuestion>.generate(
         10,
         (index) => ExamQuestion(
-          questionName: 'Question ${index + 1}',
+          questionText: 'Question ${index + 1}',
           questionNumber: index + 1,
-          rightAnswer: 'A',
-          answers: const <ExamAnswer>[
-            ExamAnswer(label: 'A', content: 'Correct'),
-            ExamAnswer(label: 'B', content: 'Incorrect'),
+          options: const <ExamAnswer>[
+            ExamAnswer(id: 'A', text: 'Correct'),
+            ExamAnswer(id: 'B', text: 'Incorrect'),
           ],
+
+          correctOptionIds: ['A'],
         ),
       );
       await _pumpAssessment(
@@ -1089,13 +1093,14 @@ List<ExamQuestion> _setQuestions(String setName) {
   return List<ExamQuestion>.generate(
     10,
     (index) => ExamQuestion(
-      questionName: '$setName - Question ${index + 1}',
+      questionText: '$setName - Question ${index + 1}',
       questionNumber: index + 1,
-      rightAnswer: 'A',
-      answers: const <ExamAnswer>[
-        ExamAnswer(label: 'A', content: 'Correct'),
-        ExamAnswer(label: 'B', content: 'Incorrect'),
+      options: const <ExamAnswer>[
+        ExamAnswer(id: 'A', text: 'Correct'),
+        ExamAnswer(id: 'B', text: 'Incorrect'),
       ],
+
+      correctOptionIds: ['A'],
     ),
   );
 }
@@ -1150,13 +1155,13 @@ Future<void> _pumpAssessment(
                   questions ??
                   const <ExamQuestion>[
                     ExamQuestion(
-                      questionName: '12 + 8 = ?',
+                      questionText: '12 + 8 = ?',
                       questionNumber: 1,
-                      answers: <ExamAnswer>[
-                        ExamAnswer(label: 'A', content: '18'),
-                        ExamAnswer(label: 'B', content: '19'),
-                        ExamAnswer(label: 'C', content: '20'),
-                        ExamAnswer(label: 'D', content: '21'),
+                      options: <ExamAnswer>[
+                        ExamAnswer(id: 'A', text: '18'),
+                        ExamAnswer(id: 'B', text: '19'),
+                        ExamAnswer(id: 'C', text: '20'),
+                        ExamAnswer(id: 'D', text: '21'),
                       ],
                     ),
                   ],
@@ -1290,7 +1295,8 @@ class _CompletedJourneyReviewExamService implements ExamService {
       grading: const ExamGrading(correctNumber: 6, totalQuestions: 6),
       answers: List<SubmitExamAnswer>.generate(
         6,
-        (index) => SubmitExamAnswer(questionNumber: index + 1, label: 'A'),
+        (index) =>
+            SubmitExamAnswer(questionNumber: index + 1, optionIds: ['A']),
       ),
       questions: _setQuestions('Journey').take(6).toList(growable: false),
     );

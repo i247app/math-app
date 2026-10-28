@@ -31,8 +31,6 @@ GeneratedExam buildPracticeReviewExam({
     title: submittedExam.title ?? sourceExam.title,
     shortText: submittedExam.shortText ?? sourceExam.shortText,
     review: submittedExam.review ?? sourceExam.review,
-    aiTitle: submittedExam.aiTitle ?? sourceExam.aiTitle,
-    aiShortText: submittedExam.aiShortText ?? sourceExam.aiShortText,
     aiReviewShort: submittedExam.aiReviewShort ?? sourceExam.aiReviewShort,
     aiReviewLong: submittedExam.aiReviewLong ?? sourceExam.aiReviewLong,
     userId: submittedExam.userId ?? sourceExam.userId,
@@ -51,6 +49,7 @@ GeneratedExam buildPracticeReviewExam({
     submittedDt: submittedExam.submittedDt ?? sourceExam.submittedDt,
     grading: grading,
     answers: List<SubmitExamAnswer>.unmodifiable(answers),
+    imageUrlsFetchedAt: sourceExam.imageUrlsFetchedAt,
     questions: sourceExam.questions,
   );
 }

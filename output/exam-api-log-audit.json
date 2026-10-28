@@ -1,0 +1,1532 @@
+[
+  {
+    "id": 4,
+    "path": "/profiles/list",
+    "http": "status=200 910ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 1
+  },
+  {
+    "id": 5,
+    "path": "/grades/list",
+    "http": "status=200 791ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 28
+  },
+  {
+    "id": 6,
+    "path": "/notifications/list",
+    "http": "status=200 870ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 55
+  },
+  {
+    "id": 7,
+    "path": "/exams/journey/progress",
+    "http": "status=200 251ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 205,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2025-10-28 21:19:22.086395",
+      "to_dt": "2026-10-28 21:19:22.086395"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 0,
+      "average_score": null,
+      "average_score_pct": null,
+      "average_delta": null,
+      "highest_score": null,
+      "highest_score_pct": null,
+      "lowest_score": null,
+      "trend": "NO_DATA",
+      "highest_esess_id": null
+    }
+  },
+  {
+    "id": 8,
+    "path": "/exams/sessions/list",
+    "http": "status=200 347ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 235,
+    "request": {
+      "profile_id": 4,
+      "exam_types": [
+        "ASSESSMENT"
+      ]
+    },
+    "response_keys": [
+      "cursor",
+      "exam_sessions",
+      "mstatus",
+      "status"
+    ],
+    "sessions": []
+  },
+  {
+    "id": 9,
+    "path": "/home/layout",
+    "http": "status=200 348ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 265
+  },
+  {
+    "id": 10,
+    "path": "/exams/journey/progress",
+    "http": "status=200 689ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 350,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:22:27.652313",
+      "to_dt": "2026-10-28 21:22:27.652313"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 0,
+      "average_score": null,
+      "average_score_pct": null,
+      "average_delta": null,
+      "highest_score": null,
+      "highest_score_pct": null,
+      "lowest_score": null,
+      "trend": "NO_DATA",
+      "highest_esess_id": null
+    }
+  },
+  {
+    "id": 11,
+    "path": "/exams/journey/progress",
+    "http": "status=200 766ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 407,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2025-10-28 21:22:35.612879",
+      "to_dt": "2026-10-28 21:22:35.612879"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 0,
+      "average_score": null,
+      "average_score_pct": null,
+      "average_delta": null,
+      "highest_score": null,
+      "highest_score_pct": null,
+      "lowest_score": null,
+      "trend": "NO_DATA",
+      "highest_esess_id": null
+    }
+  },
+  {
+    "id": 12,
+    "path": "/exams/sessions/list",
+    "http": "status=200 751ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 437,
+    "request": {
+      "profile_id": 4,
+      "exam_types": [
+        "ASSESSMENT"
+      ]
+    },
+    "response_keys": [
+      "cursor",
+      "exam_sessions",
+      "mstatus",
+      "status"
+    ],
+    "sessions": []
+  },
+  {
+    "id": 13,
+    "path": "/exams/journey/progress",
+    "http": "status=200 320ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 515,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:22:36.691151",
+      "to_dt": "2026-10-28 21:22:36.691151"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 0,
+      "average_score": null,
+      "average_score_pct": null,
+      "average_delta": null,
+      "highest_score": null,
+      "highest_score_pct": null,
+      "lowest_score": null,
+      "trend": "NO_DATA",
+      "highest_esess_id": null
+    }
+  },
+  {
+    "id": 14,
+    "path": "/exams/sessions/list",
+    "http": "status=200 709ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 569,
+    "request": {
+      "profile_id": 4,
+      "exam_types": [
+        "ASSESSMENT"
+      ]
+    },
+    "response_keys": [
+      "cursor",
+      "exam_sessions",
+      "mstatus",
+      "status"
+    ],
+    "sessions": []
+  },
+  {
+    "id": 15,
+    "path": "/exams/generate",
+    "http": "status=200 10088ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 613,
+    "request": {
+      "profile_id": 4,
+      "num_questions": 10,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1
+    },
+    "response_keys": [
+      "exam",
+      "exam_session",
+      "mstatus",
+      "resumed",
+      "status"
+    ],
+    "exam": {
+      "elink_id": 2,
+      "exam_id": 2,
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Số thập phân, phân số và hình học",
+      "num_questions": 10,
+      "status": "IN_PROGRESS",
+      "started_dt": "20261028142256.574576",
+      "create_dt": "20261028142256.574576"
+    },
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 0,
+      "correct_number": 0,
+      "skipped_number": 0,
+      "esess_flag": null,
+      "grade": 0,
+      "level": 1,
+      "create_dt": "20261028142256.570297"
+    },
+    "questions_count": 10,
+    "kinds": {
+      "SINGLE_CHOICE": 10
+    },
+    "option_orders": [
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    ],
+    "question_sample": {
+      "question_number": 1,
+      "question_kind": "SINGLE_CHOICE",
+      "render_type": "ARITHMETIC",
+      "question_text": "? > 4,7",
+      "options": [
+        {
+          "id": "a",
+          "text": "4,6"
+        },
+        {
+          "id": "b",
+          "text": "5,2"
+        },
+        {
+          "id": "c",
+          "text": "4,7"
+        },
+        {
+          "id": "d",
+          "text": "3,9"
+        }
+      ],
+      "correct_answer": {
+        "option_ids": [
+          "b"
+        ]
+      },
+      "question_topic": "So sánh số thập phân",
+      "question_grade": 0
+    }
+  },
+  {
+    "id": 16,
+    "path": "/exams/submit",
+    "http": "status=200 711ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 989,
+    "request": {
+      "profile_id": 4,
+      "elink_id": 2,
+      "answers": [
+        {
+          "question_number": 1,
+          "option_ids": [
+            "c"
+          ]
+        },
+        {
+          "question_number": 2,
+          "option_ids": [
+            "a"
+          ]
+        },
+        {
+          "question_number": 3,
+          "option_ids": [
+            "c"
+          ]
+        },
+        {
+          "question_number": 4,
+          "option_ids": [
+            "d"
+          ]
+        },
+        {
+          "question_number": 5,
+          "option_ids": [
+            "b"
+          ]
+        },
+        {
+          "question_number": 6,
+          "option_ids": [
+            "d"
+          ]
+        },
+        {
+          "question_number": 7,
+          "option_ids": [
+            "d"
+          ]
+        },
+        {
+          "question_number": 8,
+          "option_ids": [
+            "c"
+          ]
+        },
+        {
+          "question_number": 9,
+          "option_ids": [
+            "d"
+          ]
+        },
+        {
+          "question_number": 10,
+          "option_ids": [
+            "c"
+          ]
+        }
+      ]
+    },
+    "response_keys": [
+      "exam",
+      "exam_session",
+      "mstatus",
+      "status"
+    ],
+    "exam": {
+      "elink_id": 2,
+      "exam_id": 2,
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Số thập phân, phân số và hình học",
+      "num_questions": 10,
+      "result": {
+        "total_questions": 10,
+        "correct_number": 2,
+        "skipped_number": 0,
+        "score_percentage": 20
+      },
+      "status": "SUBMITTED",
+      "started_dt": "20261028142256.574576",
+      "submitted_dt": "20261028142311.925808",
+      "create_dt": "20261028142256.574576"
+    },
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 10,
+      "correct_number": 2,
+      "skipped_number": 0,
+      "score_percentage": 20,
+      "review": "Đã trả lời (2/10) câu đúng (20%).",
+      "esess_flag": null,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Số thập phân, phân số và hình học",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261028142311.925315",
+      "create_dt": "20261028142256.570297"
+    },
+    "questions_count": 10,
+    "kinds": {
+      "SINGLE_CHOICE": 10
+    },
+    "option_orders": [
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    ],
+    "question_sample": {
+      "question_number": 1,
+      "question_kind": "SINGLE_CHOICE",
+      "render_type": "ARITHMETIC",
+      "question_text": "? > 4,7",
+      "options": [
+        {
+          "id": "a",
+          "text": "4,6"
+        },
+        {
+          "id": "b",
+          "text": "5,2"
+        },
+        {
+          "id": "c",
+          "text": "4,7"
+        },
+        {
+          "id": "d",
+          "text": "3,9"
+        }
+      ],
+      "correct_answer": {
+        "option_ids": [
+          "b"
+        ]
+      },
+      "question_topic": "So sánh số thập phân",
+      "question_grade": 0
+    }
+  },
+  {
+    "id": 17,
+    "path": "/exams/generate",
+    "http": "status=200 8715ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 1435,
+    "request": {
+      "profile_id": 4,
+      "num_questions": 10,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1
+    },
+    "response_keys": [
+      "exam",
+      "exam_session",
+      "mstatus",
+      "resumed",
+      "status"
+    ],
+    "exam": {
+      "elink_id": 3,
+      "exam_id": 3,
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Phân số, thời gian và hình học",
+      "num_questions": 10,
+      "status": "IN_PROGRESS",
+      "started_dt": "20261028142320.681389",
+      "create_dt": "20261028142320.681390"
+    },
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 10,
+      "correct_number": 2,
+      "skipped_number": 0,
+      "score_percentage": 20,
+      "review": "Đã trả lời (2/10) câu đúng (20%).",
+      "esess_flag": null,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Số thập phân, phân số và hình học",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261028142311.925315",
+      "create_dt": "20261028142256.570297"
+    },
+    "questions_count": 10,
+    "kinds": {
+      "SINGLE_CHOICE": 10
+    },
+    "option_orders": [
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    ],
+    "question_sample": {
+      "question_number": 1,
+      "question_kind": "SINGLE_CHOICE",
+      "render_type": "ARITHMETIC",
+      "question_text": "? < 5/8",
+      "options": [
+        {
+          "id": "a",
+          "text": "7/8"
+        },
+        {
+          "id": "b",
+          "text": "3/8"
+        },
+        {
+          "id": "c",
+          "text": "5/8"
+        },
+        {
+          "id": "d",
+          "text": "6/8"
+        }
+      ],
+      "correct_answer": {
+        "option_ids": [
+          "b"
+        ]
+      },
+      "question_topic": "So sánh phân số",
+      "question_grade": 0
+    }
+  },
+  {
+    "id": 18,
+    "path": "/exams/submit",
+    "http": "status=200 741ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 1816,
+    "request": {
+      "profile_id": 4,
+      "elink_id": 3,
+      "answers": [
+        {
+          "question_number": 1,
+          "option_ids": [
+            "c"
+          ]
+        },
+        {
+          "question_number": 2,
+          "option_ids": [
+            "b"
+          ]
+        },
+        {
+          "question_number": 3,
+          "option_ids": [
+            "d"
+          ]
+        },
+        {
+          "question_number": 4,
+          "option_ids": [
+            "a"
+          ]
+        },
+        {
+          "question_number": 5,
+          "option_ids": [
+            "c"
+          ]
+        }
+      ]
+    },
+    "response_keys": [
+      "exam",
+      "exam_session",
+      "mstatus",
+      "status"
+    ],
+    "exam": {
+      "elink_id": 3,
+      "exam_id": 3,
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Phân số, thời gian và hình học",
+      "num_questions": 10,
+      "result": {
+        "total_questions": 5,
+        "correct_number": 0,
+        "skipped_number": 5,
+        "score_percentage": 0
+      },
+      "status": "SUBMITTED",
+      "started_dt": "20261028142320.681389",
+      "submitted_dt": "20261028142329.766198",
+      "create_dt": "20261028142320.681390"
+    },
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 15,
+      "correct_number": 2,
+      "skipped_number": 5,
+      "score_percentage": 13,
+      "review": "Đã trả lời (2/15) câu đúng (13%).",
+      "esess_flag": null,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Phân số, thời gian và hình học",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261028142329.765695",
+      "create_dt": "20261028142256.570297"
+    },
+    "questions_count": 10,
+    "kinds": {
+      "SINGLE_CHOICE": 10
+    },
+    "option_orders": [
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    ],
+    "question_sample": {
+      "question_number": 1,
+      "question_kind": "SINGLE_CHOICE",
+      "render_type": "ARITHMETIC",
+      "question_text": "? < 5/8",
+      "options": [
+        {
+          "id": "a",
+          "text": "7/8"
+        },
+        {
+          "id": "b",
+          "text": "3/8"
+        },
+        {
+          "id": "c",
+          "text": "5/8"
+        },
+        {
+          "id": "d",
+          "text": "6/8"
+        }
+      ],
+      "correct_answer": {
+        "option_ids": [
+          "b"
+        ]
+      },
+      "question_topic": "So sánh phân số",
+      "question_grade": 0
+    }
+  },
+  {
+    "id": 19,
+    "path": "/exams/sessions/mark",
+    "http": "status=200 304ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 2249,
+    "request": {
+      "profile_id": 4,
+      "esess_id": 2,
+      "status": "COMPLETE"
+    },
+    "response_keys": [
+      "exam_session",
+      "mstatus",
+      "status"
+    ],
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "COMPLETE",
+      "total_questions": 15,
+      "correct_number": 2,
+      "skipped_number": 5,
+      "score_percentage": 13,
+      "review": "Đã trả lời (2/15) câu đúng (13%).",
+      "esess_flag": null,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Phân số, thời gian và hình học",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261028142329.765695",
+      "ended_dt": "20261028142330.079922",
+      "create_dt": "20261028142256.570297"
+    }
+  },
+  {
+    "id": 20,
+    "path": "/exams/sessions/detail",
+    "http": "status=200 249ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 2302,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "esess_id": 2
+    },
+    "response_keys": [
+      "details",
+      "exam_session",
+      "exams",
+      "mstatus",
+      "practice_preview",
+      "status"
+    ],
+    "exam_session": {
+      "esess_id": 2,
+      "exam_type": "ASSESSMENT",
+      "status": "COMPLETE",
+      "total_questions": 15,
+      "correct_number": 2,
+      "skipped_number": 5,
+      "score_percentage": 13,
+      "review": "Đã trả lời (2/15) câu đúng (13%).",
+      "esess_flag": null,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Phân số, thời gian và hình học",
+      "grade": 0,
+      "level": 1,
+      "last_submitted_dt": "20261028142329.765695",
+      "ended_dt": "20261028142330.079922",
+      "create_dt": "20261028142256.570297"
+    },
+    "practice_preview": {
+      "mode": "RETRY_WEAK",
+      "base_elink_id": 3,
+      "weak_topics": [
+        {
+          "topic": "cộng thời gian",
+          "wrong": 1,
+          "answered": 1
+        },
+        {
+          "topic": "nhân với lũy thừa của 10",
+          "wrong": 1,
+          "answered": 1
+        },
+        {
+          "topic": "rút gọn phân số",
+          "wrong": 1,
+          "answered": 1
+        },
+        {
+          "topic": "so sánh phân số",
+          "wrong": 1,
+          "answered": 1
+        },
+        {
+          "topic": "đổi phân số thập phân",
+          "wrong": 1,
+          "answered": 1
+        }
+      ],
+      "strong_topics": []
+    },
+    "details_count": 15,
+    "details_sample": [
+      {
+        "elink_id": 2,
+        "question_number": 1,
+        "render_type": "ARITHMETIC",
+        "question_text": "? > 4,7",
+        "options": [
+          {
+            "id": "a",
+            "text": "4,6"
+          },
+          {
+            "id": "b",
+            "text": "5,2"
+          },
+          {
+            "id": "c",
+            "text": "4,7"
+          },
+          {
+            "id": "d",
+            "text": "3,9"
+          }
+        ],
+        "question_topic": "So sánh số thập phân",
+        "question_grade": 0,
+        "right_option_ids": [
+          "b"
+        ],
+        "right_answer_text": "5,2",
+        "child_option_ids": [
+          "c"
+        ],
+        "child_answer_text": "4,7",
+        "is_correct": false,
+        "question_kind": "SINGLE_CHOICE"
+      },
+      {
+        "elink_id": 2,
+        "question_number": 2,
+        "render_type": "ARITHMETIC",
+        "question_text": "27,46 = 27 + 0,4 + ?",
+        "options": [
+          {
+            "id": "a",
+            "text": "0,06"
+          },
+          {
+            "id": "b",
+            "text": "0,6"
+          },
+          {
+            "id": "c",
+            "text": "0,04"
+          },
+          {
+            "id": "d",
+            "text": "0,006"
+          }
+        ],
+        "question_topic": "Hàng của chữ số thập phân",
+        "question_grade": 0,
+        "right_option_ids": [
+          "a"
+        ],
+        "right_answer_text": "0,06",
+        "child_option_ids": [
+          "a"
+        ],
+        "child_answer_text": "0,06",
+        "is_correct": true,
+        "question_kind": "SINGLE_CHOICE"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "path": "/exams/journey/progress",
+    "http": "status=200 262ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 2989,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:23:30.350859",
+      "to_dt": "2026-10-28 21:23:30.350859"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 1,
+      "average_score": 1.3,
+      "average_score_pct": 13,
+      "average_delta": null,
+      "highest_score": 1.3,
+      "highest_score_pct": 13,
+      "lowest_score": 1.3,
+      "trend": "INSUFFICIENT",
+      "highest_esess_id": 2
+    }
+  },
+  {
+    "id": 22,
+    "path": "/exams/journey/progress",
+    "http": "status=200 665ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3019,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:23:30.377230",
+      "to_dt": "2026-10-28 21:23:30.377230"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 1,
+      "average_score": 1.3,
+      "average_score_pct": 13,
+      "average_delta": null,
+      "highest_score": 1.3,
+      "highest_score_pct": 13,
+      "lowest_score": 1.3,
+      "trend": "INSUFFICIENT",
+      "highest_esess_id": 2
+    }
+  },
+  {
+    "id": 23,
+    "path": "/exams/journey/progress",
+    "http": "status=200 679ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3125,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2025-10-28 21:23:37.867350",
+      "to_dt": "2026-10-28 21:23:37.867350"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 1,
+      "average_score": 1.3,
+      "average_score_pct": 13,
+      "average_delta": null,
+      "highest_score": 1.3,
+      "highest_score_pct": 13,
+      "lowest_score": 1.3,
+      "trend": "INSUFFICIENT",
+      "highest_esess_id": 2
+    }
+  },
+  {
+    "id": 24,
+    "path": "/exams/sessions/list",
+    "http": "status=200 714ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3156,
+    "request": {
+      "profile_id": 4,
+      "exam_types": [
+        "ASSESSMENT"
+      ]
+    },
+    "response_keys": [
+      "cursor",
+      "exam_sessions",
+      "mstatus",
+      "status"
+    ],
+    "sessions": [
+      {
+        "esess_id": 2,
+        "exam_type": "ASSESSMENT",
+        "status": "COMPLETE",
+        "total_questions": 15,
+        "correct_number": 2,
+        "skipped_number": 5,
+        "score_percentage": 13,
+        "review": "Đã trả lời (2/15) câu đúng (13%).",
+        "esess_flag": null,
+        "title": "Toán Đánh Giá - Mẫu giáo",
+        "short_text": "Phân số, thời gian và hình học",
+        "grade": 0,
+        "level": 1,
+        "last_submitted_dt": "20261028142329.765695",
+        "ended_dt": "20261028142330.079922",
+        "create_dt": "20261028142256.570297"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "path": "/exams/journey/progress",
+    "http": "status=200 241ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3258,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:23:39.284951",
+      "to_dt": "2026-10-28 21:23:39.284951"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 1,
+      "average_score": 1.3,
+      "average_score_pct": 13,
+      "average_delta": null,
+      "highest_score": 1.3,
+      "highest_score_pct": 13,
+      "lowest_score": 1.3,
+      "trend": "INSUFFICIENT",
+      "highest_esess_id": 2
+    }
+  },
+  {
+    "id": 26,
+    "path": "/exams/sessions/list",
+    "http": "status=200 693ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3325,
+    "request": {
+      "profile_id": 4,
+      "exam_types": [
+        "ASSESSMENT"
+      ]
+    },
+    "response_keys": [
+      "cursor",
+      "exam_sessions",
+      "mstatus",
+      "status"
+    ],
+    "sessions": [
+      {
+        "esess_id": 2,
+        "exam_type": "ASSESSMENT",
+        "status": "COMPLETE",
+        "total_questions": 15,
+        "correct_number": 2,
+        "skipped_number": 5,
+        "score_percentage": 13,
+        "review": "Đã trả lời (2/15) câu đúng (13%).",
+        "esess_flag": null,
+        "title": "Toán Đánh Giá - Mẫu giáo",
+        "short_text": "Phân số, thời gian và hình học",
+        "grade": 0,
+        "level": 1,
+        "last_submitted_dt": "20261028142329.765695",
+        "ended_dt": "20261028142330.079922",
+        "create_dt": "20261028142256.570297"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "path": "/exams/generate",
+    "http": "status=200 9031ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3388,
+    "request": {
+      "profile_id": 4,
+      "num_questions": 10,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1
+    },
+    "response_keys": [
+      "exam",
+      "exam_session",
+      "mstatus",
+      "resumed",
+      "status"
+    ],
+    "exam": {
+      "elink_id": 4,
+      "exam_id": 4,
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "grade": 0,
+      "level": 1,
+      "title": "Toán Đánh Giá - Mẫu giáo",
+      "short_text": "Số thập phân, phân số và hình học",
+      "num_questions": 10,
+      "status": "IN_PROGRESS",
+      "started_dt": "20261028142400.261159",
+      "create_dt": "20261028142400.261160"
+    },
+    "exam_session": {
+      "esess_id": 3,
+      "exam_type": "ASSESSMENT",
+      "status": "ACTIVE",
+      "total_questions": 0,
+      "correct_number": 0,
+      "skipped_number": 0,
+      "esess_flag": null,
+      "grade": 0,
+      "level": 1,
+      "create_dt": "20261028142400.258028"
+    },
+    "questions_count": 10,
+    "kinds": {
+      "SINGLE_CHOICE": 10
+    },
+    "option_orders": [
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    ],
+    "question_sample": {
+      "question_number": 1,
+      "question_kind": "SINGLE_CHOICE",
+      "render_type": "ARITHMETIC",
+      "question_text": "? > 6,3",
+      "options": [
+        {
+          "id": "a",
+          "text": "6,1"
+        },
+        {
+          "id": "b",
+          "text": "6,3"
+        },
+        {
+          "id": "c",
+          "text": "6,8"
+        },
+        {
+          "id": "d",
+          "text": "5,9"
+        }
+      ],
+      "correct_answer": {
+        "option_ids": [
+          "c"
+        ]
+      },
+      "question_topic": "So sánh số thập phân",
+      "question_grade": 0
+    }
+  },
+  {
+    "id": 28,
+    "path": "/exams/journey/progress",
+    "http": "status=200 706ms",
+    "mstatus": 200,
+    "status": "Success",
+    "line": 3766,
+    "request": {
+      "profile_id": 4,
+      "exam_type": "ASSESSMENT",
+      "from_dt": "2026-10-21 21:24:11.825989",
+      "to_dt": "2026-10-28 21:24:11.825989"
+    },
+    "response_keys": [
+      "exam_type",
+      "from_dt",
+      "limit",
+      "mstatus",
+      "profile_id",
+      "series",
+      "status",
+      "summary",
+      "to_dt",
+      "tz"
+    ],
+    "summary": {
+      "count": 1,
+      "average_score": 1.3,
+      "average_score_pct": 13,
+      "average_delta": null,
+      "highest_score": 1.3,
+      "highest_score_pct": 13,
+      "lowest_score": 1.3,
+      "trend": "INSUFFICIENT",
+      "highest_esess_id": 2
+    }
+  }
+]

@@ -10,7 +10,7 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
-const _correct = ExamAnswer(label: 'A', content: '2');
+const _correct = ExamAnswer(id: 'A', text: '2');
 final _source = GeneratedExam(
   examId: 301,
   profileId: 7,
@@ -20,12 +20,13 @@ final _source = GeneratedExam(
     10,
     (index) => ExamQuestion(
       questionNumber: index + 1,
-      questionName: 'Q',
-      answers: const [
+      questionText: 'Q',
+      options: const [
         _correct,
-        ExamAnswer(label: 'B', content: '3'),
+        ExamAnswer(id: 'B', text: '3'),
       ],
-      rightAnswer: 'A',
+
+      correctOptionIds: ['A'],
     ),
   ),
 );
@@ -35,7 +36,11 @@ const _submitted = GeneratedExam(
   examType: examTypeAssessment,
   questions: [],
 );
-const _next = GeneratedExam(examId: 302, grade: 2, questions: []);
+final _next = GeneratedExam(
+  examId: 302,
+  grade: 2,
+  questions: _source.questions,
+);
 
 void main() {
   setUp(ExamCache.clear);
@@ -79,34 +84,31 @@ void main() {
     },
   );
 
-  test(
-    'generation retry reuses a successful submission without recording the set twice',
-    () async {
-      final service = _Service();
-      final controller = attempt(service);
-      final first = controller.advanceAssessmentFlow();
-      service.submissions[0].complete(_submitted);
-      await Future<void>.delayed(Duration.zero);
-      service.generations[0].completeError(StateError('network failed'));
-      await first;
-      expect(controller.completedSets, isEmpty);
-      expect(controller.questionNumberOffset, 0);
-      expect(controller.selectedAnswerLabels, hasLength(6));
-      expect(controller.errorRetryAction, ExamAttemptRetryAction.generate);
-      final retry = controller.retryGeneration();
-      final duplicate = controller.retryGeneration();
-      expect(await duplicate, isFalse);
-      await Future<void>.delayed(Duration.zero);
-      expect(service.events, ['submit', 'generate', 'generate']);
-      service.generations[1].complete(_next);
-      expect(await retry, isTrue);
-      expect(controller.completedSets, hasLength(1));
-      expect(controller.totalAnsweredQuestionCount, 6);
-      expect(controller.selectedAnswerLabels, isEmpty);
-      expect(controller.questionNumberOffset, 6);
-      expect(controller.setNumber, 2);
-    },
-  );
+  test('generation retry reuses a successful submission without recording the set twice', () async {
+    final service = _Service();
+    final controller = attempt(service);
+    final first = controller.advanceAssessmentFlow();
+    service.submissions[0].complete(_submitted);
+    await Future<void>.delayed(Duration.zero);
+    service.generations[0].completeError(StateError('network failed'));
+    await first;
+    expect(controller.completedSets, isEmpty);
+    expect(controller.questionNumberOffset, 0);
+    expect(controller.selectedAnswerLabels, hasLength(6));
+    expect(controller.errorRetryAction, ExamAttemptRetryAction.generate);
+    final retry = controller.retryGeneration();
+    final duplicate = controller.retryGeneration();
+    expect(await duplicate, isFalse);
+    await Future<void>.delayed(Duration.zero);
+    expect(service.events, ['submit', 'generate', 'generate']);
+    service.generations[1].complete(_next);
+    expect(await retry, isTrue);
+    expect(controller.completedSets, hasLength(1));
+    expect(controller.totalAnsweredQuestionCount, 6);
+    expect(controller.selectedAnswerLabels, isEmpty);
+    expect(controller.questionNumberOffset, 6);
+    expect(controller.setNumber, 2);
+  });
 
   test(
     'final submit failure retries submit and ignores duplicate taps',
@@ -139,40 +141,37 @@ void main() {
     },
   );
 
-  test(
-    'request layer shares concurrent submissions and reuses the successful result',
-    () async {
-      final service = _Service();
-      final requests = ExamAttemptRequests(
-        service: service,
-        examType: examTypeAssessment,
-      );
-      addTearDown(requests.dispose);
-      final a = requests.submit(
+  test('request layer shares concurrent submissions and reuses the successful result', () async {
+    final service = _Service();
+    final requests = ExamAttemptRequests(
+      service: service,
+      examType: examTypeAssessment,
+    );
+    addTearDown(requests.dispose);
+    final a = requests.submit(
+      _source,
+      const [],
+      kind: ExamAttemptKind.assessment,
+    );
+    final b = requests.submit(
+      _source,
+      const [],
+      kind: ExamAttemptKind.assessment,
+    );
+    expect(service.submissions, hasLength(1));
+    service.submissions[0].complete(_submitted);
+    expect((await a).exam, same(_submitted));
+    expect((await b).exam, same(_submitted));
+    expect(
+      (await requests.submit(
         _source,
         const [],
         kind: ExamAttemptKind.assessment,
-      );
-      final b = requests.submit(
-        _source,
-        const [],
-        kind: ExamAttemptKind.assessment,
-      );
-      expect(service.submissions, hasLength(1));
-      service.submissions[0].complete(_submitted);
-      expect((await a).exam, same(_submitted));
-      expect((await b).exam, same(_submitted));
-      expect(
-        (await requests.submit(
-          _source,
-          const [],
-          kind: ExamAttemptKind.assessment,
-        )).exam,
-        same(_submitted),
-      );
-      expect(service.submissions, hasLength(1));
-    },
-  );
+      )).exam,
+      same(_submitted),
+    );
+    expect(service.submissions, hasLength(1));
+  });
 
   for (final fail in [false, true]) {
     test(
@@ -231,9 +230,10 @@ void main() {
             questions: [
               ExamQuestion(
                 questionNumber: 1,
-                questionName: 'Q',
-                answers: [_correct],
-                rightAnswer: 'A',
+                questionText: 'Q',
+                options: [_correct],
+
+                correctOptionIds: ['A'],
               ),
             ],
           ),
@@ -278,9 +278,10 @@ void main() {
           questions: [
             ExamQuestion(
               questionNumber: 1,
-              questionName: 'Q',
-              answers: [_correct],
-              rightAnswer: 'A',
+              questionText: 'Q',
+              options: [_correct],
+
+              correctOptionIds: ['A'],
             ),
           ],
         ),

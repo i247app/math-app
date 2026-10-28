@@ -33,7 +33,7 @@ void main() {
             await lingo.setLanguage(language);
             Future<void> pump(
               String? shortText, {
-              String? aiTitle,
+              String? title,
               int? grade = 3,
               int? level = 4,
             }) async {
@@ -68,8 +68,8 @@ void main() {
                           onPrevious: () {},
                           onNext: () {},
                           onPractice: () {},
-                          aiTitle: aiTitle,
-                          aiShortText: shortText,
+                          title: title,
+                          shortText: shortText,
                         ),
                       ),
                     ),
@@ -136,7 +136,7 @@ void main() {
             expect(tester.getTopLeft(banner).dy, greaterThan(emptyBannerTop));
             expect(tester.takeException(), isNull);
             const titleText = 'Numbers and arithmetic within 100';
-            await pump('  $text  ', aiTitle: '  $titleText  ');
+            await pump('  $text  ', title: '  $titleText  ');
             expect(tester.widget<Text>(title).data, titleText);
             expect(tester.widget<Text>(description).data, text);
             expect(find.descendant(of: box, matching: title), findsOneWidget);
@@ -180,13 +180,13 @@ void main() {
               lessThan(tester.getTopLeft(banner).dy),
             );
             expect(tester.takeException(), isNull);
-            await pump(' \n ', aiTitle: titleText);
+            await pump(' \n ', title: titleText);
             expect(box, findsOneWidget);
             expect(title, findsOneWidget);
             expect(description, findsNothing);
             expect(tester.takeException(), isNull);
             for (final empty in [null, '', ' \n ']) {
-              await pump(empty, aiTitle: empty);
+              await pump(empty, title: empty);
               expect(box, findsOneWidget);
               expect(title, findsNothing);
               expect(description, findsNothing);
@@ -203,7 +203,7 @@ void main() {
             await pump(null, grade: null, level: null);
             expect(box, findsNothing);
             expect(gradeText, findsNothing);
-            await pump(text, aiTitle: titleText, grade: null, level: null);
+            await pump(text, title: titleText, grade: null, level: null);
             expect(box, findsOneWidget);
             expect(gradeText, findsNothing);
             expect(title, findsOneWidget);

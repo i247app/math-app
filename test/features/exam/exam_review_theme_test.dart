@@ -25,12 +25,13 @@ const _exam = GeneratedExam(
   questions: [
     ExamQuestion(
       questionNumber: 1,
-      questionName: '1 + 2 = ?',
-      correctAnswer: 'A',
-      answers: [
-        ExamAnswer(label: 'A', content: '3'),
-        ExamAnswer(label: 'B', content: '4'),
+      questionText: '1 + 2 = ?',
+      options: [
+        ExamAnswer(id: 'A', text: '3'),
+        ExamAnswer(id: 'B', text: '4'),
       ],
+
+      correctOptionIds: ['A'],
     ),
   ],
 );
@@ -71,7 +72,7 @@ void main() {
         Future<void> answer(String? selected) => tester.pumpWidget(
           app(
             ExamReviewAnswerTile(
-              answer: _exam.questions.single.answers.first,
+              answer: _exam.questions.single.options.first,
               selectedLabel: selected,
               correctLabel: 'B',
               showCorrectAnswer: true,
@@ -139,8 +140,8 @@ void main() {
                   onPrevious: () {},
                   onNext: () {},
                   onPractice: () {},
-                  aiTitle: 'Numbers and arithmetic',
-                  aiShortText: 'Practice adding and subtracting.',
+                  title: 'Numbers and arithmetic',
+                  shortText: 'Practice adding and subtracting.',
                   aiReviewShort: 'Review addition and comparing numbers.',
                 ),
               ),

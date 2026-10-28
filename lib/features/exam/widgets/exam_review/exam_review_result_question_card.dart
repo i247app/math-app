@@ -1,3 +1,4 @@
+import 'package:numi/features/exam/widgets/shared/exam_image.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/font_size.dart';
 
@@ -21,8 +22,7 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final correctLabel = examReviewCorrectAnswerLabel(question);
-    final isCorrect = selectedLabel != null && selectedLabel == correctLabel;
+    final isCorrect = examReviewIsCorrect(question, selectedLabel);
     final colors = context.themeColors;
     final accent = isCorrect ? colors.primaryAction : colors.error;
     final questionStyle = TextStyle(
@@ -76,9 +76,10 @@ class ExamReviewResultQuestionCard extends StatelessWidget {
                       ],
                     ),
                     if (question.isFraction)
-                      ExamMathText(question.questionName, style: questionStyle)
+                      ExamMathText(question.questionText, style: questionStyle)
                     else
-                      Text(question.questionName, style: questionStyle),
+                      Text(question.questionText, style: questionStyle),
+                    ExamImage(url: question.questionImageUrl),
                     ExamReviewAnswerList(
                       question: question,
                       selectedLabel: selectedLabel,

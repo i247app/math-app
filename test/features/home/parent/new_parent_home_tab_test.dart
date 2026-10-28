@@ -759,11 +759,11 @@ class _ExamService implements ExamService {
       examType: examTypeAssessment,
       questions: [
         ExamQuestion(
-          questionName: '1 + 1 = ?',
+          questionText: '1 + 1 = ?',
           questionNumber: 1,
-          answers: [
-            ExamAnswer(label: 'A', content: '2'),
-            ExamAnswer(label: 'B', content: '3'),
+          options: [
+            ExamAnswer(id: 'A', text: '2'),
+            ExamAnswer(id: 'B', text: '3'),
           ],
         ),
       ],
@@ -854,11 +854,11 @@ const _resumableExam = GeneratedExam(
   grade: 1,
   questions: [
     ExamQuestion(
-      questionName: 'Resume question',
+      questionText: 'Resume question',
       questionNumber: 1,
-      answers: [
-        ExamAnswer(label: 'A', content: '1'),
-        ExamAnswer(label: 'B', content: '2'),
+      options: [
+        ExamAnswer(id: 'A', text: '1'),
+        ExamAnswer(id: 'B', text: '2'),
       ],
     ),
   ],

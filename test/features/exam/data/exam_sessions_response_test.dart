@@ -8,13 +8,10 @@ import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 
 void main() {
   test('parses supplied complete and left active sessions', () {
-    final json =
-        jsonDecode(
-              File(
-                'test/fixtures/exam_sessions_list_with_active.json',
-              ).readAsStringSync(),
-            )
-            as Map<String, dynamic>;
+    final json = jsonDecode(
+      File('test/fixtures/exam_sessions_list_with_active.json')
+          .readAsStringSync(),
+    ) as Map<String, dynamic>;
     final response = ExamStatsResponseDto.fromJson(json);
     expect(response.examSessions, hasLength(2));
     expect(response.toJson(), contains('exam_sessions'));
@@ -33,7 +30,7 @@ void main() {
     expect(resumable.userAiExamId, 8);
     expect(resumable.examStatus, 'IN_PROGRESS');
     expect(resumable.questions, hasLength(10));
-    expect(resumable.aiShortText, 'Đếm, cộng trừ và quy luật số');
+    expect(resumable.shortText, 'Đếm, cộng trừ và quy luật số');
 
     final complete = response.examSessions.last.toModel();
     expect(complete.status, 'COMPLETE');
@@ -51,16 +48,16 @@ void main() {
       'correct_number': 0,
       'skipped_number': 0,
       'total_questions': 0,
-      'ai_title': 'Session title',
-      'ai_short_text': 'Session description',
+      'title': 'Session title',
+      'short_text': 'Session description',
     });
     final dto = GeneratedExamDto.fromJson({
       'elink_id': 8,
       'exam_id': 80,
       'status': 'IN_PROGRESS',
       'elink_status': 'SUBMITTED',
-      'ai_title': 'Exam title',
-      'ai_short_text': 'Exam description',
+      'title': 'Exam title',
+      'short_text': 'Exam description',
       'questions': <Map<String, dynamic>>[],
     });
     final exam = dto.toModel(stats: session);
@@ -76,15 +73,14 @@ void main() {
     expect(exam.userAiExamId, 8);
     expect(exam.examId, 8);
     expect(exam.aiExamId, 80);
-    expect(exam.aiTitle, 'Exam title');
-    expect(exam.aiShortText, 'Exam description');
-    expect(dto.toJson(), containsPair('ai_short_text', 'Exam description'));
+    expect(exam.title, 'Exam title');
+    expect(exam.shortText, 'Exam description');
+    expect(dto.toJson(), containsPair('short_text', 'Exam description'));
 
-    final fallback = const GeneratedExamDto(
-      questions: [],
-    ).toModel(stats: session);
-    expect(fallback.aiTitle, 'Session title');
-    expect(fallback.aiShortText, 'Session description');
+    final fallback = const GeneratedExamDto(questions: [])
+        .toModel(stats: session);
+    expect(fallback.title, 'Session title');
+    expect(fallback.shortText, 'Session description');
   });
 
   test('request DTOs serialize session and assigned-set IDs separately', () {

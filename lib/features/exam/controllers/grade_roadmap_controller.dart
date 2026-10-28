@@ -196,8 +196,8 @@ class GradeRoadmapController extends ChangeNotifier {
         submittedDt:
             submittedAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
         grading: exam.grading,
-        aiTitle: exam.aiTitle,
-        aiShortText: exam.aiShortText,
+        title: exam.title,
+        shortText: exam.shortText,
         aiReviewShort: exam.aiReviewShort,
         aiReviewLong: exam.aiReviewLong,
         questions: const <ExamQuestion>[],

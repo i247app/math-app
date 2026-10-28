@@ -1,3 +1,4 @@
+import 'package:numi/features/exam/data/exam_image_refresher.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:numi/core/localization/app_keys.dart';
@@ -41,6 +42,25 @@ class ExamAttemptController extends ChangeNotifier {
       profileId: profileId,
     );
     _questionIndex = _answers.restore(initialExam);
+    _imageRefresher = ExamImageRefresher(
+      load: (source) => examService.getExamDetail(
+        source.examId!,
+        profileId: profileId ?? source.profileId,
+        examType: source.examType ?? examType,
+      ),
+      isCurrent: (source) =>
+          !_disposed && _requests.isActive && identical(_exam, source),
+      apply: (fresh) {
+        _exam = fresh;
+        notifyListeners();
+      },
+    );
+    _imageRefresher.schedule(initialExam);
+    if (initialExam != null && initialExam.questions.isEmpty) {
+      _needsNewPaper = true;
+      _errorMessage = AppStrings.current(AppKeys.examPaperUnavailable);
+      _errorRetryAction = ExamAttemptRetryAction.generate;
+    }
   }
 
   final String examType;
@@ -51,6 +71,11 @@ class ExamAttemptController extends ChangeNotifier {
   final _answers = ExamAttemptAnswers();
   late final ExamAttemptFlow _flow;
   late final ExamAttemptRequests _requests;
+  late final ExamImageRefresher _imageRefresher;
+  int? _errorStatus;
+  bool get hasRecoverablePaperError => _needsNewPaper || _errorStatus == 13747;
+  bool _needsNewPaper = false;
+  bool get needsNewPaper => _needsNewPaper;
   GeneratedExam? _exam;
   int _questionIndex = 0;
   String? _errorMessage;
@@ -126,7 +151,16 @@ class ExamAttemptController extends ChangeNotifier {
       _answers.selectedLabel(_questionIndex, practice: _isPractice);
   bool? get selectedAnswerFeedbackCorrect =>
       _isPractice ? _answers.feedbackAt(_questionIndex) : null;
-  bool get canContinue => selectedAnswerLabel != null;
+  Set<String> get selectedOptionIds =>
+      _answers
+          .selected(_questionIndex, practice: _isPractice)
+          ?.optionIds
+          .toSet() ??
+      const {};
+  String get numericValue =>
+      _answers.selected(_questionIndex, practice: _isPractice)?.value ?? '';
+  bool get canContinue =>
+      _answers.selected(_questionIndex, practice: _isPractice)?.isValid == true;
   int? get firstUnansweredQuestionIndex =>
       _answers.firstUnansweredIndex(_exam?.questions ?? const []);
   bool get allQuestionsAnswered =>
@@ -213,6 +247,9 @@ class ExamAttemptController extends ChangeNotifier {
     _requests.reset();
     _answers.clear();
     _exam = null;
+    _needsNewPaper = false;
+    _errorStatus = null;
+    _imageRefresher.schedule(null);
     _questionIndex = 0;
     _errorMessage = null;
     _errorRetryAction = null;
@@ -230,9 +267,12 @@ class ExamAttemptController extends ChangeNotifier {
     _isGeneratingExam = false;
     if (generated == null) {
       _errorMessage = result.errorMessage;
+      _errorStatus = result.errorStatus;
+      _needsNewPaper = result.errorStatus == 13713;
       _errorRetryAction = ExamAttemptRetryAction.generate;
     } else {
       _exam = generated;
+      _imageRefresher.schedule(generated);
       _questionIndex = _answers.restore(generated);
       _flow.restoreGenerated(generated, _kind);
     }
@@ -241,6 +281,7 @@ class ExamAttemptController extends ChangeNotifier {
   }
 
   Future<bool> retryGeneration() {
+    if (_needsNewPaper) return generateExam();
     final decision = _flow.pendingDecision;
     return decision == null ? generateExam() : _transitionToNextSet(decision);
   }
@@ -255,6 +296,20 @@ class ExamAttemptController extends ChangeNotifier {
     )) {
       return;
     }
+    _flow.selectionChanged();
+    notifyListeners();
+  }
+
+  void setNumericValue(String value) {
+    if (_disposed || _isTransitioningSet || _isSubmittingExam) return;
+    final question = currentQuestion;
+    if (question == null || !question.isNumericInput) return;
+    _answers.setNumericValue(
+      _questionIndex,
+      question,
+      value,
+      practice: _isPractice,
+    );
     _flow.selectionChanged();
     notifyListeners();
   }
@@ -275,6 +330,7 @@ class ExamAttemptController extends ChangeNotifier {
         !canContinue) {
       return AssessmentFlowAction.continueSet;
     }
+    _answers.commitPractice(_questionIndex);
     return _prepareSubmit();
   }
 
@@ -404,7 +460,11 @@ class ExamAttemptController extends ChangeNotifier {
     _isSubmittingExam = false;
     if (result.exam == null) {
       _errorMessage = result.errorMessage;
-      _errorRetryAction = ExamAttemptRetryAction.submit;
+      _errorStatus = result.errorStatus;
+      _needsNewPaper = result.errorStatus == 13713;
+      _errorRetryAction = _needsNewPaper
+          ? ExamAttemptRetryAction.generate
+          : ExamAttemptRetryAction.submit;
     }
     notifyListeners();
     return result.exam == null
@@ -447,10 +507,13 @@ class ExamAttemptController extends ChangeNotifier {
     _isTransitioningSet = false;
     if (result.exam == null) {
       _errorMessage = result.errorMessage;
+      _errorStatus = result.errorStatus;
+      _needsNewPaper = result.errorStatus == 13713;
       _errorRetryAction = ExamAttemptRetryAction.generate;
     } else {
       _flow.commitTransition(source, _answers, decision);
       _exam = result.exam;
+      _imageRefresher.schedule(_exam);
       _questionIndex = 0;
       _answers.clear();
     }
@@ -462,6 +525,7 @@ class ExamAttemptController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _operationRevision++;
+    _imageRefresher.dispose();
     _requests.dispose();
     super.dispose();
   }

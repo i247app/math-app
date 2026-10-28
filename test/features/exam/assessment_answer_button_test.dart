@@ -41,7 +41,7 @@ void main() {
           body: SizedBox(
             width: 320,
             child: AssessmentAnswerButton(
-              answer: ExamAnswer(label: 'A', content: source),
+              answer: ExamAnswer(id: 'A', text: source),
               selected: false,
               onTap: _doNothing,
             ),

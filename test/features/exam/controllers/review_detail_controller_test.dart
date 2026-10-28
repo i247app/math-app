@@ -10,17 +10,18 @@ void main() {
     const detail = GeneratedExam(
       id: examId,
       answers: <SubmitExamAnswer>[
-        SubmitExamAnswer(questionNumber: 1, label: 'B'),
+        SubmitExamAnswer(questionNumber: 1, optionIds: ['B']),
       ],
       questions: <ExamQuestion>[
         ExamQuestion(
-          questionName: '1 + 1 = ?',
+          questionText: '1 + 1 = ?',
           questionNumber: 1,
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '1'),
-            ExamAnswer(label: 'B', content: '2'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '1'),
+            ExamAnswer(id: 'B', text: '2'),
           ],
-          correctAnswer: 'B',
+
+          correctOptionIds: ['B'],
         ),
       ],
     );
@@ -52,18 +53,18 @@ void main() {
     const firstDetail = GeneratedExam(
       questions: <ExamQuestion>[
         ExamQuestion(
-          questionName: 'Profile one question',
+          questionText: 'Profile one question',
           questionNumber: 1,
-          answers: <ExamAnswer>[],
+          options: <ExamAnswer>[],
         ),
       ],
     );
     const secondDetail = GeneratedExam(
       questions: <ExamQuestion>[
         ExamQuestion(
-          questionName: 'Profile two question',
+          questionText: 'Profile two question',
           questionNumber: 1,
-          answers: <ExamAnswer>[],
+          options: <ExamAnswer>[],
         ),
       ],
     );

@@ -5,7 +5,6 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_api_models.dart';
 import 'package:numi/features/exam/data/exam_conversion.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
-import 'package:numi/features/exam/helpers/assessment_exit_placeholder.dart';
 import 'package:numi/features/exam/helpers/grade_exam_level.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
@@ -62,7 +61,10 @@ class ExamApi implements ExamService {
 
     final exam = response.exam;
     if (exam == null || exam.questions.isEmpty) {
-      throw ExamException(AppStrings.current(AppKeys.examHasNoQuestions));
+      throw ExamException(
+        AppStrings.current(AppKeys.examPaperUnavailable),
+        status: 13713,
+      );
     }
 
     final answeredQuestionCount = normalizedExamType == examTypeAssessment
@@ -132,29 +134,6 @@ class ExamApi implements ExamService {
   }
 
   @override
-  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) async {
-    final response = await _listExams(userId: userId, profileId: profileId);
-    return response.exams.map((exam) => exam.toModel()).toList();
-  }
-
-  @override
-  Future<ExamListResponse> listExamPage({
-    int? userId,
-    int? profileId,
-    required int page,
-    required int size,
-    bool takeAll = false,
-  }) {
-    return _listExams(
-      userId: userId,
-      profileId: profileId,
-      page: page,
-      size: size,
-      takeAll: takeAll,
-    ).then((response) => response.toModel());
-  }
-
-  @override
   Future<ExamProgressResponse> getExamProgress({
     required int profileId,
     required DateTime fromDt,
@@ -182,31 +161,6 @@ class ExamApi implements ExamService {
         ExamProgressResponseDto.fromJson,
       ).then((response) => response.toModel()),
     );
-  }
-
-  Future<ExamListResponseDto> _listExams({
-    int? userId,
-    int? profileId,
-    int? page,
-    int? size,
-    bool? takeAll,
-  }) async {
-    final validProfileId = _requireProfileId(profileId);
-
-    final ExamListResponseDto response;
-    response = await _runExamRequest(
-      () => _listExamResponse(
-        ExamListRequest(
-          profileId: validProfileId,
-          page: page,
-          size: size,
-          takeAll: takeAll,
-          examType: examTypeAssessment,
-        ),
-      ),
-    );
-
-    return response;
   }
 
   @override
@@ -283,14 +237,7 @@ class ExamApi implements ExamService {
     }
 
     final submittedAnswers = <SubmitExamAnswerDto>[
-      for (var index = 0; index < response.details.length; index++)
-        if (response.details[index].selectedLabel?.trim().isNotEmpty == true)
-          SubmitExamAnswerDto(
-            questionNumber: isEntireJourney
-                ? index + 1
-                : response.details[index].questionNumber,
-            label: response.details[index].selectedLabel!.trim(),
-          ),
+      for (final detail in response.details) ?detail.toSubmittedAnswer(),
     ];
     return exam.toModel(
       submittedAnswers: submittedAnswers,
@@ -389,14 +336,6 @@ class ExamApi implements ExamService {
     );
   }
 
-  Future<ExamListResponseDto> _listExamResponse(ExamListRequest request) {
-    return _postResponse(
-      '/exams/list',
-      request.toJson(),
-      ExamListResponseDto.fromJson,
-    );
-  }
-
   Future<ExamDetailResponseDto> _getExamDetailResponse({
     int? userAiExamId,
     int? userExamId,
@@ -469,11 +408,11 @@ GeneratedExam _journeyDetailToModel(
   ];
   final submittedAnswers = <SubmitExamAnswer>[
     for (var index = 0; index < response.details.length; index++)
-      if (response.details[index].selectedLabel?.trim().isNotEmpty == true)
-        SubmitExamAnswer(
-          questionNumber: index + 1,
-          label: response.details[index].selectedLabel!.trim(),
-        ),
+      if (response.details[index].toSubmittedAnswer(
+            questionNumberOverride: index + 1,
+          )
+          case final answer?)
+        answer.toModel(),
   ];
 
   return GeneratedExam(
@@ -484,8 +423,6 @@ GeneratedExam _journeyDetailToModel(
     grade: stats.grade ?? lastExam?.grade,
     lastSetGrade: lastExam?.grade ?? stats.grade,
     lastSetShortText: lastExam?.shortText,
-    aiTitle: stats.aiTitle,
-    aiShortText: stats.aiShortText,
     aiReviewShort: stats.aiReviewShort,
     aiReviewLong: stats.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
@@ -494,8 +431,8 @@ GeneratedExam _journeyDetailToModel(
       stats.examType ?? lastExam?.examType,
     ),
     numQuestions: stats.totalQuestions,
-    title: lastExam?.title,
-    shortText: lastExam?.shortText,
+    title: stats.title ?? lastExam?.title,
+    shortText: stats.shortText ?? lastExam?.shortText,
     review: stats.review,
     createDt: firstExam?.createDt ?? firstExam?.startedDt,
     modifyDt: stats.lastSubmittedDt?.toIso8601String() ?? lastExam?.submittedDt,
@@ -510,6 +447,7 @@ GeneratedExam _journeyDetailToModel(
       totalQuestions: stats.totalQuestions,
     ),
     answers: submittedAnswers,
+    imageUrlsFetchedAt: DateTime.now(),
     questions: questions,
   );
 }
@@ -531,28 +469,13 @@ GeneratedExam _activeJourneySetToModel({
             (detail.elinkId == null && response.exams.length == 1);
       })
       .toList(growable: false);
-  final hasOnlyExitPlaceholder = isAssessmentExitPlaceholderAnswer(
-    answerCount: activeDetails.length,
-    questionNumber: activeDetails.firstOrNull?.questionNumber,
-    answerLabel: activeDetails.firstOrNull?.selectedLabel,
-  );
   final submittedAnswers = <SubmitExamAnswerDto>[
-    for (final detail
-        in hasOnlyExitPlaceholder
-            ? const <ExamDetailAnswerDto>[]
-            : activeDetails)
-      if (detail.selectedLabel?.trim().isNotEmpty == true)
-        SubmitExamAnswerDto(
-          questionNumber: detail.questionNumber,
-          label: detail.selectedLabel!.trim(),
-        ),
+    for (final detail in activeDetails) ?detail.toSubmittedAnswer(),
   ];
-  final resumeQuestionIndex = hasOnlyExitPlaceholder
-      ? 0
-      : _activeResumeQuestionIndex(
-          details: activeDetails,
-          questions: activeExam.questions,
-        );
+  final resumeQuestionIndex = _activeResumeQuestionIndex(
+    details: activeDetails,
+    questions: activeExam.questions,
+  );
 
   if (activeExam.questions.length >= expectedQuestionCount) {
     return activeExam.toModel(
@@ -580,8 +503,6 @@ GeneratedExam _activeJourneySetToModel({
     grade: activeExam.grade,
     lastSetGrade: activeExam.grade,
     lastSetShortText: activeExam.shortText,
-    aiTitle: response.examSession?.aiTitle,
-    aiShortText: response.examSession?.aiShortText,
     aiReviewShort: response.examSession?.aiReviewShort,
     aiReviewLong: response.examSession?.aiReviewLong,
     practiceWeakTopics: _practiceWeakTopics(response),
@@ -590,24 +511,20 @@ GeneratedExam _activeJourneySetToModel({
       activeExam.examType ?? response.examSession?.examType,
     ),
     numQuestions: activeDetails.length,
-    title: activeExam.title,
-    shortText: activeExam.shortText,
+    title: activeExam.title ?? response.examSession?.title,
+    shortText: activeExam.shortText ?? response.examSession?.shortText,
     review: response.examSession?.review,
     createDt: activeExam.createDt,
     startedDt: activeExam.startedDt,
     answers: submittedAnswers
-        .map(
-          (answer) => SubmitExamAnswer(
-            questionNumber: answer.questionNumber,
-            label: answer.label,
-          ),
-        )
+        .map((answer) => answer.toModel())
         .toList(growable: false),
     resumeQuestionIndex: _activeResumeQuestionIndex(
       details: activeDetails,
       questions: const <ExamQuestionDto>[],
       questionCount: activeDetails.length,
     ),
+    imageUrlsFetchedAt: DateTime.now(),
     questions: activeDetails
         .map(
           (detail) =>
@@ -709,7 +626,12 @@ Future<T> _runExamRequest<T>(Future<T> Function() request) async {
   try {
     return await request();
   } on NetworkException catch (error) {
-    throw ExamException(error.message, status: error.status);
+    final message = switch (error.status) {
+      13747 => AppStrings.current(AppKeys.examBankInsufficient),
+      13713 => AppStrings.current(AppKeys.examPaperUnavailable),
+      _ => error.message,
+    };
+    throw ExamException(message, status: error.status);
   }
 }
 

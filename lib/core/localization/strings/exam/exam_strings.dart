@@ -2,6 +2,17 @@ import '../../app_keys.dart';
 
 const examStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.examNumericAnswer: 'Nhập đáp án',
+    AppKeys.examNumericHint: 'Ví dụ: 5; 0,5; 1/2',
+    AppKeys.examNumericInvalid:
+        'Nhập số nguyên, số thập phân hoặc phân số hợp lệ.',
+    AppKeys.examChooseMultiple: 'Chọn tất cả đáp án đúng',
+    AppKeys.examBankInsufficient:
+        'Chưa đủ câu hỏi để tạo bài. Vui lòng thử lại sau.',
+    AppKeys.examStartNewPaper: 'Bắt đầu bài mới',
+    AppKeys.examPaperUnavailable:
+        'Bài này không còn sử dụng được. Hãy bắt đầu bài mới nhé.',
+    AppKeys.examYourAnswer: 'Đáp án của bạn: {answer}',
     AppKeys.assessmentGenerationFailed: 'Tạo bài đánh giá thất bại.',
     AppKeys.noGrades: 'Chưa có lớp học nào để hiển thị.',
     AppKeys.completedResultTitle: 'Hoàn Thành',
@@ -81,14 +92,22 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examReviewPracticeBannerAction: 'LUYỆN TẬP',
     AppKeys.scoreUpper: 'ĐIỂM SỐ',
     AppKeys.numiAiReview: 'Numi AI nhận xét',
-    AppKeys.defaultAiReview:
-        'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần thôi.',
+    AppKeys.defaultAiReview: 'Bé làm rất tốt phần phép cộng, hãy tiếp tục phát huy nhé! Chúng ta chỉ cần thôi.',
     AppKeys.defaultAiReviewHighlight: 'phép cộng',
     AppKeys.assessmentUpper: 'Đánh Giá',
     AppKeys.practiceUpper: 'Luyện Tập',
     AppKeys.examHasNoQuestions: 'Exam không có câu hỏi.',
   },
   'en': {
+    AppKeys.examNumericAnswer: 'Enter your answer',
+    AppKeys.examNumericHint: 'For example: 5; 0.5; 1/2',
+    AppKeys.examNumericInvalid: 'Enter a valid integer, decimal or fraction.',
+    AppKeys.examChooseMultiple: 'Select all correct answers',
+    AppKeys.examBankInsufficient: 'There are not enough questions to create this paper. Please try again later.',
+    AppKeys.examStartNewPaper: 'Start a new paper',
+    AppKeys.examPaperUnavailable:
+        'This paper is no longer available. Please start a new one.',
+    AppKeys.examYourAnswer: 'Your answer: {answer}',
     AppKeys.assessmentGenerationFailed: 'Failed to create the assessment.',
     AppKeys.noGrades: 'No grades to show.',
     AppKeys.completedResultTitle: 'Completed',
@@ -170,8 +189,7 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examReviewPracticeBannerAction: 'PRACTICE',
     AppKeys.scoreUpper: 'SCORE',
     AppKeys.numiAiReview: 'Numi AI review',
-    AppKeys.defaultAiReview:
-        'Your child did very well with addition. Keep going, and practice subtraction with regrouping a little more.',
+    AppKeys.defaultAiReview: 'Your child did very well with addition. Keep going, and practice subtraction with regrouping a little more.',
     AppKeys.defaultAiReviewHighlight: 'addition',
     AppKeys.assessmentUpper: 'Review',
     AppKeys.practiceUpper: 'Practice',

@@ -1,3 +1,4 @@
+import 'package:numi/features/exam/widgets/shared/exam_image.dart';
 import 'package:flutter/material.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 
@@ -15,9 +16,11 @@ class ExamReviewAnswerTile extends StatelessWidget {
     required this.showCorrectAnswer,
     this.onTap,
     this.renderLatex = false,
+    this.displayLabel,
   });
 
   final ExamAnswer answer;
+  final String? displayLabel;
   final String? selectedLabel;
   final String? correctLabel;
   final bool showCorrectAnswer;
@@ -27,7 +30,8 @@ class ExamReviewAnswerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final label = answer.label.trim().toUpperCase();
+    final label = answer.id;
+    final letter = displayLabel ?? label;
     final isSelected = selectedLabel == label;
     final isCorrect = correctLabel == label;
     final hasSelection = selectedLabel != null;
@@ -68,40 +72,50 @@ class ExamReviewAnswerTile extends StatelessWidget {
           child: Row(
             spacing: 14,
             children: [
-              Container(
-                key: ValueKey('exam-review-answer-circle-$label'),
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: isWrongSelected
-                      ? colors.error
-                      : isHighlightedCorrect
-                      ? colors.primaryAction
-                      : colors.elevatedSurface,
-                  shape: BoxShape.circle,
-                  border: Border.all(
+              if (letter.isNotEmpty)
+                Container(
+                  key: ValueKey('exam-review-answer-circle-$letter'),
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isWrongSelected
+                        ? colors.error
+                        : isHighlightedCorrect
+                        ? colors.primaryAction
+                        : colors.elevatedSurface,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isWrongSelected || isHighlightedCorrect
+                          ? Colors.transparent
+                          : colors.borderStrong,
+                    ),
+                  ),
+                  child: ExamReviewCenteredText(
+                    letter,
                     color: isWrongSelected || isHighlightedCorrect
-                        ? Colors.transparent
-                        : colors.borderStrong,
+                        ? (isWrongSelected
+                              ? colors.onError
+                              : colors.onPrimaryAction)
+                        : colors.textPrimary,
+                    fontSize: FontSize.xs,
+                    fontWeight: FontWeight.w900,
+                    verticalOffset: 1.2,
                   ),
                 ),
-                child: ExamReviewCenteredText(
-                  label,
-                  color: isWrongSelected || isHighlightedCorrect
-                      ? (isWrongSelected
-                            ? colors.onError
-                            : colors.onPrimaryAction)
-                      : colors.textPrimary,
-                  fontSize: FontSize.xs,
-                  fontWeight: FontWeight.w900,
-                  verticalOffset: 1.2,
-                ),
-              ),
               Expanded(
-                child: renderLatex
-                    ? ExamMathText(answer.content, style: answerStyle)
+                child: answer.imageUrl != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ExamImage(url: answer.imageUrl),
+                          if (answer.text.isNotEmpty)
+                            ExamMathText(answer.text, style: answerStyle),
+                        ],
+                      )
+                    : renderLatex
+                    ? ExamMathText(answer.text, style: answerStyle)
                     : Text(
-                        answer.content,
+                        answer.text,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: answerStyle,

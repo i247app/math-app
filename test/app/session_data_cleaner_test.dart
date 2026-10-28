@@ -13,7 +13,6 @@ import 'package:numi/features/classroom_exercise/data/teacher_classroom_exercise
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_history_classroom_exercise_cache.dart';
-import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/data/parent_home_snapshot.dart';
@@ -34,7 +33,7 @@ import 'package:numi/features/settings/data/settings_profile_form_service.dart';
 
 const _cleaner = AppSessionDataCleaner();
 const _examQuestions = [
-  ExamQuestion(questionName: '1 + 1', questionNumber: 1, answers: []),
+  ExamQuestion(questionText: '1 + 1', questionNumber: 1, options: []),
 ];
 const _exerciseQuestions = [ClassroomExerciseQuestion(questionNumber: 1)];
 
@@ -97,12 +96,12 @@ void main() {
         _expectEmpty();
         // The old request's completion must not detach the new pending entry.
         expect(
-          ExamCache.loadList(
-            service: _Exams(Completer()),
-            userId: 7,
-            profileId: 7,
+          ExamCache.loadDetail(
+            loadDetail: (_) => throw StateError('duplicate detail request'),
+            cacheKey: 42,
+            serviceExamId: 42,
           ),
-          same(newRequests.examListRequest),
+          same(newRequests.examDetailRequest),
         );
       }
       newRequests.complete('new');
@@ -165,9 +164,7 @@ void main() {
 }
 
 void _expectEmpty() {
-  expect(ExamCache.peekList(userId: 7, profileId: 7), isNull);
   expect(ExamCache.peekDetail(42), isNull);
-  expect(ExamCache.isListFresh(userId: 7, profileId: 7), isFalse);
   expect(ExamCache.isDetailFresh(42), isFalse);
   expect(
     StudentClassroomExerciseCache.peekList(classroomId: 9, profileId: 7),
@@ -201,9 +198,7 @@ void _expectEmpty() {
 }
 
 void _expectCached(String title) {
-  expect(ExamCache.peekList(userId: 7, profileId: 7)!.single.title, title);
   expect(ExamCache.peekDetail(42)!.title, title);
-  expect(ExamCache.isListFresh(userId: 7, profileId: 7), isTrue);
   expect(ExamCache.isDetailFresh(42), isTrue);
   expect(
     StudentClassroomExerciseCache.peekList(
@@ -235,9 +230,9 @@ void _expectCached(String title) {
     title,
   );
   expect(
-    ExamHistoryClassroomExerciseCache.peekSubmittedClassroomExercise(
-      7,
-    )!.single.title,
+    ExamHistoryClassroomExerciseCache.peekSubmittedClassroomExercise(7)!
+        .single
+        .title,
     title,
   );
   expect(ExamHistoryClassroomExerciseCache.isFresh(7), isTrue);
@@ -258,31 +253,25 @@ void _expectCached(String title) {
 }
 
 class _Requests {
-  final examList = Completer<List<GeneratedExam>>();
   final examDetail = Completer<GeneratedExam>();
   final exerciseList = Completer<List<ClassroomExercise>>();
   final exerciseDetail = Completer<ClassroomExercise?>();
   final schools = Completer<List<SchoolModel>>();
   final notifications = Completer<List<NotificationModel>>();
-  late Future<List<GeneratedExam>> examListRequest;
+  late Future<GeneratedExam> examDetailRequest;
 
   Future<void> load() async {
     final exercises = _Exercises(exerciseList, exerciseDetail);
     final schoolService = _Schools(schools);
     final grades = _Grades();
     final profiles = _Profiles();
-    examListRequest = ExamCache.loadList(
-      service: _Exams(examList),
-      userId: 7,
-      profileId: 7,
+    examDetailRequest = ExamCache.loadDetail(
+      loadDetail: (_) => examDetail.future,
+      cacheKey: 42,
+      serviceExamId: 42,
     );
     await Future.wait<Object?>([
-      examListRequest,
-      ExamCache.loadDetail(
-        loadDetail: (_) => examDetail.future,
-        cacheKey: 42,
-        serviceExamId: 42,
-      ),
+      examDetailRequest,
       StudentClassroomExerciseCache.loadList(
         service: exercises,
         classroomId: 9,
@@ -341,23 +330,12 @@ class _Requests {
       title: title,
       questions: _exerciseQuestions,
     );
-    examList.complete([exam]);
     examDetail.complete(exam);
     exerciseList.complete([exercise]);
     exerciseDetail.complete(exercise);
     schools.complete([SchoolModel(schoolId: title == 'old' ? 1 : 2)]);
     notifications.complete([NotificationModel(title: title)]);
   }
-}
-
-class _Exams implements ExamService {
-  _Exams(this.result);
-  final Completer<List<GeneratedExam>> result;
-  @override
-  Future<List<GeneratedExam>> listExams({int? userId, int? profileId}) =>
-      result.future;
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _Exercises implements ClassroomExerciseService {

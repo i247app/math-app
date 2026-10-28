@@ -24,9 +24,8 @@ void main() {
         level: apiLevel,
         questions: const [],
       ).toModel();
-      final fromSession = const GeneratedExamDto(
-        questions: [],
-      ).toModel(stats: session);
+      final fromSession = const GeneratedExamDto(questions: [])
+          .toModel(stats: session);
       final stats = session.toModel();
       final levels = GradeLevels.fromJson({
         'latest_level': apiLevel,
@@ -59,33 +58,33 @@ void main() {
     'generate and detail preserve the question type for fraction rendering',
     () {
       final generated = ExamQuestionDto.fromJson(<String, dynamic>{
-        'question_name': r'Tinh \frac{1}{3}',
+        'question_text': r'Tinh \frac{1}{3}',
         'question_number': 1,
-        'question_type': 'FRACTION',
-        'answers': <Map<String, dynamic>>[
-          <String, dynamic>{'label': 'A', 'content': r'\frac{1}{3}'},
+        'render_type': 'FRACTION',
+        'options': <Map<String, dynamic>>[
+          <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
         ],
       }).toModel();
       final detail = ExamDetailAnswerDto.fromJson(<String, dynamic>{
-        'question_name': r'Tinh \frac{1}{3}',
+        'question_text': r'Tinh \frac{1}{3}',
         'question_number': 1,
-        'question_type': 'FRACTION',
-        'answers': <Map<String, dynamic>>[
-          <String, dynamic>{'label': 'A', 'content': r'\frac{1}{3}'},
+        'render_type': 'FRACTION',
+        'options': <Map<String, dynamic>>[
+          <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
         ],
       }).toQuestionModel(questionNumber: 1);
 
       for (final question in [generated, detail]) {
-        expect(question.questionType, 'FRACTION');
+        expect(question.renderType, 'FRACTION');
         expect(question.isFraction, isTrue);
-        expect(question.answers.single.content, r'\frac{1}{3}');
+        expect(question.options.single.text, r'\frac{1}{3}');
       }
       expect(
         const ExamQuestionDto(
-          questionName: '1 + 1',
+          questionText: '1 + 1',
           questionNumber: 1,
-          answers: [],
-          questionType: 'COUNT',
+          options: [],
+          renderType: 'COUNT',
         ).toModel().isFraction,
         isFalse,
       );
@@ -95,39 +94,35 @@ void main() {
   test('detail keeps negative option content when summary fields disagree', () {
     const detail = ExamDetailAnswerDto(
       questionNumber: 1,
-      answers: <ExamAnswerDto>[
-        ExamAnswerDto(label: 'A', content: '-5'),
-        ExamAnswerDto(label: 'B', content: '-3'),
+      options: <ExamAnswerDto>[
+        ExamAnswerDto(id: 'A', text: '-5'),
+        ExamAnswerDto(id: 'B', text: '-3'),
       ],
-      rightAnswerLabel: 'A',
-      rightAnswerContent: '5',
-      selectedLabel: 'B',
-      selectedContent: '3',
+      rightOptionIds: ['A'],
+      rightAnswerText: '5',
+      childOptionIds: ['B'],
+      childAnswerText: '3',
     );
 
     final question = detail.toQuestionModel(questionNumber: 1);
 
-    expect(question.answers.map((answer) => answer.content), <String>[
-      '-5',
-      '-3',
-    ]);
+    expect(question.options.map((answer) => answer.text), <String>['-5', '-3']);
   });
 
-  test('detail uses summary content for missing or empty options', () {
+  test('detail preserves empty options and separate answer summaries', () {
     const detail = ExamDetailAnswerDto(
       questionNumber: 1,
-      answers: <ExamAnswerDto>[ExamAnswerDto(label: 'A', content: '')],
-      rightAnswerLabel: 'A',
-      rightAnswerContent: '-5',
-      selectedLabel: 'B',
-      selectedContent: '-3',
+      options: <ExamAnswerDto>[ExamAnswerDto(id: 'A', text: '')],
+      rightOptionIds: ['A'],
+      rightAnswerText: '-5',
+      childOptionIds: ['B'],
+      childAnswerText: '-3',
     );
 
     final question = detail.toQuestionModel(questionNumber: 1);
 
-    expect(question.answers.map((answer) => answer.content), <String>[
-      '-5',
-      '-3',
-    ]);
+    expect(question.options.map((answer) => answer.text), <String>['']);
+    expect(question.reviewCorrectText, '-5');
+    expect(question.reviewChildText, '-3');
   });
 }

@@ -32,8 +32,6 @@ import 'package:numi/features/exam/data/exam_shake_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/ai_shake_service.dart';
 import 'package:numi/features/exam/data/exam_api.dart';
-import 'package:numi/features/exam/data/exam_snapshot_store.dart';
-import 'package:numi/features/exam/data/cached_exam_snapshot_store.dart';
 import 'package:numi/features/session/data/passcode_service.dart';
 import 'package:numi/features/session/data/profile_session_resolver.dart';
 
@@ -55,7 +53,6 @@ class AppServices {
     NotificationListService? notificationService,
     HomeLayoutService? homeLayoutService,
     ExamShakeService? examShakeService,
-    ExamSnapshotStore examSnapshotStore = const CachedExamSnapshotStore(),
     SessionDataCleaner sessionDataCleaner = const AppSessionDataCleaner(),
     ClassroomExerciseNavigator classroomExerciseNavigator =
         const AppClassroomExerciseNavigator(),
@@ -91,7 +88,6 @@ class AppServices {
           homeLayoutService ?? HomeLayoutApi(networkClient: client),
       examShakeService:
           examShakeService ?? AIShakeService(networkClient: client),
-      examSnapshotStore: examSnapshotStore,
       dashboardTabFactory:
           dashboardTabFactory ?? const AppDashboardTabFactory(),
       dashboardNavigator: dashboardNavigator,
@@ -120,7 +116,6 @@ class AppServices {
     required this.notificationService,
     required this.homeLayoutService,
     required this.examShakeService,
-    required this.examSnapshotStore,
     required this.sessionDataCleaner,
     required this.dashboardTabFactory,
     required this.dashboardNavigator,
@@ -143,7 +138,6 @@ class AppServices {
   final NotificationListService notificationService;
   final HomeLayoutService homeLayoutService;
   final ExamShakeService examShakeService;
-  final ExamSnapshotStore examSnapshotStore;
   final SessionDataCleaner sessionDataCleaner;
   final DashboardTabFactory dashboardTabFactory;
   final DashboardNavigator dashboardNavigator;

@@ -9,11 +9,18 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/exam_attempt_state.dart';
 
 class ExamAttemptRequestResult {
-  const ExamAttemptRequestResult.success(this.exam) : errorMessage = null;
-  const ExamAttemptRequestResult.failure(this.errorMessage) : exam = null;
-  const ExamAttemptRequestResult.ignored() : exam = null, errorMessage = null;
+  const ExamAttemptRequestResult.success(this.exam)
+    : errorMessage = null,
+      errorStatus = null;
+  const ExamAttemptRequestResult.failure(this.errorMessage, {this.errorStatus})
+    : exam = null;
+  const ExamAttemptRequestResult.ignored()
+    : exam = null,
+      errorMessage = null,
+      errorStatus = null;
   final GeneratedExam? exam;
   final String? errorMessage;
+  final int? errorStatus;
 }
 
 /// Owns the attempt's API work, successful submission reuse and cache writes.
@@ -65,11 +72,20 @@ class ExamAttemptRequests {
         level: level,
       );
       if (!_current(revision)) return const ExamAttemptRequestResult.ignored();
+      if (exam.questions.isEmpty) {
+        return ExamAttemptRequestResult.failure(
+          AppStrings.current(AppKeys.examPaperUnavailable),
+          errorStatus: 13713,
+        );
+      }
       ExamCache.seedDetail(exam);
       return ExamAttemptRequestResult.success(exam);
     } on ExamException catch (error) {
       return _current(revision)
-          ? ExamAttemptRequestResult.failure(error.message)
+          ? ExamAttemptRequestResult.failure(
+              error.message,
+              errorStatus: error.status,
+            )
           : const ExamAttemptRequestResult.ignored();
     } catch (_) {
       return _current(revision)
@@ -138,13 +154,13 @@ class ExamAttemptRequests {
           : submitted;
       _submitted[source.examId!] = review;
       ExamCache.seedDetail(review);
-      ExamCache.invalidateLists(
-        profileId: profileId ?? review.profileId ?? source.profileId,
-      );
       return ExamAttemptRequestResult.success(review);
     } on ExamException catch (error) {
       return _current(revision)
-          ? ExamAttemptRequestResult.failure(error.message)
+          ? ExamAttemptRequestResult.failure(
+              error.message,
+              errorStatus: error.status,
+            )
           : const ExamAttemptRequestResult.ignored();
     } catch (_) {
       return _current(revision)

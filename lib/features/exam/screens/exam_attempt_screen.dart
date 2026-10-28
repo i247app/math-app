@@ -1,3 +1,6 @@
+import 'package:numi/features/exam/widgets/shared/exam_image.dart';
+import 'package:numi/features/exam/widgets/shared/exam_numeric_input.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -109,7 +112,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
 
   Future<void> generateExam() async {
     final generated = await _controller.generateExam();
-    if (!mounted || generated) {
+    if (!mounted || generated || _controller.hasRecoverablePaperError) {
       return;
     }
     final navigator = Navigator.of(context);
@@ -306,8 +309,8 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
             modifyDt: submittedExam.modifyDt,
             submittedDt: submittedExam.submittedDt,
             grading: submittedExam.grading,
-            aiTitle: submittedExam.aiTitle,
-            aiShortText: submittedExam.aiShortText,
+            title: submittedExam.title,
+            shortText: submittedExam.shortText,
             aiReviewShort: submittedExam.aiReviewShort,
             aiReviewLong: submittedExam.aiReviewLong,
             questions: const <ExamQuestion>[],
@@ -496,7 +499,10 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
   Future<void> retryGeneration() async {
     final isInitialGeneration = _controller.exam == null;
     final generated = await _controller.retryGeneration();
-    if (!mounted || generated || !isInitialGeneration) {
+    if (!mounted ||
+        generated ||
+        !isInitialGeneration ||
+        _controller.hasRecoverablePaperError) {
       return;
     }
     final navigator = Navigator.of(context);
@@ -640,6 +646,11 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                   key: const ValueKey('question-error'),
                                   message: errorMessage,
                                   onRetry: retryErrorAction,
+                                  retryLabel: _controller.needsNewPaper
+                                      ? context.getText(
+                                          AppKeys.examStartNewPaper,
+                                        )
+                                      : null,
                                 ),
                               ),
                             ],
@@ -707,22 +718,53 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                         else if (setTransitionKind == null) ...[
                                           AssessmentQuestionCard(
                                             question:
-                                                currentQuestion!.questionName,
+                                                currentQuestion!.questionText,
                                             renderLatex:
                                                 currentQuestion.isFraction,
+                                          ),
+                                          ExamImage(
+                                            url: currentQuestion
+                                                .questionImageUrl,
                                           ),
                                           const SizedBox(height: 32),
-                                          AssessmentAnswerGrid(
-                                            answers: currentQuestion.answers,
-                                            renderLatex:
-                                                currentQuestion.isFraction,
-                                            selectedAnswerLabel:
-                                                _controller.selectedAnswerLabel,
-                                            selectedAnswerFeedbackCorrect:
-                                                _controller
-                                                    .selectedAnswerFeedbackCorrect,
-                                            onSelected: selectAnswer,
-                                          ),
+                                          if (currentQuestion.isNumericInput)
+                                            ExamNumericInput(
+                                              key: ValueKey(
+                                                'numeric-${currentExam?.examId}-${currentQuestion.questionNumber}',
+                                              ),
+                                              value: _controller.numericValue,
+                                              onChanged:
+                                                  _controller.setNumericValue,
+                                            )
+                                          else ...[
+                                            if (currentQuestion
+                                                .isMultipleChoice)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 12,
+                                                ),
+                                                child: Text(
+                                                  context.getText(
+                                                    AppKeys.examChooseMultiple,
+                                                  ),
+                                                ),
+                                              ),
+                                            AssessmentAnswerGrid(
+                                              options: currentQuestion.options,
+                                              selectedOptionIds:
+                                                  _controller.selectedOptionIds,
+                                              showLetters:
+                                                  !currentQuestion.isTrueFalse,
+                                              renderLatex:
+                                                  currentQuestion.isFraction,
+                                              selectedAnswerLabel: _controller
+                                                  .selectedAnswerLabel,
+                                              selectedAnswerFeedbackCorrect:
+                                                  _controller
+                                                      .selectedAnswerFeedbackCorrect,
+                                              onSelected: selectAnswer,
+                                            ),
+                                          ],
                                         ],
                                       ],
                                     ),

@@ -255,8 +255,8 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen> {
                               : () => _startPractice(exam),
                           isGeneratingPractice: _isGeneratingPractice,
                           aiReviewShort: _resolveAiReviewSummary(exam),
-                          aiTitle: exam.aiTitle,
-                          aiShortText: exam.aiShortText,
+                          title: exam.title,
+                          shortText: exam.shortText,
                           onOpenAiReview: () => _openAiReview(exam),
                         );
                       },

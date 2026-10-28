@@ -354,9 +354,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(viewport.textScale)),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(viewport.textScale)),
             child: child!,
           ),
           theme: ThemeData(
@@ -1612,13 +1611,14 @@ class _RecordingGenerateService implements ExamService {
       level: level,
       questions: const <ExamQuestion>[
         ExamQuestion(
-          questionName: '10 + 5 = ?',
+          questionText: '10 + 5 = ?',
           questionNumber: 1,
-          rightAnswer: 'A',
-          answers: <ExamAnswer>[
-            ExamAnswer(label: 'A', content: '15'),
-            ExamAnswer(label: 'B', content: '14'),
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '15'),
+            ExamAnswer(id: 'B', text: '14'),
           ],
+
+          correctOptionIds: ['A'],
         ),
       ],
     );

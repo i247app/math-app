@@ -1,40 +1,59 @@
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/exam_answer_selection.dart';
 
 /// Owns first attempts, Practice retries and feedback for one question set.
 class ExamAttemptAnswers {
-  final Map<int, String> _first = {};
-  final Map<int, String> _practiceSelections = {};
+  final Map<int, ExamAnswerSelection> _first = {};
+  final Map<int, ExamAnswerSelection> _drafts = {};
+  final Map<int, ExamAnswerSelection> _practiceSelections = {};
+  final Set<int> _practiceCommitted = {};
   final Map<int, bool?> _feedback = {};
 
-  Map<int, String> get firstAttempts => Map.unmodifiable(_first);
+  Map<int, String> get firstAttempts => Map.unmodifiable({
+    for (final entry in _first.entries) entry.key: entry.value.stateValue,
+  });
   int get answeredCount => _first.length;
 
   void clear() {
     _first.clear();
+    _drafts.clear();
     _practiceSelections.clear();
+    _practiceCommitted.clear();
     _feedback.clear();
   }
 
   int restore(GeneratedExam? exam) {
     final questions = exam?.questions ?? const <ExamQuestion>[];
     for (final answer in exam?.answers ?? const <SubmitExamAnswer>[]) {
-      final label = answer.label.trim();
-      if (label.isEmpty) continue;
       final index = questions.indexWhere(
-        (question) => question.questionNumber == answer.questionNumber,
+        (q) => q.questionNumber == answer.questionNumber,
       );
-      if (index >= 0) _first[index] = label;
+      if (index < 0) continue;
+      final question = questions[index];
+      final selection = ExamAnswerSelection.fromSubmitted(question, answer);
+      if (!selection.isValid) continue;
+      if (!question.isNumericInput &&
+          (selection.optionIds.any(
+                (id) => !question.options.any((a) => a.id == id),
+              ) ||
+              (!question.isMultipleChoice &&
+                  selection.optionIds.length != 1))) {
+        continue;
+      }
+      _first[index] = selection;
+      _practiceSelections[index] = selection;
     }
     if (questions.isEmpty) return 0;
-    final resume = exam?.resumeQuestionIndex;
-    return resume?.clamp(0, questions.length - 1) ??
+    return exam?.resumeQuestionIndex?.clamp(0, questions.length - 1) ??
         firstUnansweredIndex(questions) ??
         questions.length - 1;
   }
 
+  ExamAnswerSelection? selected(int index, {required bool practice}) =>
+      practice ? _practiceSelections[index] : _drafts[index] ?? _first[index];
   String? selectedLabel(int index, {required bool practice}) =>
-      practice ? _practiceSelections[index] : _first[index];
+      selected(index, practice: practice)?.stateValue;
   bool? feedbackAt(int index) => _feedback[index];
 
   bool select(
@@ -43,18 +62,74 @@ class ExamAttemptAnswers {
     ExamAnswer answer, {
     required bool practice,
   }) {
-    if (practice) {
-      _first.putIfAbsent(index, () => answer.label);
-      _practiceSelections[index] = answer.label;
-      _feedback[index] = question == null
-          ? null
-          : isAnswerCorrect(question, answer);
-      return true;
+    if (question == null ||
+        question.isNumericInput ||
+        !question.options.any((a) => a.id == answer.id)) {
+      return false;
     }
-    if (_first[index] == answer.label) return false;
-    _first[index] = answer.label;
+    final previous = selected(index, practice: practice);
+    final ids = question.isMultipleChoice
+        ? [...?previous?.optionIds]
+        : <String>[];
+    if (question.isMultipleChoice && ids.contains(answer.id)) {
+      ids.remove(answer.id);
+    } else {
+      ids.add(answer.id);
+    }
+    final selection = ExamAnswerSelection(
+      optionIds: List.unmodifiable(ids),
+      multiple: question.isMultipleChoice,
+    );
+    if (!practice && previous?.stateValue == selection.stateValue) return false;
+    _record(index, question, selection, practice: practice);
     return true;
   }
+
+  void setNumericValue(
+    int index,
+    ExamQuestion question,
+    String value, {
+    required bool practice,
+  }) {
+    if (!question.isNumericInput) return;
+    _record(
+      index,
+      question,
+      ExamAnswerSelection(value: value),
+      practice: practice,
+    );
+  }
+
+  void _record(
+    int index,
+    ExamQuestion question,
+    ExamAnswerSelection selection, {
+    required bool practice,
+  }) {
+    _drafts[index] = selection;
+    if (practice) {
+      _practiceSelections[index] = selection;
+      if (question.isMultipleChoice || question.isNumericInput) {
+        if (!_practiceCommitted.contains(index)) {
+          if (selection.isValid) {
+            _first[index] = selection;
+          } else {
+            _first.remove(index);
+          }
+        }
+        _feedback.remove(index);
+      } else {
+        _first.putIfAbsent(index, () => selection);
+        _feedback[index] = selection.isCorrect(question);
+      }
+    } else if (selection.isValid) {
+      _first[index] = selection;
+    } else {
+      _first.remove(index);
+    }
+  }
+
+  void commitPractice(int index) => _practiceCommitted.add(index);
 
   bool clearFeedback(int index) {
     if (!_feedback.containsKey(index)) return false;
@@ -73,82 +148,46 @@ class ExamAttemptAnswers {
     ExamQuestion? question,
     int index, {
     required bool practice,
-  }) {
-    final label = selectedLabel(index, practice: practice);
-    if (question == null || label == null) return null;
-    for (final answer in question.answers) {
-      if (_normalized(answer.label) == _normalized(label)) {
-        return isAnswerCorrect(question, answer);
-      }
-    }
-    return null;
-  }
+  }) => question == null
+      ? null
+      : selected(index, practice: practice)?.isCorrect(question);
 
   AssessmentSetScore score(GeneratedExam? exam) {
     final questions = exam?.questions ?? const <ExamQuestion>[];
-    final correct = <int>{};
-    for (final entry in _first.entries) {
-      if (entry.key < 0 || entry.key >= questions.length) continue;
-      final question = questions[entry.key];
-      if (question.answers.any(
-        (answer) =>
-            _normalized(answer.label) == _normalized(entry.value) &&
-            isAnswerCorrect(question, answer) == true,
-      )) {
-        correct.add(entry.key);
-      }
-    }
     return AssessmentSetScore(
       totalQuestions: questions.length,
       answeredQuestionIndexes: _first.keys.toSet(),
-      correctQuestionIndexes: correct,
+      correctQuestionIndexes: {
+        for (final entry in _first.entries)
+          if (entry.key >= 0 &&
+              entry.key < questions.length &&
+              entry.value.isCorrect(questions[entry.key]) == true)
+            entry.key,
+      },
     );
   }
 
   List<SubmitExamAnswer> submission(GeneratedExam exam) => [
     for (var index = 0; index < exam.questions.length; index++)
-      if (_first[index] case final label?)
-        SubmitExamAnswer(
-          questionNumber: exam.questions[index].questionNumber,
-          label: label,
-        ),
+      if (_first[index] case final selection?)
+        selection.submission(exam.questions[index].questionNumber),
   ];
 
-  static bool? isAnswerCorrect(ExamQuestion question, ExamAnswer answer) {
-    final correct = <String?>[
-      question.rightAnswer,
-      question.correctAnswer,
-    ].map(_normalized).whereType<String>().toSet();
-    if (correct.isEmpty) return null;
-    return correct.contains(_normalized(answer.label)) ||
-        correct.contains(_normalized(answer.content));
-  }
+  static bool? isAnswerCorrect(ExamQuestion question, ExamAnswer answer) =>
+      ExamAnswerSelection(optionIds: [answer.id]).isCorrect(question);
 
   static int correctSubmittedCount(
     GeneratedExam exam,
     List<SubmitExamAnswer> answers,
-  ) {
-    var count = 0;
-    for (final submitted in answers) {
-      final question = exam.questions
-          .where(
-            (question) => question.questionNumber == submitted.questionNumber,
-          )
-          .firstOrNull;
-      if (question == null) continue;
-      final answer = question.answers
-          .where(
-            (answer) =>
-                _normalized(answer.label) == _normalized(submitted.label),
-          )
-          .firstOrNull;
-      if (answer != null && isAnswerCorrect(question, answer) == true) count++;
-    }
-    return count;
-  }
-
-  static String? _normalized(String? value) {
-    final normalized = value?.trim().toUpperCase();
-    return normalized == null || normalized.isEmpty ? null : normalized;
-  }
+  ) => answers.where((submitted) {
+    final question = exam.questions
+        .where((q) => q.questionNumber == submitted.questionNumber)
+        .firstOrNull;
+    return question != null &&
+        ExamAnswerSelection.fromSubmitted(
+              question,
+              submitted,
+            ).isCorrect(question) ==
+            true;
+  }).length;
 }

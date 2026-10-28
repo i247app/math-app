@@ -12,27 +12,66 @@ import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
 import 'package:numi/features/exam/models/exam.dart';
 
 void main() {
-  test('lists exams with the new endpoint and request fields', () async {
-    late RequestOptions captured;
-    final api = _apiReturning((options) {
-      captured = options;
-      return const <String, dynamic>{
-        'mstatus': 200,
-        'exams': <Map<String, dynamic>>[],
-      };
-    });
+  test(
+    'rogue-v2 submits IDs and numeric values without legacy labels',
+    () async {
+      late RequestOptions captured;
+      final api = _apiReturning((options) {
+        captured = options;
+        return _examResponse();
+      });
+      final exam = await api.submitExam(
+        examId: 2,
+        profileId: 21,
+        answers: const [
+          SubmitExamAnswer(questionNumber: 1, optionIds: ['b']),
+          SubmitExamAnswer(questionNumber: 2, optionIds: ['Bank-Z', 'a']),
+          SubmitExamAnswer(questionNumber: 3, optionIds: ['false']),
+          SubmitExamAnswer(questionNumber: 4, value: '1/2'),
+        ],
+      );
+      expect(_body(captured), {
+        'profile_id': 21,
+        'elink_id': 2,
+        'answers': [
+          {
+            'question_number': 1,
+            'option_ids': ['b'],
+          },
+          {
+            'question_number': 2,
+            'option_ids': ['Bank-Z', 'a'],
+          },
+          {
+            'question_number': 3,
+            'option_ids': ['false'],
+          },
+          {'question_number': 4, 'value': '1/2'},
+        ],
+      });
+      expect(exam.answers.last.value, '1/2');
+      expect(exam.answers[1].selectedOptionIds, ['Bank-Z', 'a']);
+    },
+  );
 
-    await api.listExams(profileId: 21);
-
-    final body = _body(captured);
-    expect(captured.path, '/exams/list');
-    expect(body, containsPair('profile_id', 21));
-    expect(body, containsPair('exam_type', 'ASSESSMENT'));
-    expect(body, isNot(contains('purpose')));
-    expect(body, isNot(contains('page')));
-    expect(body, isNot(contains('size')));
-    expect(body, isNot(contains('take_all')));
-  });
+  for (final code in [13747, 13713]) {
+    test(
+      'rogue-v2 preserves error code $code and gives an actionable message',
+      () async {
+        final api = _apiReturning(
+          (_) => {'mstatus': code, 'mmessage': 'Internal error'},
+        );
+        await expectLater(
+          api.generateAssessmentExam(profileId: 21),
+          throwsA(
+            isA<ExamException>()
+                .having((e) => e.status, 'status', code)
+                .having((e) => e.message, 'message', isNot('Internal error')),
+          ),
+        );
+      },
+    );
+  }
 
   test('generates an exam with the new form and maps its identity', () async {
     late RequestOptions captured;
@@ -62,8 +101,8 @@ void main() {
     expect(exam.examId, 2);
     expect(exam.aiExamId, 7);
     expect(exam.userExamId, 99);
-    expect(exam.questions.single.rightAnswer, 'A');
-    expect(exam.questions.single.correctAnswer, '4');
+    expect(exam.questions.single.correctOptionIds, ['A']);
+    expect(exam.questions.single.options.single.text, '4');
   });
 
   test('includes guest uid when generating without a profile id', () async {
@@ -170,11 +209,11 @@ void main() {
           response['details'] = [
             {
               'question_number': 1,
-              'question_name': '1 + 1 = ?',
-              'selected_label': 'A',
-              'selected_content': '2',
-              'right_answer_label': 'A',
-              'right_answer_content': '2',
+              'question_text': '1 + 1 = ?',
+              'child_option_ids': ['A'],
+              'child_answer_text': '2',
+              'right_option_ids': ['A'],
+              'right_answer_text': '2',
             },
           ];
           return response;
@@ -182,7 +221,9 @@ void main() {
         final submitted = await api.submitExam(
           examId: 2,
           profileId: 21,
-          answers: const [SubmitExamAnswer(questionNumber: 1, label: 'A')],
+          answers: const [
+            SubmitExamAnswer(questionNumber: 1, optionIds: ['A']),
+          ],
         );
         final detailByLink = await api.getExamDetail(
           2,
@@ -246,7 +287,7 @@ void main() {
       examId: 2,
       profileId: 21,
       answers: const <SubmitExamAnswer>[
-        SubmitExamAnswer(questionNumber: 1, label: 'A'),
+        SubmitExamAnswer(questionNumber: 1, optionIds: ['A']),
       ],
     );
 
@@ -258,7 +299,7 @@ void main() {
     expect(exam.grading?.scorePercentage, 100);
     expect(exam.grading?.aiReview, 'Tiến bộ tốt.');
     expect(exam.userExamId, 99);
-    expect(exam.answers.single.label, 'A');
+    expect(exam.answers.single.selectedOptionIds.single, 'A');
   });
 
   test('updates the user exam status when assessment stops', () async {
@@ -550,8 +591,8 @@ void main() {
         'details': <Map<String, dynamic>>[
           <String, dynamic>{
             'question_number': 1,
-            'selected_label': 'A',
-            'selected_content': '4',
+            'child_option_ids': ['A'],
+            'child_answer_text': '4',
             'is_correct': true,
           },
         ],
@@ -567,7 +608,7 @@ void main() {
     expect(body, containsPair('elink_id', 2));
     expect(body, isNot(contains('esess_id')));
     expect(exam.answers.single.questionNumber, 1);
-    expect(exam.answers.single.label, 'A');
+    expect(exam.answers.single.selectedOptionIds.single, 'A');
   });
 
   test('sends GRADE exam type when loading grade detail', () async {
@@ -614,8 +655,8 @@ void main() {
                 'skipped_number': 0,
                 'score_percentage': 70,
                 'review': 'Answered 7/10 correctly.',
-                'ai_title': 'Number skills',
-                'ai_short_text': 'Numbers and arithmetic within 100',
+                'title': 'Number skills',
+                'short_text': 'Numbers and arithmetic within 100',
                 'ai_review_short': 'Practice subtraction and ordering numbers.',
                 'ai_review_long': 'Detailed feedback saved in stats.',
                 'grade': 1,
@@ -625,15 +666,15 @@ void main() {
                 {
                   'elink_id': 136,
                   'question_number': 1,
-                  'question_name': 'What comes after 47?',
-                  'right_answer_label': 'B',
-                  'right_answer_content': '48',
-                  'selected_label': 'B',
-                  'selected_content': '48',
+                  'question_text': 'What comes after 47?',
+                  'right_option_ids': ['B'],
+                  'right_answer_text': '48',
+                  'child_option_ids': ['B'],
+                  'child_answer_text': '48',
                   'is_correct': true,
-                  'answers': [
-                    {'label': 'A', 'content': '46'},
-                    {'label': 'B', 'content': '48'},
+                  'options': [
+                    {'id': 'A', 'text': '46'},
+                    {'id': 'B', 'text': '48'},
                   ],
                 },
               ],
@@ -645,8 +686,11 @@ void main() {
             userExamId: entireJourney ? 114 : null,
             examType: type,
           );
-          expect(exam.aiTitle, 'Number skills');
-          expect(exam.aiShortText, 'Numbers and arithmetic within 100');
+          expect(
+            exam.title,
+            entireJourney ? 'Number skills' : 'Lớp 2 - Cấp độ 1',
+          );
+          expect(exam.shortText, 'Numbers and arithmetic within 100');
           expect(
             exam.aiReviewShort,
             'Practice subtraction and ordering numbers.',
@@ -721,36 +765,36 @@ void main() {
         'details': <Map<String, dynamic>>[
           <String, dynamic>{
             'question_number': 1,
-            'question_name': '1 + 1 = ?',
-            'answers': <Map<String, dynamic>>[
-              <String, dynamic>{'label': 'A', 'content': '2'},
-              <String, dynamic>{'label': 'B', 'content': '1'},
-              <String, dynamic>{'label': 'C', 'content': '3'},
-              <String, dynamic>{'label': 'D', 'content': '4'},
+            'question_text': '1 + 1 = ?',
+            'options': <Map<String, dynamic>>[
+              <String, dynamic>{'id': 'A', 'text': '2'},
+              <String, dynamic>{'id': 'B', 'text': '1'},
+              <String, dynamic>{'id': 'C', 'text': '3'},
+              <String, dynamic>{'id': 'D', 'text': '4'},
             ],
             'question_level': 1,
             'question_topic': 'addition',
-            'right_answer_content': '2',
-            'right_answer_label': 'A',
-            'selected_content': '2',
-            'selected_label': 'A',
+            'right_answer_text': '2',
+            'right_option_ids': ['A'],
+            'child_answer_text': '2',
+            'child_option_ids': ['A'],
             'is_correct': true,
           },
           <String, dynamic>{
             'question_number': 1,
-            'question_name': '3 + 2 = ?',
-            'answers': <Map<String, dynamic>>[
-              <String, dynamic>{'label': 'A', 'content': '5'},
-              <String, dynamic>{'label': 'B', 'content': '4'},
-              <String, dynamic>{'label': 'C', 'content': '6'},
-              <String, dynamic>{'label': 'D', 'content': '3'},
+            'question_text': '3 + 2 = ?',
+            'options': <Map<String, dynamic>>[
+              <String, dynamic>{'id': 'A', 'text': '5'},
+              <String, dynamic>{'id': 'B', 'text': '4'},
+              <String, dynamic>{'id': 'C', 'text': '6'},
+              <String, dynamic>{'id': 'D', 'text': '3'},
             ],
             'question_level': 1,
             'question_topic': 'addition',
-            'right_answer_content': '5',
-            'right_answer_label': 'A',
-            'selected_content': '4',
-            'selected_label': 'B',
+            'right_answer_text': '5',
+            'right_option_ids': ['A'],
+            'child_answer_text': '4',
+            'child_option_ids': ['B'],
             'is_correct': false,
           },
         ],
@@ -785,9 +829,9 @@ void main() {
     );
     expect(exam.practiceWeakTopics.first.answered, 3);
     expect(exam.practiceWeakTopics.first.wrong, 3);
-    expect(exam.questions.last.answers, hasLength(4));
-    expect(exam.questions.last.rightAnswer, 'A');
-    expect(exam.answers.last.label, 'B');
+    expect(exam.questions.last.options, hasLength(4));
+    expect(exam.questions.last.correctOptionIds, ['A']);
+    expect(exam.answers.last.selectedOptionIds.single, 'B');
   });
 
   test('loads only the active set with its saved answers for resume', () async {
@@ -817,12 +861,14 @@ void main() {
               3,
               (index) => <String, dynamic>{
                 'question_number': index + 1,
-                'question_name': 'Resume question ${index + 1}',
-                'right_answer_label': 'A',
-                'right_answer_content': '${index + 2}',
-                'answers': <Map<String, dynamic>>[
-                  <String, dynamic>{'label': 'A', 'content': '${index + 2}'},
-                  <String, dynamic>{'label': 'B', 'content': '0'},
+                'question_text': 'Resume question ${index + 1}',
+                'correct_answer': {
+                  'option_ids': ['A'],
+                },
+
+                'options': <Map<String, dynamic>>[
+                  <String, dynamic>{'id': 'A', 'text': '${index + 2}'},
+                  <String, dynamic>{'id': 'B', 'text': '0'},
                 ],
               },
             ),
@@ -842,17 +888,17 @@ void main() {
           <String, dynamic>{
             'elink_id': 40,
             'question_number': 1,
-            'selected_label': 'A',
+            'child_option_ids': ['A'],
           },
           <String, dynamic>{
             'elink_id': 41,
             'question_number': 1,
-            'selected_label': 'A',
+            'child_option_ids': ['A'],
           },
           <String, dynamic>{
             'elink_id': 41,
             'question_number': 2,
-            'selected_label': 'B',
+            'child_option_ids': ['B'],
           },
         ],
       };
@@ -866,7 +912,7 @@ void main() {
     expect(exam.userExamId, 99);
     expect(exam.examStatus, 'ACTIVE');
     expect(exam.questions, hasLength(3));
-    expect(exam.questions.last.questionName, 'Resume question 3');
+    expect(exam.questions.last.questionText, 'Resume question 3');
     expect(exam.answers, hasLength(2));
     expect(exam.resumeQuestionIndex, 2);
     expect(
@@ -875,7 +921,7 @@ void main() {
     );
   });
 
-  test('clears the synthetic Q1/A exit answer when resuming', () async {
+  test('preserves a real first option ID when resuming', () async {
     final api = _apiReturning((_) {
       return <String, dynamic>{
         'mstatus': 200,
@@ -892,12 +938,14 @@ void main() {
               3,
               (index) => <String, dynamic>{
                 'question_number': index + 1,
-                'question_name': 'Resume question ${index + 1}',
-                'right_answer_label': 'A',
-                'right_answer_content': '${index + 2}',
-                'answers': <Map<String, dynamic>>[
-                  <String, dynamic>{'label': 'A', 'content': '${index + 2}'},
-                  <String, dynamic>{'label': 'B', 'content': '0'},
+                'question_text': 'Resume question ${index + 1}',
+                'correct_answer': {
+                  'option_ids': ['A'],
+                },
+
+                'options': <Map<String, dynamic>>[
+                  <String, dynamic>{'id': 'A', 'text': '${index + 2}'},
+                  <String, dynamic>{'id': 'B', 'text': '0'},
                 ],
               },
             ),
@@ -917,7 +965,7 @@ void main() {
           <String, dynamic>{
             'elink_id': 41,
             'question_number': 1,
-            'selected_label': 'A',
+            'child_option_ids': ['A'],
           },
         ],
       };
@@ -926,12 +974,12 @@ void main() {
     final exam = await api.getExamDetail(99, profileId: 21, userExamId: 99);
 
     expect(exam.questions, hasLength(3));
-    expect(exam.answers, isEmpty);
-    expect(exam.resumeQuestionIndex, 0);
+    expect(exam.answers.single.selectedOptionIds, ['A']);
+    expect(exam.resumeQuestionIndex, 1);
   });
 
   test(
-    'loads the full active set before resuming a placeholder-only journey',
+    'loads the full active set and preserves the first selected ID',
     () async {
       final requests = <RequestOptions>[];
       final api = _apiReturning((options) {
@@ -967,7 +1015,7 @@ void main() {
               <String, dynamic>{
                 'elink_id': 41,
                 'question_number': 1,
-                'selected_label': 'A',
+                'child_option_ids': ['A'],
               },
             ],
           };
@@ -990,12 +1038,14 @@ void main() {
               10,
               (index) => <String, dynamic>{
                 'question_number': index + 1,
-                'question_name': 'Resume question ${index + 1}',
-                'right_answer_label': 'B',
-                'right_answer_content': '${index + 2}',
-                'answers': <Map<String, dynamic>>[
-                  <String, dynamic>{'label': 'A', 'content': '0'},
-                  <String, dynamic>{'label': 'B', 'content': '${index + 2}'},
+                'question_text': 'Resume question ${index + 1}',
+                'correct_answer': {
+                  'option_ids': ['B'],
+                },
+
+                'options': <Map<String, dynamic>>[
+                  <String, dynamic>{'id': 'A', 'text': '0'},
+                  <String, dynamic>{'id': 'B', 'text': '${index + 2}'},
                 ],
               },
             ),
@@ -1010,8 +1060,8 @@ void main() {
       expect(exam.userExamId, 99);
       expect(exam.examStatus, 'ACTIVE');
       expect(exam.questions, hasLength(10));
-      expect(exam.answers, isEmpty);
-      expect(exam.resumeQuestionIndex, 0);
+      expect(exam.answers.single.selectedOptionIds, ['A']);
+      expect(exam.resumeQuestionIndex, 1);
 
       final controller = ExamAttemptController(
         examService: api,
@@ -1019,7 +1069,7 @@ void main() {
         profileId: 21,
       );
       addTearDown(controller.dispose);
-      controller.selectAnswer(exam.questions.first.answers.first);
+      controller.selectAnswer(exam.questions.first.options.first);
 
       expect(
         controller.prepareAssessmentFlow(),
@@ -1044,7 +1094,7 @@ void main() {
               'esess_id': 99,
               'grade': 1,
               'level': 5,
-              'ai_short_text': 'Practice subtraction',
+              'short_text': 'Practice subtraction',
               'ai_review_short': 'Good progress.',
               'ai_review_long': 'Good progress. Focus on subtraction next.',
               'score_percentage': 65,
@@ -1062,12 +1112,14 @@ void main() {
                   'title': 'Lớp 2',
                   'questions': <Map<String, dynamic>>[
                     <String, dynamic>{
-                      'question_name': 'Resume from stats',
+                      'question_text': 'Resume from stats',
                       'question_number': 1,
-                      'right_answer_content': '4',
-                      'right_answer_label': 'A',
-                      'answers': <Map<String, dynamic>>[
-                        <String, dynamic>{'content': '4', 'label': 'A'},
+
+                      'correct_answer': {
+                        'option_ids': ['A'],
+                      },
+                      'options': <Map<String, dynamic>>[
+                        <String, dynamic>{'text': '4', 'id': 'A'},
                       ],
                     },
                   ],
@@ -1088,7 +1140,7 @@ void main() {
       expect(stats.single.status, 'COMPLETE');
       expect(stats.single.userExamId, 99);
       expect(stats.single.scorePercentage, 65);
-      expect(stats.single.aiShortText, 'Practice subtraction');
+      expect(stats.single.shortText, 'Practice subtraction');
       expect(stats.single.aiReviewShort, 'Good progress.');
       expect(
         stats.single.aiReviewLong,
@@ -1098,7 +1150,7 @@ void main() {
       expect(stats.single.inProgressExams.single.userAiExamId, 27);
       expect(stats.single.inProgressExams.single.examStatus, 'IN_PROGRESS');
       expect(
-        stats.single.inProgressExams.single.questions.single.questionName,
+        stats.single.inProgressExams.single.questions.single.questionText,
         'Resume from stats',
       );
     },
@@ -1123,7 +1175,7 @@ void main() {
               'score_percentage': 30,
               'review': 'Answered 6/20 correctly.',
               'esess_flag': null,
-              'ai_short_text': 'Enjoy learning math',
+              'short_text': 'Enjoy learning math',
               'ai_review_short': 'Practice counting and matching quantities.',
               'ai_review_long': 'Practice with objects at home.',
               'grade': 0,
@@ -1172,7 +1224,7 @@ void main() {
       expect(stats.every((entry) => entry.status == 'COMPLETE'), isTrue);
       expect(stats.first.passed, isNull);
       expect(stats.last.passed, isTrue);
-      expect(stats.first.aiShortText, 'Enjoy learning math');
+      expect(stats.first.shortText, 'Enjoy learning math');
       final learningItems = stats
           .where(isCompletedAssessmentStats)
           .map((entry) => completedAssessmentFromStats(entry, profileId: 21))
@@ -1215,8 +1267,8 @@ void main() {
           'score_percentage': 50,
           'review': 'Answered 5/10 correctly.',
           'esess_flag': true,
-          'ai_title': 'Counting and subtraction',
-          'ai_short_text': 'Learn counting and subtraction.',
+          'title': 'Counting and subtraction',
+          'short_text': 'Learn counting and subtraction.',
           'ai_review_short': 'Practice counting and subtraction.',
           'ai_review_long': 'First paragraph.\n\nSecond paragraph.',
           'grade': 0,
@@ -1249,8 +1301,8 @@ void main() {
       expect(result.correctNumber, 5);
       expect(result.scorePercentage, 50);
       expect(result.aiReviewShort, 'Practice counting and subtraction.');
-      expect(result.aiTitle, 'Counting and subtraction');
-      expect(result.aiShortText, 'Learn counting and subtraction.');
+      expect(result.title, 'Counting and subtraction');
+      expect(result.shortText, 'Learn counting and subtraction.');
       expect(result.aiReviewLong, 'First paragraph.\n\nSecond paragraph.');
       expect(result.endedDt, DateTime.parse('2026-10-01T13:09:28.266769Z'));
     },
@@ -1437,16 +1489,18 @@ Map<String, dynamic> _examResponse() => <String, dynamic>{
     'title': 'Lớp 2 - Cấp độ 1',
     'questions': <Map<String, dynamic>>[
       <String, dynamic>{
-        'question_name': '🍓 🍓 🍓 + 🍓 = ?',
+        'question_text': '🍓 🍓 🍓 + 🍓 = ?',
         'question_number': 1,
         'question_grade': 2,
         'question_level': 1,
         'question_topic': 'counting',
-        'question_type': 'COUNT',
-        'right_answer_content': '4',
-        'right_answer_label': 'A',
-        'answers': <Map<String, dynamic>>[
-          <String, dynamic>{'content': '4', 'label': 'A'},
+        'render_type': 'COUNT',
+
+        'correct_answer': {
+          'option_ids': ['A'],
+        },
+        'options': <Map<String, dynamic>>[
+          <String, dynamic>{'text': '4', 'id': 'A'},
         ],
       },
     ],
