@@ -1,4 +1,3 @@
-import 'package:numi/features/exam/widgets/shared/exam_image.dart';
 import 'package:numi/features/exam/widgets/shared/exam_numeric_input.dart';
 
 import 'dart:async';
@@ -721,10 +720,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                                 currentQuestion!.questionText,
                                             renderLatex:
                                                 currentQuestion.isFraction,
-                                          ),
-                                          ExamImage(
-                                            url: currentQuestion
+                                            imageUrl: currentQuestion
                                                 .questionImageUrl,
+                                            grade: _controller.currentGrade,
                                           ),
                                           const SizedBox(height: 32),
                                           if (currentQuestion.isNumericInput)

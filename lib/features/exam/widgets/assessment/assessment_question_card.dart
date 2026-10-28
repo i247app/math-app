@@ -11,9 +11,13 @@ class AssessmentQuestionCard extends StatelessWidget {
     super.key,
     required this.question,
     this.renderLatex = false,
+    this.imageUrl,
+    this.grade,
   });
   final String question;
   final bool renderLatex;
+  final String? imageUrl;
+  final int? grade;
 
   static final RegExp _pictorialSymbolPattern = RegExp(
     <String>[
@@ -28,6 +32,15 @@ class AssessmentQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final displayQuestion = normalizeAssessmentText(question);
+    final questionImageUrl = imageUrl?.trim();
+    if (questionImageUrl != null && questionImageUrl.isNotEmpty) {
+      return _AssessmentImageQuestion(
+        question: displayQuestion,
+        imageUrl: questionImageUrl,
+        renderLatex: renderLatex,
+        showSpeaker: grade == 0,
+      );
+    }
     final mathQuestion = _mathQuestionParts(displayQuestion);
     final isPictorialQuestion = _containsPictorialSymbols(displayQuestion);
 
@@ -153,6 +166,113 @@ class AssessmentQuestionCard extends StatelessWidget {
           height: 1.2,
           letterSpacing: 0,
         ),
+      ),
+    );
+  }
+}
+
+class _AssessmentImageQuestion extends StatelessWidget {
+  const _AssessmentImageQuestion({
+    required this.question,
+    required this.imageUrl,
+    required this.renderLatex,
+    required this.showSpeaker,
+  });
+
+  final String question;
+  final String imageUrl;
+  final bool renderLatex;
+  final bool showSpeaker;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final textStyle = TextStyle(
+      color: colors.brandStrong,
+      fontSize: FontSize.xl,
+      fontWeight: FontWeight.w700,
+      height: 1.3,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.elevatedSurface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: colors.brand.withValues(alpha: 0.06)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.brand.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              if (showSpeaker) ...[
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: colors.brand.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.volume_up_rounded,
+                    color: colors.brand,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: renderLatex
+                    ? ExamMathText(
+                        question,
+                        textAlign: TextAlign.start,
+                        style: textStyle,
+                      )
+                    : Text(question, softWrap: true, style: textStyle),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: LayoutBuilder(
+              builder: (context, constraints) => ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxWidth * 0.8,
+                ),
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                  excludeFromSemantics: true,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return AspectRatio(
+                      aspectRatio: 4 / 3,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: colors.brand,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
