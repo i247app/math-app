@@ -3,5 +3,10 @@
     "version": "5.1.0",
     "upstreamBuildFile": "build.gradle",
     "upstreamBuildSha256": "827a96ea46790e5675641d027f0b42dd82170e5bc47f07fa12373ec4348448c1"
+  },
+  "flutter_tts": {
+    "upstreamBuildFile": "build.gradle",
+    "upstreamBuildSha256": "e8282fed47a650a28c490df7cae3c800db574b8335a7d4d2b8db806378482088",
+    "version": "4.2.5"
   }
 }

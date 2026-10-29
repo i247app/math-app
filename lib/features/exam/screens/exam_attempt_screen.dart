@@ -8,11 +8,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_question_speech_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
@@ -75,17 +77,41 @@ class ExamAttemptScreen extends StatefulWidget {
   State<ExamAttemptScreen> createState() => _ExamAttemptScreenState();
 }
 
-class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
+class _ExamAttemptScreenState extends State<ExamAttemptScreen>
+    with WidgetsBindingObserver {
   late final ExamAttemptController _controller;
   late final ProfileGradeProgressStore _gradeProgressStore;
   Timer? _practiceFeedbackTimer;
   bool _isCompletingAssessment = false;
+  final _questionSpeech = ExamQuestionSpeechService();
+  Object? _spokenQuestionKey;
+  bool _speechSuspended = false;
+
+  int? get _questionGrade => questionSpeechGrade(
+    questionGrade: _controller.currentQuestion?.questionGrade,
+    examGrade: _controller.exam?.grade,
+  );
+
+  bool get _canReadQuestion =>
+      !_speechSuspended &&
+      !_controller.isGeneratingQuestion &&
+      !_controller.isGeneratingExam &&
+      !_controller.isSubmittingExam &&
+      !_isCompletingAssessment &&
+      _controller.errorMessage == null &&
+      _questionGrade == 0 &&
+      questionSpeechText(_controller.currentQuestion?.questionText ?? '') !=
+          null;
   final GuardedExitController<ExamAttemptResult> _exitController =
       GuardedExitController<ExamAttemptResult>();
 
   @override
   void initState() {
     super.initState();
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    _speechSuspended =
+        lifecycle != null && lifecycle != AppLifecycleState.resumed;
+    WidgetsBinding.instance.addObserver(this);
     _controller = ExamAttemptController(
       examService: widget.examService ?? context.read<ExamService>(),
       initialExam: widget.initialExam,
@@ -97,6 +123,10 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
     );
     _gradeProgressStore =
         widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
+    _controller.addListener(_syncQuestionSpeech);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _syncQuestionSpeech();
+    });
     if (widget.initialExam == null) {
       generateExam();
     }
@@ -104,9 +134,54 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.removeListener(_syncQuestionSpeech);
+    _questionSpeech.dispose();
     _practiceFeedbackTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _speechSuspended = state != AppLifecycleState.resumed;
+    if (_speechSuspended) unawaited(_questionSpeech.stop());
+    // Returning to the app allows replay without automatically repeating a prompt.
+    if (mounted) setState(() {});
+  }
+
+  void _syncQuestionSpeech() {
+    final question = _controller.currentQuestion;
+    final key = (
+      _controller.exam?.examId,
+      _controller.exam?.aiExamId,
+      _controller.setNumber,
+      _controller.questionIndex,
+      question?.questionNumber,
+      question?.questionText,
+      _questionGrade,
+    );
+    if (!_canReadQuestion) {
+      if (_spokenQuestionKey != key) _spokenQuestionKey = null;
+      unawaited(_questionSpeech.stop());
+      return;
+    }
+    if (_spokenQuestionKey == key) return;
+    _spokenQuestionKey = key;
+    unawaited(_readQuestion());
+  }
+
+  Future<void> _readQuestion({bool manual = false}) async {
+    if (!_canReadQuestion || ModalRoute.of(context)?.isCurrent == false) return;
+    final result = await _questionSpeech.read(
+      _controller.currentQuestion!.questionText,
+      language: AppLanguageState.currentApiCode,
+    );
+    if (mounted && manual && result == QuestionSpeechResult.unavailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.getText(AppKeys.examSpeechUnavailable))),
+      );
+    }
   }
 
   Future<void> generateExam() async {
@@ -220,6 +295,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
   }
 
   Future<void> submitCurrentExam() async {
+    unawaited(_questionSpeech.stop());
     HapticFeedback.mediumImpact();
     final isGradeSubmission = _controller.isGrade;
     if (isGradeSubmission && mounted) {
@@ -511,6 +587,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
   }
 
   Future<bool> showUnansweredSubmitDialog() async {
+    unawaited(_questionSpeech.stop());
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -573,6 +650,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
   }
 
   Future<bool> _confirmAttemptExit(BuildContext dialogContext) {
+    unawaited(_questionSpeech.stop());
     if (!_controller.isAssessment && !_controller.isGrade) {
       return showAttemptExitDialog(dialogContext);
     }
@@ -722,7 +800,12 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                                                 currentQuestion.isFraction,
                                             imageUrl: currentQuestion
                                                 .questionImageUrl,
-                                            grade: _controller.currentGrade,
+                                            grade: _questionGrade,
+                                            onReadQuestion: _canReadQuestion
+                                                ? () => _readQuestion(
+                                                    manual: true,
+                                                  )
+                                                : null,
                                           ),
                                           const SizedBox(height: 32),
                                           if (currentQuestion.isNumericInput)

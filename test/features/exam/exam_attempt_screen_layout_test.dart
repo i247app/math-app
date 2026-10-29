@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -26,6 +27,223 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  group('question narration', () {
+    const channel = MethodChannel('flutter_tts');
+    final calls = <MethodCall>[];
+    const questions = <ExamQuestion>[
+      ExamQuestion(
+        questionText: 'Con hãy đếm số quả táo.',
+        questionNumber: 1,
+        options: [ExamAnswer(id: 'A', text: '2')],
+        correctOptionIds: ['A'],
+      ),
+      ExamQuestion(
+        questionText: 'Con hãy chọn hình tròn.',
+        questionNumber: 2,
+        options: [ExamAnswer(id: 'A', text: '1')],
+      ),
+    ];
+
+    setUp(() {
+      calls.clear();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            calls.add(call);
+            return call.method == 'isLanguageAvailable' ? true : 1;
+          });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    testWidgets(
+      'emoji question keeps its speaker disabled without starting narration',
+      (tester) async {
+        await _pumpAssessment(
+          tester,
+          questions: const [
+            ExamQuestion(
+              questionText: '😺😺😺😺😺 = ?',
+              questionNumber: 1,
+              options: [ExamAnswer(id: 'A', text: '5')],
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+        final speaker = find.byKey(const ValueKey('read-question'));
+        expect(tester.widget<IconButton>(speaker).onPressed, isNull);
+        expect(calls.where((c) => c.method == 'speak'), isEmpty);
+        calls.clear();
+        await tester.tap(speaker);
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), isEmpty);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'auto reads once, supports replay, and reads a newly selected question',
+      (tester) async {
+        await _pumpAssessment(tester, questions: questions);
+        await tester.pumpAndSettle();
+        List<Object?> spoken() => calls
+            .where((c) => c.method == 'speak')
+            .map((c) => c.arguments)
+            .toList();
+        expect(spoken(), [questions.first.questionText]);
+        expect(find.byKey(const ValueKey('read-question')), findsOneWidget);
+
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pumpAndSettle();
+        expect(spoken(), [questions.first.questionText]);
+
+        await tester.tap(find.byKey(const ValueKey('read-question')));
+        await tester.pumpAndSettle();
+        expect(spoken(), [
+          questions.first.questionText,
+          questions.first.questionText,
+        ]);
+
+        tester
+            .widget<AssessmentProgressSection>(
+              find.byType(AssessmentProgressSection),
+            )
+            .onQuestionSelected!(1);
+        await tester.pumpAndSettle();
+        expect(spoken().last, questions.last.questionText);
+        expect(spoken(), hasLength(3));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    for (final grades in <(int?, int?, bool)>[
+      (2, 0, true),
+      (0, 2, false),
+      (0, null, true),
+      (2, null, false),
+      (null, null, false),
+    ]) {
+      testWidgets(
+        'paper ${grades.$1}, question ${grades.$2}: narration ${grades.$3}',
+        (tester) async {
+          await _pumpAssessment(
+            tester,
+            initialGrade: grades.$1,
+            questions: [
+              ExamQuestion(
+                questionText: questions.first.questionText,
+                questionNumber: 1,
+                questionGrade: grades.$2,
+                options: questions.first.options,
+              ),
+            ],
+          );
+          await tester.pumpAndSettle();
+          expect(
+            calls.where((c) => c.method == 'speak'),
+            hasLength(grades.$3 ? 1 : 0),
+          );
+          expect(
+            find.byKey(const ValueKey('read-question')),
+            grades.$3 ? findsOneWidget : findsNothing,
+          );
+        },
+      );
+    }
+
+    testWidgets('background stops speech and returning allows manual replay', (
+      tester,
+    ) async {
+      await _pumpAssessment(tester, questions: questions);
+      await tester.pumpAndSettle();
+      calls.clear();
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      expect(calls.last.method, 'stop');
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(calls.where((c) => c.method == 'speak'), isEmpty);
+      await tester.tap(find.byKey(const ValueKey('read-question')));
+      await tester.pumpAndSettle();
+      expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+
+      calls.clear();
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      expect(calls.last.method, 'stop');
+    });
+
+    testWidgets(
+      'changing to an older grade stops narration and returning reads again',
+      (tester) async {
+        await _pumpAssessment(
+          tester,
+          questions: [
+            questions.first,
+            ExamQuestion(
+              questionText: questions.last.questionText,
+              questionNumber: 2,
+              questionGrade: 1,
+              options: questions.last.options,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+        calls.clear();
+        tester
+            .widget<AssessmentProgressSection>(
+              find.byType(AssessmentProgressSection),
+            )
+            .onQuestionSelected!(1);
+        await tester.pumpAndSettle();
+        expect(calls.last.method, 'stop');
+        expect(find.byKey(const ValueKey('read-question')), findsNothing);
+        tester
+            .widget<AssessmentProgressSection>(
+              find.byType(AssessmentProgressSection),
+            )
+            .onQuestionSelected!(0);
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+      },
+    );
+
+    testWidgets('opening the exit dialog stops the current narration', (
+      tester,
+    ) async {
+      await _pumpAssessment(
+        tester,
+        examType: examTypeAssessment,
+        questions: questions,
+      );
+      await tester.pumpAndSettle();
+      calls.clear();
+      tester.widget<AssessmentHeader>(find.byType(AssessmentHeader)).onClose();
+      await tester.pumpAndSettle();
+      expect(calls.last.method, 'stop');
+      expect(calls.where((c) => c.method == 'speak'), isEmpty);
+    });
+
+    testWidgets('missing voice keeps exam usable and explains failed replay', (
+      tester,
+    ) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            channel,
+            (call) async => call.method == 'isLanguageAvailable' ? false : 1,
+          );
+      await _pumpAssessment(tester, questions: questions);
+      await tester.pumpAndSettle();
+      expect(find.byType(SnackBar), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('read-question')));
+      await tester.pumpAndSettle();
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.byType(AssessmentAnswerButton), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+  });
   for (final examType in <String>[
     examTypeAssessment,
     examTypeGrade,
@@ -1111,7 +1329,7 @@ Future<void> _pumpAssessment(
   List<ExamQuestion>? questions,
   bool allowQuestionNavigation = true,
   ExamService? examService,
-  int initialGrade = 0,
+  int? initialGrade = 0,
   String examType = examTypePractice,
   int? initialUserExamId = 7001,
   bool isResumedAssessment = false,

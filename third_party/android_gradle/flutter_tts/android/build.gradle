@@ -1,0 +1,39 @@
+// Android Gradle migration for flutter_tts 4.2.5.
+// Sources and license are copied unchanged from the published package.
+group 'com.eyedeadevelopment.fluttertts'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.eyedeadevelopment.fluttertts'
+    compileSdk 36
+
+    defaultConfig {
+        minSdkVersion 24
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        main.kotlin.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        disable 'GradleDependency'
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.addAll(['-Xlint:deprecation'])
+}

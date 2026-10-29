@@ -318,6 +318,7 @@ class ExamQuestion {
     required this.questionText,
     required this.questionNumber,
     required this.options,
+    this.questionGrade,
     this.difficulty,
     this.topic,
     this.renderType,
@@ -331,6 +332,7 @@ class ExamQuestion {
   });
 
   final String questionText;
+  final int? questionGrade;
   final int questionNumber;
   final List<ExamAnswer> options;
   final int? difficulty;
@@ -352,6 +354,7 @@ class ExamQuestion {
 
   ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
     questionText: questionText,
+    questionGrade: questionGrade,
     questionNumber: questionNumber,
     options: options
         .map(

@@ -1,5 +1,22 @@
 # Built-in Kotlin compatibility patches
 
+## Flutter TTS 4.2.5
+
+`flutter_tts` is pinned to 4.2.5. Its Android project is redirected through
+the same version/hash check below. `flutter_tts/android/src`, LICENSE and
+pubspec metadata are copied unchanged from the published package. The local
+Gradle script removes the legacy Kotlin plugin/buildscript and explicit Kotlin
+stdlib dependency, registers Kotlin sources with AGP's built-in compiler, and
+keeps the upstream namespace, SDK requirements and Java/Kotlin target (11).
+Dart, iOS and other platforms still use the official package.
+
+To upgrade, review the upstream build script, replace the copied sources and
+license, and update the version and LF-normalized SHA-256 in `patches.json`
+together with the root dependency pin. Remove the patch when upstream supports
+built-in Kotlin. Do not edit the shared Pub Cache.
+
+## Firebase Core
+
 The host uses Flutter 3.47+, AGP 9.1 and `android.builtInKotlin=true`.
 Firebase Core 5.1.0 still contains a conditional legacy Kotlin plugin application
 that Flutter's static scanner reports even when the branch does not execute.

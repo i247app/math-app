@@ -310,6 +310,8 @@ class AppKeys {
   static const missingExamId = 'missing_exam_id';
   static const incomplete = 'incomplete';
   static const mathAssessment = 'math_assessment';
+  static const examReadQuestion = 'exam_read_question';
+  static const examSpeechUnavailable = 'exam_speech_unavailable';
   static const kindergartenMathAssessment = 'kindergarten_math_assessment';
   static const gradeMathAssessment = 'grade_math_assessment';
   static const assessmentListKindergartenTitle =

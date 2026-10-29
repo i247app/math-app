@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/localization/app_strings.dart';
 
 import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -13,11 +15,13 @@ class AssessmentQuestionCard extends StatelessWidget {
     this.renderLatex = false,
     this.imageUrl,
     this.grade,
+    this.onReadQuestion,
   });
   final String question;
   final bool renderLatex;
   final String? imageUrl;
   final int? grade;
+  final VoidCallback? onReadQuestion;
 
   static final RegExp _pictorialSymbolPattern = RegExp(
     <String>[
@@ -39,10 +43,29 @@ class AssessmentQuestionCard extends StatelessWidget {
         imageUrl: questionImageUrl,
         renderLatex: renderLatex,
         showSpeaker: grade == 0,
+        onReadQuestion: onReadQuestion,
       );
     }
     final mathQuestion = _mathQuestionParts(displayQuestion);
     final isPictorialQuestion = _containsPictorialSymbols(displayQuestion);
+    final questionContent = renderLatex
+        ? ExamMathText(
+            displayQuestion,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: FontSize.displaySmall,
+              fontWeight: FontWeight.w600,
+              height: 1.2,
+            ),
+          )
+        : mathQuestion != null
+        ? _AssessmentMathQuestion(
+            prefix: mathQuestion.prefix,
+            expression: mathQuestion.expression,
+            color: colors.textPrimary,
+          )
+        : _questionText(colors, displayQuestion);
 
     return Container(
       constraints: BoxConstraints(
@@ -52,35 +75,36 @@ class AssessmentQuestionCard extends StatelessWidget {
           isPictorialQuestion: isPictorialQuestion,
         ),
       ),
-      alignment: Alignment.center,
-      padding: EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: isPictorialQuestion ? 40 : 28,
-      ),
+      alignment: grade == 0 ? Alignment.topCenter : Alignment.center,
+      padding: grade == 0
+          ? const EdgeInsets.all(16)
+          : EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: isPictorialQuestion ? 40 : 28,
+            ),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: colors.border),
         boxShadow: AppShadows.card(colors),
       ),
-      child: renderLatex
-          ? ExamMathText(
-              displayQuestion,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: FontSize.displaySmall,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
+      child: grade == 0
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: _QuestionSpeaker(onPressed: onReadQuestion),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: questionContent,
+                ),
+              ],
             )
-          : mathQuestion != null
-          ? _AssessmentMathQuestion(
-              prefix: mathQuestion.prefix,
-              expression: mathQuestion.expression,
-              color: colors.textPrimary,
-            )
-          : _questionText(colors, displayQuestion),
+          : questionContent,
     );
   }
 
@@ -177,12 +201,14 @@ class _AssessmentImageQuestion extends StatelessWidget {
     required this.imageUrl,
     required this.renderLatex,
     required this.showSpeaker,
+    required this.onReadQuestion,
   });
 
   final String question;
   final String imageUrl;
   final bool renderLatex;
   final bool showSpeaker;
+  final VoidCallback? onReadQuestion;
 
   @override
   Widget build(BuildContext context) {
@@ -212,34 +238,16 @@ class _AssessmentImageQuestion extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              if (showSpeaker) ...[
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: colors.brand.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.volume_up_rounded,
-                    color: colors.brand,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: renderLatex
-                    ? ExamMathText(
-                        question,
-                        textAlign: TextAlign.start,
-                        style: textStyle,
-                      )
-                    : Text(question, softWrap: true, style: textStyle),
-              ),
-            ],
+          _QuestionPromptRow(
+            showSpeaker: showSpeaker,
+            onReadQuestion: onReadQuestion,
+            child: renderLatex
+                ? ExamMathText(
+                    question,
+                    textAlign: TextAlign.start,
+                    style: textStyle,
+                  )
+                : Text(question, softWrap: true, style: textStyle),
           ),
           const SizedBox(height: 16),
           ClipRRect(
@@ -274,6 +282,51 @@ class _AssessmentImageQuestion extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _QuestionPromptRow extends StatelessWidget {
+  const _QuestionPromptRow({
+    required this.showSpeaker,
+    required this.onReadQuestion,
+    required this.child,
+  });
+
+  final bool showSpeaker;
+  final VoidCallback? onReadQuestion;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      if (showSpeaker) ...[
+        _QuestionSpeaker(onPressed: onReadQuestion),
+        const SizedBox(width: 12),
+      ],
+      Expanded(child: child),
+    ],
+  );
+}
+
+class _QuestionSpeaker extends StatelessWidget {
+  const _QuestionSpeaker({required this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    return IconButton.filledTonal(
+      key: const ValueKey('read-question'),
+      tooltip: AppStrings.current(AppKeys.examReadQuestion),
+      onPressed: onPressed,
+      style: IconButton.styleFrom(
+        foregroundColor: colors.brand,
+        backgroundColor: colors.brand.withValues(alpha: 0.12),
+        minimumSize: const Size(48, 48),
+      ),
+      icon: const Icon(Icons.volume_up_rounded, size: 28),
     );
   }
 }

@@ -5,6 +5,38 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
 
 void main() {
+  testWidgets('kindergarten speaker stays at top left above visual content', (
+    tester,
+  ) async {
+    const prompt = '😺😺😺😺😺 = ?';
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
+        ),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 320,
+            child: AssessmentQuestionCard(question: prompt, grade: 0),
+          ),
+        ),
+      ),
+    );
+    final card = find.byType(AssessmentQuestionCard);
+    final speaker = find.byKey(const ValueKey('read-question'));
+    final content = find.text(prompt);
+    // The card's 1px border is included in its effective padding.
+    expect(tester.getTopLeft(speaker).dx, tester.getTopLeft(card).dx + 17);
+    expect(tester.getTopLeft(speaker).dy, tester.getTopLeft(card).dy + 17);
+    expect(
+      tester.getBottomLeft(speaker).dy,
+      lessThan(tester.getTopLeft(content).dy),
+    );
+    expect(tester.getSize(content).width, 286);
+    expect(tester.widget<IconButton>(speaker).onPressed, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('uses pictorial spacing for emoji outside the fruit range', (
     tester,
   ) async {

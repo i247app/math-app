@@ -2,6 +2,8 @@ import '../../app_keys.dart';
 
 const examStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.examReadQuestion: 'Nghe lại câu hỏi',
+    AppKeys.examSpeechUnavailable: 'Chưa thể đọc câu hỏi. Hãy kiểm tra giọng đọc trong cài đặt thiết bị và thử lại.',
     AppKeys.examNumericAnswer: 'Nhập đáp án',
     AppKeys.examNumericHint: 'Ví dụ: 5; 0,5; 1/2',
     AppKeys.examNumericInvalid:
@@ -99,6 +101,8 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examHasNoQuestions: 'Exam không có câu hỏi.',
   },
   'en': {
+    AppKeys.examReadQuestion: 'Read question again',
+    AppKeys.examSpeechUnavailable: 'Unable to read this question. Check the speech voices in your device settings and try again.',
     AppKeys.examNumericAnswer: 'Enter your answer',
     AppKeys.examNumericHint: 'For example: 5; 0.5; 1/2',
     AppKeys.examNumericInvalid: 'Enter a valid integer, decimal or fraction.',

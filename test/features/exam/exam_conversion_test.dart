@@ -5,6 +5,28 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 
 void main() {
+  test(
+    'keeps per-question grade through generate, detail and image refresh',
+    () {
+      for (final grade in <int?>[0, 1, null]) {
+        final generated = ExamQuestionDto.fromJson({
+          'question_number': 1,
+          'question_text': 'Con hãy đếm số quả táo.',
+          'question_grade': grade,
+          'options': <Map<String, dynamic>>[],
+        }).toModel();
+        final detail = ExamDetailAnswerDto.fromJson({
+          'question_number': 1,
+          'question_text': 'Con hãy đếm số quả táo.',
+          'question_grade': grade,
+        }).toQuestionModel(questionNumber: 1);
+        for (final question in [generated, detail]) {
+          expect(question.questionGrade, grade);
+          expect(question.withRefreshedImages(null).questionGrade, grade);
+        }
+      }
+    },
+  );
   for (var apiLevel = 0; apiLevel <= 9; apiLevel++) {
     test('GRADE API level $apiLevel maps to display level ${apiLevel + 1}', () {
       final session = ExamStatsDto.fromJson({

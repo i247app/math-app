@@ -31,6 +31,7 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
             : [correctAnswer!.value.toString()]);
     return ExamQuestion(
       questionText: questionText,
+      questionGrade: questionGrade,
       questionNumber: questionNumberOverride ?? questionNumber,
       options: options.map((answer) => answer.toModel()).toList(),
       correctOptionIds: ids,
@@ -63,6 +64,7 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
 
   ExamQuestion toQuestionModel({required int questionNumber}) => ExamQuestion(
     questionText: questionText?.trim() ?? '',
+    questionGrade: questionGrade,
     questionNumber: questionNumber,
     options: options.map((answer) => answer.toModel()).toList(growable: false),
     correctOptionIds: rightOptionIds,
