@@ -30,6 +30,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_set_transition_
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_image_match_card.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_skeleton.dart';
 import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -792,7 +793,28 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                         if (setTransitionKind == null &&
                                             isTransitioningSet)
                                           const AssessmentQuestionSkeleton()
-                                        else if (setTransitionKind == null) ...[
+                                        else if (setTransitionKind == null &&
+                                            currentQuestion != null &&
+                                            AssessmentImageMatchCard.supports(
+                                              currentQuestion,
+                                            )) ...[
+                                          AssessmentImageMatchCard(
+                                            question: currentQuestion,
+                                            grade: _questionGrade,
+                                            selectedOptionIds:
+                                                _controller.selectedOptionIds,
+                                            feedbackCorrect: _controller
+                                                .selectedAnswerFeedbackCorrect,
+                                            onSelected: selectAnswer,
+                                            onReadQuestion: _canReadQuestion
+                                                ? () => _readQuestion(
+                                                    manual: true,
+                                                  )
+                                                : null,
+                                          ),
+                                          const SizedBox(height: 24),
+                                        ] else if (setTransitionKind ==
+                                            null) ...[
                                           AssessmentQuestionCard(
                                             question:
                                                 currentQuestion!.questionText,

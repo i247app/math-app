@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/localization/app_strings.dart';
 
 import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
 import 'package:numi/features/exam/widgets/exam_math_text.dart';
+
+import 'assessment_question_speaker.dart';
 
 class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({
@@ -95,7 +95,7 @@ class AssessmentQuestionCard extends StatelessWidget {
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: _QuestionSpeaker(onPressed: onReadQuestion),
+                  child: AssessmentQuestionSpeaker(onPressed: onReadQuestion),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -301,34 +301,12 @@ class _QuestionPromptRow extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       if (showSpeaker) ...[
-        _QuestionSpeaker(onPressed: onReadQuestion),
+        AssessmentQuestionSpeaker(onPressed: onReadQuestion),
         const SizedBox(width: 12),
       ],
       Expanded(child: child),
     ],
   );
-}
-
-class _QuestionSpeaker extends StatelessWidget {
-  const _QuestionSpeaker({required this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    return IconButton.filledTonal(
-      key: const ValueKey('read-question'),
-      tooltip: AppStrings.current(AppKeys.examReadQuestion),
-      onPressed: onPressed,
-      style: IconButton.styleFrom(
-        foregroundColor: colors.brand,
-        backgroundColor: colors.brand.withValues(alpha: 0.12),
-        minimumSize: const Size(48, 48),
-      ),
-      icon: const Icon(Icons.volume_up_rounded, size: 28),
-    );
-  }
 }
 
 class _MathQuestionParts {

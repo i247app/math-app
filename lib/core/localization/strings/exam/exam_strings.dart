@@ -2,6 +2,8 @@ import '../../app_keys.dart';
 
 const examStrings = <String, Map<String, String>>{
   'vi': {
+    AppKeys.examMatchNumberToImage: 'Nối số với nhóm hình tương ứng',
+    AppKeys.examImageGroup: 'Nhóm hình {number}',
     AppKeys.examReadQuestion: 'Nghe lại câu hỏi',
     AppKeys.examSpeechUnavailable: 'Chưa thể đọc câu hỏi. Hãy kiểm tra giọng đọc trong cài đặt thiết bị và thử lại.',
     AppKeys.examNumericAnswer: 'Nhập đáp án',
@@ -101,6 +103,8 @@ const examStrings = <String, Map<String, String>>{
     AppKeys.examHasNoQuestions: 'Exam không có câu hỏi.',
   },
   'en': {
+    AppKeys.examMatchNumberToImage: 'Match the number to the picture group',
+    AppKeys.examImageGroup: 'Picture group {number}',
     AppKeys.examReadQuestion: 'Read question again',
     AppKeys.examSpeechUnavailable: 'Unable to read this question. Check the speech voices in your device settings and try again.',
     AppKeys.examNumericAnswer: 'Enter your answer',

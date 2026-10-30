@@ -14,6 +14,8 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_image_match_card.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
@@ -27,6 +29,63 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  testWidgets('image matching stores exact option IDs and enables Continue', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      initialGrade: 1,
+      examType: examTypeAssessment,
+      questions: const [
+        ExamQuestion(
+          questionText: '10',
+          questionNumber: 1,
+          options: [
+            ExamAnswer(
+              id: 'Bank-z',
+              text: '',
+              imageUrl: 'https://example.test/z.png',
+            ),
+            ExamAnswer(
+              id: 'd',
+              text: '',
+              imageUrl: 'https://example.test/d.png',
+            ),
+          ],
+        ),
+      ],
+    );
+    final card = find.byType(AssessmentImageMatchCard);
+    expect(card, findsOneWidget);
+    expect(find.byType(AssessmentAnswerGrid), findsNothing);
+    expect(find.byKey(const ValueKey('read-question')), findsNothing);
+    final continueButton = find.widgetWithText(
+      AssessmentBottomActionButton,
+      'TIẾP TỤC',
+    );
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNull,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('image-match-option-d')));
+    await tester.pump();
+    expect(tester.widget<AssessmentImageMatchCard>(card).selectedOptionIds, {
+      'd',
+    });
+    expect(
+      tester.widget<AssessmentBottomActionButton>(continueButton).onTap,
+      isNotNull,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('image-match-option-Bank-z')));
+    await tester.pump();
+    expect(tester.widget<AssessmentImageMatchCard>(card).selectedOptionIds, {
+      'Bank-z',
+    });
+    expect(tester.takeException(), isNull);
+  });
+
   group('question narration', () {
     const channel = MethodChannel('flutter_tts');
     final calls = <MethodCall>[];
