@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +12,7 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
@@ -29,6 +32,70 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  testWidgets(
+    'set transition remains visible until every new image is decoded',
+    (tester) async {
+      final providers = {
+        'first-image': _PendingQuestionImageProvider(),
+        'later-image': _PendingQuestionImageProvider(),
+      };
+      ExamImageCache.providerOverride = (url, dimension) => providers[url]!;
+      final recorder = ui.PictureRecorder();
+      ui.Canvas(recorder).drawColor(const Color(0xFF00AA88), ui.BlendMode.src);
+      final picture = recorder.endRecording();
+      final image = picture.toImageSync(1, 1);
+      picture.dispose();
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
+        ExamImageCache.providerOverride = null;
+        image.dispose();
+      });
+      final service = _PendingGenerateExamService();
+      await _pumpAssessment(
+        tester,
+        examService: service,
+        initialGrade: 2,
+        examType: examTypeAssessment,
+        questions: _setQuestions('Old set'),
+      );
+      for (var i = 0; i < 5; i++) {
+        await tester.tap(find.byType(AssessmentAnswerButton).at(1));
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pump();
+      }
+      service.completeNextSet(
+        grade: 1,
+        questions: const [
+          ExamQuestion(
+            questionText: 'New set question',
+            questionNumber: 1,
+            questionImageUrl: 'first-image',
+            options: [ExamAnswer(id: 'a', text: '1')],
+          ),
+          ExamQuestion(
+            questionText: 'Later question',
+            questionNumber: 2,
+            options: [ExamAnswer(id: 'a', text: '', imageUrl: 'later-image')],
+          ),
+        ],
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+      expect(find.text('New set question'), findsNothing);
+      providers['first-image']!.completer.emit(image);
+      await tester.pump();
+      expect(find.byType(AssessmentSetTransitionLoader), findsOneWidget);
+      providers['later-image']!.completer.emit(image);
+      await tester.pumpAndSettle();
+      expect(find.byType(AssessmentSetTransitionLoader), findsNothing);
+      expect(find.text('New set question'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('image matching stores exact option IDs and enables Continue', (
     tester,
   ) async {
@@ -1597,13 +1664,17 @@ class _PendingGenerateExamService implements ExamService {
     _nextSetCompleter = Completer<GeneratedExam>();
   }
 
-  void completeNextSet({int grade = 2, String setName = 'Set 2'}) {
+  void completeNextSet({
+    int grade = 2,
+    String setName = 'Set 2',
+    List<ExamQuestion>? questions,
+  }) {
     _nextSetCompleter.complete(
       GeneratedExam(
         examId: 2,
         examType: examTypeAssessment,
         grade: grade,
-        questions: _setQuestions(setName),
+        questions: questions ?? _setQuestions(setName),
       ),
     );
   }
@@ -1639,4 +1710,22 @@ class _PendingGenerateExamService implements ExamService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _PendingQuestionImageProvider
+    extends ImageProvider<_PendingQuestionImageProvider> {
+  final completer = _PendingQuestionImageCompleter();
+  @override
+  Future<_PendingQuestionImageProvider> obtainKey(
+    ImageConfiguration configuration,
+  ) => SynchronousFuture(this);
+  @override
+  ImageStreamCompleter loadImage(
+    _PendingQuestionImageProvider key,
+    ImageDecoderCallback decode,
+  ) => completer;
+}
+
+class _PendingQuestionImageCompleter extends ImageStreamCompleter {
+  void emit(ui.Image image) => setImage(ImageInfo(image: image.clone()));
 }

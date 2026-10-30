@@ -5,6 +5,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_text_normalizer.dart';
 import 'package:numi/features/exam/widgets/exam_math_text.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 
 import 'assessment_question_speaker.dart';
 
@@ -257,8 +258,8 @@ class _AssessmentImageQuestion extends StatelessWidget {
                 constraints: BoxConstraints(
                   maxHeight: constraints.maxWidth * 0.8,
                 ),
-                child: Image.network(
-                  imageUrl,
+                child: Image(
+                  image: ExamImageCache.provider(imageUrl),
                   width: double.infinity,
                   fit: BoxFit.contain,
                   excludeFromSemantics: true,

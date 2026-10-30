@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 // Google Fonts exposes this manifest override for testing font loading.
 // ignore: implementation_imports
 import 'package:google_fonts/src/google_fonts_base.dart' as font_loading;
@@ -36,6 +38,9 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   void installTestAssets() {
+    // Widget tests already reject network images. Keep disk/plugin IO out of
+    // the fake clock; persistent cache behavior has its own filesystem test.
+    ExamImageCache.managerOverride = _UnavailableImageCache();
     binding.defaultBinaryMessenger.setMockMessageHandler('flutter/assets', (
       message,
     ) async {
@@ -61,6 +66,24 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   installTestAssets();
   setUp(installTestAssets);
   await testMain();
+}
+
+class _UnavailableImageCache implements BaseCacheManager {
+  @override
+  Future<void> removeFile(String key) async {}
+
+  @override
+  Stream<FileResponse> getFileStream(
+    String url, {
+    String? key,
+    Map<String, String>? headers,
+    bool withProgress = false,
+  }) => Stream.error(
+    const HttpException('Network images disabled in widget tests'),
+  );
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _TestFontManifest implements AssetManifest {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 
 /// Image URLs are transient. The enclosing exam controller refreshes them.
 class ExamImage extends StatelessWidget {
@@ -13,8 +14,8 @@ class ExamImage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 240),
-        child: Image.network(
-          url!,
+        child: Image(
+          image: ExamImageCache.provider(url!),
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
         ),

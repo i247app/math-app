@@ -5,6 +5,7 @@ import 'package:numi/core/theme/app_shadows.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 
 import 'assessment_question_speaker.dart';
 
@@ -226,8 +227,8 @@ class _ImageMatchOption extends StatelessWidget {
                 onTap: onTap,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Image.network(
-                    option.imageUrl!,
+                  child: Image(
+                    image: ExamImageCache.provider(option.imageUrl!),
                     fit: BoxFit.contain,
                     excludeFromSemantics: true,
                     loadingBuilder: (context, child, progress) =>

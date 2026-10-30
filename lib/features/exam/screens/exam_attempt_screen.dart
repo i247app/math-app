@@ -15,6 +15,8 @@ import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_question_speech_service.dart';
+import 'package:numi/features/exam/data/exam_image_preloader.dart';
+import 'package:numi/features/exam/data/exam_image_cache.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
@@ -82,6 +84,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     with WidgetsBindingObserver {
   late final ExamAttemptController _controller;
   late final ProfileGradeProgressStore _gradeProgressStore;
+  late final ExamImagePreloader _imagePreloader;
+  bool _imageContextReady = false;
+  AssessmentSetTransitionKind? _imageTransitionKind;
   Timer? _practiceFeedbackTimer;
   bool _isCompletingAssessment = false;
   final _questionSpeech = ExamQuestionSpeechService();
@@ -95,6 +100,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
 
   bool get _canReadQuestion =>
       !_speechSuspended &&
+      !_imagePreloader.isPreparingSet &&
       !_controller.isGeneratingQuestion &&
       !_controller.isGeneratingExam &&
       !_controller.isSubmittingExam &&
@@ -124,6 +130,14 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     );
     _gradeProgressStore =
         widget.gradeProgressStore ?? const SecureProfileGradeProgressStore();
+    _imagePreloader = ExamImagePreloader(
+      retain: ExamImageCache.retain,
+      release: ExamImageCache.release,
+      isCached: ExamImageCache.isReady,
+      load: (url) => ExamImageCache.prepare(url, context),
+    );
+    _controller.addListener(_syncPreloadedImages);
+    _imagePreloader.addListener(_syncQuestionSpeech);
     _controller.addListener(_syncQuestionSpeech);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _syncQuestionSpeech();
@@ -134,9 +148,34 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _imageContextReady = true;
+    _syncPreloadedImages();
+  }
+
+  void _syncPreloadedImages() {
+    if (!_imageContextReady || !mounted) return;
+    if (_controller.exam == null) _imageTransitionKind = null;
+    if (_controller.isTransitioningSet) {
+      _imageTransitionKind = switch (_controller.transitioningGradeDelta) {
+        int delta when delta < 0 => AssessmentSetTransitionKind.downGrade,
+        0 => AssessmentSetTransitionKind.stayGrade,
+        1 => AssessmentSetTransitionKind.grow,
+        int delta when delta >= 2 => AssessmentSetTransitionKind.trophy,
+        _ => null,
+      };
+    }
+    _imagePreloader.update(_controller.exam, _controller.questionIndex);
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _controller.removeListener(_syncQuestionSpeech);
+    _controller.removeListener(_syncPreloadedImages);
+    _imagePreloader.removeListener(_syncQuestionSpeech);
+    _imagePreloader.dispose();
     _questionSpeech.dispose();
     _practiceFeedbackTimer?.cancel();
     _controller.dispose();
@@ -679,22 +718,27 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
       child: AnimatedBuilder(
-        animation: _controller,
+        animation: Listenable.merge([_controller, _imagePreloader]),
         builder: (context, child) {
           final currentExam = _controller.exam;
           final questions = currentExam?.questions ?? const <ExamQuestion>[];
           final currentQuestion = _controller.currentQuestion;
           final errorMessage = _controller.errorMessage;
-          final isGeneratingQuestion = _controller.isGeneratingQuestion;
-          final isTransitioningSet = _controller.isTransitioningSet;
+          final preparingImages = _imagePreloader.isPreparingSet;
           final setTransitionKind = switch (_controller
               .transitioningGradeDelta) {
             int delta when delta < 0 => AssessmentSetTransitionKind.downGrade,
             0 => AssessmentSetTransitionKind.stayGrade,
             1 => AssessmentSetTransitionKind.grow,
             int delta when delta >= 2 => AssessmentSetTransitionKind.trophy,
-            _ => null,
+            _ => preparingImages ? _imageTransitionKind : null,
           };
+          final isGeneratingQuestion =
+              _controller.isGeneratingQuestion ||
+              (preparingImages && setTransitionKind == null);
+          final isTransitioningSet =
+              _controller.isTransitioningSet ||
+              (preparingImages && setTransitionKind != null);
           final isSubmittingExam =
               _controller.isSubmittingExam || _isCompletingAssessment;
           final hasActiveAttempt = questions.isNotEmpty;
