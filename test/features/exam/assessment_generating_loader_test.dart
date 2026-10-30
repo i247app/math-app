@@ -16,14 +16,14 @@ void main() {
       const MaterialApp(
         home: Scaffold(
           body: AssessmentGeneratingLoader(
-            message: 'Để Numi tạo bài kiểm tra cho bạn nhé',
+            message: 'Numi đang chuẩn bị bài cho bạn nhé!',
           ),
         ),
       ),
     );
 
     expect(find.byType(NumiAssessmentMascotAnimation), findsOneWidget);
-    expect(find.text('Để Numi tạo bài kiểm tra cho bạn nhé'), findsOneWidget);
+    expect(find.text('Numi đang chuẩn bị bài cho bạn nhé!'), findsOneWidget);
     final fallback = tester.widget<Image>(
       find.byKey(const ValueKey('numi-rig-loading-fallback')),
     );

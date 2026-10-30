@@ -598,6 +598,7 @@ class AppKeys {
   static const submitUpper = 'submit_upper';
   static const submittingForYou = 'submitting_for_you';
   static const generatingAssessment = 'generating_assessment';
+  static const loadingSavedAssessment = 'loading_saved_assessment';
   static const assessmentHeaderTitle = 'assessment_header_title';
   static const questionProgress = 'question_progress';
   static const previousQuestionUpper = 'previous_question_upper';

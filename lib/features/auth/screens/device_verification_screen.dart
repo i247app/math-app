@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
@@ -36,6 +38,7 @@ class DeviceVerificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthLayout(
       onBack: onBack,
+      mascotAsset: 'assets/images/auth-entry-mascot.png',
       titleWidget: const _DeviceVerificationHeading(),
       bodyGap: 28,
       fillRemainingBody: true,
@@ -68,6 +71,13 @@ class DeviceVerificationScreen extends StatelessWidget {
                     : onSend,
                 layout: AuthActionButtonLayout.compact,
                 isBusy: isSending,
+                backgroundColor: AppColors.brandLogoOrange,
+                foregroundColor: Colors.white,
+                textStyle: GoogleFonts.nunito(
+                  fontSize: FontSize.large,
+                  fontWeight: FontWeight.w900,
+                  height: 1.2,
+                ),
               ),
             ],
           ),

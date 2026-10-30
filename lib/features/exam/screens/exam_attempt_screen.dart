@@ -721,6 +721,12 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
         animation: Listenable.merge([_controller, _imagePreloader]),
         builder: (context, child) {
           final currentExam = _controller.exam;
+          final isLoadingSavedExam =
+              widget.isResumedAssessment &&
+              currentExam != null &&
+              (currentExam.examId != null
+                  ? currentExam.examId == widget.initialExam?.examId
+                  : identical(currentExam, widget.initialExam));
           final questions = currentExam?.questions ?? const <ExamQuestion>[];
           final currentQuestion = _controller.currentQuestion;
           final errorMessage = _controller.errorMessage;
@@ -786,7 +792,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                         ? AssessmentGeneratingLoader(
                             key: const ValueKey('question-loader'),
                             message: context.getText(
-                              AppKeys.generatingAssessment,
+                              isLoadingSavedExam
+                                  ? AppKeys.loadingSavedAssessment
+                                  : AppKeys.generatingAssessment,
                             ),
                           )
                         : SizedBox.expand(
