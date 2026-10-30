@@ -32,6 +32,8 @@ class WelcomeComposition extends StatelessWidget {
     final safePadding = MediaQuery.paddingOf(context);
 
     return Stack(
+      // Fill wide viewports instead of shrinking to the capped artwork width.
+      fit: StackFit.expand,
       children: [
         const Positioned.fill(child: WelcomeBackground()),
         LayoutBuilder(

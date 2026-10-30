@@ -10,6 +10,8 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/welcome/screens/welcome_screen.dart';
+import 'package:numi/features/welcome/widgets/welcome_background.dart';
+import 'package:numi/features/welcome/widgets/welcome_thinking_scene.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
@@ -79,6 +81,32 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final size in const [Size(1032, 1376), Size(1376, 1032)]) {
+    testWidgets(
+      'iPad welcome fills the viewport and centers content at $size',
+      (tester) async {
+        await _pumpWelcome(tester, size: size, language: AppLanguage.en);
+
+        expect(
+          tester.getRect(find.byType(WelcomeBackground)),
+          Offset.zero & size,
+        );
+        for (final content in [
+          find.text('LOGIN'),
+          find.text('SIGNUP'),
+          find.byType(WelcomeThinkingScene),
+        ]) {
+          expect(tester.getCenter(content).dx, closeTo(size.width / 2, 0.1));
+        }
+        expect(tester.takeException(), isNull);
+
+        if (const bool.fromEnvironment('WELCOME_PREVIEW')) {
+          await _savePreview(tester, 'welcome-ipad-${size.width.toInt()}.png');
+        }
+      },
+    );
+  }
+
   testWidgets('reference composition keeps the artwork above the actions', (
     tester,
   ) async {
@@ -122,7 +150,7 @@ void main() {
     expect(find.text('Try It Now!'), findsOneWidget);
     expect(find.text('LOGIN'), findsOneWidget);
     expect(find.text('SIGNUP'), findsOneWidget);
-    expect(find.text('Learn & Assess'), findsOneWidget);
+    expect(find.text('Assess & Learn'), findsOneWidget);
     expect(find.text('Thử Ngay!'), findsNothing);
     expect(tester.takeException(), isNull);
 
@@ -189,9 +217,8 @@ Future<void> _savePreview(WidgetTester tester, String fileName) async {
     final image = await boundary.toImage(pixelRatio: 2);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
     await Directory('build/welcome-preview').create(recursive: true);
-    await File(
-      'build/welcome-preview/$fileName',
-    ).writeAsBytes(bytes!.buffer.asUint8List());
+    await File('build/welcome-preview/$fileName')
+        .writeAsBytes(bytes!.buffer.asUint8List());
     image.dispose();
   });
 }
@@ -222,9 +249,8 @@ Future<LingoProvider> _pumpWelcome(
       child: MaterialApp(
         theme: dark ? AppTheme.dark() : AppTheme.light(),
         builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(textScale)),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
           child: child!,
         ),
         home: RepaintBoundary(
