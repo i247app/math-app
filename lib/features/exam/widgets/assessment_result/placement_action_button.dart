@@ -23,6 +23,10 @@ class PlacementActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final foregroundColor = outlined
+        ? color
+        : (isDark ? colors.onPrimaryAction : colors.onBrand);
     final radius = BorderRadius.circular(14);
 
     return Material(
@@ -34,7 +38,7 @@ class PlacementActionButton extends StatelessWidget {
         child: Ink(
           height: 50,
           decoration: BoxDecoration(
-            color: outlined ? Colors.white : color,
+            color: outlined ? (isDark ? colors.surface : Colors.white) : color,
             borderRadius: radius,
             border: outlined ? Border.all(color: color, width: 1.5) : null,
             boxShadow: outlined
@@ -54,18 +58,14 @@ class PlacementActionButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    icon,
-                    color: outlined ? color : colors.onBrand,
-                    size: 19,
-                  ),
+                  Icon(icon, color: foregroundColor, size: 19),
                   const SizedBox(width: 8),
                   Text(
                     label,
                     maxLines: 1,
                     softWrap: false,
                     style: GoogleFonts.andika(
-                      color: outlined ? color : colors.onBrand,
+                      color: foregroundColor,
                       fontSize: FontSize.normal,
                       fontWeight: FontWeight.w700,
                       height: 1.1,

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 
 class GradeExamLevelRibbon extends StatelessWidget {
   const GradeExamLevelRibbon({super.key, required this.currentLevel});
@@ -26,6 +27,10 @@ class GradeExamLevelRibbon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors =
+        Theme.of(context).extension<AppThemeColors>() ??
+        (isDark ? AppThemeColors.dark : AppThemeColors.light);
     final activeLevel = currentLevel.clamp(1, _levelCenters.length);
     final levelLabel = context
         .getText(AppKeys.placementResultChartGrade)
@@ -63,7 +68,9 @@ class GradeExamLevelRibbon extends StatelessWidget {
                                 'grade-exam-current-level-label',
                               ),
                               style: GoogleFonts.nunito(
-                                color: Colors.black,
+                                color: isDark
+                                    ? colors.textPrimary
+                                    : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w800,
                                 height: 1,
@@ -79,10 +86,14 @@ class GradeExamLevelRibbon extends StatelessWidget {
                             label: context.getText(
                               AppKeys.placementResultYouAreHere,
                             ),
-                            child: const ClipPath(
-                              key: ValueKey('grade-exam-current-level-marker'),
-                              clipper: _InvertedHouseClipper(),
-                              child: ColoredBox(color: AppColors.red),
+                            child: ClipPath(
+                              key: const ValueKey(
+                                'grade-exam-current-level-marker',
+                              ),
+                              clipper: const _InvertedHouseClipper(),
+                              child: ColoredBox(
+                                color: isDark ? colors.error : AppColors.red,
+                              ),
                             ),
                           ),
                         ),

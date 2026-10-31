@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_colors.dart';
+import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 
 class PlacementGradeTitle extends StatelessWidget {
@@ -18,6 +19,8 @@ class PlacementGradeTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final label = grade == AssessmentFlowPolicy.minimumGrade
         ? context.getText(AppKeys.placementResultKindergarten)
         : context.formatText(AppKeys.placementResultGrade, {'grade': grade});
@@ -73,8 +76,12 @@ class PlacementGradeTitle extends StatelessWidget {
                             glyphs[index],
                             style: textStyle.copyWith(
                               color: index < splitIndex
-                                  ? AppColors.teal600
-                                  : AppColors.coral600,
+                                  ? (isDark
+                                        ? colors.brandStrong
+                                        : AppColors.teal600)
+                                  : (isDark
+                                        ? colors.accent
+                                        : AppColors.coral600),
                             ),
                           ),
                         ),

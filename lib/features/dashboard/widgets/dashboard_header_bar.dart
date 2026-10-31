@@ -298,6 +298,9 @@ class DashboardNotificationButton extends StatelessWidget {
                   studentHomeBellAsset,
                   width: 12,
                   height: 15,
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? ColorFilter.mode(colors.textPrimary, BlendMode.srcIn)
+                      : null,
                 ),
               ),
               if (hasUnreadNotifications)

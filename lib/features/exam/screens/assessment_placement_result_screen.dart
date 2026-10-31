@@ -159,10 +159,18 @@ class _AssessmentPlacementResultScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? colors.pageBackground : Colors.white;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: isDark
+          ? SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: backgroundColor,
+              systemNavigationBarColor: backgroundColor,
+            )
+          : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
         body: SafeArea(
           child: Align(
             alignment: Alignment.topCenter,
@@ -215,6 +223,7 @@ class _AssessmentPlacementResultScreenState
 
   Widget _buildResultContent(BuildContext context) {
     final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final config = _controller.config;
     final chart = _controller.state.chart;
     final generationAction = config.generationAction;
@@ -251,7 +260,9 @@ class _AssessmentPlacementResultScreenState
                       ? null
                       : context.getText(config.headerTitleKey!),
                   topInset: 0,
-                  backgroundColor: Colors.white,
+                  backgroundColor: isDark
+                      ? colors.pageBackground
+                      : Colors.white,
                   actionWidth: 44,
                   horizontalPadding: 16,
                   trailing: Align(
@@ -261,16 +272,17 @@ class _AssessmentPlacementResultScreenState
                       height: 38,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: isDark ? colors.surface : Colors.white,
                         border: Border.all(
-                          color: const Color(0xFFB5EBF4),
+                          color: isDark
+                              ? colors.borderStrong
+                              : const Color(0xFFB5EBF4),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(
-                              0xFF04A8B3,
-                            ).withValues(alpha: 0.1),
+                            color: const Color(0xFF04A8B3)
+                                .withValues(alpha: 0.1),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -279,7 +291,9 @@ class _AssessmentPlacementResultScreenState
                       child: ExamHeaderIconButton(
                         key: const ValueKey('placement-result-close'),
                         icon: Icons.close_rounded,
-                        color: const Color(0xFF04A8B3),
+                        color: isDark
+                            ? colors.brandStrong
+                            : const Color(0xFF04A8B3),
                         size: 38,
                         iconSize: 22,
                         circle: true,
@@ -293,7 +307,9 @@ class _AssessmentPlacementResultScreenState
                   context.getText(config.headingKey),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.nunito(
-                    color: const Color(0xFF04A8B3),
+                    color: isDark
+                        ? colors.brandStrong
+                        : const Color(0xFF04A8B3),
                     fontSize: FontSize.xxl,
                     fontWeight: FontWeight.w800,
                     height: 1.2,
@@ -391,7 +407,9 @@ class _AssessmentPlacementResultScreenState
                                 AppKeys.placementResultReview,
                               ),
                               icon: Icons.assignment_outlined,
-                              color: AppColors.resultCoral,
+                              color: isDark
+                                  ? colors.accent
+                                  : AppColors.resultCoral,
                               outlined: true,
                               onTap: _viewDetails,
                             ),
@@ -405,7 +423,9 @@ class _AssessmentPlacementResultScreenState
                             key: const ValueKey('placement-continue-grade'),
                             label: context.getText(generationAction.labelKey),
                             icon: Icons.arrow_forward_rounded,
-                            color: AppColors.teal500,
+                            color: isDark
+                                ? colors.primaryAction
+                                : AppColors.teal500,
                             onTap: _generateNextExam,
                           ),
                         ),
