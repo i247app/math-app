@@ -1,0 +1,1989 @@
+{
+  "summary": {
+    "date": "2026-11-01",
+    "total_images": 146,
+    "total_bytes": 64894677,
+    "counts": {
+      "referenced": 122,
+      "no_references": 10,
+      "legacy_only": 14
+    },
+    "candidate_bytes": 9880613,
+    "dynamic_images_verified": 17,
+    "reachable_dart_files": 740,
+    "total_dart_files": 812,
+    "cleanup": {
+      "date": "2026-11-01",
+      "removed_images": 24,
+      "removed_bytes": 9880613,
+      "remaining_images": 122,
+      "remaining_bytes": 55014064
+    }
+  },
+  "images": [
+    {
+      "path": "assets/avatars/20260530-3b3dedb2-f0da-424a-8236-43d332555a35.png",
+      "bytes": 158422,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-44517641-967a-4ffb-b08f-efb6d6f087d2.png",
+      "bytes": 145542,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-598c7654-c1b1-422d-9857-7d44cb39113e.png",
+      "bytes": 146065,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-6fe2364f-2bdf-4eed-ba12-29ffb719ab91.png",
+      "bytes": 147605,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-92ad1bf7-289a-4efa-836b-863cb4b6e5a8.png",
+      "bytes": 151385,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-b3cdd011-da7c-423c-97d7-c358d9535c69.png",
+      "bytes": 179775,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-b618570e-20ed-41a3-bfbc-53fa7577d47d.png",
+      "bytes": 166438,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-e08c6d07-6812-4155-be41-d7edec85013b.png",
+      "bytes": 167442,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/avatars/20260530-efdbb9df-d6ec-4ad6-9f61-f0bc1e8ad4dd.png",
+      "bytes": 149985,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/models/profile_avatar_catalog.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/1.svg",
+      "bytes": 30836,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/2.svg",
+      "bytes": 43920,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/3.svg",
+      "bytes": 46632,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/4.svg",
+      "bytes": 41516,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/5.svg",
+      "bytes": 49928,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/assessment-navbar-icon.svg",
+      "bytes": 1933,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNavAssessmentAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/classroom-homework.png",
+      "bytes": 257668,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_function_grid.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_function_grid.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/exam-icon.svg",
+      "bytes": 1255,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/parent_room/parent_room_utilities_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/parent_room/parent_room_utilities_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/folder-icon.svg",
+      "bytes": 770,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/parent_room/parent_room_utilities_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/parent_room/parent_room_utilities_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/game-navbar-icon.svg",
+      "bytes": 4130,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNavGameAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/home-assessment-stopwatch.png",
+      "bytes": 984652,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/home/screens/parent/parent_home_tab.dart"
+      ],
+      "source_references": [
+        "lib/features/home/screens/parent/parent_home_tab.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/home-learning-book.png",
+      "bytes": 934490,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/home/screens/parent/parent_home_tab.dart"
+      ],
+      "source_references": [
+        "lib/features/home/screens/parent/parent_home_tab.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/home-navbar-icon.svg",
+      "bytes": 249,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/dashboard/widgets/dashboard_bottom_navigation.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNavHomeAsset"
+      ]
+    },
+    {
+      "path": "assets/icons/mau_giao.svg",
+      "bytes": 69444,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-copy.svg",
+      "bytes": 334,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_code_action_button.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_code_action_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-delete.svg",
+      "bytes": 564,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-edit.svg",
+      "bytes": 425,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart",
+        "lib/features/profile/widgets/list/parent_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart",
+        "lib/features/profile/widgets/list/parent_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-grade.svg",
+      "bytes": 434,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-mail.svg",
+      "bytes": 337,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-program.svg",
+      "bytes": 476,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_child_profile_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-profile-manage-qr.svg",
+      "bytes": 476,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/profile/widgets/list/parent_code_action_button.dart"
+      ],
+      "source_references": [
+        "lib/features/profile/widgets/list/parent_code_action_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-role.png",
+      "bytes": 895189,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/parent-room-assessment.svg",
+      "bytes": 323,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/helpers/parent_room_helpers.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/helpers/parent_room_helpers.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/pin-figma-back.svg",
+      "bytes": 307,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/auth_header.dart",
+        "lib/shared/widgets/app_back_button.dart"
+      ],
+      "source_references": [
+        "lib/shared/widgets/app_back_button.dart",
+        "lib/features/auth/widgets/auth_header.dart"
+      ],
+      "asset_constants": [
+        "_backIconAsset"
+      ]
+    },
+    {
+      "path": "assets/icons/room-navbar-icon.svg",
+      "bytes": 364,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNavRoomAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/setting-navbar-icon.svg",
+      "bytes": 2236,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/dashboard/widgets/dashboard_bottom_navigation.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNavSettingsAsset"
+      ]
+    },
+    {
+      "path": "assets/icons/student-class-assignment.svg",
+      "bytes": 1361,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-class-chevron.svg",
+      "bytes": 322,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_upcoming_deadline_tile.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-class-exam.svg",
+      "bytes": 1879,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-class-grades.svg",
+      "bytes": 417,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-class-message.svg",
+      "bytes": 526,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_message_button.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_message_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-class-resources.svg",
+      "bytes": 747,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_detail/student_class_learning_category_section.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-home-bell.svg",
+      "bytes": 905,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_class_action_state.dart",
+        "lib/features/dashboard/widgets/dashboard_header_bar.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart",
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentHomeBellAsset",
+        "studentJoinPendingIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-home-invite.svg",
+      "bytes": 697,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "studentHomeInviteAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/student-homework-calendar.svg",
+      "bytes": 870,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_assignment_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_assignment_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-homework-search.png",
+      "bytes": 18615,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_search_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_search_field.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-join-back.svg",
+      "bytes": 307,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_detail/student_class_top_bar.dart",
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_top_bar.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/student_list/student_classroom_exercise_top_bar.dart",
+        "lib/features/classroom/widgets/student_detail/student_class_top_bar.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/student-join-book.svg",
+      "bytes": 1329,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_class_search_content.dart",
+        "lib/features/classroom/widgets/student_search/student_join_class_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinBookIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-join-dropdown.svg",
+      "bytes": 316,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_class_action_state.dart",
+        "lib/features/classroom/widgets/student_search/student_join_school_filter_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinDropdownIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-join-enter.svg",
+      "bytes": 649,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_class_action_state.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinEnterIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-join-filter.svg",
+      "bytes": 293,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_class_action_state.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinFilterIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-join-scan.png",
+      "bytes": 10971,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_search_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinScanIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-join-search.png",
+      "bytes": 18615,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_class_search_content.dart",
+        "lib/features/classroom/widgets/student_search/student_join_search_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart"
+      ],
+      "asset_constants": [
+        "studentJoinSearchIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/student-parent-home-accept.png",
+      "bytes": 18738,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "studentParentHomeAcceptIconAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/student-parent-home-join-icon.svg",
+      "bytes": 821,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "studentParentHomeJoinIconAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/student-parent-home-reject.png",
+      "bytes": 25057,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "studentParentHomeRejectIconAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/icons/student-role.png",
+      "bytes": 1072062,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-add.svg",
+      "bytes": 330,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/shared/widgets/small_coral_add_button.dart"
+      ],
+      "source_references": [
+        "lib/shared/widgets/small_coral_add_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-assignment.png",
+      "bytes": 32186,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_function_grid.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_function_grid.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-back.svg",
+      "bytes": 307,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/screens/teacher_class_detail_screen.dart",
+        "lib/features/classroom/screens/teacher_create_class_screen.dart",
+        "lib/features/classroom/widgets/teacher_members/teacher_class_members_content.dart",
+        "lib/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart",
+        "lib/features/classroom_exercise/screens/teacher_classroom_exercise_screen.dart",
+        "lib/features/classroom_exercise/screens/teacher_create_classroom_exercise_screen.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart",
+        "lib/features/classroom_exercise/screens/teacher_classroom_exercise_screen.dart",
+        "lib/features/classroom_exercise/screens/teacher_create_classroom_exercise_screen.dart",
+        "lib/features/classroom/screens/teacher_class_detail_screen.dart",
+        "lib/features/classroom/screens/teacher_create_class_screen.dart",
+        "lib/features/classroom/widgets/teacher_members/teacher_class_members_content.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-chevron.svg",
+      "bytes": 347,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_member_management_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_member_management_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-copy.svg",
+      "bytes": 716,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/parent_room/parent_room_detail_hero.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/parent_room/parent_room_detail_hero.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-description.png",
+      "bytes": 14702,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart",
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-grade.png",
+      "bytes": 29423,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart",
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-graduation.svg",
+      "bytes": 1027,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/student_search/student_join_class_action_state.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart",
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart",
+        "lib/features/classroom/widgets/student_search/student_class_search_assets.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": [
+        "studentJoinJoinedIcon"
+      ]
+    },
+    {
+      "path": "assets/icons/teacher-class-link-copy.svg",
+      "bytes": 716,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_code_chip.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_code_chip.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-members.png",
+      "bytes": 25543,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_member_management_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_member_management_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-program.png",
+      "bytes": 25017,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart",
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_class_summary.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-qr.png",
+      "bytes": 7170,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/parent_room/parent_room_detail_hero.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/parent_room/parent_room_detail_hero.dart",
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-class-share.png",
+      "bytes": 19787,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_detail/teacher_class_detail_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-add.svg",
+      "bytes": 330,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_add_button.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_add_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-create-arrow.svg",
+      "bytes": 372,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_submit_button.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_submit_button.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-create-calendar.svg",
+      "bytes": 605,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_date_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_create/teacher_create_classroom_exercise_date_field.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-detail-calendar.svg",
+      "bytes": 1052,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_stat_due.dart",
+        "lib/features/classroom_exercise/widgets/teacher_study/teacher_study_exercise_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_stat_due.dart",
+        "lib/features/classroom_exercise/widgets/teacher_study/teacher_study_exercise_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-detail-check.svg",
+      "bytes": 934,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_answer_option.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_answer_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-detail-class.svg",
+      "bytes": 669,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_info_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_info_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-detail-questions.svg",
+      "bytes": 1877,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_stat_questions.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_detail/teacher_assignment_stat_questions.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-dropdown.svg",
+      "bytes": 267,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/screens/teacher_create_classroom_exercise_screen.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/screens/teacher_create_classroom_exercise_screen.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-more.svg",
+      "bytes": 581,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_assignment_card.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_assignment_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-search.svg",
+      "bytes": 908,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_search_field.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_search_field.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-homework-sort.svg",
+      "bytes": 419,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_section_header.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom_exercise/widgets/teacher_list/teacher_classroom_exercise_section_header.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-member-accept.png",
+      "bytes": 18738,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_members/teacher_join_request_row.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_members/teacher_join_request_row.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-member-reject.png",
+      "bytes": 25057,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/teacher_members/teacher_join_request_row.dart"
+      ],
+      "source_references": [
+        "lib/features/classroom/widgets/teacher_members/teacher_join_request_row.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/icons/teacher-role.png",
+      "bytes": 4830,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/widgets/signup/signup_role_selector.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-active-mascot.png",
+      "bytes": 968856,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/parent_assessment/active_assessment_dialog.dart",
+        "lib/features/exam/widgets/parent_assessment/parent_assessment_active_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-blocks.png",
+      "bytes": 520043,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-checklist.png",
+      "bytes": 517715,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-mascot.png",
+      "bytes": 594038,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-numbers.png",
+      "bytes": 680824,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-pencil.png",
+      "bytes": 893827,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-result-stars.png",
+      "bytes": 268711,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment-tab-banner.jpg",
+      "bytes": 58579,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-cyan-planet.png",
+      "bytes": 21222,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-graduate-mascot.png",
+      "bytes": 1122711,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/welcome/screens/welcome_assessment_intro_screen.dart"
+      ],
+      "source_references": [
+        "lib/features/welcome/screens/welcome_assessment_intro_screen.dart"
+      ],
+      "asset_constants": [
+        "_mascotAsset"
+      ]
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-ground.png",
+      "bytes": 171604,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-intro-background.png",
+      "bytes": 198603,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-intro-decorations.png",
+      "bytes": 653118,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-left-star.png",
+      "bytes": 4185,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-lower-left-dot.png",
+      "bytes": 1174,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-middle-left-dot.png",
+      "bytes": 1083,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-purple-planet.png",
+      "bytes": 14585,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-right-dot.png",
+      "bytes": 900,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-right-star.png",
+      "bytes": 4543,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-saturn.png",
+      "bytes": 22919,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-top-dot.png",
+      "bytes": 1137,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/assessment_intro/assessment-upper-left-dot.png",
+      "bytes": 1005,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_assessment_background.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/auth-entry-mascot.png",
+      "bytes": 1437186,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/screens/device_verification_screen.dart",
+        "lib/features/auth/screens/otp_screen.dart",
+        "lib/features/auth/screens/passcode_screen.dart",
+        "lib/features/auth/widgets/auth_entry/auth_entry_view.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/screens/device_verification_screen.dart",
+        "lib/features/auth/screens/otp_screen.dart",
+        "lib/features/auth/screens/passcode_screen.dart",
+        "lib/features/auth/widgets/auth_entry/auth_entry_view.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/game-numi-electric-rescue.png",
+      "bytes": 2096266,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart",
+        "lib/features/home/widgets/home_monster_rescue_preview_artwork.dart"
+      ],
+      "asset_constants": [
+        "parentHomeMonsterRescueAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/game-numi-farm-banner.png",
+      "bytes": 1917895,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeNumiFarmAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/grade-ribbon-levels-1-10.png",
+      "bytes": 563031,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-ribbon-numbers.png",
+      "bytes": 516483,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart",
+        "lib/features/welcome/screens/welcome_assessment_intro_screen.dart"
+      ],
+      "source_references": [
+        "lib/features/welcome/screens/welcome_assessment_intro_screen.dart",
+        "lib/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-roadmap-background-2.png",
+      "bytes": 4610832,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "asset_constants": [
+        "grade2BackgroundAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-roadmap-background-3.png",
+      "bytes": 5013533,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "asset_constants": [
+        "grade3BackgroundAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-roadmap-background-4.png",
+      "bytes": 4485859,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "asset_constants": [
+        "grade4BackgroundAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-roadmap-background-k.png",
+      "bytes": 4235691,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "asset_constants": [
+        "kindergartenBackgroundAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-roadmap-background.jpg",
+      "bytes": 662531,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/helpers/grade_roadmap_layout.dart"
+      ],
+      "asset_constants": [
+        "backgroundAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-roadmap-mascot.png",
+      "bytes": 666269,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/screens/grade_roadmap_screen.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/screens/grade_roadmap_screen.dart"
+      ],
+      "asset_constants": [
+        "_mascotAsset"
+      ]
+    },
+    {
+      "path": "assets/images/grade-selection-1.png",
+      "bytes": 1397802,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-selection-2.png",
+      "bytes": 2357646,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-selection-3.png",
+      "bytes": 2011720,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-selection-4.png",
+      "bytes": 1436344,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-selection-5.png",
+      "bytes": 1972354,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/grade-selection-k.png",
+      "bytes": 2047855,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/grade_selection/grade_option.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/join-classroom.jpg",
+      "bytes": 96107,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeClassroomAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/no-profile-mascot.png",
+      "bytes": 1505259,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/widgets/parent_room/parent_room_select_student_card.dart",
+        "lib/features/exam/widgets/assessment/numi_assessment_mascot_animation.dart",
+        "lib/features/home/widgets/home_missing_student_dialog.dart",
+        "lib/features/notifications/widgets/notification_card.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart",
+        "lib/features/exam/widgets/assessment/numi_assessment_mascot_animation.dart"
+      ],
+      "asset_constants": [
+        "parentNoStudentMascotAsset",
+        "_thinkingHandAsset"
+      ]
+    },
+    {
+      "path": "assets/images/numi-assessment-animation-mascot.png",
+      "bytes": 1033331,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/assessment/numi_assessment_mascot_animation.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/assessment/numi_assessment_mascot_animation.dart"
+      ],
+      "asset_constants": [
+        "_sourceAsset"
+      ]
+    },
+    {
+      "path": "assets/images/numi-mascot-hero.png",
+      "bytes": 1011007,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom_exercise/widgets/student_result/student_classroom_exercise_review_card.dart",
+        "lib/shared/widgets/loading_screen.dart"
+      ],
+      "source_references": [
+        "lib/shared/widgets/loading_screen.dart",
+        "lib/features/exam/widgets/assessment_result/ai_review_card.dart",
+        "lib/features/classroom_exercise/widgets/student_result/student_classroom_exercise_review_card.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/numi-mascot.png",
+      "bytes": 1066109,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/screens/passcode_screen.dart",
+        "lib/features/auth/widgets/auth_header.dart",
+        "lib/features/auth/widgets/auth_layout.dart",
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart",
+        "lib/features/games/screens/games_coming_soon_tab.dart",
+        "lib/features/home/widgets/teacher/shared/class_default_image.dart",
+        "lib/features/home/widgets/teacher/teacher_hero_card.dart",
+        "lib/features/notifications/widgets/notification_card.dart"
+      ],
+      "source_references": [
+        "lib/features/notifications/widgets/notification_card.dart",
+        "lib/features/home/widgets/teacher/teacher_hero_card.dart",
+        "lib/features/home/widgets/teacher/shared/class_default_image.dart",
+        "lib/features/games/screens/games_coming_soon_tab.dart",
+        "lib/features/exam/widgets/assessment_result/placement_celebration_mascot.dart",
+        "lib/features/auth/screens/passcode_screen.dart",
+        "lib/features/auth/widgets/auth_header.dart",
+        "lib/features/auth/widgets/auth_layout.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/parent-banner-after-review.jpg",
+      "bytes": 140552,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentHomeAfterReviewBannerAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/parent-home-mode1-assessment-banner.jpg",
+      "bytes": 85660,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "homeInitialAssessmentBannerAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/parent-review-empty-assessment.jpg",
+      "bytes": 85654,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "parentReviewEmptyAssessmentAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/review-practice-mascot.png",
+      "bytes": 1058485,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/exam/widgets/exam_review/exam_review_practice_banner.dart"
+      ],
+      "source_references": [
+        "lib/features/exam/widgets/exam_review/exam_review_practice_banner.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/signup-cloud-background.png",
+      "bytes": 821019,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/signup/signup_hero_banner.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/widgets/signup/signup_hero_banner.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/signup-rocket.png",
+      "bytes": 1039684,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/auth/widgets/signup/signup_hero_banner.dart"
+      ],
+      "source_references": [
+        "lib/features/auth/widgets/signup/signup_hero_banner.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/student-class-teacher.png",
+      "bytes": 2978,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/screens/parent_messages_screen.dart",
+        "lib/features/classroom/widgets/parent_messages/parent_message_contact_data.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "homeTeacherAvatarTwoAsset"
+      ]
+    },
+    {
+      "path": "assets/images/student-home-avatar.png",
+      "bytes": 1698,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/classroom/screens/parent_messages_screen.dart",
+        "lib/features/classroom/widgets/parent_messages/parent_message_contact_data.dart"
+      ],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "homeTeacherAvatarOneAsset"
+      ]
+    },
+    {
+      "path": "assets/images/student-parent-home-class-thumb.png",
+      "bytes": 1861781,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [
+        "lib/shared/constants/app_visual_constants.dart"
+      ],
+      "asset_constants": [
+        "studentParentHomeClassThumbAsset"
+      ],
+      "previous_status": "legacy_only"
+    },
+    {
+      "path": "assets/images/welcome-card-assessment.png",
+      "bytes": 21740,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_feature_grid.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-card-game-learning.png",
+      "bytes": 27378,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_feature_grid.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-card-progress-tracking.png",
+      "bytes": 30889,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_feature_grid.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-card-teacher-support.png",
+      "bytes": 32128,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_feature_grid.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-figma-books.png",
+      "bytes": 2258006,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/images/welcome-figma-waves.png",
+      "bytes": 152955,
+      "status": "removed",
+      "dynamic": false,
+      "runtime_sources": [],
+      "source_references": [],
+      "asset_constants": [],
+      "previous_status": "no_references"
+    },
+    {
+      "path": "assets/images/welcome-hero-math-friends.png",
+      "bytes": 956127,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_header.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-logo-mascot.png",
+      "bytes": 74825,
+      "status": "referenced",
+      "dynamic": true,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_details_header.dart"
+      ],
+      "source_references": [],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-thinking-owl.png",
+      "bytes": 897563,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_thinking_scene.dart"
+      ],
+      "source_references": [
+        "lib/features/welcome/widgets/welcome_thinking_scene.dart"
+      ],
+      "asset_constants": []
+    },
+    {
+      "path": "assets/images/welcome-thinking.png",
+      "bytes": 312109,
+      "status": "referenced",
+      "dynamic": false,
+      "runtime_sources": [
+        "lib/features/welcome/widgets/welcome_thinking_scene.dart"
+      ],
+      "source_references": [
+        "lib/features/welcome/widgets/welcome_thinking_scene.dart"
+      ],
+      "asset_constants": []
+    }
+  ]
+}

@@ -17,10 +17,9 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_a
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_full_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_banner.dart';
-import 'package:numi/shared/constants/app_visual_constants.dart';
 
 void main() {
-  testWidgets('assessment tab shows the list without landing banners', (
+  testWidgets('assessment tab loads stats with the current banner', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -64,12 +63,8 @@ void main() {
     ]);
     expect(find.byType(ParentAssessmentTabBanner), findsOneWidget);
     expect(
-      find.image(const AssetImage(homeInitialAssessmentBannerAsset)),
-      findsNothing,
-    );
-    expect(
-      find.image(const AssetImage(parentHomeAfterReviewBannerAsset)),
-      findsNothing,
+      find.image(const AssetImage('assets/images/assessment-tab-banner.jpg')),
+      findsOneWidget,
     );
     expect(find.byType(ExamAttemptScreen), findsNothing);
   });
