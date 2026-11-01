@@ -106,9 +106,11 @@ class NewParentHomeContent extends StatefulWidget {
 }
 
 enum NewParentHomeEntranceMode {
-  initialAssessment,
-  completedAssessment,
-  childOverview,
+  gradeRibbon,
+  progressChart,
+  assessmentAction,
+  practiceAction,
+  assessmentList,
 }
 
 class NewParentHomeContentState extends State<NewParentHomeContent> {
@@ -152,12 +154,12 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
     super.didUpdateWidget(oldWidget);
     final oldProfileId = profileStableId(oldWidget.activeProfile);
     final profileId = profileStableId(widget.activeProfile);
-    final oldChildIds = studentProfiles(
-      oldWidget.profiles,
-    ).map(profileStableId).join(',');
-    final childIds = studentProfiles(
-      widget.profiles,
-    ).map(profileStableId).join(',');
+    final oldChildIds = studentProfiles(oldWidget.profiles)
+        .map(profileStableId)
+        .join(',');
+    final childIds = studentProfiles(widget.profiles)
+        .map(profileStableId)
+        .join(',');
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||
@@ -393,15 +395,14 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
     required NewParentHomeEntranceMode mode,
     required Widget child,
     int order = 0,
-    bool markOnEnd = false,
   }) {
-    if (_playedEntrances.contains(mode)) {
-      return child;
-    }
-
     return AppStaggeredEntrance(
+      key: ValueKey(
+        'new-home-entrance-${profileStableId(widget.activeProfile)}-${mode.name}',
+      ),
       order: order,
-      onFinished: markOnEnd ? () => _markEntrancePlayed(mode) : null,
+      initiallyVisible: _playedEntrances.contains(mode),
+      onFinished: () => _markEntrancePlayed(mode),
       child: child,
     );
   }
@@ -440,56 +441,76 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                   if (showInitialLoading)
                     const NewHomeSkeleton()
                   else ...[
-                    AssessmentGradeRibbon(currentGrade: _chart.finalGrade),
-                    const SizedBox(height: 18),
-                    AssessmentProgressionChart(
-                      key: const ValueKey('parent-home-progress-chart'),
-                      finalGrade: _chart.finalGrade,
-                      gradeTitle: context.getText(AppKeys.newHomeChartLevel),
-                      activityTitle: context.getText(
-                        AppKeys.newHomeChartActivity,
+                    homeEntrance(
+                      mode: NewParentHomeEntranceMode.gradeRibbon,
+                      child: AssessmentGradeRibbon(
+                        currentGrade: _chart.finalGrade,
                       ),
-                      previousGrades: _chart.previousGrades,
-                      testNumbers: _chart.testNumbers,
-                      lastSubmittedAt: _chart.lastSubmittedAt,
-                      chartHeight: 150,
+                    ),
+                    const SizedBox(height: 18),
+                    homeEntrance(
+                      mode: NewParentHomeEntranceMode.progressChart,
+                      order: 1,
+                      child: AssessmentProgressionChart(
+                        key: const ValueKey('parent-home-progress-chart'),
+                        finalGrade: _chart.finalGrade,
+                        gradeTitle: context.getText(AppKeys.newHomeChartLevel),
+                        activityTitle: context.getText(
+                          AppKeys.newHomeChartActivity,
+                        ),
+                        previousGrades: _chart.previousGrades,
+                        testNumbers: _chart.testNumbers,
+                        lastSubmittedAt: _chart.lastSubmittedAt,
+                        chartHeight: 150,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: ParentHomeActionButton(
-                            key: const ValueKey(
-                              'parent-home-assessment-action',
+                          child: homeEntrance(
+                            mode: NewParentHomeEntranceMode.assessmentAction,
+                            order: 2,
+                            child: ParentHomeActionButton(
+                              key: const ValueKey(
+                                'parent-home-assessment-action',
+                              ),
+                              label: context.getText(
+                                AppKeys.newHomeAssessmentTest,
+                              ),
+                              iconAsset:
+                                  'assets/icons/home-assessment-stopwatch.png',
+                              colors: const [
+                                Color(0xFFFFBE54),
+                                Color(0xFFFF993C),
+                              ],
+                              accentColor: const Color(0xFFFFDB70),
+                              onTap: openInitialAssessment,
                             ),
-                            label: context.getText(
-                              AppKeys.newHomeAssessmentTest,
-                            ),
-                            iconAsset:
-                                'assets/icons/home-assessment-stopwatch.png',
-                            colors: const [
-                              Color(0xFFFFBE54),
-                              Color(0xFFFF993C),
-                            ],
-                            accentColor: const Color(0xFFFFDB70),
-                            onTap: openInitialAssessment,
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: ParentHomeActionButton(
-                            key: const ValueKey('parent-home-practice-action'),
-                            label: context.getText(
-                              AppKeys.newHomeLearningPractice,
+                          child: homeEntrance(
+                            mode: NewParentHomeEntranceMode.practiceAction,
+                            order: 3,
+                            child: ParentHomeActionButton(
+                              key: const ValueKey(
+                                'parent-home-practice-action',
+                              ),
+                              label: context.getText(
+                                AppKeys.newHomeLearningPractice,
+                              ),
+                              iconAsset: 'assets/icons/home-learning-book.png',
+                              colors: const [
+                                Color(0xFFFFA18C),
+                                Color(0xFFFA796B),
+                              ],
+                              accentColor: const Color(0xFFFFB0AA),
+                              onTap:
+                                  widget.onOpenLearningTab ?? openGradeRoadmap,
                             ),
-                            iconAsset: 'assets/icons/home-learning-book.png',
-                            colors: const [
-                              Color(0xFFFFA18C),
-                              Color(0xFFFA796B),
-                            ],
-                            accentColor: const Color(0xFFFFB0AA),
-                            onTap: widget.onOpenLearningTab ?? openGradeRoadmap,
                           ),
                         ),
                       ],
@@ -497,15 +518,19 @@ class NewParentHomeContentState extends State<NewParentHomeContent> {
                   ],
                   if (widget.showAssessmentList) ...[
                     const SizedBox(height: 28),
-                    NewHomeAssessmentList(
-                      assessments: learningListExams,
-                      activeAssessment: activeAssessment,
-                      isLoading: isLoadingAssessments,
-                      isOpeningActiveAssessment: isOpeningActiveAssessment,
-                      errorMessage: assessmentLoadError,
-                      onOpenExam: openParentAssessmentResult,
-                      onResumeExam: openActiveAssessment,
-                      onRetry: () => loadHome(forceRefresh: true),
+                    homeEntrance(
+                      mode: NewParentHomeEntranceMode.assessmentList,
+                      order: 4,
+                      child: NewHomeAssessmentList(
+                        assessments: learningListExams,
+                        activeAssessment: activeAssessment,
+                        isLoading: isLoadingAssessments,
+                        isOpeningActiveAssessment: isOpeningActiveAssessment,
+                        errorMessage: assessmentLoadError,
+                        onOpenExam: openParentAssessmentResult,
+                        onResumeExam: openActiveAssessment,
+                        onRetry: () => loadHome(forceRefresh: true),
+                      ),
                     ),
                   ],
                 ],
