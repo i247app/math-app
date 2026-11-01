@@ -54,6 +54,9 @@ class _SignupGenderDisabledHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final borderColor = Theme.of(context).brightness == Brightness.dark
+        ? colors.borderStrong
+        : colors.border;
 
     return Container(
       height: 52,
@@ -62,7 +65,7 @@ class _SignupGenderDisabledHint extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.inputSurface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: colors.border, width: 1.5),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       child: Text(
         hintText,
@@ -92,12 +95,18 @@ class _SignupGenderRadioItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final accentColor = colors.brandStrong;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SizedBox(
       height: 53,
       child: Material(
         color: selected
-            ? colors.brand.withValues(alpha: 0.12)
+            ? (isDark
+                  ? Color.alphaBlend(
+                      accentColor.withValues(alpha: 0.12),
+                      colors.inputSurface,
+                    )
+                  : colors.brand.withValues(alpha: 0.12))
             : colors.inputSurface,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
@@ -110,7 +119,9 @@ class _SignupGenderRadioItem extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: selected ? accentColor : colors.border,
+                color: selected
+                    ? accentColor
+                    : (isDark ? colors.borderStrong : colors.border),
                 width: selected ? 2 : 1.5,
               ),
             ),

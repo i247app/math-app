@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';
@@ -76,6 +77,8 @@ class RegistrationProfileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
     final heroTopGap = compact ? 10.0 : 14.0;
@@ -85,7 +88,7 @@ class RegistrationProfileContent extends StatelessWidget {
     final genderChoices = _genderChoicesForRole(role);
     final nameLabelKey = _nameLabelKey(role, gender);
 
-    return GestureDetector(
+    final screen = GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -200,6 +203,7 @@ class RegistrationProfileContent extends StatelessWidget {
                             contentPadding: EdgeInsets.zero,
                             visualDensity: VisualDensity.compact,
                             activeColor: context.themeColors.brandStrong,
+                            checkColor: isDark ? colors.onPrimaryAction : null,
                           ),
                         ),
                         Material(
@@ -225,6 +229,7 @@ class RegistrationProfileContent extends StatelessWidget {
                             contentPadding: EdgeInsets.zero,
                             visualDensity: VisualDensity.compact,
                             activeColor: context.themeColors.brandStrong,
+                            checkColor: isDark ? colors.onPrimaryAction : null,
                           ),
                         ),
                         SizedBox(height: compact ? 16 : 20),
@@ -247,6 +252,15 @@ class RegistrationProfileContent extends StatelessWidget {
         ),
       ),
     );
+    return isDark
+        ? AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: colors.pageBackground,
+              systemNavigationBarColor: colors.pageBackground,
+            ),
+            child: screen,
+          )
+        : screen;
   }
 
   static List<SignupGenderChoice> _genderChoicesForRole(SignupRole? role) {

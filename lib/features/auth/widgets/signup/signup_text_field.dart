@@ -26,6 +26,9 @@ class SignupTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final borderColor = Theme.of(context).brightness == Brightness.dark
+        ? colors.borderStrong
+        : colors.border;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,11 +64,11 @@ class SignupTextField extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colors.border, width: 1.5),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colors.border, width: 1.5),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),

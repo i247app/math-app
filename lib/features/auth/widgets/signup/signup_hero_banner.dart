@@ -17,6 +17,7 @@ class SignupHeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 122,
       child: Stack(
@@ -29,7 +30,9 @@ class SignupHeroBanner extends StatelessWidget {
             height: 218,
             child: IgnorePointer(
               child: Image.asset(
-                'assets/images/signup-cloud-background.png',
+                isDark
+                    ? 'assets/images/signup-cloud-background-dark.png'
+                    : 'assets/images/signup-cloud-background.png',
                 fit: BoxFit.cover,
                 alignment: Alignment.topRight,
               ),
