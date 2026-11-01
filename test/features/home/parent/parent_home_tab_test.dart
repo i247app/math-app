@@ -26,17 +26,18 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_a
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/models/home_layout.dart';
-import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
-import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
+import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
+import 'package:numi/features/home/screens/student/student_home_tab.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
-import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
-import 'package:numi/features/home/widgets/parent/new_home_skeleton.dart';
+import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
+import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -44,7 +45,7 @@ void main() {
 
   for (final isStudent in [false, true]) {
     for (final progressFirst in [false, true]) {
-      testWidgets('new home skeleton waits for layout and chart '
+      testWidgets('home skeleton waits for layout and chart '
           '(student=$isStudent, progressFirst=$progressFirst)', (tester) async {
         const profileId = 90;
         HomeProfileCache.instance.invalidateProfile(profileId);
@@ -56,8 +57,8 @@ void main() {
         final homeService = _DelayedHomeService();
         final examService = _DelayedProgressService();
         final buildContent = isStudent
-            ? NewStudentHomeContent.new
-            : NewParentHomeContent.new;
+            ? StudentHomeContent.new
+            : ParentHomeContent.new;
         await tester.pumpWidget(
           RepositoryProvider<HomeLayoutService>.value(
             value: homeService,
@@ -90,7 +91,7 @@ void main() {
             ),
           ),
         );
-        expect(find.byType(NewHomeSkeleton), findsOneWidget);
+        expect(find.byType(HomeContentSkeleton), findsOneWidget);
         expect(find.text('Home header'), findsOneWidget);
         expect(find.byType(AssessmentProgressionChart), findsNothing);
         expect(
@@ -110,7 +111,7 @@ void main() {
           homeService.layout.complete(const HomeLayout(role: 'PARENT'));
         }
         await tester.pump();
-        expect(find.byType(NewHomeSkeleton), findsOneWidget);
+        expect(find.byType(HomeContentSkeleton), findsOneWidget);
 
         if (progressFirst) {
           homeService.layout.complete(const HomeLayout(role: 'PARENT'));
@@ -124,7 +125,7 @@ void main() {
           );
         }
         await tester.pumpAndSettle();
-        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(find.byType(HomeContentSkeleton), findsNothing);
         expect(
           tester
               .widget<AssessmentProgressionChart>(
@@ -136,19 +137,19 @@ void main() {
 
         homeService.layout = Completer<HomeLayout>();
         examService.progress = Completer<ExamProgressResponse>();
-        final state = tester.state<NewParentHomeContentState>(
-          find.byType(isStudent ? NewStudentHomeContent : NewParentHomeContent),
+        final state = tester.state<ParentHomeContentState>(
+          find.byType(isStudent ? StudentHomeContent : ParentHomeContent),
         );
         final refresh = state.loadHome(forceRefresh: true);
         await tester.pump();
-        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(find.byType(HomeContentSkeleton), findsNothing);
         expect(find.byType(AssessmentProgressionChart), findsOneWidget);
 
         homeService.layout.completeError(Exception('Layout unavailable'));
         examService.progress.completeError(Exception('Progress unavailable'));
         await refresh;
         await tester.pumpAndSettle();
-        expect(find.byType(NewHomeSkeleton), findsNothing);
+        expect(find.byType(HomeContentSkeleton), findsNothing);
         expect(
           tester
               .widget<AssessmentProgressionChart>(
@@ -162,7 +163,7 @@ void main() {
     }
   }
 
-  testWidgets('new home skeleton fits a narrow screen with large text', (
+  testWidgets('home skeleton fits a narrow screen with large text', (
     tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(280, 640));
@@ -176,7 +177,7 @@ void main() {
             body: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(14),
-                child: NewHomeSkeleton(),
+                child: HomeContentSkeleton(),
               ),
             ),
           ),
@@ -184,12 +185,12 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(NewHomeSkeleton), findsOneWidget);
+    expect(find.byType(HomeContentSkeleton), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
   for (final hasAssessment in [false, true]) {
-    testWidgets('new parent home shows chart and actions without banner '
+    testWidgets('parent home shows chart and actions without banner '
         'when hasAssessment=$hasAssessment', (tester) async {
       HomeProfileCache.instance.invalidateProfile(77);
       addTearDown(() => HomeProfileCache.instance.invalidateProfile(77));
@@ -211,7 +212,7 @@ void main() {
             child: MaterialApp(
               theme: AppTheme.light(),
               home: Scaffold(
-                body: NewParentHomeContent(
+                body: ParentHomeContent(
                   user: null,
                   profiles: const <UserProfile>[],
                   activeProfile: const UserProfile(profileId: 77),
@@ -240,7 +241,7 @@ void main() {
 
       expect(find.byType(AssessmentGradeRibbon), findsOneWidget);
       expect(find.byType(HomeBanner), findsNothing);
-      expect(find.byType(NewHomeAssessmentList), findsNothing);
+      expect(find.byType(HomeAssessmentList), findsNothing);
       expect(find.byType(AssessmentProgressionChart), findsOneWidget);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byType(AssessmentProgressionChart),
@@ -296,7 +297,7 @@ void main() {
           child: MaterialApp(
             theme: AppTheme.light(),
             home: Scaffold(
-              body: NewParentHomeContent(
+              body: ParentHomeContent(
                 user: null,
                 profiles: const <UserProfile>[],
                 activeProfile: const UserProfile(profileId: 80),
@@ -323,7 +324,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AssessmentProgressionChart), findsOneWidget);
-    expect(find.byType(NewHomeAssessmentList), findsOneWidget);
+    expect(find.byType(HomeAssessmentList), findsOneWidget);
     expect(examService.requestedStatsExamTypes, [
       [examTypeGrade, examTypeAssessment],
     ]);
@@ -341,7 +342,7 @@ void main() {
     );
     expect(find.byType(TextField), findsNothing);
     expect(
-      tester.getTopLeft(find.byType(NewHomeAssessmentList)).dy,
+      tester.getTopLeft(find.byType(HomeAssessmentList)).dy,
       greaterThan(
         tester
             .getBottomLeft(
@@ -405,141 +406,140 @@ void main() {
     attempt.onResultBack!();
     await tester.pumpAndSettle();
     expect(find.byType(ExamAttemptScreen), findsNothing);
-    expect(find.byType(NewParentHomeContent), findsOneWidget);
+    expect(find.byType(ParentHomeContent), findsOneWidget);
   });
 
-  testWidgets(
-    'student dashboard uses new home with the active student profile',
-    (tester) async {
-      HomeProfileCache.instance.invalidateProfile(78);
-      addTearDown(() => HomeProfileCache.instance.invalidateProfile(78));
-      final originalLanguage = AppLanguageState.current;
-      final lingo = LingoProvider();
-      addTearDown(() {
-        AppLanguageState.current = originalLanguage;
-        lingo.dispose();
-      });
-      final homeService = _RecordingStudentHomeService();
-      final examService = _ExamService(false);
-      var activeTab = DashboardTabId.home;
-      late StateSetter setActiveTab;
+  testWidgets('student dashboard uses home with the active student profile', (
+    tester,
+  ) async {
+    HomeProfileCache.instance.invalidateProfile(78);
+    addTearDown(() => HomeProfileCache.instance.invalidateProfile(78));
+    final originalLanguage = AppLanguageState.current;
+    final lingo = LingoProvider();
+    addTearDown(() {
+      AppLanguageState.current = originalLanguage;
+      lingo.dispose();
+    });
+    final homeService = _RecordingStudentHomeService();
+    final examService = _ExamService(false);
+    var activeTab = DashboardTabId.home;
+    late StateSetter setActiveTab;
 
-      await tester.pumpWidget(
-        RepositoryProvider<HomeLayoutService>.value(
-          value: homeService,
-          child: LingoScope(
-            lingo: lingo,
-            child: MaterialApp(
-              theme: AppTheme.light(),
-              home: Scaffold(
-                body: StatefulBuilder(
-                  builder: (context, setTabState) {
-                    setActiveTab = setTabState;
-                    return const AppDashboardTabFactory().buildTab(
-                      context: context,
-                      role: ProfileRole.student,
-                      args: DashboardTabArgs(
-                        activeTab: activeTab,
-                        isActive: true,
-                        activeRefreshTick: 0,
-                        session: const DashboardSessionData(
-                          user: null,
-                          profiles: [UserProfile(profileId: 77)],
-                          activeProfile: UserProfile(profileId: 78),
-                          profileLoadError: null,
-                          initialGrades: [],
-                        ),
-                        services: DashboardTabServices(
-                          gradeService: _GradeService(),
-                          classroomService: _ClassroomService(),
-                          assignmentService: _ClassroomExerciseService(),
-                          examService: examService,
-                        ),
-                        actions: const DashboardTabActions(
-                          onRefreshProfiles: _noopAsync,
-                          onActivateProfile: _noopActivate,
-                          onLogout: _noop,
-                          onProfileSaved: _noop,
-                          onCompleteTeacherProfile: _noopAsync,
-                          onOpenClassroomTab: _noop,
-                          onOpenGamesTab: _noop,
-                          onOpenExercisesTab: _noop,
-                          onOpenProfileMenu: _noop,
-                          onParentAssessmentStateChanged: _noopAssessmentState,
-                          onNotificationTap: _noop,
-                        ),
-                        presentation: const DashboardTabPresentation(
-                          openAddProfileRequestId: 0,
-                          bottomPadding: 0,
-                          hasUnreadNotifications: false,
-                          showChildProfileDialogOnStart: true,
-                        ),
+    await tester.pumpWidget(
+      RepositoryProvider<HomeLayoutService>.value(
+        value: homeService,
+        child: LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (context, setTabState) {
+                  setActiveTab = setTabState;
+                  return const AppDashboardTabFactory().buildTab(
+                    context: context,
+                    role: ProfileRole.student,
+                    args: DashboardTabArgs(
+                      activeTab: activeTab,
+                      isActive: true,
+                      activeRefreshTick: 0,
+                      session: const DashboardSessionData(
+                        user: null,
+                        profiles: [UserProfile(profileId: 77)],
+                        activeProfile: UserProfile(profileId: 78),
+                        profileLoadError: null,
+                        initialGrades: [],
                       ),
-                    );
-                  },
-                ),
+                      services: DashboardTabServices(
+                        gradeService: _GradeService(),
+                        classroomService: _ClassroomService(),
+                        assignmentService: _ClassroomExerciseService(),
+                        examService: examService,
+                      ),
+                      actions: const DashboardTabActions(
+                        onRefreshProfiles: _noopAsync,
+                        onActivateProfile: _noopActivate,
+                        onLogout: _noop,
+                        onProfileSaved: _noop,
+                        onCompleteTeacherProfile: _noopAsync,
+                        onOpenClassroomTab: _noop,
+                        onOpenGamesTab: _noop,
+                        onOpenExercisesTab: _noop,
+                        onOpenProfileMenu: _noop,
+                        onParentAssessmentStateChanged: _noopAssessmentState,
+                        onNotificationTap: _noop,
+                      ),
+                      presentation: const DashboardTabPresentation(
+                        openAddProfileRequestId: 0,
+                        bottomPadding: 0,
+                        hasUnreadNotifications: false,
+                        showChildProfileDialogOnStart: true,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.byType(NewStudentHomeContent), findsOneWidget);
-      expect(find.byType(PageHeader), findsNothing);
-      expect(find.byType(AssessmentProgressionChart), findsOneWidget);
-      expect(find.text('Lớp'), findsOneWidget);
-      expect(find.text('Trend'), findsOneWidget);
-      expect(find.text('LỚP'), findsOneWidget);
-      expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
-      expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
+    expect(find.byType(StudentHomeContent), findsOneWidget);
+    expect(find.byType(PageHeader), findsNothing);
+    expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+    expect(find.text('Lớp'), findsOneWidget);
+    expect(find.text('Trend'), findsOneWidget);
+    expect(find.text('LỚP'), findsOneWidget);
+    expect(find.text('Đánh Giá\nTrình Độ'), findsOneWidget);
+    expect(find.text('Học Và\nLuyện Tập'), findsOneWidget);
 
-      await lingo.setLanguage(AppLanguage.en);
-      await tester.pumpAndSettle();
-      expect(find.text('Assessment Test'), findsOneWidget);
-      expect(find.text('Learning & Practice'), findsOneWidget);
-      expect(homeService.profileIds, [78]);
-      expect(examService.progressProfileIds, [78]);
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
+    expect(find.text('Assessment Test'), findsOneWidget);
+    expect(find.text('Learning & Practice'), findsOneWidget);
+    expect(homeService.profileIds, [78]);
+    expect(examService.progressProfileIds, [78]);
 
-      await tester.tap(find.text('Learning & Practice'));
-      await tester.pumpAndSettle();
-      expect(activeTab, DashboardTabId.home);
-      final homeRoadmap = tester.widget<GradeRoadmapScreen>(
-        find.byType(GradeRoadmapScreen),
-      );
-      expect(homeRoadmap.profileId, 78);
-      await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Learning & Practice'));
+    await tester.pumpAndSettle();
+    expect(activeTab, DashboardTabId.home);
+    final homeRoadmap = tester.widget<GradeRoadmapScreen>(
+      find.byType(GradeRoadmapScreen),
+    );
+    expect(homeRoadmap.profileId, 78);
+    await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
+    await tester.pumpAndSettle();
 
-      setActiveTab(() => activeTab = DashboardTabId.learning);
-      await tester.pumpAndSettle();
-      expect(find.byType(NewStudentHomeContent), findsOneWidget);
-      expect(find.byType(PageHeader), findsOneWidget);
-      expect(
-        tester.widget<PageHeader>(find.byType(PageHeader)).title,
-        'Learning',
-      );
-      expect(find.byType(NewHomeAssessmentList), findsOneWidget);
-      expect(find.byType(AssessmentProgressionChart), findsOneWidget);
-      expect(find.text('Assessment Test'), findsOneWidget);
-      expect(find.byType(GradeRoadmapScreen), findsNothing);
+    setActiveTab(() => activeTab = DashboardTabId.learning);
+    await tester.pumpAndSettle();
+    expect(find.byType(StudentHomeContent), findsOneWidget);
+    expect(find.byType(PageHeader), findsOneWidget);
+    expect(
+      tester.widget<PageHeader>(find.byType(PageHeader)).title,
+      'Learning',
+    );
+    expect(find.byType(HomeAssessmentList), findsOneWidget);
+    expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+    expect(find.text('Assessment Test'), findsOneWidget);
+    expect(find.byType(GradeRoadmapScreen), findsNothing);
 
-      await lingo.setLanguage(AppLanguage.vi);
-      await tester.pumpAndSettle();
-      expect(tester.widget<PageHeader>(find.byType(PageHeader)).title, 'Học');
-      await lingo.setLanguage(AppLanguage.en);
-      await tester.pumpAndSettle();
+    await lingo.setLanguage(AppLanguage.vi);
+    await tester.pumpAndSettle();
+    expect(tester.widget<PageHeader>(find.byType(PageHeader)).title, 'Học');
+    await lingo.setLanguage(AppLanguage.en);
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Learning & Practice'));
-      await tester.pumpAndSettle();
-      final roadmap = tester.widget<GradeRoadmapScreen>(
-        find.byType(GradeRoadmapScreen),
-      );
-      expect(roadmap.profileId, 78);
-      expect(roadmap.showCloseButton, isTrue);
-      expect(find.byKey(const ValueKey('grade-roadmap-close')), findsOneWidget);
-    },
-  );
+    await tester.tap(find.text('Learning & Practice'));
+    await tester.pumpAndSettle();
+    final roadmap = tester.widget<GradeRoadmapScreen>(
+      find.byType(GradeRoadmapScreen),
+    );
+    expect(roadmap.profileId, 78);
+    expect(roadmap.showCloseButton, isTrue);
+    expect(find.byKey(const ValueKey('grade-roadmap-close')), findsOneWidget);
+  });
 
   for (final role in [ProfileRole.parent, ProfileRole.student]) {
     for (final hasAssessment in [false, true]) {
@@ -632,23 +632,30 @@ void main() {
             if (role == ProfileRole.parent && tabIndex == DashboardTabId.home) {
               expect(
                 tester
-                    .widget<NewParentHomeContent>(
-                      find.byType(NewParentHomeContent),
-                    )
+                    .widget<ParentHomeContent>(find.byType(ParentHomeContent))
                     .showChildProfileDialogOnStart,
                 isFalse,
               );
               expect(
                 tester
-                    .widget<NewParentHomeContent>(
-                      find.byType(NewParentHomeContent),
-                    )
+                    .widget<ParentHomeContent>(find.byType(ParentHomeContent))
                     .onOpenLearningTab,
                 isNull,
               );
               expect(find.byType(HomeMissingStudentDialog), findsNothing);
             }
 
+            // Image decoding needs real async work before the intro can settle.
+            await tester.runAsync(() async {
+              final context = tester.element(find.byType(Scaffold));
+              for (final asset in [
+                ...WelcomeAssessmentBackground.decorationAssets,
+                'assets/images/assessment_intro/assessment-graduate-mascot.png',
+                'assets/images/grade-ribbon-numbers.png',
+              ]) {
+                await precacheImage(AssetImage(asset), context);
+              }
+            });
             final assessmentAction = find.byKey(
               const ValueKey('parent-home-assessment-action'),
             );

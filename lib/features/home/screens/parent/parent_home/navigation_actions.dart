@@ -1,11 +1,21 @@
 part of '../parent_home_tab.dart';
 
 extension ParentHomeNavigationActions on ParentHomeContentState {
-  Future<void> openAssessment() async {
+  Future<void> openGradeRoadmap() async {
+    final profileId = profileStableId(widget.activeProfile);
+    if (isOpeningGradeRoadmap || profileId == null || profileId <= 0) {
+      return;
+    }
+
+    isOpeningGradeRoadmap = true;
     HapticFeedback.lightImpact();
-    await widget.onOpenAssessment?.call(context);
-    if (mounted) {
-      await loadHome();
+    try {
+      await widget.onOpenGradeRoadmap?.call(context);
+      if (mounted) {
+        await loadHome(forceRefresh: true);
+      }
+    } finally {
+      isOpeningGradeRoadmap = false;
     }
   }
 
@@ -25,53 +35,43 @@ extension ParentHomeNavigationActions on ParentHomeContentState {
     }
   }
 
+  Future<void> openActiveAssessment() async {
+    final exam = activeAssessment;
+    final profileId = profileStableId(widget.activeProfile);
+    if (isOpeningActiveAssessment ||
+        exam == null ||
+        exam.questions.isEmpty ||
+        profileId == null ||
+        profileId <= 0) {
+      return;
+    }
+
+    HapticFeedback.selectionClick();
+    _updateState(() => isOpeningActiveAssessment = true);
+    try {
+      await widget.onResumeAssessment?.call(context, exam);
+      if (mounted) {
+        await loadHome(forceRefresh: true);
+      }
+    } finally {
+      if (mounted) {
+        _updateState(() => isOpeningActiveAssessment = false);
+      }
+    }
+  }
+
   void openParentAssessmentResult(GeneratedExam exam) {
     _openExamReview(exam);
   }
 
-  void openCompletionResult(HomeLayoutRecentCompletion completion) {
-    _openExamReview(examFromRecentCompletion(completion));
-  }
-
   void _openExamReview(GeneratedExam exam) {
-    final examId = exam.userExamId ?? exam.examId ?? exam.id;
+    final examId =
+        exam.userExamId ?? exam.examId ?? exam.userAiExamId ?? exam.id;
     if (examId == null || examId <= 0) {
       return;
     }
     HapticFeedback.selectionClick();
     widget.onOpenExamReview?.call(context, exam);
-  }
-
-  Future<void> showClassroomMessage() async {
-    HapticFeedback.selectionClick();
-    if (widget.useActiveStudentProfileData) {
-      widget.onOpenClassroomTab();
-      return;
-    }
-
-    if (_children.isEmpty) {
-      await _showMissingStudentDialog();
-      return;
-    }
-
-    final action = await showDialog<ParentProfileDialogAction>(
-      context: context,
-      barrierColor: context.themeColors.shadow.withValues(alpha: 0.48),
-      builder: (_) => const ParentSelectStudentDialog(),
-    );
-    if (!mounted) {
-      return;
-    }
-    switch (action) {
-      case ParentProfileDialogAction.choose:
-        widget.onOpenProfileMenu();
-        return;
-      case ParentProfileDialogAction.create:
-        await _openCreateStudentProfile();
-        return;
-      case null:
-        return;
-    }
   }
 
   void _scheduleMissingStudentDialogIfNeeded() {

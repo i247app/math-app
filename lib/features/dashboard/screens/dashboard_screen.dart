@@ -17,7 +17,7 @@ import 'package:numi/features/notifications/controllers/notification_badge_contr
 import 'package:numi/features/notifications/data/notification_list_service.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_home_skeleton.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_skeleton.dart';
+import 'package:numi/features/home/widgets/parent/home_skeleton.dart';
 import 'package:numi/features/dashboard/controllers/dashboard_profile_controller.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_navigator.dart';
@@ -228,10 +228,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onNotificationTap: _openNotifications,
                 hasUnreadNotifications: _notificationBadgeController.hasUnread,
               ),
-              (DashboardTabId.home, ProfileRole.parent) => ParentHomeSkeleton(
-                bottomPadding: navHeight + 14,
-                homeHeader: homeHeader,
-              ),
+              (
+                DashboardTabId.home,
+                ProfileRole.parent || ProfileRole.student,
+              ) =>
+                HomeSkeleton(
+                  bottomPadding: navHeight + 14,
+                  homeHeader: homeHeader,
+                ),
               _ => DashboardSessionSkeleton(
                 topPadding: showHeader ? headerHeight : topInset,
                 bottomPadding: navHeight + 14,
@@ -328,10 +332,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                 ),
-                if (widget.isResolvingProfile &&
-                    homeHeader != null &&
-                    widget.activeRole != ProfileRole.parent)
-                  Positioned(left: 0, right: 0, top: 0, child: homeHeader),
                 if (isMenuOpen)
                   Positioned.fill(
                     child: GestureDetector(

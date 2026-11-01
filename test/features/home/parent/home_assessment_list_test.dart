@@ -10,7 +10,7 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_a
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_list_skeleton.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_pagination.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
-import 'package:numi/features/home/widgets/parent/new_home_assessment_list.dart';
+import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
 import 'package:numi/shared/widgets/score_progress_ring.dart';
 
 void main() {
@@ -25,7 +25,7 @@ void main() {
         child: MaterialApp(
           theme: AppTheme.light(),
           home: Scaffold(
-            body: NewHomeAssessmentList(
+            body: HomeAssessmentList(
               assessments: const [
                 GeneratedExam(
                   userExamId: 1,
@@ -72,7 +72,7 @@ void main() {
       child: MaterialApp(
         theme: AppTheme.light(),
         home: Scaffold(
-          body: NewHomeAssessmentList(
+          body: HomeAssessmentList(
             assessments: const [GeneratedExam(userExamId: 1, questions: [])],
             activeAssessment: const GeneratedExam(examId: 99, questions: []),
             isLoading: isLoading,
@@ -121,7 +121,7 @@ void main() {
           theme: AppTheme.light(),
           home: Scaffold(
             body: SingleChildScrollView(
-              child: NewHomeAssessmentList(
+              child: HomeAssessmentList(
                 assessments: exams,
                 activeAssessment: const GeneratedExam(
                   examId: 99,

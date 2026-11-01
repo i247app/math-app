@@ -9,8 +9,8 @@ import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_p
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_state_card.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 
-class NewHomeAssessmentList extends StatefulWidget {
-  const NewHomeAssessmentList({
+class HomeAssessmentList extends StatefulWidget {
+  const HomeAssessmentList({
     super.key,
     required this.assessments,
     required this.activeAssessment,
@@ -32,10 +32,10 @@ class NewHomeAssessmentList extends StatefulWidget {
   final VoidCallback onRetry;
 
   @override
-  State<NewHomeAssessmentList> createState() => _NewHomeAssessmentListState();
+  State<HomeAssessmentList> createState() => _HomeAssessmentListState();
 }
 
-class _NewHomeAssessmentListState extends State<NewHomeAssessmentList> {
+class _HomeAssessmentListState extends State<HomeAssessmentList> {
   static const _pageSize = 5;
 
   int _page = 1;

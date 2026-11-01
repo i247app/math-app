@@ -16,8 +16,7 @@ import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
-import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
-import 'package:numi/features/home/screens/student/new_student_home_tab.dart';
+import 'package:numi/features/home/screens/student/student_home_tab.dart';
 import 'package:numi/features/home/screens/teacher/teacher_home_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_study_tab.dart';
 import 'package:numi/features/classroom_exercise/screens/teacher_classroom_exercise_detail_screen.dart';
@@ -41,11 +40,6 @@ import 'package:numi/shared/layouts/page_header.dart';
 class AppDashboardTabFactory implements DashboardTabFactory {
   const AppDashboardTabFactory();
 
-  // Set to false to restore the original Parent Home.
-  static const bool _useNewParentHome = true;
-  // Set to false to restore the original Student Home.
-  static const bool _useNewStudentHome = true;
-
   @override
   Widget buildTab({
     required BuildContext context,
@@ -67,18 +61,11 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     DashboardTabArgs args, {
     bool useActiveStudentProfileData = false,
   }) {
-    final usesNewHome = useActiveStudentProfileData
-        ? _useNewStudentHome
-        : _useNewParentHome;
     return switch (args.activeTab) {
       DashboardTabId.home =>
         (useActiveStudentProfileData
-            ? (_useNewStudentHome
-                  ? NewStudentHomeContent.new
-                  : ParentHomeContent.new)
-            : (_useNewParentHome
-                  ? NewParentHomeContent.new
-                  : ParentHomeContent.new))(
+            ? StudentHomeContent.new
+            : ParentHomeContent.new)(
           user: args.session.user,
           profiles: args.session.profiles,
           activeProfile: args.session.activeProfile,
@@ -103,7 +90,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
             ),
           ),
           onOpenInitialAssessment: (context) =>
-              _openAssessmentFromHome(context, args, showIntro: usesNewHome),
+              _openAssessmentFromHome(context, args),
           onOpenExamReview: _openHomeExamReview,
           onCreateStudentProfile: (context) =>
               _openCreateStudentProfile(context, args),
@@ -181,8 +168,8 @@ class AppDashboardTabFactory implements DashboardTabFactory {
       );
     }
     final buildContent = useActiveStudentProfileData
-        ? NewStudentHomeContent.new
-        : NewParentHomeContent.new;
+        ? StudentHomeContent.new
+        : ParentHomeContent.new;
     return buildContent(
       user: args.session.user,
       profiles: args.session.profiles,
@@ -204,7 +191,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
       homeHeader: const _LearningPageHeader(),
       showAssessmentList: true,
       onOpenInitialAssessment: (context) =>
-          _openAssessmentFromHome(context, args, showIntro: true),
+          _openAssessmentFromHome(context, args),
       onOpenExamReview: _openHomeExamReview,
       onOpenGradeRoadmap: (context) => _openGradeRoadmap(context, args),
       onResumeAssessment: (context, exam) =>
@@ -301,11 +288,10 @@ class AppDashboardTabFactory implements DashboardTabFactory {
 
   Future<void> _openAssessmentFromHome(
     BuildContext context,
-    DashboardTabArgs args, {
-    required bool showIntro,
-  }) {
+    DashboardTabArgs args,
+  ) {
     final profileId = profileStableId(args.session.activeProfile);
-    if (showIntro && profileId != null && profileId > 0) {
+    if (profileId != null && profileId > 0) {
       return Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (_) => WelcomeAssessmentIntroScreen(

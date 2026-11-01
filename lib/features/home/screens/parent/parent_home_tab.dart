@@ -25,23 +25,16 @@ import 'package:numi/features/home/models/parent/parent_child_summary.dart';
 import 'package:numi/features/home/helpers/parent_home_helpers.dart';
 import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/home/helpers/parent/parent_child_dashboard_helpers.dart';
-import 'package:numi/features/home/screens/parent/parent_learning_streak_content.dart';
-import 'package:numi/features/home/screens/parent/parent_home_child_dashboard.dart';
-import 'package:numi/features/home/screens/parent/parent_home_completed_assessment.dart';
-import 'package:numi/features/home/screens/parent/parent_home_first_assessment.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_error_card.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_loading_card.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_skeleton.dart';
-import 'package:numi/features/home/widgets/parent/parent_home_refresh_label.dart';
-import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
-import 'package:numi/features/home/widgets/parent/parent_profile_dialog_action.dart';
-import 'package:numi/features/home/widgets/parent/parent_select_student_dialog.dart';
+import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
+import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
+import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
+import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
+import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
+import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 
 part 'parent_home/snapshot_actions.dart';
 part 'parent_home/navigation_actions.dart';
 
-/// Original Parent Home, retained so the previous layout can be restored.
-/// The experimental layout is in `new_parent_home_tab.dart`.
 class ParentHomeContent extends StatefulWidget {
   const ParentHomeContent({
     super.key,
@@ -59,7 +52,6 @@ class ParentHomeContent extends StatefulWidget {
     required this.onOpenProfileMenu,
     required this.onOpenClassroomTab,
     required this.onOpenGamesTab,
-    this.onOpenLearningTab,
     required this.onParentAssessmentStateChanged,
     required this.bottomPadding,
     this.showChildProfileDialogOnStart = false,
@@ -69,9 +61,11 @@ class ParentHomeContent extends StatefulWidget {
     this.onOpenAssessment,
     this.onOpenInitialAssessment,
     this.onOpenExamReview,
+    this.onOpenLearningTab,
     this.onCreateStudentProfile,
     this.onOpenGradeRoadmap,
     this.onResumeAssessment,
+    this.showAssessmentList = false,
   });
 
   final LoginUser? user;
@@ -88,7 +82,6 @@ class ParentHomeContent extends StatefulWidget {
   final VoidCallback onOpenProfileMenu;
   final VoidCallback onOpenClassroomTab;
   final VoidCallback onOpenGamesTab;
-  final VoidCallback? onOpenLearningTab;
   final ValueChanged<bool> onParentAssessmentStateChanged;
   final double bottomPadding;
   final bool showChildProfileDialogOnStart;
@@ -102,16 +95,20 @@ class ParentHomeContent extends StatefulWidget {
   final Future<void> Function(BuildContext context)? onOpenInitialAssessment;
   final Future<void> Function(BuildContext context, GeneratedExam exam)?
   onOpenExamReview;
+  final VoidCallback? onOpenLearningTab;
   final Future<void> Function(BuildContext context)? onCreateStudentProfile;
+  final bool showAssessmentList;
 
   @override
   State<ParentHomeContent> createState() => ParentHomeContentState();
 }
 
 enum ParentHomeEntranceMode {
-  initialAssessment,
-  completedAssessment,
-  childOverview,
+  gradeRibbon,
+  progressChart,
+  assessmentAction,
+  practiceAction,
+  assessmentList,
 }
 
 class ParentHomeContentState extends State<ParentHomeContent> {
@@ -121,13 +118,23 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   bool isLoading = true;
   bool hasLoadedHome = false;
   bool isOpeningInitialAssessment = false;
+  bool isOpeningGradeRoadmap = false;
   String? errorMessage;
   HomeLayout? homeLayout;
   List<GeneratedExam> completedAssessments = const <GeneratedExam>[];
+  List<GeneratedExam> learningListExams = const <GeneratedExam>[];
+  GeneratedExam? activeAssessment;
+  bool isLoadingAssessments = false;
+  bool isOpeningActiveAssessment = false;
+  String? assessmentLoadError;
   List<ParentChildSummary> childSummaries = const <ParentChildSummary>[];
   int _childLoadRequestId = 0;
   int _assessmentLoadRequestId = 0;
   int _lastAppliedAssessmentLoadRequestId = 0;
+  int _progressLoadRequestId = 0;
+  bool _isLoadingProgress = false;
+  bool _hasLoadedProgress = false;
+  AssessmentProgressChartData _chart = AssessmentProgressChartData.empty;
   final Set<ParentHomeEntranceMode> _playedEntrances = {};
   bool _hasOfferedMissingStudentProfile = false;
   bool _isMissingStudentDialogVisible = false;
@@ -145,19 +152,28 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     super.didUpdateWidget(oldWidget);
     final oldProfileId = profileStableId(oldWidget.activeProfile);
     final profileId = profileStableId(widget.activeProfile);
-    final oldChildIds = studentProfiles(
-      oldWidget.profiles,
-    ).map(profileStableId).join(',');
-    final childIds = studentProfiles(
-      widget.profiles,
-    ).map(profileStableId).join(',');
+    final oldChildIds = studentProfiles(oldWidget.profiles)
+        .map(profileStableId)
+        .join(',');
+    final childIds = studentProfiles(widget.profiles)
+        .map(profileStableId)
+        .join(',');
     final shouldForceRefresh =
         oldWidget.user?.id != widget.user?.id ||
         oldChildIds != childIds ||
+        oldWidget.showAssessmentList != widget.showAssessmentList ||
         oldWidget.useActiveStudentProfileData !=
             widget.useActiveStudentProfileData;
     if (oldProfileId != profileId || shouldForceRefresh) {
       hasLoadedHome = false;
+      _progressLoadRequestId++;
+      _isLoadingProgress = false;
+      _hasLoadedProgress = false;
+      _chart = AssessmentProgressChartData.empty;
+      isLoadingAssessments = false;
+      activeAssessment = null;
+      learningListExams = const <GeneratedExam>[];
+      assessmentLoadError = null;
       _resetModeEntrances();
       if (widget.isActive) {
         loadHome(forceRefresh: shouldForceRefresh);
@@ -196,8 +212,12 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   Future<void> loadHome({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
     final profileId = profileStableId(widget.activeProfile);
+    if (profileId != null && profileId > 0) {
+      unawaited(_loadAssessmentProgress(profileId));
+    }
     if (profileId == null || profileId <= 0) {
       _assessmentLoadRequestId++;
+      _progressLoadRequestId++;
       if (!mounted) {
         return;
       }
@@ -208,6 +228,13 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         homeLayout = null;
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedExam>[];
+        learningListExams = const <GeneratedExam>[];
+        activeAssessment = null;
+        isLoadingAssessments = false;
+        assessmentLoadError = null;
+        _isLoadingProgress = false;
+        _hasLoadedProgress = true;
+        _chart = AssessmentProgressChartData.empty;
       });
       widget.onParentAssessmentStateChanged(false);
       return;
@@ -236,6 +263,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       if (!hadRenderableContent) {
         childSummaries = const <ParentChildSummary>[];
         completedAssessments = const <GeneratedExam>[];
+        learningListExams = const <GeneratedExam>[];
       }
     });
     if (!hadRenderableContent) {
@@ -322,8 +350,36 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     }
   }
 
+  Future<void> _loadAssessmentProgress(int profileId) async {
+    final requestId = ++_progressLoadRequestId;
+    setState(() => _isLoadingProgress = true);
+    try {
+      final toDt = DateTime.now();
+      final progress = await widget.examService.getExamProgress(
+        profileId: profileId,
+        fromDt: toDt.subtract(const Duration(days: 365)),
+        toDt: toDt,
+      );
+      if (!mounted || requestId != _progressLoadRequestId) return;
+      setState(() {
+        _chart = AssessmentProgressChartData.fromProgress(progress);
+      });
+    } catch (_) {
+      // Keep the last chart when progress is temporarily unavailable.
+    } finally {
+      if (mounted && requestId == _progressLoadRequestId) {
+        setState(() {
+          _isLoadingProgress = false;
+          _hasLoadedProgress = true;
+        });
+      }
+    }
+  }
+
   int _startAssessmentBackgroundRefresh({required int profileId}) {
     final requestId = ++_assessmentLoadRequestId;
+    isLoadingAssessments = true;
+    assessmentLoadError = null;
     unawaited(
       _refreshAssessmentsInBackground(
         requestId: requestId,
@@ -337,15 +393,14 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     required ParentHomeEntranceMode mode,
     required Widget child,
     int order = 0,
-    bool markOnEnd = false,
   }) {
-    if (_playedEntrances.contains(mode)) {
-      return child;
-    }
-
     return AppStaggeredEntrance(
+      key: ValueKey(
+        'home-entrance-${profileStableId(widget.activeProfile)}-${mode.name}',
+      ),
       order: order,
-      onFinished: markOnEnd ? () => _markEntrancePlayed(mode) : null,
+      initiallyVisible: _playedEntrances.contains(mode),
+      onFinished: () => _markEntrancePlayed(mode),
       child: child,
     );
   }
@@ -359,29 +414,11 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.useActiveStudentProfileData && isLoading && !hasLoadedHome) {
-      return RefreshIndicator(
-        color: context.themeColors.brandStrong,
-        onRefresh: loadHome,
-        child: ParentHomeSkeleton(
-          bottomPadding: widget.bottomPadding,
-          homeHeader: widget.homeHeader,
-        ),
-      );
-    }
-    final hasJoinedClassroom = childSummaries.any(
-      (summary) => summary.classroom != null,
-    );
-    final isInitialChildDashboardLoad =
-        _children.isNotEmpty && !hasLoadedHome && isLoading;
     _scheduleMissingStudentDialogIfNeeded();
-    if (_children.isNotEmpty &&
-        (hasJoinedClassroom || isInitialChildDashboardLoad)) {
-      return buildChildDashboard();
-    }
-
-    final hasCompletedAssessment = completedAssessments.isNotEmpty;
-    final padding = EdgeInsets.fromLTRB(14, 0, 14, widget.bottomPadding);
+    final padding = EdgeInsets.fromLTRB(14, 14, 14, widget.bottomPadding + 18);
+    final showInitialLoading =
+        (isLoading && !hasLoadedHome) ||
+        (_isLoadingProgress && !_hasLoadedProgress);
 
     return RefreshIndicator(
       color: context.themeColors.brandStrong,
@@ -399,51 +436,101 @@ class ParentHomeContentState extends State<ParentHomeContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (isLoading && !hasLoadedHome)
-                    const LearningStreakSkeleton()
-                  else if (!hasCompletedAssessment)
+                  if (showInitialLoading)
+                    const HomeContentSkeleton()
+                  else ...[
                     homeEntrance(
-                      mode: ParentHomeEntranceMode.initialAssessment,
-                      order: 0,
-                      child: LearningStreakCard(
-                        data: parentLearningStreakContent(
-                          context,
-                          hasCompletedAssessment: hasCompletedAssessment,
-                        ),
+                      mode: ParentHomeEntranceMode.gradeRibbon,
+                      child: AssessmentGradeRibbon(
+                        currentGrade: _chart.finalGrade,
                       ),
-                    )
-                  else
+                    ),
+                    const SizedBox(height: 18),
                     homeEntrance(
-                      mode: ParentHomeEntranceMode.completedAssessment,
-                      order: 0,
-                      child: LearningStreakCard(
-                        data: parentLearningStreakContent(
-                          context,
-                          hasCompletedAssessment: hasCompletedAssessment,
+                      mode: ParentHomeEntranceMode.progressChart,
+                      order: 1,
+                      child: AssessmentProgressionChart(
+                        key: const ValueKey('parent-home-progress-chart'),
+                        finalGrade: _chart.finalGrade,
+                        gradeTitle: context.getText(AppKeys.homeChartLevel),
+                        activityTitle: context.getText(
+                          AppKeys.homeChartActivity,
                         ),
+                        previousGrades: _chart.previousGrades,
+                        testNumbers: _chart.testNumbers,
+                        lastSubmittedAt: _chart.lastSubmittedAt,
+                        chartHeight: 150,
                       ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: isLoading && !hasLoadedHome
-                        ? const ParentHomeLoadingCard()
-                        : hasCompletedAssessment
-                        ? buildCompletedState()
-                        : buildFirstAssessmentState(),
-                  ),
-                  if (isLoading && hasLoadedHome)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: ParentHomeRefreshLabel(),
+                    const SizedBox(height: 24),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: homeEntrance(
+                            mode: ParentHomeEntranceMode.assessmentAction,
+                            order: 2,
+                            child: ParentHomeActionButton(
+                              key: const ValueKey(
+                                'parent-home-assessment-action',
+                              ),
+                              label: context.getText(
+                                AppKeys.homeAssessmentTest,
+                              ),
+                              iconAsset:
+                                  'assets/icons/home-assessment-stopwatch.png',
+                              colors: const [
+                                Color(0xFFFFBE54),
+                                Color(0xFFFF993C),
+                              ],
+                              accentColor: const Color(0xFFFFDB70),
+                              onTap: openInitialAssessment,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: homeEntrance(
+                            mode: ParentHomeEntranceMode.practiceAction,
+                            order: 3,
+                            child: ParentHomeActionButton(
+                              key: const ValueKey(
+                                'parent-home-practice-action',
+                              ),
+                              label: context.getText(
+                                AppKeys.homeLearningPractice,
+                              ),
+                              iconAsset: 'assets/icons/home-learning-book.png',
+                              colors: const [
+                                Color(0xFFFFA18C),
+                                Color(0xFFFA796B),
+                              ],
+                              accentColor: const Color(0xFFFFB0AA),
+                              onTap:
+                                  widget.onOpenLearningTab ?? openGradeRoadmap,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  if (errorMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: ParentHomeErrorCard(
-                        message: errorMessage!,
-                        onRetry: loadHome,
+                  ],
+                  if (widget.showAssessmentList) ...[
+                    const SizedBox(height: 28),
+                    homeEntrance(
+                      mode: ParentHomeEntranceMode.assessmentList,
+                      order: 4,
+                      child: HomeAssessmentList(
+                        assessments: learningListExams,
+                        activeAssessment: activeAssessment,
+                        isLoading: isLoadingAssessments,
+                        isOpeningActiveAssessment: isOpeningActiveAssessment,
+                        errorMessage: assessmentLoadError,
+                        onOpenExam: openParentAssessmentResult,
+                        onResumeExam: openActiveAssessment,
+                        onRetry: () => loadHome(forceRefresh: true),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),

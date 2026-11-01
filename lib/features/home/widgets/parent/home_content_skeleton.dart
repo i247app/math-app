@@ -3,8 +3,8 @@ import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
-class NewHomeSkeleton extends StatelessWidget {
-  const NewHomeSkeleton({super.key});
+class HomeContentSkeleton extends StatelessWidget {
+  const HomeContentSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -9,8 +9,7 @@ import 'package:numi/features/home/data/home_profile_cache.dart';
 import 'package:numi/features/home/data/home_layout_service.dart';
 import 'package:numi/features/home/models/home_layout.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
-import 'package:numi/features/home/widgets/sections/banner/banner.dart';
-import 'package:numi/features/home/widgets/sections/assessment_list/home_assessment_result_card.dart';
+import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
 import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -20,7 +19,7 @@ import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/open_initial_assessment_from_home.dart';
 
 void main() {
-  testWidgets('home banner resumes the active assessment after leaving', (
+  testWidgets('home action resumes the active assessment after leaving', (
     tester,
   ) async {
     const profileId = 81522;
@@ -76,7 +75,9 @@ void main() {
     await tester.pumpAndSettle();
 
     final statsCallsBeforeFirstTap = examService.statsCalls;
-    await tester.tap(find.byType(HomeBanner).first);
+    await tester.tap(
+      find.byKey(const ValueKey('parent-home-assessment-action')),
+    );
     await tester.pumpAndSettle();
     expect(find.byType(ExamAttemptScreen), findsOneWidget);
     expect(find.text('Resume question 3'), findsOneWidget);
@@ -89,14 +90,16 @@ void main() {
     await tester.pumpAndSettle();
 
     final statsCallsBeforeSecondTap = examService.statsCalls;
-    await tester.tap(find.byType(HomeBanner).first);
+    await tester.tap(
+      find.byKey(const ValueKey('parent-home-assessment-action')),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Resume question 3'), findsOneWidget);
     expect(examService.generatedCount, 0);
     expect(examService.statsCalls, statsCallsBeforeSecondTap + 1);
   });
 
-  testWidgets('initial assessment banner opens the direct assessment action', (
+  testWidgets('home assessment action opens the direct assessment action', (
     tester,
   ) async {
     const profileId = 81520;
@@ -148,7 +151,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(HomeBanner).first);
+    await tester.tap(
+      find.byKey(const ValueKey('parent-home-assessment-action')),
+    );
     await tester.pumpAndSettle();
 
     expect(directAssessmentOpenCount, 1);
@@ -198,6 +203,7 @@ void main() {
                   onOpenGamesTab: _doNothingSync,
                   onParentAssessmentStateChanged: (_) {},
                   bottomPadding: 0,
+                  showAssessmentList: true,
                   onOpenExamReview: (_, exam) async {
                     openedResult = exam;
                   },
@@ -213,7 +219,7 @@ void main() {
     await tester.pump();
     expect(examService.profileRequests, const <int?>[profileId]);
     expect(examService.requestedExamTypes, const [
-      [examTypeAssessment],
+      [examTypeGrade, examTypeAssessment],
     ]);
 
     await pumpParentHome(isActive: false);
@@ -222,10 +228,10 @@ void main() {
     expect(examService.profileRequests, const <int?>[profileId, profileId]);
 
     await tester.pumpAndSettle();
-    expect(find.byType(HomeAssessmentResultCard), findsOneWidget);
-    await tester.ensureVisible(find.byType(HomeAssessmentResultCard));
+    expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
+    await tester.ensureVisible(find.byType(AssessmentResultListItemCard));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(HomeAssessmentResultCard));
+    await tester.tap(find.byType(AssessmentResultListItemCard));
     await tester.pump();
     expect(openedResult?.userExamId, 991);
     expect(openedResult?.grading?.scorePercentage, 80);

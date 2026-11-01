@@ -1,8 +1,8 @@
-import 'package:numi/features/home/screens/parent/new_parent_home_tab.dart';
+import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 
-/// Student entry point for the shared new home layout.
-class NewStudentHomeContent extends NewParentHomeContent {
-  const NewStudentHomeContent({
+/// Student entry point for the shared home layout.
+class StudentHomeContent extends ParentHomeContent {
+  const StudentHomeContent({
     super.key,
     required super.user,
     required super.profiles,

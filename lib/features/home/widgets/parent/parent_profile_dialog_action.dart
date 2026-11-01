@@ -1,1 +1,0 @@
-enum ParentProfileDialogAction { choose, create }

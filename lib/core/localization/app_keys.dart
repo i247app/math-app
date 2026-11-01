@@ -120,10 +120,10 @@ class AppKeys {
 
   static const student = 'student';
   static const assessment = 'assessment';
-  static const newHomeAssessmentTest = 'new_home_assessment_test';
-  static const newHomeLearningPractice = 'new_home_learning_practice';
-  static const newHomeChartLevel = 'new_home_chart_level';
-  static const newHomeChartActivity = 'new_home_chart_activity';
+  static const homeAssessmentTest = 'home_assessment_test';
+  static const homeLearningPractice = 'home_learning_practice';
+  static const homeChartLevel = 'home_chart_level';
+  static const homeChartActivity = 'home_chart_activity';
   static const parentLearningStreak = 'parent_learning_streak';
   static const parentAssessmentTitle = 'parent_assessment_title';
   static const parentAssessmentSubtitle = 'parent_assessment_subtitle';
