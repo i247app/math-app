@@ -385,7 +385,7 @@ void main() {
           ExamQuestion(
             questionText: r'Tính $\frac{1}{3} + \frac{1}{3}$',
             questionNumber: 1,
-            renderType: 'FRACTION',
+            questionTags: ['fraction'],
             options: <ExamAnswer>[
               ExamAnswer(id: 'A', text: r'\frac{1}{3}'),
               ExamAnswer(id: 'B', text: r'\frac{2}{3}'),

@@ -322,7 +322,6 @@ class ExamQuestion {
     this.difficulty,
     this.topic,
     this.questionTags = const [],
-    this.renderType,
     this.questionKind = 'SINGLE_CHOICE',
     this.correctOptionIds = const [],
     this.correctValues = const [],
@@ -339,7 +338,6 @@ class ExamQuestion {
   final int? difficulty;
   final String? topic;
   final List<String> questionTags;
-  final String? renderType;
   final String questionKind;
   final List<String> correctOptionIds;
   final List<String> correctValues;
@@ -353,7 +351,6 @@ class ExamQuestion {
   bool get isTrueFalse => questionKind == 'TRUE_FALSE';
 
   bool get isFraction =>
-      renderType?.trim().toUpperCase() == 'FRACTION' ||
       questionTags.any((tag) => tag.trim().toLowerCase() == 'fraction');
 
   ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
@@ -375,7 +372,6 @@ class ExamQuestion {
     difficulty: difficulty,
     topic: topic,
     questionTags: questionTags,
-    renderType: renderType,
     questionKind: questionKind,
     correctOptionIds: correctOptionIds,
     correctValues: correctValues,

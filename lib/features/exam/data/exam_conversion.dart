@@ -41,7 +41,6 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
       difficulty: questionLevel,
       topic: questionTopic,
       questionTags: questionTags,
-      renderType: renderType,
     );
   }
 }
@@ -77,7 +76,6 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
     difficulty: questionLevel,
     topic: questionTopic,
     questionTags: questionTags,
-    renderType: renderType,
   );
 }
 

@@ -77,7 +77,6 @@ void main() {
         final json = <String, dynamic>{
           'question_number': 1,
           'question_text': r'\frac{1}{2}',
-          'render_type': 'ARITHMETIC',
           'question_tags': tags,
           'options': <Map<String, dynamic>>[],
         };
@@ -165,42 +164,53 @@ void main() {
     });
   }
 
-  test(
-    'generate and detail preserve the question type for fraction rendering',
-    () {
-      final generated = ExamQuestionDto.fromJson(<String, dynamic>{
-        'question_text': r'Tinh \frac{1}{3}',
-        'question_number': 1,
-        'render_type': 'FRACTION',
-        'options': <Map<String, dynamic>>[
-          <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
-        ],
-      }).toModel();
-      final detail = ExamDetailAnswerDto.fromJson(<String, dynamic>{
-        'question_text': r'Tinh \frac{1}{3}',
-        'question_number': 1,
-        'render_type': 'FRACTION',
-        'options': <Map<String, dynamic>>[
-          <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
-        ],
-      }).toQuestionModel(questionNumber: 1);
+  test('generate and detail preserve fraction tags and answer content', () {
+    final generated = ExamQuestionDto.fromJson(<String, dynamic>{
+      'question_text': r'Tinh \frac{1}{3}',
+      'question_number': 1,
+      'question_tags': ['fraction'],
+      'options': <Map<String, dynamic>>[
+        <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
+      ],
+    }).toModel();
+    final detail = ExamDetailAnswerDto.fromJson(<String, dynamic>{
+      'question_text': r'Tinh \frac{1}{3}',
+      'question_number': 1,
+      'question_tags': ['fraction'],
+      'options': <Map<String, dynamic>>[
+        <String, dynamic>{'id': 'A', 'text': r'\frac{1}{3}'},
+      ],
+    }).toQuestionModel(questionNumber: 1);
 
-      for (final question in [generated, detail]) {
-        expect(question.renderType, 'FRACTION');
-        expect(question.isFraction, isTrue);
-        expect(question.options.single.text, r'\frac{1}{3}');
-      }
-      expect(
-        const ExamQuestionDto(
-          questionText: '1 + 1',
-          questionNumber: 1,
-          options: [],
-          renderType: 'COUNT',
-        ).toModel().isFraction,
-        isFalse,
-      );
-    },
-  );
+    for (final question in [generated, detail]) {
+      expect(question.questionTags, ['fraction']);
+      expect(question.isFraction, isTrue);
+      expect(question.options.single.text, r'\frac{1}{3}');
+    }
+    expect(
+      const ExamQuestionDto(
+        questionText: '1 + 1',
+        questionNumber: 1,
+        options: [],
+      ).toModel().isFraction,
+      isFalse,
+    );
+  });
+
+  test('removed render_type is ignored and is not serialized', () {
+    final json = <String, dynamic>{
+      'question_number': 1,
+      'question_text': r'\frac{1}{2}',
+      'render_type': 'FRACTION',
+      'options': <Map<String, dynamic>>[],
+    };
+    final generated = ExamQuestionDto.fromJson(json);
+    final detail = ExamDetailAnswerDto.fromJson(json);
+    expect(generated.toModel().isFraction, isFalse);
+    expect(detail.toQuestionModel(questionNumber: 1).isFraction, isFalse);
+    expect(generated.toJson(), isNot(contains('render_type')));
+    expect(detail.toJson(), isNot(contains('render_type')));
+  });
 
   test('detail keeps negative option content when summary fields disagree', () {
     const detail = ExamDetailAnswerDto(

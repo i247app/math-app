@@ -30,7 +30,6 @@ ExamQuestion _question({String? kind, Map<String, dynamic>? correct}) =>
     ExamQuestionDto.fromJson({
       'question_number': 7,
       'question_text': '2 + 3 = ?',
-      'render_type': 'ARITHMETIC',
       'question_kind': ?kind,
       'options': kind == 'NUMERIC_INPUT' ? [] : _options,
       'correct_answer': ?correct,
@@ -183,7 +182,6 @@ void main() {
       final dto = ExamQuestionDto.fromJson({
         'question_number': 1,
         'question_text': 'Pick a shape',
-        'render_type': 'IDENTIFY_SHAPE',
         'question_image_url': 'https://example.com/stem',
         'options': [
           {

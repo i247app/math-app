@@ -1570,7 +1570,7 @@ Map<String, dynamic> _examResponse() => <String, dynamic>{
         'question_grade': 2,
         'question_level': 1,
         'question_topic': 'counting',
-        'render_type': 'COUNT',
+        'question_tags': ['counting'],
 
         'correct_answer': {
           'option_ids': ['A'],

@@ -121,7 +121,6 @@ void main() {
   const fractionQuestion = ExamQuestion(
     questionText: r'So sánh \frac{1}{3} và \frac{2}{3}',
     questionNumber: 1,
-    renderType: 'ARITHMETIC',
     questionTags: ['measurement', 'fraction'],
     options: answers,
 

@@ -250,7 +250,6 @@ class ExamDetailAnswerDto {
     this.questionText,
     this.questionTopic,
     this.questionTags = const [],
-    this.renderType,
     this.rightAnswerText,
     this.childAnswerText,
     this.isCorrect,
@@ -276,7 +275,6 @@ class ExamDetailAnswerDto {
   final String? questionText;
   final String? questionTopic;
   final List<String> questionTags;
-  final String? renderType;
   final String? rightAnswerText;
   final String? childAnswerText;
   final bool? isCorrect;
@@ -592,7 +590,6 @@ class ExamQuestionDto {
     this.questionLevel,
     this.questionTopic,
     this.questionTags = const [],
-    this.renderType,
   });
 
   final String questionText;
@@ -608,7 +605,6 @@ class ExamQuestionDto {
   final int? questionLevel;
   final String? questionTopic;
   final List<String> questionTags;
-  final String? renderType;
 
   factory ExamQuestionDto.fromJson(Map<String, dynamic> json) =>
       _$ExamQuestionDtoFromJson(json);
