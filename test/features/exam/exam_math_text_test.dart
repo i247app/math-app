@@ -121,13 +121,14 @@ void main() {
   const fractionQuestion = ExamQuestion(
     questionText: r'So sánh \frac{1}{3} và \frac{2}{3}',
     questionNumber: 1,
-    renderType: 'FRACTION',
+    renderType: 'ARITHMETIC',
+    questionTags: ['measurement', 'fraction'],
     options: answers,
 
     correctOptionIds: ['A'],
   );
 
-  testWidgets('attempt renders both question and answers for fractions', (
+  testWidgets('fraction tag renders attempt question and answers as math', (
     tester,
   ) async {
     final selections = <String>[];
@@ -137,11 +138,11 @@ void main() {
         children: [
           AssessmentQuestionCard(
             question: fractionQuestion.questionText,
-            renderLatex: true,
+            renderLatex: fractionQuestion.isFraction,
           ),
           AssessmentAnswerGrid(
             options: answers,
-            renderLatex: true,
+            renderLatex: fractionQuestion.isFraction,
             selectedAnswerLabel: null,
             onSelected: (answer) => selections.add(answer.id),
           ),
@@ -178,9 +179,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('both review modes render fraction questions and answers', (
-    tester,
-  ) async {
+  testWidgets('fraction tag renders math in both review modes', (tester) async {
     await _pump(
       tester,
       const Column(

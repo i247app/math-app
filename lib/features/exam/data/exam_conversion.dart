@@ -40,6 +40,7 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
       questionImageUrl: questionImageUrl,
       difficulty: questionLevel,
       topic: questionTopic,
+      questionTags: questionTags,
       renderType: renderType,
     );
   }
@@ -75,6 +76,7 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
     reviewIsCorrect: isCorrect,
     difficulty: questionLevel,
     topic: questionTopic,
+    questionTags: questionTags,
     renderType: renderType,
   );
 }

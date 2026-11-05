@@ -5,6 +5,92 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 
 void main() {
+  test('keeps question tags through API conversion and image refresh', () {
+    final json = <String, dynamic>{
+      'question_number': 1,
+      'question_text': 'Measure the length.',
+      'question_tags': ['length', 'measurement'],
+      'options': <Map<String, dynamic>>[],
+    };
+    final generated = ExamQuestionDto.fromJson(json);
+    final detail = ExamDetailAnswerDto.fromJson(json);
+
+    for (final encoded in [generated.toJson(), detail.toJson()]) {
+      expect(encoded['question_tags'], ['length', 'measurement']);
+    }
+    for (final question in [
+      generated.toModel(),
+      detail.toQuestionModel(questionNumber: 1),
+    ]) {
+      expect(question.questionTags, ['length', 'measurement']);
+      expect(question.withRefreshedImages(null).questionTags, [
+        'length',
+        'measurement',
+      ]);
+      expect(
+        question
+            .withRefreshedImages(
+              const ExamQuestionDto(
+                questionText: 'Measure the length.',
+                questionNumber: 1,
+                options: [],
+              ).toModel(),
+            )
+            .questionTags,
+        ['length', 'measurement'],
+      );
+    }
+  });
+
+  test('missing, null and empty question tags become an empty list', () {
+    for (final tags in <Map<String, dynamic>>[
+      {},
+      {'question_tags': null},
+      {'question_tags': <String>[]},
+    ]) {
+      final json = <String, dynamic>{
+        'question_number': 1,
+        'question_text': 'Measure the length.',
+        'options': <Map<String, dynamic>>[],
+        ...tags,
+      };
+      expect(ExamQuestionDto.fromJson(json).toModel().questionTags, isEmpty);
+      expect(
+        ExamDetailAnswerDto.fromJson(json)
+            .toQuestionModel(questionNumber: 1)
+            .questionTags,
+        isEmpty,
+      );
+    }
+  });
+
+  test(
+    'fraction tag enables math rendering for generated and review questions',
+    () {
+      for (final (tags, expected) in <(List<String>, bool)>[
+        (['measurement', 'fraction'], true),
+        ([' FRACTION '], true),
+        (['length', 'measurement'], false),
+        (['fractional', 'unit_fraction'], false),
+        ([], false),
+      ]) {
+        final json = <String, dynamic>{
+          'question_number': 1,
+          'question_text': r'\frac{1}{2}',
+          'render_type': 'ARITHMETIC',
+          'question_tags': tags,
+          'options': <Map<String, dynamic>>[],
+        };
+        for (final question in [
+          ExamQuestionDto.fromJson(json).toModel(),
+          ExamDetailAnswerDto.fromJson(json).toQuestionModel(questionNumber: 1),
+        ]) {
+          expect(question.isFraction, expected, reason: 'tags: $tags');
+        }
+      }
+    },
+  );
+
   test(
     'keeps per-question grade through generate, detail and image refresh',
     () {
