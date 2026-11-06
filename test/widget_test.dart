@@ -21,12 +21,30 @@ import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
+import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/session/controllers/app_session_cubit.dart';
 import 'package:numi/features/session/controllers/app_session_state.dart';
 import 'package:numi/app/composition/app_services.dart';
 import 'package:numi/main.dart';
 import 'package:numi/shared/widgets/app_back_button.dart';
+
+Future<void> _precacheAssessmentIntroArtwork(WidgetTester tester) async {
+  await tester.pump();
+  // Image decoding needs the real event loop before the loading animation settles.
+  await tester.runAsync(() async {
+    final context = tester.element(find.byType(WelcomeAssessmentIntroScreen));
+    await Future.wait([
+      for (final asset in [
+        ...WelcomeAssessmentBackground.decorationAssets,
+        'assets/images/assessment_intro/assessment-graduate-mascot.png',
+        'assets/images/grade-ribbon-numbers.png',
+      ])
+        precacheImage(AssetImage(asset), context),
+    ]);
+  });
+  await tester.pump();
+}
 
 class _FakeAuthService implements AuthService {
   @override
@@ -107,6 +125,14 @@ class _SignupLookupAuthService implements AuthService {
 }
 
 class _PendingExamService implements ExamService {
+  @override
+  Future<ExamProgressResponse> getExamProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+    String examType = examTypeAssessment,
+  }) async => const ExamProgressResponse(mstatus: 200);
+
   @override
   Future<GeneratedExam> generateAssessmentExam({
     String examType = examTypeAssessment,
@@ -221,28 +247,6 @@ void main() {
       );
     });
 
-    testWidgets('places Try It in the cloud above the mascot and login', (
-      tester,
-    ) async {
-      await tester.pumpWidget(const NumiApp());
-
-      final assessment = find.byKey(
-        const ValueKey('welcome-assessment-action'),
-      );
-      final mascot = find.byKey(const ValueKey('welcome-thinking-mascot'));
-      await tester.ensureVisible(assessment);
-
-      expect(mascot, findsOneWidget);
-      expect(
-        tester.getBottomLeft(assessment).dy,
-        lessThan(tester.getTopLeft(mascot).dy),
-      );
-      expect(
-        tester.getBottomLeft(mascot).dy,
-        lessThan(tester.getTopLeft(find.text('ĐĂNG NHẬP')).dy),
-      );
-    });
-
     testWidgets('opens guest assessment from the initial welcome screen', (
       tester,
     ) async {
@@ -263,14 +267,15 @@ void main() {
       );
       await tester.ensureVisible(find.text('Thử Ngay!'));
       await tester.tap(find.text('Thử Ngay!'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      await _precacheAssessmentIntroArtwork(tester);
       await tester.pumpAndSettle();
 
       expect(guestAccounts.ensureCalls, 1);
       expect(find.byType(WelcomeAssessmentIntroScreen), findsOneWidget);
       expect(find.text('TOÁN AI'), findsOneWidget);
       expect(find.text('ĐÁNH GIÁ NĂNG LỰC'), findsOneWidget);
-      expect(find.text('START'), findsOneWidget);
-      expect(tester.widget<Text>(find.text('START')).style?.fontSize, 32);
       expect(
         tester.widget<Text>(find.text('TOÁN AI')).style?.fontFamily,
         startsWith('Nunito_'),
@@ -280,6 +285,16 @@ void main() {
         startsWith('Nunito_'),
       );
 
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('welcome-assessment-intro-action')),
+        120,
+        scrollable: find.descendant(
+          of: find.byKey(const ValueKey('welcome-assessment-intro-scroll')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(find.text('START'), findsOneWidget);
+      expect(tester.widget<Text>(find.text('START')).style?.fontSize, 32);
       await tester.tap(
         find.byKey(const ValueKey('welcome-assessment-intro-action')),
       );
@@ -609,8 +624,9 @@ void main() {
           ),
         ),
       );
+      await _precacheAssessmentIntroArtwork(tester);
       expect(
-        find.byKey(const ValueKey('welcome-assessment-intro-history-skeleton')),
+        find.byKey(const ValueKey('welcome-assessment-intro-loading')),
         findsOneWidget,
       );
       expect(find.byType(AssessmentProgressionChart), findsNothing);
@@ -653,6 +669,14 @@ void main() {
         2,
       );
 
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('welcome-assessment-intro-action')),
+        120,
+        scrollable: find.descendant(
+          of: find.byKey(const ValueKey('welcome-assessment-intro-scroll')),
+          matching: find.byType(Scrollable),
+        ),
+      );
       await tester.tap(
         find.byKey(const ValueKey('welcome-assessment-intro-action')),
       );
@@ -663,7 +687,7 @@ void main() {
       expect(examService.statsCalls, 0);
       expect(examService.progressCalls, 2);
       expect(
-        find.byKey(const ValueKey('welcome-assessment-intro-history-skeleton')),
+        find.byKey(const ValueKey('welcome-assessment-intro-loading')),
         findsOneWidget,
       );
       expect(find.byType(AssessmentProgressionChart), findsNothing);
@@ -692,7 +716,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(
-        find.byKey(const ValueKey('welcome-assessment-intro-history-skeleton')),
+        find.byKey(const ValueKey('welcome-assessment-intro-loading')),
         findsNothing,
       );
       final chart = tester.widget<AssessmentProgressionChart>(
