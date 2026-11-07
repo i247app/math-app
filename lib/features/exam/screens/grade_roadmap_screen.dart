@@ -511,8 +511,6 @@ class _GradeRoadmapPath extends StatelessWidget {
     final mascotLeft =
         (isOnLeft ? center.dx + _nodeSize / 2 - 3 : nodeLeft - _mascotSize)
             .clamp(8.0, math.max(8.0, width - _mascotSize - 8));
-    final raysLeft = (isOnLeft ? nodeLeft - 25 : nodeLeft + _nodeSize - 1)
-        .clamp(6.0, math.max(6.0, width - 32));
     return Positioned(
       left: nodeLeft,
       top: center.dy - _nodeSize / 2,
@@ -531,21 +529,6 @@ class _GradeRoadmapPath extends StatelessWidget {
               isLoading: openingLevel == level,
               onTap: unlocked ? () => onLevelTap(level) : null,
             ),
-            if (current || completed)
-              Positioned(
-                left: raysLeft - nodeLeft,
-                top: -4,
-                child: _RoadmapNodeRays(
-                  mirrored: isOnLeft,
-                  color: current
-                      ? const Color(0xFFFFC81E)
-                      : Color.lerp(
-                          _RoadmapLevelNode.colorForLevel(level),
-                          const Color(0xFFFFD326),
-                          0.58,
-                        )!,
-                ),
-              ),
             if (current)
               Positioned(
                 left: mascotLeft - nodeLeft,
@@ -799,63 +782,6 @@ class _RoadmapLevelLabel extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _RoadmapNodeRays extends StatelessWidget {
-  const _RoadmapNodeRays({required this.color, required this.mirrored});
-
-  final Color color;
-  final bool mirrored;
-
-  @override
-  Widget build(BuildContext context) {
-    final rays = SizedBox(
-      width: 26,
-      height: 31,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 1,
-            top: 18,
-            child: _RoadmapNodeRay(color: color, angle: -1.1),
-          ),
-          Positioned(
-            left: 8,
-            top: 7,
-            child: _RoadmapNodeRay(color: color, angle: -0.55),
-          ),
-          Positioned(
-            left: 18,
-            top: 2,
-            child: _RoadmapNodeRay(color: color, angle: -0.12),
-          ),
-        ],
-      ),
-    );
-    return mirrored ? Transform.flip(flipX: true, child: rays) : rays;
-  }
-}
-
-class _RoadmapNodeRay extends StatelessWidget {
-  const _RoadmapNodeRay({required this.color, required this.angle});
-
-  final Color color;
-  final double angle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: angle,
-      child: Container(
-        width: 5,
-        height: 14,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
     );
   }
 }
