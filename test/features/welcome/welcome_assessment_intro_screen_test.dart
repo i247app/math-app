@@ -14,6 +14,7 @@ import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_question_audio_settings.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
@@ -23,6 +24,61 @@ void main() {
   setUp(() {
     GoogleFonts.config.allowRuntimeFetching = false;
     FlutterSecureStorage.setMockInitialValues({});
+  });
+
+  testWidgets('intro toggles question autoplay and restores the saved choice', (
+    tester,
+  ) async {
+    await _pumpIntro(
+      tester,
+      size: const Size(390, 844),
+      progress: Future.value(_progress(false)),
+    );
+    await tester.pumpAndSettle();
+    final audio = find.byKey(const ValueKey('welcome-assessment-audio-toggle'));
+    expect(audio.hitTestable(), findsOneWidget);
+    expect(
+      find.descendant(
+        of: audio,
+        matching: find.byIcon(Icons.volume_up_rounded),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(audio);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: audio,
+        matching: find.byIcon(Icons.volume_off_rounded),
+      ),
+      findsOneWidget,
+    );
+    expect(await const ExamQuestionAudioSettings().readEnabled(), isFalse);
+
+    await tester.pumpWidget(const SizedBox());
+    await _pumpIntro(
+      tester,
+      size: const Size(390, 844),
+      progress: Future.value(_progress(false)),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: audio,
+        matching: find.byIcon(Icons.volume_off_rounded),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(audio);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: audio,
+        matching: find.byIcon(Icons.volume_up_rounded),
+      ),
+      findsOneWidget,
+    );
+    expect(await const ExamQuestionAudioSettings().readEnabled(), isTrue);
   });
 
   testWidgets('dark loading uses a dark canvas and bright dots', (

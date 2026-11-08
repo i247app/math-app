@@ -10,6 +10,7 @@ import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_question_audio_settings.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/data/profile_roadmap_grade_store.dart';
 import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
@@ -28,6 +29,7 @@ import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/grade.dart';
 
 void main() {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   setUpAll(() async {
     if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
       final font = File('C:/Windows/Fonts/segoeui.ttf');
@@ -1903,6 +1905,30 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(service.levelRequests, <int>[grade]);
+      final audio = find.byKey(const ValueKey('grade-roadmap-audio-toggle'));
+      expect(audio, grade == 0 ? findsOneWidget : findsNothing);
+      if (grade == 0) {
+        expect(
+          find.descendant(
+            of: audio,
+            matching: find.byIcon(Icons.volume_up_rounded),
+          ),
+          findsOneWidget,
+        );
+        await tester.tap(audio);
+        await tester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: audio,
+            matching: find.byIcon(Icons.volume_off_rounded),
+          ),
+          findsOneWidget,
+        );
+        expect(await const ExamQuestionAudioSettings().readEnabled(), isFalse);
+        await tester.tap(audio);
+        await tester.pumpAndSettle();
+        expect(await const ExamQuestionAudioSettings().readEnabled(), isTrue);
+      }
       expect(
         find.image(
           AssetImage(GradeRoadmapLayout.backgroundAssetForGrade(grade)),

@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -11,6 +12,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/exam_question_audio_settings.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_image_cache.dart';
 import 'package:numi/core/theme/app_colors.dart';
@@ -32,6 +34,7 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   testWidgets(
     'set transition remains visible until every new image is decoded',
     (tester) async {
@@ -183,6 +186,39 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
+
+    for (final examType in [examTypeGrade, examTypeAssessment]) {
+      testWidgets('muted $examType skips autoplay but allows manual replay', (
+        tester,
+      ) async {
+        await const ExamQuestionAudioSettings().saveEnabled(false);
+        await _pumpAssessment(tester, questions: questions, examType: examType);
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), isEmpty);
+
+        await tester.tap(find.byKey(const ValueKey('read-question')));
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+        calls.clear();
+        await tester.tap(find.byType(AssessmentAnswerButton).first);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pumpAndSettle();
+        expect(find.text(questions.last.questionText), findsOneWidget);
+        expect(calls.where((c) => c.method == 'speak'), isEmpty);
+        await tester.tap(find.byKey(const ValueKey('read-question')));
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpAndSettle();
+        await const ExamQuestionAudioSettings().saveEnabled(true);
+        calls.clear();
+        await _pumpAssessment(tester, questions: questions, examType: examType);
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+      });
+    }
 
     testWidgets(
       'emoji question keeps its speaker disabled without starting narration',

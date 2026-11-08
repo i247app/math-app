@@ -13,6 +13,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/widgets/shared/question_audio_toggle.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
@@ -151,16 +152,20 @@ class _WelcomeAssessmentIntroScreenState
   Widget _buildToolbar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        heightFactor: 1,
-        child: AppBackButton(
-          key: const ValueKey('welcome-assessment-back'),
-          onPressed: () => Navigator.of(context).pop(),
-          color: Theme.of(context).brightness == Brightness.dark
-              ? context.themeColors.brandStrong
-              : AppColors.welcomeTeal,
-        ),
+      child: Row(
+        children: [
+          AppBackButton(
+            key: const ValueKey('welcome-assessment-back'),
+            onPressed: () => Navigator.of(context).pop(),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? context.themeColors.brandStrong
+                : AppColors.welcomeTeal,
+          ),
+          const Spacer(),
+          const QuestionAudioToggle(
+            key: ValueKey('welcome-assessment-audio-toggle'),
+          ),
+        ],
       ),
     );
   }

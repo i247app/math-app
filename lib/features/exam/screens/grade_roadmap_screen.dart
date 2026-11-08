@@ -21,6 +21,7 @@ import 'package:numi/features/exam/models/grade_exam_completion.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/exam_review_screen.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
+import 'package:numi/features/exam/widgets/shared/question_audio_toggle.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
 import 'package:numi/features/profile/models/grade.dart';
 
@@ -394,6 +395,12 @@ class _GradeRoadmapHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          if (selectedGrade == 0) ...[
+            const QuestionAudioToggle(
+              key: ValueKey('grade-roadmap-audio-toggle'),
+            ),
+            if (onBack != null) const SizedBox(width: 8),
+          ],
           if (onBack != null)
             IconButton(
               key: const ValueKey('grade-roadmap-close'),
