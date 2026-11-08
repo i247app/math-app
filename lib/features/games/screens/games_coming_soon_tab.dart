@@ -22,7 +22,7 @@ class GamesComingSoonTab extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                'assets/images/numi-mascot.png',
+                'assets/images/games-coming-soon-mascot.png',
                 width: 220,
                 height: 220,
                 fit: BoxFit.contain,

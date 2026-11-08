@@ -511,8 +511,6 @@ class _GradeRoadmapPath extends StatelessWidget {
     final mascotLeft =
         (isOnLeft ? center.dx + _nodeSize / 2 - 3 : nodeLeft - _mascotSize)
             .clamp(8.0, math.max(8.0, width - _mascotSize - 8));
-    final raysLeft = (isOnLeft ? nodeLeft - 25 : nodeLeft + _nodeSize - 1)
-        .clamp(6.0, math.max(6.0, width - 32));
     return Positioned(
       left: nodeLeft,
       top: center.dy - _nodeSize / 2,
@@ -531,21 +529,6 @@ class _GradeRoadmapPath extends StatelessWidget {
               isLoading: openingLevel == level,
               onTap: unlocked ? () => onLevelTap(level) : null,
             ),
-            if (current || completed)
-              Positioned(
-                left: raysLeft - nodeLeft,
-                top: -4,
-                child: _RoadmapNodeRays(
-                  mirrored: isOnLeft,
-                  color: current
-                      ? const Color(0xFFFFC81E)
-                      : Color.lerp(
-                          _RoadmapLevelNode.colorForLevel(level),
-                          const Color(0xFFFFD326),
-                          0.58,
-                        )!,
-                ),
-              ),
             if (current)
               Positioned(
                 left: mascotLeft - nodeLeft,
@@ -616,8 +599,8 @@ class _RoadmapLevelNode extends StatelessWidget {
     final displayLevel = level - 1;
     final faceColor = unlocked || completed
         ? levelColor
-        : Color.lerp(levelColor, const Color(0xFFCFD8DC), 0.14)!;
-    final faceHighlight = Color.lerp(faceColor, Colors.white, 0.22)!;
+        : Color.lerp(levelColor, const Color(0xFFDFE5D7), 0.24)!;
+    final faceHighlight = Color.lerp(faceColor, Colors.white, 0.2)!;
     final lowerRim = Color.lerp(faceColor, Colors.black, 0.18)!;
     final iconColor = Color.lerp(faceColor, Colors.black, 0.42)!;
     final stateLabel = completed
@@ -647,24 +630,25 @@ class _RoadmapLevelNode extends StatelessWidget {
                 clipBehavior: Clip.none,
                 alignment: Alignment.topCenter,
                 children: [
-                  Positioned(
-                    top: 8,
+                  const Positioned(
+                    top: 4,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: lowerRim,
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFFF9F8E3), Color(0xFFD0D4B9)],
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: faceColor.withValues(
-                              alpha: current ? 0.42 : 0.28,
-                            ),
-                            offset: const Offset(0, 8),
-                            blurRadius: current ? 18 : 13,
-                            spreadRadius: current ? 1 : 0,
+                            color: Color(0x2B6D6846),
+                            offset: Offset(0, 4),
+                            blurRadius: 10,
                           ),
                         ],
                       ),
-                      child: const SizedBox.square(dimension: 104),
+                      child: SizedBox.square(dimension: 104),
                     ),
                   ),
                   Positioned(
@@ -674,43 +658,56 @@ class _RoadmapLevelNode extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                           colors: [faceHighlight, faceColor],
+                          stops: const [0, 0.8],
                         ),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.62),
-                          width: 2,
+                          color: const Color(0xFFFCF8DF),
+                          width: 3.5,
                         ),
                         boxShadow: const [
                           BoxShadow(
-                            color: Color(0x21000000),
-                            offset: Offset(0, 2),
-                            blurRadius: 3,
+                            color: Color(0x1F7D8053),
+                            offset: Offset(0, 1),
+                            blurRadius: 2,
                           ),
                         ],
                       ),
                       child: SizedBox.square(
                         dimension: 104,
-                        child: Center(
-                          child: isLoading
-                              ? const SizedBox.square(
-                                  dimension: 30,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : unlocked || completed
-                              ? _RoadmapLevelLabel(level: displayLevel)
-                              : Icon(
-                                  Icons.lock_rounded,
-                                  key: ValueKey(
-                                    'grade-roadmap-level-$level-locked',
-                                  ),
-                                  color: iconColor,
-                                  size: 39,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            IgnorePointer(
+                              child: CustomPaint(
+                                painter: _RoadmapNodeSheenPainter(
+                                  rimColor: lowerRim,
                                 ),
+                              ),
+                            ),
+                            Center(
+                              child: isLoading
+                                  ? const SizedBox.square(
+                                      dimension: 30,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : unlocked || completed
+                                  ? _RoadmapLevelLabel(level: displayLevel)
+                                  : Icon(
+                                      Icons.lock_rounded,
+                                      key: ValueKey(
+                                        'grade-roadmap-level-$level-locked',
+                                      ),
+                                      color: iconColor,
+                                      size: 39,
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -718,20 +715,22 @@ class _RoadmapLevelNode extends StatelessWidget {
                   if (completed)
                     Positioned(
                       key: ValueKey('grade-roadmap-level-$level-completed'),
-                      top: 3,
-                      right: 3,
+                      top: 0,
+                      right: 0,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: faceColor.withValues(alpha: 0.3),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.white, Color(0xFFFFFEF4)],
                           ),
+                          border: Border.all(color: const Color(0xFFF6F6DF)),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x26000000),
-                              offset: Offset(0, 2),
-                              blurRadius: 4,
+                              color: Color(0x28606C43),
+                              offset: Offset(0, 3),
+                              blurRadius: 5,
                             ),
                           ],
                         ),
@@ -739,8 +738,8 @@ class _RoadmapLevelNode extends StatelessWidget {
                           padding: const EdgeInsets.all(4),
                           child: Icon(
                             Icons.check_rounded,
-                            color: lowerRim,
-                            size: 18,
+                            color: faceColor,
+                            size: 22,
                           ),
                         ),
                       ),
@@ -755,6 +754,66 @@ class _RoadmapLevelNode extends StatelessWidget {
   }
 }
 
+class _RoadmapNodeSheenPainter extends CustomPainter {
+  const _RoadmapNodeSheenPainter({required this.rimColor});
+
+  final Color rimColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final face = (Offset.zero & size).deflate(5.5);
+    canvas.drawArc(
+      face,
+      0,
+      math.pi,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..shader = SweepGradient(
+          startAngle: 0,
+          endAngle: math.pi,
+          colors: [
+            rimColor.withValues(alpha: 0),
+            rimColor.withValues(alpha: 0.55),
+            rimColor.withValues(alpha: 0.9),
+            rimColor.withValues(alpha: 0.55),
+            rimColor.withValues(alpha: 0),
+          ],
+          stops: const [0, 0.22, 0.5, 0.78, 1],
+        ).createShader(face),
+    );
+
+    canvas.save();
+    canvas.translate(size.width * 0.2, size.height * 0.2);
+    canvas.rotate(-math.pi / 4);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: 28, height: 12),
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.12)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: 21, height: 6),
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.45)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1),
+    );
+    canvas.restore();
+    canvas.drawCircle(
+      Offset(size.width * 0.33, size.height * 0.12),
+      2.5,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.22)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.2),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_RoadmapNodeSheenPainter oldDelegate) =>
+      oldDelegate.rimColor != rimColor;
+}
+
 class _RoadmapLevelLabel extends StatelessWidget {
   const _RoadmapLevelLabel({required this.level});
 
@@ -762,6 +821,15 @@ class _RoadmapLevelLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const numberStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 38,
+      fontWeight: FontWeight.w900,
+      height: 1,
+      shadows: [
+        Shadow(color: Color(0x33744E24), offset: Offset(0, 2), blurRadius: 3),
+      ],
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -770,11 +838,11 @@ class _RoadmapLevelLabel extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 17,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
             height: 1,
             shadows: [
               Shadow(
-                color: Color(0x3D000000),
+                color: Color(0x33744E24),
                 offset: Offset(0, 1.5),
                 blurRadius: 2,
               ),
@@ -782,80 +850,33 @@ class _RoadmapLevelLabel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 3),
-        Text(
-          '$level',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 34,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            shadows: [
-              Shadow(
-                color: Color(0x3D000000),
-                offset: Offset(0, 2),
-                blurRadius: 3,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Reinforce the glyphs even when the inherited font has no
+            // heavier weight, without changing their size or semantics.
+            ExcludeSemantics(
+              child: RichText(
+                textScaler: MediaQuery.textScalerOf(context),
+                text: TextSpan(
+                  text: '$level',
+                  style: DefaultTextStyle.of(context).style
+                      .merge(numberStyle)
+                      .copyWith(
+                        foreground: Paint()
+                          ..color = Colors.white
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 1.6
+                          ..strokeJoin = StrokeJoin.round,
+                        shadows: const [],
+                      ),
+                ),
               ),
-            ],
-          ),
+            ),
+            Text('$level', style: numberStyle),
+          ],
         ),
       ],
-    );
-  }
-}
-
-class _RoadmapNodeRays extends StatelessWidget {
-  const _RoadmapNodeRays({required this.color, required this.mirrored});
-
-  final Color color;
-  final bool mirrored;
-
-  @override
-  Widget build(BuildContext context) {
-    final rays = SizedBox(
-      width: 26,
-      height: 31,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 1,
-            top: 18,
-            child: _RoadmapNodeRay(color: color, angle: -1.1),
-          ),
-          Positioned(
-            left: 8,
-            top: 7,
-            child: _RoadmapNodeRay(color: color, angle: -0.55),
-          ),
-          Positioned(
-            left: 18,
-            top: 2,
-            child: _RoadmapNodeRay(color: color, angle: -0.12),
-          ),
-        ],
-      ),
-    );
-    return mirrored ? Transform.flip(flipX: true, child: rays) : rays;
-  }
-}
-
-class _RoadmapNodeRay extends StatelessWidget {
-  const _RoadmapNodeRay({required this.color, required this.angle});
-
-  final Color color;
-  final double angle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: angle,
-      child: Container(
-        width: 5,
-        height: 14,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
     );
   }
 }

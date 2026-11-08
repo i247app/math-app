@@ -90,6 +90,18 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
+      final context = tester.element(
+        find.byKey(const ValueKey('grade-roadmap-preview')),
+      );
+      await tester.runAsync(() async {
+        await Future.wait([
+          for (final image in tester.widgetList<Image>(find.byType(Image)))
+            precacheImage(image.image, context),
+        ]);
+      });
+      await tester.pumpAndSettle();
+    }
   }
 
   for (final padding in const [
@@ -252,7 +264,7 @@ void main() {
     });
   }
 
-  for (final grade in [0, 1, 2, 3, 4]) {
+  for (final grade in [0, 1, 2, 3, 4, 5]) {
     for (final size in [
       const Size(320, 700),
       const Size(390, 844),
@@ -300,11 +312,53 @@ void main() {
                 0 => const Offset(414, 4750) * (rect.width / 863),
                 2 => const Offset(181, 4600) * (rect.width / 863),
                 3 => const Offset(224.5, 4500) * (rect.width / 861),
-                4 => const Offset(451, 4500) * (rect.width / 863),
+                4 => const Offset(584.5, 4750) * (rect.width / 863),
+                5 => const Offset(177.5, 4800) * (rect.width / 672),
                 _ => const Offset(187.5, 4760) * (rect.width / 672),
               };
           expect(firstLevel.center.dx, closeTo(firstLevelCenter.dx, 0.01));
           expect(firstLevel.center.dy, closeTo(firstLevelCenter.dy, 0.01));
+          expect(firstLevel.bottom, lessThanOrEqualTo(rect.bottom));
+          if (grade == 2 || grade == 4) {
+            final curveLevel = tester.getRect(
+              find.byKey(const ValueKey('grade-roadmap-level-2')),
+            );
+            final sourceCenter = grade == 2
+                ? const Offset(468, 4144)
+                : const Offset(186, 4250);
+            final curveCenter =
+                rect.topLeft + sourceCenter * (rect.width / 863);
+            expect(curveLevel.center.dx, closeTo(curveCenter.dx, 0.01));
+            expect(curveLevel.center.dy, closeTo(curveCenter.dy, 0.01));
+          }
+          final lastLevel = tester.getRect(
+            find.byKey(const ValueKey('grade-roadmap-level-10')),
+          );
+          if (grade == 1) {
+            final endCenter =
+                rect.topLeft + const Offset(318, 500) * (rect.width / 672);
+            expect(lastLevel.center.dx, closeTo(endCenter.dx, 0.01));
+            expect(lastLevel.center.dy, closeTo(endCenter.dy, 0.01));
+          }
+          // Bend-aligned maps start at their upper bend; other maps use the
+          // end of the road to include the upper stretch in the progression.
+          final followsBends =
+              grade == 1 || grade == 2 || grade == 4 || grade == 5;
+          expect(
+            lastLevel.center.dy - rect.top,
+            lessThan(size.width * (followsBends ? 0.9 : 0.75)),
+          );
+          expect(
+            lastLevel.top - rect.top,
+            greaterThan(
+              tester
+                      .getRect(
+                        find.byKey(const ValueKey('grade-roadmap-grade-pill')),
+                      )
+                      .bottom +
+                  24,
+            ),
+          );
           for (var level = 1; level <= 10; level++) {
             final checkpoint = tester.getRect(
               find.byKey(ValueKey('grade-roadmap-level-$level')),
@@ -320,6 +374,17 @@ void main() {
             expect(checkpoint.center.dy, closeTo(expected.dy, 0.01));
             expect(checkpoint.left, greaterThanOrEqualTo(0));
             expect(checkpoint.right, lessThanOrEqualTo(size.width));
+            if (level < 10) {
+              final next = tester.getRect(
+                find.byKey(ValueKey('grade-roadmap-level-${level + 1}')),
+              );
+              // Bend-aligned checkpoints can be closer vertically while
+              // remaining well separated across opposite sides of the road.
+              final spacing = followsBends
+                  ? (checkpoint.center - next.center).distance
+                  : checkpoint.center.dy - next.center.dy;
+              expect(spacing, greaterThanOrEqualTo(size.width * 0.5));
+            }
           }
           final mascot = tester.getRect(
             find.image(
@@ -2472,7 +2537,11 @@ class _FakeExamService implements ExamService {
       userExamId: 600,
       profileId: profileId,
       submittedDt: submittedDt,
-      grading: ExamGrading(scorePercentage: answers.first.selectedOptionIds.single == 'A' ? 100 : 0),
+      grading: ExamGrading(
+        scorePercentage: answers.first.selectedOptionIds.single == 'A'
+            ? 100
+            : 0,
+      ),
       questions: const <ExamQuestion>[],
     );
   }
