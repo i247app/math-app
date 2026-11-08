@@ -821,6 +821,15 @@ class _RoadmapLevelLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const numberStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 38,
+      fontWeight: FontWeight.w900,
+      height: 1,
+      shadows: [
+        Shadow(color: Color(0x33744E24), offset: Offset(0, 2), blurRadius: 3),
+      ],
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -841,21 +850,31 @@ class _RoadmapLevelLabel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 3),
-        Text(
-          '$level',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 38,
-            fontWeight: FontWeight.w900,
-            height: 1,
-            shadows: [
-              Shadow(
-                color: Color(0x33744E24),
-                offset: Offset(0, 2),
-                blurRadius: 3,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Reinforce the glyphs even when the inherited font has no
+            // heavier weight, without changing their size or semantics.
+            ExcludeSemantics(
+              child: RichText(
+                textScaler: MediaQuery.textScalerOf(context),
+                text: TextSpan(
+                  text: '$level',
+                  style: DefaultTextStyle.of(context).style
+                      .merge(numberStyle)
+                      .copyWith(
+                        foreground: Paint()
+                          ..color = Colors.white
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 1.6
+                          ..strokeJoin = StrokeJoin.round,
+                        shadows: const [],
+                      ),
+                ),
               ),
-            ],
-          ),
+            ),
+            Text('$level', style: numberStyle),
+          ],
         ),
       ],
     );
