@@ -57,13 +57,17 @@ class GradeRoadmapController extends ChangeNotifier {
 
   bool _isCurrent(int requestId) => !_disposed && requestId == _levelRequestId;
 
-  Future<void> initialize() async {
+  Future<void> initialize({int? selectedGrade}) async {
     if (_disposed) return;
     final requestId = ++_levelRequestId;
     final saved = await _readSavedProgress();
     if (!_isCurrent(requestId)) return;
-    if ((saved.grade > 0 || saved.level > 0) && !_hasInitialCompletion) {
-      _selectedGrade = AssessmentFlowPolicy.clampGrade(saved.grade);
+    if (!_hasInitialCompletion) {
+      if (selectedGrade != null) {
+        _selectedGrade = AssessmentFlowPolicy.clampGrade(selectedGrade);
+      } else if (saved.grade > 0 || saved.level > 0) {
+        _selectedGrade = AssessmentFlowPolicy.clampGrade(saved.grade);
+      }
     }
     await _loadGradeLevels(_selectedGrade);
   }

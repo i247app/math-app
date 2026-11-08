@@ -4,12 +4,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
+import 'package:numi/features/exam/data/profile_roadmap_grade_store.dart';
 import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
 import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -386,10 +388,29 @@ void main() {
               expect(spacing, greaterThanOrEqualTo(size.width * 0.5));
             }
           }
-          final mascot = tester.getRect(
-            find.image(
-              const AssetImage('assets/images/grade-roadmap-mascot.png'),
+          final mascotFinder = find.byKey(
+            const ValueKey('grade-roadmap-mascot'),
+          );
+          final mascot = tester.getRect(mascotFinder);
+          final currentLevel = (service.levelsByGrade[grade]?.maxLevel ?? 1)
+              .clamp(1, 10);
+          final currentNode = tester.getRect(
+            find.byKey(ValueKey('grade-roadmap-level-$currentLevel')),
+          );
+          final nodeIsOnLeft = currentNode.center.dx <= size.width / 2;
+          expect(
+            tester.widget<Image>(mascotFinder).image,
+            AssetImage(
+              nodeIsOnLeft
+                  ? 'assets/images/grade-roadmap-mascot.png'
+                  : 'assets/images/grade-roadmap-mascot-point-right.png',
             ),
+          );
+          expect(
+            mascot.center.dx,
+            nodeIsOnLeft
+                ? greaterThan(currentNode.center.dx)
+                : lessThan(currentNode.center.dx),
           );
           expect(mascot.left, greaterThanOrEqualTo(0));
           expect(mascot.right, lessThanOrEqualTo(size.width));
@@ -1656,6 +1677,7 @@ void main() {
   testWidgets('grade pill opens grade selection and swipes stay disabled', (
     tester,
   ) async {
+    FlutterSecureStorage.setMockInitialValues({});
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
 
@@ -1722,6 +1744,7 @@ void main() {
     expect(find.byType(GradeSelectionScreen), findsNothing);
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(find.text('LỚP 3'), findsOneWidget);
+    expect(await const ProfileRoadmapGradeStore().read(11), 3);
     expect(
       find.image(const AssetImage(GradeRoadmapLayout.grade3BackgroundAsset)),
       findsOneWidget,

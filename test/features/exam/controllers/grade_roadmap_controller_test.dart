@@ -65,11 +65,24 @@ void main() {
       ),
       completion: _completion(grade: 3, level: 2),
     );
-    await controller.initialize();
+    await controller.initialize(selectedGrade: 0);
     expect(controller.state.selectedGrade, 3);
     expect(controller.state.currentLevel, 3);
     expect(controller.state.level(2).completedExam?.userExamId, 8011);
   });
+
+  test(
+    'explicit kindergarten selection takes precedence over saved progress',
+    () async {
+      final controller = build(
+        progress: _Progress(
+          Future.value(const ProfileGradeProgress(grade: 4, level: 8)),
+        ),
+      );
+      await controller.initialize(selectedGrade: 0);
+      expect(controller.state.selectedGrade, 0);
+    },
+  );
 
   test('storage failure falls back to the initial grade', () async {
     final controller = build(

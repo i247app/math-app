@@ -13,6 +13,7 @@ import 'package:numi/features/exam/controllers/grade_roadmap_controller.dart';
 import 'package:numi/features/exam/controllers/grade_roadmap_state.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
+import 'package:numi/features/exam/data/profile_roadmap_grade_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
 import 'package:numi/features/exam/helpers/grade_roadmap_layout.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -33,6 +34,7 @@ class GradeRoadmapScreen extends StatefulWidget {
     this.gradeService,
     this.initialExams = const <GeneratedExam>[],
     this.initialGrade = 0,
+    this.restoreSavedGrade = true,
     this.initialCompletion,
     this.gradeProgressStore,
     this.showCloseButton = true,
@@ -46,6 +48,7 @@ class GradeRoadmapScreen extends StatefulWidget {
   final GradeService? gradeService;
   final List<GeneratedExam> initialExams;
   final int initialGrade;
+  final bool restoreSavedGrade;
   final GradeExamCompletion? initialCompletion;
   final ProfileGradeProgressStore? gradeProgressStore;
   final bool showCloseButton;
@@ -56,9 +59,8 @@ class GradeRoadmapScreen extends StatefulWidget {
 }
 
 class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
-  static const _mascotAsset = 'assets/images/grade-roadmap-mascot.png';
-
   late final GradeRoadmapController _controller;
+  final _gradeStore = const ProfileRoadmapGradeStore();
   bool _wasLoading = true;
   bool _isOpeningGradeSelection = false;
   final List<ScrollController> _scrollControllers = List.generate(
@@ -81,7 +83,11 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
       initialGrade: widget.initialGrade,
       initialCompletion: widget.initialCompletion,
     )..addListener(_handleStateChanged);
-    unawaited(_controller.initialize());
+    unawaited(
+      _controller.initialize(
+        selectedGrade: widget.restoreSavedGrade ? null : widget.initialGrade,
+      ),
+    );
   }
 
   void _handleStateChanged() {
@@ -189,6 +195,8 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
         ),
       );
       if (!mounted || selectedGrade == null) return;
+      await _gradeStore.save(widget.profileId, selectedGrade);
+      if (!mounted) return;
       await _controller.selectGrade(selectedGrade);
     } finally {
       _isOpeningGradeSelection = false;
@@ -268,7 +276,6 @@ class _GradeRoadmapScreenState extends State<GradeRoadmapScreen> {
                           hasActiveExam: (level) =>
                               state.level(level).activeExam != null,
                           onLevelTap: _handleLevelTap,
-                          mascotAsset: _mascotAsset,
                         ),
                       ),
                     ),
@@ -443,11 +450,13 @@ class _GradeRoadmapPath extends StatelessWidget {
     required this.isUnlocked,
     required this.hasActiveExam,
     required this.onLevelTap,
-    required this.mascotAsset,
   });
 
   static const double _nodeSize = 112;
   static const double _mascotSize = 104;
+  static const _mascotPointLeftAsset = 'assets/images/grade-roadmap-mascot.png';
+  static const _mascotPointRightAsset =
+      'assets/images/grade-roadmap-mascot-point-right.png';
 
   final int grade;
   final int currentLevel;
@@ -456,7 +465,6 @@ class _GradeRoadmapPath extends StatelessWidget {
   final bool Function(int level) isUnlocked;
   final bool Function(int level) hasActiveExam;
   final Future<void> Function(int level) onLevelTap;
-  final String mascotAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -544,7 +552,8 @@ class _GradeRoadmapPath extends StatelessWidget {
                       child: child,
                     ),
                     child: Image.asset(
-                      mascotAsset,
+                      isOnLeft ? _mascotPointLeftAsset : _mascotPointRightAsset,
+                      key: const ValueKey('grade-roadmap-mascot'),
                       width: _mascotSize,
                       height: _mascotSize,
                     ),
