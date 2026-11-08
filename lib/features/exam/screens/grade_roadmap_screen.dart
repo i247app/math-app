@@ -630,17 +630,17 @@ class _RoadmapLevelNode extends StatelessWidget {
                 clipBehavior: Clip.none,
                 alignment: Alignment.topCenter,
                 children: [
-                  Positioned(
+                  const Positioned(
                     top: 4,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [Color(0xFFF9F8E3), Color(0xFFD0D4B9)],
                         ),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             color: Color(0x2B6D6846),
                             offset: Offset(0, 4),
@@ -648,7 +648,7 @@ class _RoadmapLevelNode extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const SizedBox.square(dimension: 104),
+                      child: SizedBox.square(dimension: 104),
                     ),
                   ),
                   Positioned(
