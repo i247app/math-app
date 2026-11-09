@@ -134,6 +134,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   int _progressLoadRequestId = 0;
   bool _isLoadingProgress = false;
   bool _hasLoadedProgress = false;
+  bool? _wasRouteCurrent;
   AssessmentProgressChartData _chart = AssessmentProgressChartData.empty;
   final Set<ParentHomeEntranceMode> _playedEntrances = {};
   bool _hasOfferedMissingStudentProfile = false;
@@ -144,6 +145,23 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     super.initState();
     if (widget.isActive) {
       loadHome();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isRouteCurrent = ModalRoute.isCurrentOf(context);
+    final returnedToHome = _wasRouteCurrent == false && isRouteCurrent == true;
+    _wasRouteCurrent = isRouteCurrent;
+    final profileId = profileStableId(widget.activeProfile);
+    if (returnedToHome &&
+        widget.isActive &&
+        profileId != null &&
+        profileId > 0) {
+      // An attempt can be replaced by its result, completing the original
+      // navigation future before the user actually returns to Home.
+      unawaited(_loadAssessmentProgress(profileId));
     }
   }
 

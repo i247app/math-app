@@ -534,6 +534,83 @@ void main() {
     expect(find.byType(ParentHomeContent), findsOneWidget);
   });
 
+  for (final role in [ProfileRole.parent, ProfileRole.student]) {
+    testWidgets('$role refreshes the chart when a replaced result closes', (
+      tester,
+    ) async {
+      const profileId = 93;
+      HomeProfileCache.instance.invalidateProfile(profileId);
+      addTearDown(() => HomeProfileCache.instance.invalidateProfile(profileId));
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final service = _UpdatedProgressService();
+      await tester.pumpWidget(
+        RepositoryProvider<HomeLayoutService>.value(
+          value: const _HomeService(),
+          child: LingoScope(
+            lingo: lingo,
+            child: MaterialApp(
+              theme: AppTheme.light(),
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => const AppDashboardTabFactory().buildTab(
+                    context: context,
+                    role: role,
+                    args: _dashboardArgs(
+                      profileId: profileId,
+                      examService: service,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final continueButton = find.byKey(
+        const ValueKey('parent-assessment-active-continue'),
+      );
+      await tester.ensureVisible(continueButton);
+      await tester.tap(continueButton);
+      await tester.pumpAndSettle();
+      final attemptContext = tester.element(find.byType(ExamAttemptScreen));
+      final attempt = tester.widget<ExamAttemptScreen>(
+        find.byType(ExamAttemptScreen),
+      );
+
+      // Submission replaces the attempt. Its push future completes here,
+      // while the result screen is still open and progress can still be stale.
+      Navigator.of(attemptContext).pushReplacement<void, void>(
+        MaterialPageRoute<void>(
+          builder: (_) => Scaffold(
+            body: TextButton(
+              onPressed: attempt.onResultBack,
+              child: const Text('Close assessment result'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final requestsBeforeClose = service.progressProfileIds.length;
+      service.latestGrade = 4;
+      await tester.tap(find.text('Close assessment result'));
+      await tester.pumpAndSettle();
+
+      expect(
+        service.progressProfileIds.length,
+        greaterThan(requestsBeforeClose),
+      );
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byKey(const ValueKey('parent-home-progress-chart')),
+      );
+      expect(chart.finalGrade, 4);
+      expect(chart.previousGrades, [2]);
+      expect(chart.testNumbers, [1, 2]);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('student dashboard uses home with the active student profile', (
     tester,
   ) async {
@@ -861,6 +938,45 @@ class _DelayedProgressService extends _ExamService {
     required DateTime toDt,
     String examType = examTypeAssessment,
   }) => progress.future;
+}
+
+class _UpdatedProgressService extends _ExamService {
+  _UpdatedProgressService() : super(true, hasActiveAssessment: true);
+
+  int? latestGrade;
+
+  @override
+  Future<ExamProgressResponse> getExamProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+    String examType = examTypeAssessment,
+  }) async {
+    final progress = await super.getExamProgress(
+      profileId: profileId,
+      fromDt: fromDt,
+      toDt: toDt,
+      examType: examType,
+    );
+    return ExamProgressResponse(
+      mstatus: 200,
+      series: [
+        ...progress.series,
+        if (latestGrade case final grade?)
+          ExamProgressPoint(
+            completedDt: DateTime.now(),
+            correctNumber: 8,
+            examId: 8100,
+            score: 8,
+            scorePct: 80,
+            sequence: 2,
+            totalQuestions: 10,
+            status: 'COMPLETE',
+            grade: grade,
+          ),
+      ],
+    );
+  }
 }
 
 class _ExamService implements ExamService {
