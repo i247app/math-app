@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
 import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -52,11 +53,18 @@ void main() {
     Size size = const Size(390, 844),
     TargetPlatform? platform,
     EdgeInsets? systemPadding,
+    AppLanguage? language,
+    TextScaler? textScaler,
   }) async {
     await tester.binding.setSurfaceSize(size);
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final lingo = LingoProvider();
     addTearDown(lingo.dispose);
+    if (language != null) {
+      final originalLanguage = AppLanguageState.current;
+      addTearDown(() => AppLanguageState.current = originalLanguage);
+      await lingo.setLanguage(language);
+    }
     await tester.pumpWidget(
       LingoScope(
         lingo: lingo,
@@ -68,12 +76,13 @@ void main() {
                 : null,
             extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
           ),
-          builder: systemPadding == null
+          builder: systemPadding == null && textScaler == null
               ? null
               : (context, child) => MediaQuery(
                   data: MediaQuery.of(context).copyWith(
                     padding: systemPadding,
                     viewPadding: systemPadding,
+                    textScaler: textScaler,
                   ),
                   child: child!,
                 ),
@@ -105,6 +114,75 @@ void main() {
         ]);
       });
       await tester.pumpAndSettle();
+    }
+  }
+
+  for (final width in [320.0, 360.0, 390.0]) {
+    for (final textScale in [1.0, 1.3]) {
+      testWidgets(
+        'kindergarten selector fits English title at width $width and text scale $textScale',
+        (tester) async {
+          final service = _FakeExamService();
+          await pumpRoadmap(
+            tester,
+            service,
+            home: GradeRoadmapScreen(
+              profileId: 11,
+              initialGrade: 0,
+              examService: service,
+              initialGrades: const [GradeModel(id: 1, label: 'Mẫu giáo')],
+              gradeService: _UnusedGradeService(),
+              gradeProgressStore: const _FakeProgressStore(
+                ProfileGradeProgress.initial,
+              ),
+            ),
+            size: Size(width, 844),
+            systemPadding: const EdgeInsets.only(top: 24, bottom: 20),
+            language: AppLanguage.en,
+            textScaler: TextScaler.linear(textScale),
+          );
+
+          final title = find.byKey(
+            const ValueKey('grade-roadmap-grade-title-0'),
+          );
+          final paragraph = tester.renderObject<RenderParagraph>(title);
+          expect(tester.widget<Text>(title).data, 'KINDERGARTEN');
+          expect(paragraph.didExceedMaxLines, isFalse);
+
+          final pill = tester.getRect(
+            find.byKey(const ValueKey('grade-roadmap-grade-pill')),
+          );
+          final titleRect = tester.getRect(title);
+          final arrow = tester.getRect(
+            find.byIcon(Icons.keyboard_arrow_down_rounded),
+          );
+          final audio = tester.getRect(
+            find.byKey(const ValueKey('grade-roadmap-audio-toggle')),
+          );
+          final close = tester.getRect(
+            find.byKey(const ValueKey('grade-roadmap-close')),
+          );
+          expect(pill.width, greaterThan(132));
+          expect(titleRect.left, greaterThanOrEqualTo(pill.left + 15));
+          expect(titleRect.right, lessThanOrEqualTo(arrow.left - 3));
+          expect(audio.left - pill.right, greaterThanOrEqualTo(12));
+          expect(close.left - audio.right, greaterThanOrEqualTo(8));
+          expect(close.right, lessThanOrEqualTo(width - 12));
+          expect(tester.takeException(), isNull);
+
+          if (const bool.fromEnvironment('ROADMAP_PREVIEW')) {
+            await _saveRoadmapPreview(
+              tester,
+              'roadmap-kindergarten-header-${width.toInt()}-$textScale.png',
+            );
+          }
+          await tester.tap(
+            find.byKey(const ValueKey('grade-roadmap-grade-selector')),
+          );
+          await tester.pumpAndSettle();
+          expect(find.byType(GradeSelectionScreen), findsOneWidget);
+        },
+      );
     }
   }
 

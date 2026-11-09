@@ -1123,6 +1123,51 @@ void main() {
 
     for (final signup in [false, true]) {
       testWidgets(
+        'all-digit input stops at ten digits while email remains editable (signup=$signup)',
+        (tester) async {
+          final controller = await openIdentifierEntry(tester, signup: signup);
+          final input = find.byType(EditableText);
+          await tester.enterText(input, '0901234567');
+          await tester.pumpAndSettle();
+          expect(find.text('+84'), findsOneWidget);
+
+          tester.testTextInput.updateEditingValue(
+            const TextEditingValue(
+              text: '09012345678',
+              selection: TextSelection.collapsed(offset: 11),
+            ),
+          );
+          await tester.pump();
+          expect(controller.text, '0901234567');
+          expect(controller.selection.extentOffset, 10);
+          expect(find.text('+84'), findsOneWidget);
+
+          await tester.enterText(input, '090123456');
+          await tester.enterText(input, '0901234568');
+          await tester.pump();
+          expect(controller.text, '0901234568');
+
+          await tester.enterText(input, '');
+          await tester.enterText(input, '20255501019999');
+          await tester.pumpAndSettle();
+          expect(controller.text, '2025550101');
+          expect(find.text('+1'), findsOneWidget);
+
+          await tester.enterText(input, '2025550101@');
+          await tester.pumpAndSettle();
+          expect(controller.text, '2025550101@');
+          expect(find.byType(PhoneRegionMenu), findsNothing);
+          await tester.enterText(input, 'a12345678901234567890@example.com');
+          await tester.pump();
+          expect(controller.text, 'a12345678901234567890@example.com');
+          expect(
+            find.byKey(const ValueKey('auth-identifier-error')),
+            findsNothing,
+          );
+        },
+      );
+
+      testWidgets(
         'nine-digit input shows a Vietnam hint separately from validation (signup=$signup)',
         (tester) async {
           final service = _SignupLookupAuthService();
@@ -1246,7 +1291,7 @@ void main() {
           for (final email in [
             '901234567@example.com',
             '3475550123@example.com',
-            '123456789012345678901234567890@example.com',
+            '1234567890@example.com',
           ]) {
             await tester.enterText(input, '');
             await tester.pump();

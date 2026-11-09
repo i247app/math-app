@@ -30,8 +30,10 @@ not a different country. It could also reflect an explicit manual US selection.
 
 ## Application policy
 
-1. Preserve the original input while typing. Email takes priority when `@`
-   appears; numeric usernames are never truncated or reformatted. The app's
+1. Limit all-digit input to ten digits, including pasted text. Letters and `@`
+   remain available at the limit so the field can switch to email. Explicit
+   international numbers containing `+` keep their original text. Email takes
+   priority when `@` appears and is not subject to the ten-digit limit. The app's
    email policy requires the first character to be an ASCII letter (`a-z` or
    `A-Z`). A numeric-leading email stays intact but is rejected on blur/submit
    with a specific first-letter error. Digits after the initial letter are valid.

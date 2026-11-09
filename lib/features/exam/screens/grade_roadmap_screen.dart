@@ -341,60 +341,68 @@ class _GradeRoadmapHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              key: const ValueKey('grade-roadmap-grade-selector'),
-              onTap: onGradeTap,
-              borderRadius: BorderRadius.circular(21),
-              child: Container(
-                key: const ValueKey('grade-roadmap-grade-pill'),
-                height: 38,
-                width: 132,
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: Colors.white,
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  key: const ValueKey('grade-roadmap-grade-selector'),
+                  onTap: onGradeTap,
                   borderRadius: BorderRadius.circular(21),
-                  border: Border.all(color: const Color(0xFFE4EEEE)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x120F5E64),
-                      offset: Offset(0, 2),
-                      blurRadius: 7,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        gradeTitles[selectedGrade].toUpperCase(),
-                        key: ValueKey(
-                          'grade-roadmap-grade-title-$selectedGrade',
+                  child: Container(
+                    key: const ValueKey('grade-roadmap-grade-pill'),
+                    height: 38,
+                    constraints: const BoxConstraints(minWidth: 132),
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(21),
+                      border: Border.all(color: const Color(0xFFE4EEEE)),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x120F5E64),
+                          offset: Offset(0, 2),
+                          blurRadius: 7,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF256B6B),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.35,
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              gradeTitles[selectedGrade].toUpperCase(),
+                              key: ValueKey(
+                                'grade-roadmap-grade-title-$selectedGrade',
+                              ),
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: Color(0xFF256B6B),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.35,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Color(0xFF6B9393),
+                          size: 18,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF6B9393),
-                      size: 18,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 12),
           if (selectedGrade == 0) ...[
             const QuestionAudioToggle(
               key: ValueKey('grade-roadmap-audio-toggle'),

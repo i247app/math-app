@@ -6,6 +6,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
+import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/controllers/auth_state.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
@@ -54,6 +55,7 @@ class AuthEntryCard extends StatefulWidget {
 class _AuthEntryCardState extends State<AuthEntryCard> {
   final _inputFocus = FocusNode();
   final _actionKey = GlobalKey();
+  final _identifierFormatter = LoginNameInputFormatter();
   double _keyboardInset = 0;
   bool _revealScheduled = false;
 
@@ -148,6 +150,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
                   controller: widget.controller,
                   focusNode: _inputFocus,
                   keyboardType: TextInputType.emailAddress,
+                  inputFormatters: [_identifierFormatter],
                   autofillHints: null,
                   autocorrect: false,
                   enableSuggestions: false,
