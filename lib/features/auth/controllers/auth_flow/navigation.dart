@@ -273,6 +273,7 @@ extension AuthFlowNavigation on AuthFlowCubit {
   }
 
   void selectPhoneRegion(PhoneRegion region) {
+    _hasSelectedPhoneRegion = true;
     _emitState(state.copyWith(phoneRegion: region));
   }
 

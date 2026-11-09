@@ -16,7 +16,19 @@ PhoneValidationResult normalizePhoneInput(
   PhoneRegion region,
   String rawDigits,
 ) {
-  final digits = rawDigits.replaceAll(RegExp(r'\D'), '');
+  var digits = rawDigits.replaceAll(RegExp(r'\D'), '');
+  if (rawDigits.trimLeft().startsWith('+')) {
+    final compact = rawDigits.replaceAll(RegExp(r'[\s()-]'), '');
+    if (!compact.startsWith(region.code)) {
+      return PhoneValidationResult(
+        phone: null,
+        errorKey: region.code.startsWith(compact)
+            ? AppKeys.phoneTooShort
+            : AppKeys.invalidPhone,
+      );
+    }
+    digits = digits.substring(region.code.length - 1);
+  }
   if (digits.isEmpty) {
     return const PhoneValidationResult.empty();
   }

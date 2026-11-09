@@ -26,6 +26,7 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
     : super(initialState ?? const AuthFlowState());
 
   final AuthService _authService;
+  bool _hasSelectedPhoneRegion = false;
   SignupFormData? _pendingSignupForm;
   String? _pendingSignupIdentifier;
   String? _signupIdentifierReadyForCreation;
@@ -33,6 +34,8 @@ class AuthFlowCubit extends Cubit<AuthFlowState> {
   int _signupAttemptId = 0;
 
   SignupFormData? get pendingSignupForm => _pendingSignupForm;
+
+  bool get allowBareCountryInference => !_hasSelectedPhoneRegion;
 
   void _emitState(AuthFlowState nextState) => emit(nextState);
 }

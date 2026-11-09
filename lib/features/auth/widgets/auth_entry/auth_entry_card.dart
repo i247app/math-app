@@ -30,6 +30,7 @@ class AuthEntryCard extends StatefulWidget {
     required this.onLoginWithPin,
     required this.onIdentifierChanged,
     this.identifierErrorText,
+    this.allowBareCountryInference = true,
   });
 
   final TextEditingController controller;
@@ -46,6 +47,7 @@ class AuthEntryCard extends StatefulWidget {
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onIdentifierChanged;
   final String? identifierErrorText;
+  final bool allowBareCountryInference;
 
   @override
   State<AuthEntryCard> createState() => _AuthEntryCardState();
@@ -56,10 +58,16 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   final _actionKey = GlobalKey();
   double _keyboardInset = 0;
   bool _revealScheduled = false;
+  late final LoginNameInputFormatter _inputFormatter;
 
   @override
   void initState() {
     super.initState();
+    _inputFormatter = LoginNameInputFormatter(
+      widget.region,
+      allowBareCountryInference: widget.allowBareCountryInference,
+      onRegionDetected: (region) => widget.onRegionChanged(region),
+    );
     _inputFocus.addListener(_revealAction);
   }
 
@@ -76,6 +84,13 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   void didUpdateWidget(covariant AuthEntryCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _inputFormatter.region = widget.region;
+    _inputFormatter.allowBareCountryInference =
+        widget.allowBareCountryInference;
+    if (widget.mode != oldWidget.mode ||
+        widget.controller != oldWidget.controller) {
+      _inputFormatter.reset();
+    }
     if (widget.identifierErrorText != oldWidget.identifierErrorText) {
       _revealAction();
     }
@@ -122,10 +137,15 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
           ),
           child: Row(
             children: [
-              if (widget.showPhoneRegion) ...[
+              if (widget.showPhoneRegion ||
+                  (_inputFormatter.hasCountryCodeOnly &&
+                      widget.controller.text.isEmpty)) ...[
                 PhoneRegionMenu(
                   region: widget.region,
-                  onChanged: widget.onRegionChanged,
+                  onChanged: (region) {
+                    _inputFormatter.reset();
+                    widget.onRegionChanged(region);
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -134,7 +154,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
               ],
               Expanded(
                 child: TextField(
-                  key: ValueKey('${widget.region.name}-${widget.mode.name}'),
+                  key: ValueKey('auth-identifier-${widget.mode.name}'),
                   controller: widget.controller,
                   focusNode: _inputFocus,
                   keyboardType: TextInputType.emailAddress,
@@ -144,9 +164,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: <TextInputFormatter>[
-                    LoginNameInputFormatter(widget.region),
-                  ],
+                  inputFormatters: <TextInputFormatter>[_inputFormatter],
                   onChanged: widget.onIdentifierChanged,
                   decoration: InputDecoration(
                     hintText: context.getText(AppKeys.loginNameHint),

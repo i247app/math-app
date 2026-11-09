@@ -161,13 +161,16 @@ class AppScreenRouter extends StatelessWidget {
             final entryBindings = AuthEntryBindings(
               controller: loginNameController,
               region: state.phoneRegion,
-              showPhoneRegion:
-                  normalizedLoginName.kind == LoginNameKind.phone &&
-                  RegExp(r'\d').hasMatch(loginNameController.text),
+              allowBareCountryInference: cubit.allowBareCountryInference,
+              showPhoneRegion: normalizedLoginName.kind == LoginNameKind.phone,
               onRegionChanged: (region) {
-                clearLoginNameInput();
-                cubit.clearIdentifierLookup();
                 cubit.selectPhoneRegion(region);
+                handleLoginNameInputChanged(
+                  cubit,
+                  region,
+                  state.authEntryMode,
+                  loginNameController.text,
+                );
               },
               onBack: () {
                 if (cubit.backFromAuthEntrySwitchesMode) {
