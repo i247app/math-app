@@ -26,6 +26,7 @@ class AuthEntryBindings {
     required this.onSwitchEntryMode,
     required this.onIdentifierChanged,
     this.identifierErrorText,
+    this.onIdentifierBlurred,
   });
 
   final TextEditingController controller;
@@ -42,6 +43,7 @@ class AuthEntryBindings {
   final VoidCallback onSwitchEntryMode;
   final ValueChanged<String> onIdentifierChanged;
   final String? identifierErrorText;
+  final VoidCallback? onIdentifierBlurred;
 }
 
 class AuthEntryView extends StatelessWidget {
@@ -67,6 +69,7 @@ class AuthEntryView extends StatelessWidget {
             child: AuthEntryCard(
               controller: entry.controller,
               region: entry.region,
+              onIdentifierBlurred: entry.onIdentifierBlurred,
               mode: mode,
               showPhoneRegion: entry.showPhoneRegion,
               onRegionChanged: entry.onRegionChanged,

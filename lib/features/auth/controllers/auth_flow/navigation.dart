@@ -272,7 +272,8 @@ extension AuthFlowNavigation on AuthFlowCubit {
     unawaited(_sendSignupOtp(identifier));
   }
 
-  void selectPhoneRegion(PhoneRegion region) {
+  void selectPhoneRegion(PhoneRegion region, {bool isManual = true}) {
+    _hasSelectedPhoneRegion = _hasSelectedPhoneRegion || isManual;
     _emitState(state.copyWith(phoneRegion: region));
   }
 

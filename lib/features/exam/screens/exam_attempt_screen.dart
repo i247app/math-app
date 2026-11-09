@@ -15,6 +15,7 @@ import 'package:numi/features/exam/controllers/exam_attempt_controller.dart';
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/data/exam_question_speech_service.dart';
+import 'package:numi/features/exam/data/exam_question_audio_settings.dart';
 import 'package:numi/features/exam/data/exam_image_preloader.dart';
 import 'package:numi/features/exam/data/exam_image_cache.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
@@ -92,6 +93,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
   final _questionSpeech = ExamQuestionSpeechService();
   Object? _spokenQuestionKey;
   bool _speechSuspended = false;
+  bool? _autoReadEnabled;
 
   int? get _questionGrade => questionSpeechGrade(
     questionGrade: _controller.currentQuestion?.questionGrade,
@@ -145,6 +147,14 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     if (widget.initialExam == null) {
       generateExam();
     }
+    unawaited(_loadQuestionAudioSettings());
+  }
+
+  Future<void> _loadQuestionAudioSettings() async {
+    final enabled = await const ExamQuestionAudioSettings().readEnabled();
+    if (!mounted) return;
+    _autoReadEnabled = enabled;
+    _syncQuestionSpeech();
   }
 
   @override
@@ -206,12 +216,13 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       unawaited(_questionSpeech.stop());
       return;
     }
-    if (_spokenQuestionKey == key) return;
+    if (_autoReadEnabled != true || _spokenQuestionKey == key) return;
     _spokenQuestionKey = key;
     unawaited(_readQuestion());
   }
 
   Future<void> _readQuestion({bool manual = false}) async {
+    if (!manual && _autoReadEnabled != true) return;
     if (!_canReadQuestion || ModalRoute.of(context)?.isCurrent == false) return;
     final result = await _questionSpeech.read(
       _controller.currentQuestion!.questionText,

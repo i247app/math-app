@@ -66,7 +66,7 @@ void main() {
     await showMode(AuthEntryMode.login);
     expect(
       tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
-      lingo.lookup(AppKeys.loginNameHint),
+      PhoneRegion.vn.hint,
     );
     expect(
       tester
@@ -81,7 +81,7 @@ void main() {
     await showMode(AuthEntryMode.signup);
     expect(
       tester.widget<TextField>(find.byType(TextField)).decoration?.hintText,
-      lingo.lookup(AppKeys.loginNameHint),
+      PhoneRegion.vn.hint,
     );
     expect(
       tester

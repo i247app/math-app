@@ -43,15 +43,18 @@ class AppScreenRouter extends StatelessWidget {
     required this.normalizedLoginNameInput,
     required this.handleLoginNameInputChanged,
     required this.submitAuthIdentifier,
+    required this.validateLoginNameInput,
   });
 
   final TextEditingController loginNameController;
   final bool loginNameHasInput;
   final bool loginNameSubmitAttempted;
   final VoidCallback clearLoginNameInput;
+  final VoidCallback validateLoginNameInput;
   final LoginNameValidationResult Function(
     PhoneRegion region,
     AuthEntryMode mode,
+    bool inferPhoneRegion,
   )
   normalizedLoginNameInput;
   final void Function(
@@ -128,18 +131,15 @@ class AppScreenRouter extends StatelessWidget {
             final normalizedLoginName = normalizedLoginNameInput(
               state.phoneRegion,
               state.authEntryMode,
+              cubit.allowBareCountryInference,
             );
             final lookupMatchesLoginName =
                 state.checkedIdentifier == normalizedLoginName.loginName;
             final canSubmitLoginName = loginNameHasInput;
             final validationErrorKey = normalizedLoginName.errorKey;
-            final delaysValidationError =
-                validationErrorKey == AppKeys.invalidEmail ||
-                validationErrorKey == AppKeys.phoneTooShort;
-            final loginNameInputErrorKey =
-                delaysValidationError && !loginNameSubmitAttempted
-                ? null
-                : validationErrorKey;
+            final loginNameInputErrorKey = loginNameSubmitAttempted
+                ? validationErrorKey
+                : null;
             final loginNameErrorText =
                 (state.screen == AuthScreen.login ||
                         state.screen == AuthScreen.signup) &&
@@ -160,14 +160,33 @@ class AppScreenRouter extends StatelessWidget {
                   );
             final entryBindings = AuthEntryBindings(
               controller: loginNameController,
-              region: state.phoneRegion,
+              region:
+                  normalizedLoginName.phonePreviewRegion ?? state.phoneRegion,
               showPhoneRegion:
                   normalizedLoginName.kind == LoginNameKind.phone &&
-                  RegExp(r'\d').hasMatch(loginNameController.text),
+                  (normalizedLoginName.phonePreviewRegion != null ||
+                      !cubit.allowBareCountryInference),
+              onIdentifierBlurred: () {
+                final current = normalizedLoginNameInput(
+                  cubit.state.phoneRegion,
+                  cubit.state.authEntryMode,
+                  cubit.allowBareCountryInference,
+                );
+                final phoneRegion = current.phoneRegion;
+                if (phoneRegion != null &&
+                    phoneRegion != cubit.state.phoneRegion) {
+                  cubit.selectPhoneRegion(phoneRegion, isManual: false);
+                }
+                validateLoginNameInput();
+              },
               onRegionChanged: (region) {
-                clearLoginNameInput();
-                cubit.clearIdentifierLookup();
                 cubit.selectPhoneRegion(region);
+                handleLoginNameInputChanged(
+                  cubit,
+                  region,
+                  state.authEntryMode,
+                  loginNameController.text,
+                );
               },
               onBack: () {
                 if (cubit.backFromAuthEntrySwitchesMode) {

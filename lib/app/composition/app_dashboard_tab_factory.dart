@@ -25,6 +25,7 @@ import 'package:numi/features/profile/helpers/profile_identity_helpers.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_roadmap_grade_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
@@ -199,13 +200,39 @@ class AppDashboardTabFactory implements DashboardTabFactory {
     );
   }
 
-  Future<void> _openGradeRoadmap(BuildContext context, DashboardTabArgs args) {
+  Future<void> _openGradeRoadmap(
+    BuildContext context,
+    DashboardTabArgs args,
+  ) async {
     final profileId = profileStableId(args.session.activeProfile);
-    if (profileId == null || profileId <= 0) return Future<void>.value();
-    return Navigator.of(context).push<void>(
+    if (profileId == null || profileId <= 0) return;
+    const gradeStore = ProfileRoadmapGradeStore();
+    var grade = await gradeStore.read(profileId);
+    if (!context.mounted) return;
+    if (grade == null) {
+      grade = await Navigator.of(context).push<int>(
+        MaterialPageRoute<int>(
+          builder: (_) => GradeSelectionScreen(
+            user: args.session.user,
+            initialGrades: args.session.initialGrades,
+            gradeService: args.services.gradeService,
+            examService: args.services.examService,
+            examType: examTypeGrade,
+            profileId: profileId,
+            selectionOnly: true,
+          ),
+        ),
+      );
+      if (!context.mounted || grade == null) return;
+      await gradeStore.save(profileId, grade);
+      if (!context.mounted) return;
+    }
+    await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => GradeRoadmapScreen(
           profileId: profileId,
+          initialGrade: grade!,
+          restoreSavedGrade: false,
           examService: args.services.examService,
           user: args.session.user,
           initialGrades: args.session.initialGrades,

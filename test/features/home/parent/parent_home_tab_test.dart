@@ -16,9 +16,12 @@ import 'package:numi/features/classroom/data/classroom_service.dart';
 import 'package:numi/features/classroom_exercise/data/classroom_exercise_service.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/profile_roadmap_grade_store.dart';
 import 'package:numi/features/exam/models/exam.dart';
+import 'package:numi/features/exam/models/grade_levels.dart';
 import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/screens/grade_roadmap_screen.dart';
+import 'package:numi/features/exam/screens/grade_selection_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_tab_card.dart';
@@ -34,14 +37,136 @@ import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
+import 'package:numi/features/profile/models/grade.dart';
 import 'package:numi/features/profile/models/profile.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
 import 'package:numi/shared/layouts/page_header.dart';
+import 'package:numi/shared/widgets/app_back_button.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+
+  for (final role in [ProfileRole.parent, ProfileRole.student]) {
+    for (final tab in [DashboardTabId.home, DashboardTabId.learning]) {
+      testWidgets('$role $tab selects a grade once and reopens its roadmap', (
+        tester,
+      ) async {
+        const profileId = 92;
+        final grade = role == ProfileRole.parent ? 3 : 0;
+        HomeProfileCache.instance.invalidateProfile(profileId);
+        addTearDown(
+          () => HomeProfileCache.instance.invalidateProfile(profileId),
+        );
+        final originalLanguage = AppLanguageState.current;
+        final lingo = LingoProvider();
+        addTearDown(() {
+          AppLanguageState.current = originalLanguage;
+          lingo.dispose();
+        });
+        final examService = _ExamService(false);
+        await tester.pumpWidget(
+          RepositoryProvider<HomeLayoutService>.value(
+            value: const _HomeService(),
+            child: LingoScope(
+              lingo: lingo,
+              child: MaterialApp(
+                theme: AppTheme.light(),
+                home: Scaffold(
+                  body: Builder(
+                    builder: (context) =>
+                        const AppDashboardTabFactory().buildTab(
+                          context: context,
+                          role: role,
+                          args: _dashboardArgs(
+                            profileId: profileId,
+                            examService: examService,
+                            activeTab: tab,
+                            initialGrades: const [
+                              GradeModel(id: 1, label: 'Lớp 1'),
+                              GradeModel(id: 3, label: 'Lớp 3'),
+                            ],
+                          ),
+                        ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await lingo.setLanguage(AppLanguage.en);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Learning & Practice'));
+        await tester.pumpAndSettle();
+        expect(find.byType(GradeSelectionScreen), findsOneWidget);
+        expect(find.byType(GradeRoadmapScreen), findsNothing);
+        final selection = tester.widget<GradeSelectionScreen>(
+          find.byType(GradeSelectionScreen),
+        );
+        expect(selection.selectionOnly, isTrue);
+        expect(selection.examType, examTypeGrade);
+        expect(selection.profileId, profileId);
+
+        // Leaving without choosing must keep the first-visit flow available.
+        await tester.tap(find.byType(AppBackButton));
+        await tester.pumpAndSettle();
+        expect(await const ProfileRoadmapGradeStore().read(profileId), isNull);
+        await tester.tap(find.text('Learning & Practice'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(
+            ValueKey(
+              'grade-card-assets/images/grade-selection-${grade == 0 ? 'k' : grade}.png',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(GradeSelectionScreen), findsNothing);
+        expect(
+          tester
+              .widget<GradeRoadmapScreen>(find.byType(GradeRoadmapScreen))
+              .initialGrade,
+          grade,
+        );
+        expect(await const ProfileRoadmapGradeStore().read(profileId), grade);
+        expect(examService.roadmapGrades.last, grade);
+        expect(examService.generatedProfileIds, isEmpty);
+
+        await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Learning & Practice'));
+        await tester.pumpAndSettle();
+        expect(find.byType(GradeSelectionScreen), findsNothing);
+        expect(
+          tester
+              .widget<GradeRoadmapScreen>(find.byType(GradeRoadmapScreen))
+              .initialGrade,
+          grade,
+        );
+        expect(examService.roadmapGrades.last, grade);
+
+        await tester.tap(
+          find.byKey(const ValueKey('grade-roadmap-grade-pill')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(
+            const ValueKey('grade-card-assets/images/grade-selection-1.png'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('grade-roadmap-close')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Learning & Practice'));
+        await tester.pumpAndSettle();
+        expect(find.byType(GradeSelectionScreen), findsNothing);
+        expect(examService.roadmapGrades.last, 1);
+      });
+    }
+  }
 
   for (final isStudent in [false, true]) {
     for (final progressFirst in [false, true]) {
@@ -409,9 +534,87 @@ void main() {
     expect(find.byType(ParentHomeContent), findsOneWidget);
   });
 
+  for (final role in [ProfileRole.parent, ProfileRole.student]) {
+    testWidgets('$role refreshes the chart when a replaced result closes', (
+      tester,
+    ) async {
+      const profileId = 93;
+      HomeProfileCache.instance.invalidateProfile(profileId);
+      addTearDown(() => HomeProfileCache.instance.invalidateProfile(profileId));
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final service = _UpdatedProgressService();
+      await tester.pumpWidget(
+        RepositoryProvider<HomeLayoutService>.value(
+          value: const _HomeService(),
+          child: LingoScope(
+            lingo: lingo,
+            child: MaterialApp(
+              theme: AppTheme.light(),
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => const AppDashboardTabFactory().buildTab(
+                    context: context,
+                    role: role,
+                    args: _dashboardArgs(
+                      profileId: profileId,
+                      examService: service,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final continueButton = find.byKey(
+        const ValueKey('parent-assessment-active-continue'),
+      );
+      await tester.ensureVisible(continueButton);
+      await tester.tap(continueButton);
+      await tester.pumpAndSettle();
+      final attemptContext = tester.element(find.byType(ExamAttemptScreen));
+      final attempt = tester.widget<ExamAttemptScreen>(
+        find.byType(ExamAttemptScreen),
+      );
+
+      // Submission replaces the attempt. Its push future completes here,
+      // while the result screen is still open and progress can still be stale.
+      Navigator.of(attemptContext).pushReplacement<void, void>(
+        MaterialPageRoute<void>(
+          builder: (_) => Scaffold(
+            body: TextButton(
+              onPressed: attempt.onResultBack,
+              child: const Text('Close assessment result'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final requestsBeforeClose = service.progressProfileIds.length;
+      service.latestGrade = 4;
+      await tester.tap(find.text('Close assessment result'));
+      await tester.pumpAndSettle();
+
+      expect(
+        service.progressProfileIds.length,
+        greaterThan(requestsBeforeClose),
+      );
+      final chart = tester.widget<AssessmentProgressionChart>(
+        find.byKey(const ValueKey('parent-home-progress-chart')),
+      );
+      expect(chart.finalGrade, 4);
+      expect(chart.previousGrades, [2]);
+      expect(chart.testNumbers, [1, 2]);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('student dashboard uses home with the active student profile', (
     tester,
   ) async {
+    await const ProfileRoadmapGradeStore().save(78, 2);
     HomeProfileCache.instance.invalidateProfile(78);
     addTearDown(() => HomeProfileCache.instance.invalidateProfile(78));
     final originalLanguage = AppLanguageState.current;
@@ -737,6 +940,45 @@ class _DelayedProgressService extends _ExamService {
   }) => progress.future;
 }
 
+class _UpdatedProgressService extends _ExamService {
+  _UpdatedProgressService() : super(true, hasActiveAssessment: true);
+
+  int? latestGrade;
+
+  @override
+  Future<ExamProgressResponse> getExamProgress({
+    required int profileId,
+    required DateTime fromDt,
+    required DateTime toDt,
+    String examType = examTypeAssessment,
+  }) async {
+    final progress = await super.getExamProgress(
+      profileId: profileId,
+      fromDt: fromDt,
+      toDt: toDt,
+      examType: examType,
+    );
+    return ExamProgressResponse(
+      mstatus: 200,
+      series: [
+        ...progress.series,
+        if (latestGrade case final grade?)
+          ExamProgressPoint(
+            completedDt: DateTime.now(),
+            correctNumber: 8,
+            examId: 8100,
+            score: 8,
+            scorePct: 80,
+            sequence: 2,
+            totalQuestions: 10,
+            status: 'COMPLETE',
+            grade: grade,
+          ),
+      ],
+    );
+  }
+}
+
 class _ExamService implements ExamService {
   _ExamService(
     this.hasAssessment, {
@@ -751,6 +993,22 @@ class _ExamService implements ExamService {
   final List<List<String>> requestedStatsExamTypes = [];
   final List<int> progressProfileIds = [];
   final List<int?> generatedProfileIds = [];
+  final List<int> roadmapGrades = [];
+
+  @override
+  Future<GradeLevels> getGradeLevels({
+    required int profileId,
+    required int grade,
+  }) async => const GradeLevels(latestLevel: 1, maxLevel: 1);
+
+  @override
+  Future<List<ExamStats>> getGradeRoadmap({
+    required int profileId,
+    required int grade,
+  }) async {
+    roadmapGrades.add(grade);
+    return const [];
+  }
 
   @override
   Future<GeneratedExam> generateAssessmentExam({
@@ -889,8 +1147,10 @@ class _ClassroomExerciseService implements ClassroomExerciseService {
 DashboardTabArgs _dashboardArgs({
   required int profileId,
   required ExamService examService,
+  DashboardTabId activeTab = DashboardTabId.learning,
+  List<GradeModel> initialGrades = const [],
 }) => DashboardTabArgs(
-  activeTab: DashboardTabId.learning,
+  activeTab: activeTab,
   isActive: true,
   activeRefreshTick: 0,
   session: DashboardSessionData(
@@ -898,7 +1158,7 @@ DashboardTabArgs _dashboardArgs({
     profiles: const [],
     activeProfile: UserProfile(profileId: profileId),
     profileLoadError: null,
-    initialGrades: const [],
+    initialGrades: initialGrades,
   ),
   services: DashboardTabServices(
     gradeService: _GradeService(),

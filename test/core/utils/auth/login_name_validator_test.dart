@@ -1,9 +1,8 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/core/utils/phone/phone_number_validator.dart';
 
 void main() {
   group('normalizeLoginNameInput', () {
@@ -62,57 +61,241 @@ void main() {
       );
       expect(invalid.kind, LoginNameKind.email);
       expect(invalid.isValid, isFalse);
-      expect(invalid.errorKey, AppKeys.invalidEmail);
+      expect(invalid.errorKey, AppKeys.emailMustStartWithLetter);
     });
+
+    for (final email in [
+      'a@example.com',
+      'A123@example.com',
+      'a23432432@gmail.com',
+      'a1231231232@hotmail.com',
+      'user.name+tag@outlook.com',
+    ]) {
+      test('accepts a letter at the start of $email', () {
+        expect(isValidEmailInput(email), isTrue);
+        expect(normalizeLoginNameInput(PhoneRegion.vn, email).loginName, email);
+      });
+    }
+
+    for (final email in [
+      '23432432@gmail.com',
+      '1231231232@hotmail.com',
+      '12345678@outlook.com',
+      '1a@example.com',
+      '_name@example.com',
+      '.name@example.com',
+      '+name@example.com',
+    ]) {
+      test('rejects $email because the first character is not a letter', () {
+        expect(isValidEmailInput(email), isFalse);
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          email,
+          inferPhoneRegion: true,
+        );
+        expect(result.kind, LoginNameKind.email);
+        expect(result.loginName, isNull);
+        expect(result.phonePreviewRegion, isNull);
+        expect(result.errorKey, AppKeys.emailMustStartWithLetter);
+      });
+    }
   });
 
-  test('smart formatter supports both phone and email input', () {
-    const formatter = LoginNameInputFormatter(PhoneRegion.vn);
-
-    final phone = formatter.formatEditUpdate(
-      TextEditingValue.empty,
-      const TextEditingValue(text: '0901234567'),
-    );
-    final email = formatter.formatEditUpdate(
-      phone,
-      const TextEditingValue(text: 'learner @example.com'),
-    );
-
-    expect(phone.text, '090 123 4567');
-    expect(email.text, 'learner@example.com');
-  });
-
-  test('smart formatter keeps the email cursor at a mid-string deletion', () {
-    const formatter = LoginNameInputFormatter(PhoneRegion.vn);
-    const oldValue = TextEditingValue(
-      text: 'learner@example.com',
-      selection: TextSelection.collapsed(offset: 7),
-    );
-    const newValue = TextEditingValue(
-      text: 'learne@example.com',
-      selection: TextSelection.collapsed(offset: 6),
-    );
-
-    final formatted = formatter.formatEditUpdate(oldValue, newValue);
-
-    expect(formatted.text, 'learne@example.com');
-    expect(formatted.selection, const TextSelection.collapsed(offset: 6));
-  });
-
-  test('smart formatter keeps the phone cursor at a mid-string deletion', () {
-    const formatter = LoginNameInputFormatter(PhoneRegion.vn);
-    const oldValue = TextEditingValue(
-      text: '090 123 4567',
-      selection: TextSelection.collapsed(offset: 5),
-    );
-    const newValue = TextEditingValue(
-      text: '090 23 4567',
-      selection: TextSelection.collapsed(offset: 4),
+  group('complete phone candidates', () {
+    test(
+      'every nonzero-leading nine-digit prefix has a Vietnam country hint',
+      () {
+        var testedCodes = 0;
+        for (var code = 10; code <= 99; code++) {
+          testedCodes++;
+          for (final subscriber in ['0000000', '1234567', '9999999']) {
+            final national = '$code$subscriber';
+            for (final raw in [
+              national,
+              '0$national',
+              '+84$national',
+              '84$national',
+            ]) {
+              final result = normalizeLoginNameInput(
+                PhoneRegion.vn,
+                raw,
+                inferPhoneRegion: true,
+              );
+              expect(result.phonePreviewRegion, PhoneRegion.vn, reason: raw);
+            }
+          }
+        }
+        expect(testedCodes, 90);
+      },
     );
 
-    final formatted = formatter.formatEditUpdate(oldValue, newValue);
+    test(
+      '074 and 068 get country hints without accepting unsupported numbers',
+      () {
+        for (final raw in [
+          '747372827',
+          '0747372827',
+          '+84747372827',
+          '84747372827',
+          '688777777',
+          '0688777777',
+          '+84688777777',
+          '84688777777',
+        ]) {
+          final result = normalizeLoginNameInput(
+            PhoneRegion.vn,
+            raw,
+            inferPhoneRegion: true,
+          );
+          expect(result.phonePreviewRegion, PhoneRegion.vn);
+          expect(result.phoneRegion, isNull);
+          expect(result.isValid, isFalse);
+          expect(result.loginName, isNull);
+          expect(result.errorKey, AppKeys.invalidPhone);
+        }
+      },
+    );
 
-    expect(formatted.text, '090 234 567');
-    expect(formatted.selection, const TextSelection.collapsed(offset: 4));
+    test('country hints exclude leading zero, incomplete input and explicit other countries', () {
+      for (final raw in [
+        '012345678',
+        '74737282',
+        '747372827@example.com',
+        '+1747372827',
+      ]) {
+        expect(previewPhoneRegion(raw), isNull, reason: raw);
+      }
+      expect(
+        previewPhoneRegion('747372827', preferredRegion: PhoneRegion.us),
+        isNull,
+      );
+      expect(
+        previewPhoneRegion('+84747372827', preferredRegion: PhoneRegion.us),
+        PhoneRegion.vn,
+      );
+      expect(previewPhoneRegion('7473728270'), PhoneRegion.us);
+    });
+
+    for (final (raw, country, canonical) in [
+      ('0901234567', PhoneRegion.vn, '+84901234567'),
+      ('901234567', PhoneRegion.vn, '+84901234567'),
+      ('0325802809', PhoneRegion.vn, '+84325802809'),
+      ('0702465814', PhoneRegion.vn, '+84702465814'),
+      ('+84 90 123 4567', PhoneRegion.vn, '+84901234567'),
+      ('84901234567', PhoneRegion.vn, '+84901234567'),
+      ('2025550101', PhoneRegion.us, '+12025550101'),
+      ('+1 (202) 555-0101', PhoneRegion.us, '+12025550101'),
+      ('12025550101', PhoneRegion.us, '+12025550101'),
+    ]) {
+      test('recognizes and normalizes $raw only as a complete number', () {
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          raw,
+          inferPhoneRegion: true,
+        );
+        expect(result.isValid, isTrue);
+        expect(result.phoneRegion, country);
+        expect(result.loginName, canonical);
+      });
+    }
+
+    for (final raw in [
+      '1',
+      '1202',
+      '+1',
+      '+84',
+      '032580280',
+      '1111111111',
+      '2021550101',
+      '0125550101',
+      '0412345678',
+      '901234567890',
+      '+442071838750',
+      '090abc1234567',
+      '++84901234567',
+    ]) {
+      test(
+        'does not classify incomplete or invalid $raw as a phone candidate',
+        () {
+          expect(detectPhoneRegion(raw), isNull);
+          expect(
+            normalizeLoginNameInput(
+              PhoneRegion.vn,
+              raw,
+              inferPhoneRegion: true,
+            ).isValid,
+            isFalse,
+          );
+        },
+      );
+    }
+
+    test(
+      'reconsiders a Vietnam prefix when the next digit completes a US number',
+      () {
+        expect(detectPhoneRegion('347555012'), PhoneRegion.vn);
+        expect(detectPhoneRegion('3475550123'), PhoneRegion.us);
+        expect(detectPhoneRegion('3475550123@'), isNull);
+      },
+    );
+
+    test('manual selection applies to national input but explicit country codes override it', () {
+      expect(
+        detectPhoneRegion('2025550101', preferredRegion: PhoneRegion.vn),
+        isNull,
+      );
+      expect(
+        detectPhoneRegion('2025550101', preferredRegion: PhoneRegion.us),
+        PhoneRegion.us,
+      );
+      expect(
+        detectPhoneRegion('+12025550101', preferredRegion: PhoneRegion.vn),
+        PhoneRegion.us,
+      );
+      expect(
+        detectPhoneRegion('+84901234567', preferredRegion: PhoneRegion.us),
+        PhoneRegion.vn,
+      );
+    });
+
+    test('an unfinished international code reports a short phone number on validation', () {
+      for (final code in ['+1', '+84']) {
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          code,
+          inferPhoneRegion: true,
+        );
+        expect(result.phoneRegion, isNull);
+        expect(result.errorKey, AppKeys.phoneTooShort);
+      }
+    });
+
+    test('numeric usernames are detected as email but rejected by the app first-letter rule', () {
+      for (final email in [
+        '123456789012345678901234567890@example.com',
+        '901234567@example.com',
+        '3475550123@example.com',
+      ]) {
+        for (var length = 1; length <= email.length; length++) {
+          final raw = email.substring(0, length);
+          final result = normalizeLoginNameInput(
+            PhoneRegion.vn,
+            raw,
+            inferPhoneRegion: true,
+          );
+          if (raw.contains('@')) expect(result.kind, LoginNameKind.email);
+        }
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          email,
+          inferPhoneRegion: true,
+        );
+        expect(result.isValid, isFalse);
+        expect(result.kind, LoginNameKind.email);
+        expect(result.phoneRegion, isNull);
+        expect(result.loginName, isNull);
+        expect(result.errorKey, AppKeys.emailMustStartWithLetter);
+      }
+    });
   });
 }

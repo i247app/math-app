@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
@@ -7,7 +6,6 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/controllers/auth_state.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
@@ -30,6 +28,7 @@ class AuthEntryCard extends StatefulWidget {
     required this.onLoginWithPin,
     required this.onIdentifierChanged,
     this.identifierErrorText,
+    this.onIdentifierBlurred,
   });
 
   final TextEditingController controller;
@@ -46,6 +45,7 @@ class AuthEntryCard extends StatefulWidget {
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onIdentifierChanged;
   final String? identifierErrorText;
+  final VoidCallback? onIdentifierBlurred;
 
   @override
   State<AuthEntryCard> createState() => _AuthEntryCardState();
@@ -60,7 +60,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   void initState() {
     super.initState();
-    _inputFocus.addListener(_revealAction);
+    _inputFocus.addListener(_handleFocusChanged);
   }
 
   @override
@@ -83,8 +83,17 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
 
   @override
   void dispose() {
+    _inputFocus.removeListener(_handleFocusChanged);
     _inputFocus.dispose();
     super.dispose();
+  }
+
+  void _handleFocusChanged() {
+    if (_inputFocus.hasFocus) {
+      _revealAction();
+    } else {
+      widget.onIdentifierBlurred?.call();
+    }
   }
 
   void _revealAction() {
@@ -108,6 +117,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isPhoneInput = widget.showPhoneRegion;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -122,7 +132,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
           ),
           child: Row(
             children: [
-              if (widget.showPhoneRegion) ...[
+              if (isPhoneInput) ...[
                 PhoneRegionMenu(
                   region: widget.region,
                   onChanged: widget.onRegionChanged,
@@ -134,7 +144,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
               ],
               Expanded(
                 child: TextField(
-                  key: ValueKey('${widget.region.name}-${widget.mode.name}'),
+                  key: ValueKey('auth-identifier-${widget.mode.name}'),
                   controller: widget.controller,
                   focusNode: _inputFocus,
                   keyboardType: TextInputType.emailAddress,
@@ -144,12 +154,11 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: <TextInputFormatter>[
-                    LoginNameInputFormatter(widget.region),
-                  ],
                   onChanged: widget.onIdentifierChanged,
                   decoration: InputDecoration(
-                    hintText: context.getText(AppKeys.loginNameHint),
+                    hintText: isPhoneInput
+                        ? widget.region.hint
+                        : context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
                       fontWeight: FontWeight.w500,

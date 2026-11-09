@@ -9,6 +9,7 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.phoneRequired: 'Vui lòng nhập số điện thoại.',
     AppKeys.invalidPhone: 'Số điện thoại chưa hợp lệ.',
     AppKeys.invalidEmail: 'Email chưa hợp lệ.',
+    AppKeys.emailMustStartWithLetter: 'Email phải bắt đầu bằng chữ cái (a–z).',
     AppKeys.phoneTooShort: 'Số điện thoại chưa đủ ký tự.',
     AppKeys.restoringSession: 'Đang kiểm tra phiên đăng nhập...',
     AppKeys.signup: 'Đăng ký',
@@ -84,6 +85,8 @@ const authStrings = <String, Map<String, String>>{
     AppKeys.phoneRequired: 'Please enter a phone number.',
     AppKeys.invalidPhone: 'The phone number is invalid.',
     AppKeys.invalidEmail: 'The email address is invalid.',
+    AppKeys.emailMustStartWithLetter:
+        'Your email address must start with a letter (a–z).',
     AppKeys.phoneTooShort: 'The phone number is too short.',
     AppKeys.restoringSession: 'Checking login session...',
     AppKeys.signup: 'Sign up',

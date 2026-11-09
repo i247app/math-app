@@ -47,6 +47,7 @@ class AppKeys {
   static const phoneRequired = 'phone_required';
   static const invalidPhone = 'invalid_phone';
   static const invalidEmail = 'invalid_email';
+  static const emailMustStartWithLetter = 'email_must_start_with_letter';
   static const phoneTooShort = 'phone_too_short';
   static const restoringSession = 'restoring_session';
   static const signup = 'signup';
@@ -314,6 +315,8 @@ class AppKeys {
   static const examMatchNumberToImage = 'exam_match_number_to_image';
   static const examImageGroup = 'exam_image_group';
   static const examSpeechUnavailable = 'exam_speech_unavailable';
+  static const examMuteAutoplay = 'exam_mute_autoplay';
+  static const examEnableAutoplay = 'exam_enable_autoplay';
   static const kindergartenMathAssessment = 'kindergarten_math_assessment';
   static const gradeMathAssessment = 'grade_math_assessment';
   static const assessmentListKindergartenTitle =
