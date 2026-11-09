@@ -323,6 +323,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         MaterialPageRoute<void>(
           builder: (_) => WelcomeAssessmentIntroScreen(
             profileId: profileId,
+            profileCreatedAt: args.session.activeProfile?.createDt,
             onAssessment: (_) => openInitialAssessmentFromHome(
               context: context,
               examService: args.services.examService,

@@ -1507,6 +1507,12 @@ void main() {
     expect(plottedPoints(), [3, 4, 5, 0, 1, 2]);
     expect(find.text('Trend'), findsOneWidget);
     expect(tester.takeException(), isNull);
+
+    await showChart(330);
+    expect(plottedPoints(), [2, 3, 4, 5, 0, 1, 2]);
+    await showChart(329);
+    expect(plottedPoints(), [3, 4, 5, 0, 1, 2]);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Trend header stays inside a narrow chart', (tester) async {

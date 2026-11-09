@@ -48,6 +48,7 @@ class AssessmentQuestionCard extends StatelessWidget {
       );
     }
     final mathQuestion = _mathQuestionParts(displayQuestion);
+    final orderingQuestion = _OrderingQuestionParts.parse(displayQuestion);
     final isPictorialQuestion = _containsPictorialSymbols(displayQuestion);
     final questionContent = renderLatex
         ? ExamMathText(
@@ -59,6 +60,12 @@ class AssessmentQuestionCard extends StatelessWidget {
               fontWeight: FontWeight.w600,
               height: 1.2,
             ),
+          )
+        : orderingQuestion != null
+        ? Semantics(
+            label: displayQuestion,
+            excludeSemantics: true,
+            child: _AssessmentOrderingQuestion(parts: orderingQuestion),
           )
         : mathQuestion != null
         ? _AssessmentMathQuestion(
@@ -157,7 +164,7 @@ class AssessmentQuestionCard extends StatelessWidget {
     }
 
     final prefixedExpression = RegExp(
-      r'^((?:Tìm\s+x|Tính|Giải)\s*:\s*)(.+)$',
+      r'^((?:Tìm\s+x|Tính(?:\s+giá\s+trị(?:\s+(?:của\s+)?biểu\s+thức)?)?|Giải|Điền\s+số(?:\s+thích\s+hợp)?)\s*:\s*)(.+)$',
       caseSensitive: false,
     ).firstMatch(value.trim());
     if (prefixedExpression == null) {
@@ -343,12 +350,12 @@ class _AssessmentMathQuestion extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: color,
-              fontSize: FontSize.displaySmall,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
+              fontSize: FontSize.xl,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           _AssessmentMathExpression(expression: expression, color: color),
         ],
       ),
@@ -369,17 +376,53 @@ class _AssessmentMathExpression extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (expression.length <= 24) {
+        final displayExpression = expression.replaceAllMapped(
+          RegExp(r'\s*([+×xX*/÷:=−-])\s*'),
+          (match) {
+            final operator = match.group(1)!;
+            final preceding = expression.substring(0, match.start).trimRight();
+            final isSign =
+                (operator == '-' || operator == '−') &&
+                (preceding.isEmpty ||
+                    '(+×xX*/÷:=−-'.contains(preceding[preceding.length - 1]));
+            return isSign ? operator : ' $operator ';
+          },
+        ).trim();
+        // Use the actual width (including accessibility text scaling) rather
+        // than shrinking every short expression from a fixed 64px size.
+        double? singleLineFontSize;
+        for (final size in [
+          FontSize.displayMath,
+          FontSize.displayExtraLarge,
+          FontSize.displayLarge,
+          FontSize.displaySmall,
+        ]) {
+          final painter = TextPainter(
+            text: TextSpan(
+              text: displayExpression,
+              style: DefaultTextStyle.of(context).style.merge(_textStyle(size)),
+            ),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout();
+          final fits = painter.width <= constraints.maxWidth;
+          painter.dispose();
+          if (fits) {
+            singleLineFontSize = size;
+            break;
+          }
+        }
+        if (singleLineFontSize != null) {
           return SizedBox(
             width: constraints.maxWidth,
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  expression,
+                  displayExpression,
                   softWrap: false,
                   textAlign: TextAlign.center,
-                  style: _textStyle(FontSize.displayMath),
+                  style: _textStyle(singleLineFontSize),
                 ),
               ),
             ),
@@ -392,7 +435,7 @@ class _AssessmentMathExpression extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             spacing: 12,
             runSpacing: 10,
-            children: _semanticSegments().map((segment) {
+            children: _semanticSegments(displayExpression).map((segment) {
               return ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: constraints.maxWidth),
                 child: FittedBox(
@@ -416,25 +459,128 @@ class _AssessmentMathExpression extends StatelessWidget {
     return TextStyle(
       color: color,
       fontSize: fontSize,
-      fontWeight: FontWeight.w900,
+      fontWeight: FontWeight.w700,
+      fontFeatures: const [FontFeature.tabularFigures()],
       height: 1.15,
       letterSpacing: 0,
     );
   }
 
-  List<String> _semanticSegments() {
-    final primarySegments = expression
-        .split(RegExp(r'(?=[+−=\-])'))
-        .where((segment) => segment.trim().isNotEmpty);
-
-    return primarySegments.expand((segment) {
-      if (segment.length <= 18) {
-        return [segment.trim()];
+  List<String> _semanticSegments(String value) {
+    final segments = <String>[];
+    var start = 0;
+    var depth = 0;
+    for (var index = 0; index < value.length; index++) {
+      final character = value[index];
+      if (character == '(') depth++;
+      if (character == ')') depth--;
+      if (depth == 0 &&
+          index > start &&
+          '+−-=×xX*/÷:'.contains(character) &&
+          RegExp(r'[0-9)?]').hasMatch(value.substring(start, index))) {
+        segments.add(value.substring(start, index).trim());
+        start = index;
       }
-      return segment
-          .split(RegExp(r'(?=[×xX*/÷:])'))
-          .where((part) => part.trim().isNotEmpty)
-          .map((part) => part.trim());
-    }).toList();
+    }
+    segments.add(value.substring(start).trim());
+    return segments;
+  }
+}
+
+class _OrderingQuestionParts {
+  const _OrderingQuestionParts(this.prefix, this.numbers, this.suffix);
+
+  final String prefix;
+  final List<String> numbers;
+  final String suffix;
+
+  static _OrderingQuestionParts? parse(String value) {
+    if (!RegExp(
+      r'sắp\s+xếp|xếp\s+.*thứ\s+tự',
+      caseSensitive: false,
+    ).hasMatch(value)) {
+      return null;
+    }
+    // A comma followed by whitespace separates items; a comma inside a number
+    // is decimal punctuation. Semicolons support decimal-comma lists as well.
+    const number = r'[−-]?\d+(?:[.,]\d+)?';
+    const separator = r'(?:\s*;\s*|,\s+)';
+    final match = RegExp(
+      '^(.+?(?::|các\\s+số)\\s*)'
+      '($number(?:$separator$number)+)'
+      r'([.!?]?|\s+(?:theo|từ)\s+.*)$',
+      caseSensitive: false,
+    ).firstMatch(value);
+    if (match == null) return null;
+    return _OrderingQuestionParts(
+      match.group(1)!.trim(),
+      match.group(2)!.split(RegExp(separator)),
+      match.group(3)!.trim().replaceFirst(RegExp(r'^[.!?]$'), ''),
+    );
+  }
+}
+
+class _AssessmentOrderingQuestion extends StatelessWidget {
+  const _AssessmentOrderingQuestion({required this.parts});
+
+  final _OrderingQuestionParts parts;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final promptStyle = TextStyle(
+      color: colors.textPrimary,
+      fontSize: FontSize.xl,
+      fontWeight: FontWeight.w600,
+      height: 1.4,
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(parts.prefix, textAlign: TextAlign.center, style: promptStyle),
+        const SizedBox(height: 20),
+        LayoutBuilder(
+          builder: (context, constraints) => Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final number in parts.numbers)
+                Container(
+                  constraints: BoxConstraints(
+                    minWidth: 56,
+                    maxWidth: constraints.maxWidth,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.inputSurface,
+                    border: Border.all(color: colors.border),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      number,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: FontSize.displaySmall,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (parts.suffix.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(parts.suffix, textAlign: TextAlign.center, style: promptStyle),
+        ],
+      ],
+    );
   }
 }

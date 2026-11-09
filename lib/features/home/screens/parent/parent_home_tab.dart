@@ -29,6 +29,7 @@ import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart
 import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
 import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
+import 'package:numi/features/exam/data/assessment_progress_chart_loader.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 
@@ -372,15 +373,14 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     final requestId = ++_progressLoadRequestId;
     setState(() => _isLoadingProgress = true);
     try {
-      final toDt = DateTime.now();
-      final progress = await widget.examService.getExamProgress(
+      final chart = await loadRecentAssessmentChart(
+        widget.examService,
         profileId: profileId,
-        fromDt: toDt.subtract(const Duration(days: 365)),
-        toDt: toDt,
+        profileCreatedAt: widget.activeProfile?.createDt,
       );
       if (!mounted || requestId != _progressLoadRequestId) return;
       setState(() {
-        _chart = AssessmentProgressChartData.fromProgress(progress);
+        _chart = chart;
       });
     } catch (_) {
       // Keep the last chart when progress is temporarily unavailable.

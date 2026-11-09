@@ -27,18 +27,18 @@ void main() {
     },
   );
 
-  test(
-    'home/intro history retains every completed point in the API window',
-    () {
-      final chart = AssessmentProgressChartData.fromProgress(
-        _progress([
-          for (var i = 1; i <= 12; i++) _point(i, i % 6, sequence: i),
-        ]),
-      );
-      expect(chart.previousGrades.length, 11);
-      expect(chart.testNumbers, List.generate(12, (i) => i + 1));
-    },
-  );
+  test('home/intro history keeps only the seven latest completed attempts', () {
+    final chart = AssessmentProgressChartData.fromProgress(
+      _progress([
+        _point(14, null, sequence: 14),
+        _point(13, 3, sequence: 13, status: 'IN_PROGRESS'),
+        for (var i = 12; i >= 1; i--) _point(i, i % 6, sequence: i),
+      ]),
+    );
+    expect(chart.previousGrades, [0, 1, 2, 3, 4, 5]);
+    expect(chart.finalGrade, 0);
+    expect(chart.testNumbers, [6, 7, 8, 9, 10, 11, 12]);
+  });
 
   test('result keeps six preceding points and excludes later attempts', () {
     final chart = AssessmentProgressChartData.forResult(
@@ -54,6 +54,21 @@ void main() {
     expect(chart.firstTestNumber, 14);
     expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 20));
   });
+
+  test(
+    'home/intro combines windows by completion time when sequence restarts',
+    () {
+      final chart = AssessmentProgressChartData.fromProgress(
+        _progress([
+          _point(1, 4, sequence: 1, day: 20),
+          _point(2, 2, sequence: 9, day: 10),
+        ]),
+      );
+      expect(chart.previousGrades, [2]);
+      expect(chart.finalGrade, 4);
+      expect(chart.lastSubmittedAt, DateTime.utc(2026, 1, 20));
+    },
+  );
 
   test(
     'result appends the local grade when the API has not included it yet',

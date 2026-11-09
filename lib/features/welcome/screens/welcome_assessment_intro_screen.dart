@@ -13,6 +13,7 @@ import 'package:numi/core/theme/app_colors.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
+import 'package:numi/features/exam/data/assessment_progress_chart_loader.dart';
 import 'package:numi/features/exam/widgets/shared/question_audio_toggle.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
@@ -28,6 +29,7 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
     super.key,
     required this.onAssessment,
     this.profileId,
+    this.profileCreatedAt,
   });
 
   static const _mascotAsset =
@@ -39,6 +41,7 @@ class WelcomeAssessmentIntroScreen extends StatefulWidget {
 
   final Future<void> Function(BuildContext context) onAssessment;
   final int? profileId;
+  final String? profileCreatedAt;
 
   @override
   State<WelcomeAssessmentIntroScreen> createState() =>
@@ -78,25 +81,31 @@ class _WelcomeAssessmentIntroScreenState
     ]);
     try {
       var profileId = widget.profileId;
+      var profileCreatedAt = widget.profileCreatedAt;
       if (profileId == null) {
         final guestAccounts = context.read<GuestAccountService>();
         final guest =
             guestAccounts.current ?? await guestAccounts.ensureGuest();
         if (!mounted || requestId != _chartRequestId) return;
         profileId = guest.profileId;
+        profileCreatedAt =
+            guest.profiles
+                .where((profile) => profile.stableId == profileId)
+                .firstOrNull
+                ?.createDt ??
+            guest.user['create_dt']?.toString();
       }
       if (profileId == null) return;
 
       final examService = context.read<ExamService>();
-      final toDt = DateTime.now();
-      final progress = await examService.getExamProgress(
+      final chart = await loadRecentAssessmentChart(
+        examService,
         profileId: profileId,
-        fromDt: toDt.subtract(const Duration(days: 7)),
-        toDt: toDt,
+        profileCreatedAt: profileCreatedAt,
       );
       if (!mounted || requestId != _chartRequestId) return;
       setState(() {
-        _chart = AssessmentProgressChartData.fromProgress(progress);
+        _chart = chart;
       });
     } catch (_) {
       // Keep the last rendered state if progress cannot be refreshed.

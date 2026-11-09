@@ -13,6 +13,7 @@ class AssessmentProgressChartData {
        testNumbers = List.unmodifiable(testNumbers);
 
   static final empty = AssessmentProgressChartData.result(grade: 0);
+  static const recentPointLimit = 7;
 
   final int finalGrade;
   final List<int> previousGrades;
@@ -22,11 +23,20 @@ class AssessmentProgressChartData {
 
   int get firstTestNumber => testNumbers.last - previousGrades.length;
 
-  /// Home and intro charts include all completed assessments in their window.
+  /// Home and intro charts keep the latest seven completed assessments.
   factory AssessmentProgressChartData.fromProgress(
     ExamProgressResponse progress,
   ) {
-    final points = _completedPoints(progress);
+    // Sequence numbers can restart in each API window; completion time orders
+    // the combined history consistently when loading older windows.
+    final completed = _completedPoints(progress)
+      ..sort((a, b) {
+        final byDate = a.completedDt.compareTo(b.completedDt);
+        return byDate != 0 ? byDate : a.sequence.compareTo(b.sequence);
+      });
+    final points = completed.length > recentPointLimit
+        ? completed.sublist(completed.length - recentPointLimit)
+        : completed;
     if (points.isEmpty) return empty;
     return AssessmentProgressChartData._(
       finalGrade: AssessmentFlowPolicy.clampGrade(points.last.grade!),
