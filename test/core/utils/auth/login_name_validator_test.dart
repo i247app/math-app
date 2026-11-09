@@ -1,9 +1,8 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/core/localization/app_keys.dart';
-import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/auth/login_name_validator.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
+import 'package:numi/core/utils/phone/phone_number_validator.dart';
 
 void main() {
   group('normalizeLoginNameInput', () {
@@ -66,219 +65,200 @@ void main() {
     });
   });
 
-  test('smart formatter supports both phone and email input', () {
-    final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-
-    final phone = formatter.formatEditUpdate(
-      TextEditingValue.empty,
-      const TextEditingValue(text: '0901234567'),
-    );
-    final email = formatter.formatEditUpdate(
-      phone,
-      const TextEditingValue(text: 'learner @example.com'),
-    );
-
-    expect(phone.text, '090 123 4567');
-    expect(email.text, 'learner@example.com');
-  });
-
-  test('smart formatter keeps the email cursor at a mid-string deletion', () {
-    final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-    const oldValue = TextEditingValue(
-      text: 'learner@example.com',
-      selection: TextSelection.collapsed(offset: 7),
-    );
-    const newValue = TextEditingValue(
-      text: 'learne@example.com',
-      selection: TextSelection.collapsed(offset: 6),
-    );
-
-    final formatted = formatter.formatEditUpdate(oldValue, newValue);
-
-    expect(formatted.text, 'learne@example.com');
-    expect(formatted.selection, const TextSelection.collapsed(offset: 6));
-  });
-
-  test('smart formatter keeps the phone cursor at a mid-string deletion', () {
-    final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-    const oldValue = TextEditingValue(
-      text: '090 123 4567',
-      selection: TextSelection.collapsed(offset: 5),
-    );
-    const newValue = TextEditingValue(
-      text: '090 23 4567',
-      selection: TextSelection.collapsed(offset: 4),
-    );
-
-    final formatted = formatter.formatEditUpdate(oldValue, newValue);
-
-    expect(formatted.text, '090 234 567');
-    expect(formatted.selection, const TextSelection.collapsed(offset: 4));
-  });
-
-  group('country code input', () {
-    TextEditingValue value(String text) => TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: text.length),
-    );
-
+  group('complete phone candidates', () {
     test(
-      'initial 1 becomes the US prefix and the next digit starts the number',
+      'every nonzero-leading nine-digit prefix has a Vietnam country hint',
       () {
-        PhoneRegion? detected;
-        final formatter = LoginNameInputFormatter(
-          PhoneRegion.vn,
-          onRegionDetected: (region) => detected = region,
-        );
-        final code = formatter.formatEditUpdate(value(''), value('1'));
-        expect(code.text, isEmpty);
-        expect(formatter.hasCountryCodeOnly, isTrue);
-        expect(detected, PhoneRegion.us);
-
-        final national = formatter.formatEditUpdate(code, value('2'));
-        expect(national.text, '2');
-        final cleared = formatter.formatEditUpdate(national, value(''));
-        expect(cleared.text, isEmpty);
-        expect(formatter.hasCountryCodeOnly, isFalse);
-        expect(formatter.region, PhoneRegion.us);
-      },
-    );
-
-    test('a manual Vietnam choice is retained for ambiguous numeric input', () {
-      final formatter = LoginNameInputFormatter(
-        PhoneRegion.vn,
-        allowBareCountryInference: false,
-      );
-      expect(formatter.formatEditUpdate(value(''), value('1')).text, '1');
-      expect(formatter.region, PhoneRegion.vn);
-    });
-
-    test(
-      'a partial number pasted with leading 1 selects US and keeps the rest',
-      () {
-        final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-        final formatted = formatter.formatEditUpdate(value(''), value('1202'));
-
-        expect(formatter.region, PhoneRegion.us);
-        expect(formatted.text, '202');
-        expect(formatted.selection.extentOffset, 3);
-      },
-    );
-
-    test('a manual country choice is overridden only by an explicit other country code', () {
-      final formatter = LoginNameInputFormatter(
-        PhoneRegion.vn,
-        allowBareCountryInference: false,
-      );
-      var current = formatter.formatEditUpdate(value(''), value('1202'));
-      expect(formatter.region, PhoneRegion.vn);
-      expect(current.text.replaceAll(' ', ''), '1202');
-
-      current = formatter.formatEditUpdate(current, value('12025550101'));
-      expect(formatter.region, PhoneRegion.vn);
-
-      current = formatter.formatEditUpdate(current, value('+12025550101'));
-      expect(formatter.region, PhoneRegion.us);
-      expect(current.text.replaceAll(' ', ''), '2025550101');
-    });
-
-    for (final (raw, country, national, normalized) in [
-      ('+1 (202) 555-0101', PhoneRegion.us, '2025550101', '+12025550101'),
-      ('12025550101', PhoneRegion.us, '2025550101', '+12025550101'),
-      ('+84 90 123 4567', PhoneRegion.vn, '901234567', '+84901234567'),
-      ('84901234567', PhoneRegion.vn, '901234567', '+84901234567'),
-      ('+84 090 123 4567', PhoneRegion.vn, '0901234567', '+84901234567'),
-      ('0901234567', PhoneRegion.vn, '0901234567', '+84901234567'),
-    ]) {
-      test('keeps every national digit when pasting $raw', () {
-        final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-        final formatted = formatter.formatEditUpdate(value(''), value(raw));
-        expect(formatter.region, country);
-        expect(formatted.text.replaceAll(' ', ''), national);
-        expect(formatted.selection.extentOffset, formatted.text.length);
-        expect(
-          normalizeLoginNameInput(formatter.region, formatted.text).loginName,
-          normalized,
-        );
-      });
-    }
-
-    test('typing +84 in separate keystrokes preserves the partial prefix', () {
-      final formatter = LoginNameInputFormatter(PhoneRegion.us);
-      var current = value('');
-      for (final text in ['+', '+8', '+84']) {
-        current = formatter.formatEditUpdate(current, value(text));
-        expect(current.text, text == '+84' ? '' : text);
-        expect(formatter.hasCountryCodeOnly, text == '+84');
-      }
-      expect(formatter.region, PhoneRegion.vn);
-      expect(formatter.formatEditUpdate(current, value('9')).text, '9');
-    });
-
-    test(
-      'numeric email usernames retain their prefix during incremental typing',
-      () {
-        for (final email in [
-          '1a@example.com',
-          '123@example.com',
-          '1234567@example.com',
-        ]) {
-          final formatter = LoginNameInputFormatter(PhoneRegion.us);
-          var current = value('');
-          for (final character in email.split('')) {
-            current = formatter.formatEditUpdate(
-              current,
-              value('${current.text}$character'),
-            );
+        var testedCodes = 0;
+        for (var code = 10; code <= 99; code++) {
+          testedCodes++;
+          for (final subscriber in ['0000000', '1234567', '9999999']) {
+            final national = '$code$subscriber';
+            for (final raw in [
+              national,
+              '0$national',
+              '+84$national',
+              '84$national',
+            ]) {
+              final result = normalizeLoginNameInput(
+                PhoneRegion.vn,
+                raw,
+                inferPhoneRegion: true,
+              );
+              expect(result.phonePreviewRegion, PhoneRegion.vn, reason: raw);
+            }
           }
-          expect(current.text, email);
-          expect(current.selection.extentOffset, email.length);
+        }
+        expect(testedCodes, 90);
+      },
+    );
+
+    test(
+      '074 and 068 get country hints without accepting unsupported numbers',
+      () {
+        for (final raw in [
+          '747372827',
+          '0747372827',
+          '+84747372827',
+          '84747372827',
+          '688777777',
+          '0688777777',
+          '+84688777777',
+          '84688777777',
+        ]) {
+          final result = normalizeLoginNameInput(
+            PhoneRegion.vn,
+            raw,
+            inferPhoneRegion: true,
+          );
+          expect(result.phonePreviewRegion, PhoneRegion.vn);
+          expect(result.phoneRegion, isNull);
+          expect(result.isValid, isFalse);
+          expect(result.loginName, isNull);
+          expect(result.errorKey, AppKeys.invalidPhone);
         }
       },
     );
 
-    test(
-      'replacing a number with an email does not prepend a consumed code',
-      () {
-        final formatter = LoginNameInputFormatter(PhoneRegion.us);
-        var current = formatter.formatEditUpdate(value(''), value('1'));
-        current = formatter.formatEditUpdate(current, value('2025550101'));
-        current = formatter.formatEditUpdate(
-          current,
-          value('learner@example.com'),
+    test('country hints exclude leading zero, incomplete input and explicit other countries', () {
+      for (final raw in [
+        '012345678',
+        '74737282',
+        '747372827@example.com',
+        '+1747372827',
+      ]) {
+        expect(previewPhoneRegion(raw), isNull, reason: raw);
+      }
+      expect(
+        previewPhoneRegion('747372827', preferredRegion: PhoneRegion.us),
+        isNull,
+      );
+      expect(
+        previewPhoneRegion('+84747372827', preferredRegion: PhoneRegion.us),
+        PhoneRegion.vn,
+      );
+      expect(previewPhoneRegion('7473728270'), PhoneRegion.us);
+    });
+
+    for (final (raw, country, canonical) in [
+      ('0901234567', PhoneRegion.vn, '+84901234567'),
+      ('901234567', PhoneRegion.vn, '+84901234567'),
+      ('0325802809', PhoneRegion.vn, '+84325802809'),
+      ('0702465814', PhoneRegion.vn, '+84702465814'),
+      ('+84 90 123 4567', PhoneRegion.vn, '+84901234567'),
+      ('84901234567', PhoneRegion.vn, '+84901234567'),
+      ('2025550101', PhoneRegion.us, '+12025550101'),
+      ('+1 (202) 555-0101', PhoneRegion.us, '+12025550101'),
+      ('12025550101', PhoneRegion.us, '+12025550101'),
+    ]) {
+      test('recognizes and normalizes $raw only as a complete number', () {
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          raw,
+          inferPhoneRegion: true,
         );
-        expect(current.text, 'learner@example.com');
+        expect(result.isValid, isTrue);
+        expect(result.phoneRegion, country);
+        expect(result.loginName, canonical);
+      });
+    }
+
+    for (final raw in [
+      '1',
+      '1202',
+      '+1',
+      '+84',
+      '032580280',
+      '1111111111',
+      '2021550101',
+      '0125550101',
+      '0412345678',
+      '901234567890',
+      '+442071838750',
+      '090abc1234567',
+      '++84901234567',
+    ]) {
+      test(
+        'does not classify incomplete or invalid $raw as a phone candidate',
+        () {
+          expect(detectPhoneRegion(raw), isNull);
+          expect(
+            normalizeLoginNameInput(
+              PhoneRegion.vn,
+              raw,
+              inferPhoneRegion: true,
+            ).isValid,
+            isFalse,
+          );
+        },
+      );
+    }
+
+    test(
+      'reconsiders a Vietnam prefix when the next digit completes a US number',
+      () {
+        expect(detectPhoneRegion('347555012'), PhoneRegion.vn);
+        expect(detectPhoneRegion('3475550123'), PhoneRegion.us);
+        expect(detectPhoneRegion('3475550123@'), isNull);
       },
     );
 
-    test(
-      'unsupported international codes remain visible and cannot submit',
-      () {
-        final formatter = LoginNameInputFormatter(PhoneRegion.vn);
-        final formatted = formatter.formatEditUpdate(
-          value(''),
-          value('+442071838750'),
-        );
-        expect(formatted.text, '+442071838750');
-        expect(
-          normalizeLoginNameInput(PhoneRegion.vn, formatted.text).isValid,
-          isFalse,
-        );
-      },
-    );
+    test('manual selection applies to national input but explicit country codes override it', () {
+      expect(
+        detectPhoneRegion('2025550101', preferredRegion: PhoneRegion.vn),
+        isNull,
+      );
+      expect(
+        detectPhoneRegion('2025550101', preferredRegion: PhoneRegion.us),
+        PhoneRegion.us,
+      );
+      expect(
+        detectPhoneRegion('+12025550101', preferredRegion: PhoneRegion.vn),
+        PhoneRegion.us,
+      );
+      expect(
+        detectPhoneRegion('+84901234567', preferredRegion: PhoneRegion.us),
+        PhoneRegion.vn,
+      );
+    });
 
-    test(
-      'an international number restored by navigation is normalized once',
-      () {
-        expect(
-          normalizeLoginNameInput(PhoneRegion.vn, '+84901234567').loginName,
-          '+84901234567',
+    test('an unfinished international code reports a short phone number on validation', () {
+      for (final code in ['+1', '+84']) {
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          code,
+          inferPhoneRegion: true,
         );
-        expect(
-          normalizeLoginNameInput(PhoneRegion.us, '+12025550101').loginName,
-          '+12025550101',
+        expect(result.phoneRegion, isNull);
+        expect(result.errorKey, AppKeys.phoneTooShort);
+      }
+    });
+
+    test('every intermediate prefix remains intact when a numeric username becomes email', () {
+      for (final email in [
+        '123456789012345678901234567890@example.com',
+        '901234567@example.com',
+        '3475550123@example.com',
+      ]) {
+        for (var length = 1; length <= email.length; length++) {
+          final raw = email.substring(0, length);
+          final result = normalizeLoginNameInput(
+            PhoneRegion.vn,
+            raw,
+            inferPhoneRegion: true,
+          );
+          if (raw.contains('@')) expect(result.kind, LoginNameKind.email);
+        }
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          email,
+          inferPhoneRegion: true,
         );
-      },
-    );
+        expect(result.isValid, isTrue);
+        expect(result.kind, LoginNameKind.email);
+        expect(result.phoneRegion, isNull);
+        expect(result.loginName, email);
+      }
+    });
   });
 }

@@ -13,6 +13,7 @@ import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/auth/data/auth_exception.dart';
 import 'package:numi/features/auth/controllers/auth_cubit.dart';
 import 'package:numi/features/auth/data/auth_service.dart';
+import 'package:numi/features/auth/widgets/auth_entry/phone_region_menu.dart';
 import 'package:numi/features/auth/data/guest_account_service.dart';
 import 'package:numi/features/auth/models/auth_models.dart';
 import 'package:numi/features/auth/models/guest_account.dart';
@@ -954,7 +955,7 @@ void main() {
     for (final language in AppLanguage.values) {
       for (final signup in [false, true]) {
         testWidgets(
-          'phone validation updates on digit changes ($language, signup=$signup)',
+          'phone errors wait for blur or submit and clear on editing ($language, signup=$signup)',
           (tester) async {
             final originalLanguage = AppLanguageState.current;
             addTearDown(() => AppLanguageState.current = originalLanguage);
@@ -978,6 +979,12 @@ void main() {
             final input = find.byType(EditableText);
             await tester.enterText(input, '032580280');
             await tester.pumpAndSettle();
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
+            FocusManager.instance.primaryFocus?.unfocus();
+            await tester.pumpAndSettle();
             expect(find.text(strings[AppKeys.invalidPhone]!), findsOneWidget);
 
             await tester.enterText(input, '0325802809');
@@ -989,6 +996,12 @@ void main() {
             expect(authService.lookedUpNames, isEmpty);
 
             await tester.enterText(input, '032580280');
+            await tester.pumpAndSettle();
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
+            await tester.tap(find.byType(ElevatedButton));
             await tester.pumpAndSettle();
             expect(find.text(strings[AppKeys.invalidPhone]!), findsOneWidget);
 
@@ -1032,6 +1045,9 @@ void main() {
 
         await tester.enterText(input, '032580280');
         await tester.pumpAndSettle();
+        expect(error, findsNothing);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
         expect(
           tester.widget<Text>(error).data,
           AppStrings.current(AppKeys.invalidPhone),
@@ -1059,12 +1075,12 @@ void main() {
       await tester.tap(signupButton);
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(EditableText), '0488483883');
+      await tester.enterText(find.byType(EditableText), '0988483883');
       await tester.pumpAndSettle();
       await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      expect(authService.lookedUpNames, <String>['+84488483883']);
+      expect(authService.lookedUpNames, <String>['+84988483883']);
       expect(authService.sentOtpCount, 0);
       expect(
         find.byKey(const ValueKey('registration-profile')),
@@ -1092,295 +1108,245 @@ void main() {
       expect(find.byKey(const ValueKey('welcome')), findsOneWidget);
     });
 
-    testWidgets(
-      'starts neutral, detects phone or email, and delays email errors until submit',
-      (tester) async {
-        FlutterSecureStorage.setMockInitialValues(<String, String>{});
-        await tester.pumpWidget(const NumiApp());
-
-        final welcomeLogin = find.text('ĐĂNG NHẬP');
-        await tester.ensureVisible(welcomeLogin);
-        await tester.tap(welcomeLogin);
-        await tester.pumpAndSettle();
-
-        expect(find.byKey(const ValueKey('login')), findsOneWidget);
-        expect(find.text('🇻🇳'), findsNothing);
-
-        final input = find.byType(EditableText);
-        await tester.enterText(input, 'learner');
-        await tester.pump();
-
-        expect(find.text('🇻🇳'), findsNothing);
-        expect(
-          find.byKey(const ValueKey('auth-identifier-error')),
-          findsNothing,
-        );
-
-        final submitButton = find.byType(ElevatedButton);
-        expect(
-          tester.widget<ElevatedButton>(submitButton).onPressed,
-          isNotNull,
-        );
-
-        await tester.tap(submitButton);
-        await tester.pumpAndSettle();
-
-        expect(
-          find.byKey(const ValueKey('auth-identifier-error')),
-          findsOneWidget,
-        );
-
-        await tester.enterText(input, '090');
-        await tester.pumpAndSettle();
-
-        expect(find.text('🇻🇳'), findsOneWidget);
-        expect(
-          find.byKey(const ValueKey('auth-identifier-error')),
-          findsNothing,
-        );
-
-        await tester.enterText(input, '090a');
-        await tester.pumpAndSettle();
-        expect(find.text('🇻🇳'), findsNothing);
-        expect(tester.widget<EditableText>(input).controller.text, '090a');
-
-        await tester.enterText(input, '090');
-        await tester.pumpAndSettle();
-        expect(find.text('🇻🇳'), findsOneWidget);
-
-        await tester.enterText(input, '');
-        await tester.pumpAndSettle();
-        expect(find.text('🇻🇳'), findsNothing);
-      },
-    );
-
-    for (final signup in [false, true]) {
-      testWidgets(
-        'phone country is kept only for the current app session (signup=$signup)',
-        (tester) async {
-          FlutterSecureStorage.setMockInitialValues({
-            'phone_region': 'us',
-            'app_language': 'vi-VN',
-          });
-          tester.platformDispatcher.localeTestValue = const Locale('vi', 'VN');
-          addTearDown(tester.platformDispatcher.clearLocaleTestValue);
-
-          Future<void> openEntry() async {
-            final button = find.text(signup ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP');
-            await tester.ensureVisible(button);
-            await tester.tap(button);
-            await tester.pumpAndSettle();
-          }
-
-          await tester.pumpWidget(const NumiApp());
-          await openEntry();
-          expect(find.text('+1'), findsNothing);
-
-          await tester.enterText(find.byType(EditableText), '2025550101');
-          await tester.pumpAndSettle();
-          expect(find.text('+84'), findsOneWidget);
-          final controller = tester
-              .widget<EditableText>(find.byType(EditableText))
-              .controller;
-          final previousText = controller.text;
-          await tester.tap(find.text('+84'));
-          await tester.pumpAndSettle();
-          await tester.tap(find.text('🇺🇸  US +1'));
-          await tester.pumpAndSettle();
-          expect(controller.text, previousText);
-          expect(find.text('+1'), findsOneWidget);
-
-          // Numeric input, email mode and clearing must not change the choice.
-          for (final value in [
-            '1',
-            '',
-            'learner@example.com',
-            '',
-            '2025550101',
-            '',
-          ]) {
-            await tester.enterText(find.byType(EditableText), value);
-            await tester.pumpAndSettle();
-            expect(
-              find.text('+1'),
-              value.isEmpty || value.contains('@')
-                  ? findsNothing
-                  : findsOneWidget,
-            );
-          }
-
-          await tester.pumpWidget(const SizedBox.shrink());
-          await tester.pumpAndSettle();
-          await tester.pumpWidget(const NumiApp());
-          await openEntry();
-          expect(find.text('+84'), findsNothing);
-          await tester.enterText(find.byType(EditableText), '2025550101');
-          await tester.pumpAndSettle();
-          expect(find.text('+84'), findsOneWidget);
-        },
-      );
+    Future<TextEditingController> openIdentifierEntry(
+      WidgetTester tester, {
+      required bool signup,
+      AuthService? authService,
+    }) async {
+      await tester.pumpWidget(NumiApp(authService: authService));
+      final button = find.text(signup ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP');
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      return tester.widget<EditableText>(find.byType(EditableText)).controller;
     }
 
     for (final signup in [false, true]) {
       testWidgets(
-        'country follows input and current choices instead of device region (signup=$signup)',
+        'nine-digit input shows a Vietnam hint separately from validation (signup=$signup)',
         (tester) async {
-          tester.platformDispatcher.localeTestValue = const Locale('en', 'US');
-          addTearDown(tester.platformDispatcher.clearLocaleTestValue);
-          await tester.pumpWidget(const NumiApp());
-          final entryButton = find.text(signup ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP');
-          await tester.ensureVisible(entryButton);
-          await tester.tap(entryButton);
-          await tester.pumpAndSettle();
-
+          final service = _SignupLookupAuthService();
+          final controller = await openIdentifierEntry(
+            tester,
+            signup: signup,
+            authService: service,
+          );
           final input = find.byType(EditableText);
-          expect(find.text('+1'), findsNothing);
-          expect(find.text('+84'), findsNothing);
-
-          for (final digit in '023456789'.split('')) {
-            await tester.enterText(input, digit);
+          for (final raw in [
+            '747372827',
+            '0747372827',
+            '+84747372827',
+            '688777777',
+            '0688777777',
+            '+84688777777',
+          ]) {
+            await tester.enterText(input, raw);
             await tester.pumpAndSettle();
-            expect(find.text('+84'), findsOneWidget);
+            expect(find.text('🇻🇳'), findsOneWidget);
+            expect(controller.text, raw);
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
           }
 
-          await tester.enterText(input, 'learner');
+          await tester.tap(find.byType(ElevatedButton));
           await tester.pumpAndSettle();
-          expect(find.text('+84'), findsNothing);
+          expect(
+            find.byKey(const ValueKey('auth-identifier-error')),
+            findsOneWidget,
+          );
+          expect(service.lookedUpNames, isEmpty);
 
-          await tester.enterText(input, '');
+          await tester.enterText(input, '767372827');
           await tester.pumpAndSettle();
-          await tester.enterText(input, '1202');
-          await tester.pumpAndSettle();
-          final controller = tester.widget<EditableText>(input).controller;
-          expect(find.text('+1'), findsOneWidget);
-          expect(controller.text, '202');
+          expect(find.text('🇻🇳'), findsOneWidget);
+          expect(
+            find.byKey(const ValueKey('auth-identifier-error')),
+            findsNothing,
+          );
 
-          // Once chosen, US remains selected for a national number starting 2.
-          await tester.enterText(input, '2');
+          await tester.enterText(input, '7473728270');
           await tester.pumpAndSettle();
-          expect(find.text('+1'), findsOneWidget);
+          expect(find.text('🇺🇸'), findsOneWidget);
+          await tester.enterText(input, '747372827@example.com');
+          await tester.pumpAndSettle();
+          expect(find.byType(PhoneRegionMenu), findsNothing);
+          expect(controller.text, '747372827@example.com');
+        },
+      );
 
-          await tester.tap(find.text('+1'));
-          await tester.pumpAndSettle();
-          await tester.tap(find.text('🇻🇳  VN +84'));
-          await tester.pumpAndSettle();
-          await tester.enterText(input, '1');
-          await tester.pumpAndSettle();
-          expect(find.text('+84'), findsOneWidget);
-          expect(controller.text, '1');
-
-          // An explicit international prefix also updates the empty-field hint.
-          for (final code in ['+1', '+84']) {
-            await tester.enterText(input, code);
+      testWidgets(
+        'phone preview waits for a complete valid number (signup=$signup)',
+        (tester) async {
+          FlutterSecureStorage.setMockInitialValues({
+            'app_language': 'vi-VN',
+            'phone_region': 'vn',
+          });
+          final controller = await openIdentifierEntry(tester, signup: signup);
+          final input = find.byType(EditableText);
+          for (final raw in [
+            '1',
+            '1202',
+            '+1',
+            '+84',
+            '032580280',
+            '1111111111',
+            '2021550101',
+          ]) {
+            await tester.enterText(input, raw);
             await tester.pumpAndSettle();
-            expect(find.text(code), findsOneWidget);
-            expect(controller.text, isEmpty);
+            expect(controller.text, raw);
+            expect(find.byType(PhoneRegionMenu), findsNothing);
+            expect(
+              find.byKey(const ValueKey('auth-identifier-error')),
+              findsNothing,
+            );
             expect(
               tester
                   .widget<TextField>(find.byType(TextField))
                   .decoration
                   ?.hintText,
-              code == '+1' ? '202 555 0101' : '090 123 4567',
+              AppStrings.current(AppKeys.loginNameHint),
             );
           }
-
-          await tester.enterText(input, 'learner@example.com');
+          for (final (raw, code, hint) in [
+            ('+1 (202) 555-0101', '+1', '202 555 0101'),
+            ('+84 90 123 4567', '+84', '090 123 4567'),
+          ]) {
+            await tester.enterText(input, raw);
+            await tester.pumpAndSettle();
+            expect(controller.text, raw);
+            expect(find.text(code), findsOneWidget);
+            expect(
+              tester
+                  .widget<TextField>(find.byType(TextField))
+                  .decoration
+                  ?.hintText,
+              hint,
+            );
+          }
+          await tester.enterText(input, '');
           await tester.pumpAndSettle();
           expect(find.text('+1'), findsNothing);
           expect(find.text('+84'), findsNothing);
-          expect(controller.text, 'learner@example.com');
+        },
+      );
+
+      testWidgets(
+        'numeric email usernames remain intact while typing (signup=$signup)',
+        (tester) async {
+          final service = _SignupLookupAuthService();
+          final controller = await openIdentifierEntry(
+            tester,
+            signup: signup,
+            authService: service,
+          );
+          final input = find.byType(EditableText);
+          for (final email in [
+            '901234567@example.com',
+            '3475550123@example.com',
+            '123456789012345678901234567890@example.com',
+          ]) {
+            await tester.enterText(input, '');
+            await tester.pump();
+            var raw = '';
+            for (final character in email.split('')) {
+              raw += character;
+              tester.testTextInput.updateEditingValue(
+                TextEditingValue(
+                  text: raw,
+                  selection: TextSelection.collapsed(offset: raw.length),
+                ),
+              );
+              await tester.pump();
+              expect(controller.text, raw);
+              expect(controller.selection.extentOffset, raw.length);
+              expect(
+                find.byKey(const ValueKey('auth-identifier-error')),
+                findsNothing,
+              );
+            }
+            await tester.pumpAndSettle();
+            expect(find.text('+1'), findsNothing);
+            expect(find.text('+84'), findsNothing);
+            expect(
+              tester.widget<TextField>(find.byType(TextField)).keyboardType,
+              TextInputType.emailAddress,
+            );
+          }
+          expect(service.lookedUpNames, isEmpty);
+          if (signup) {
+            final expected = controller.text;
+            await tester.tap(find.byType(ElevatedButton));
+            await tester.pumpAndSettle();
+            expect(service.lookedUpNames, [expected]);
+          }
+        },
+      );
+
+      testWidgets(
+        'phone preview can change country without altering raw digits (signup=$signup)',
+        (tester) async {
+          final controller = await openIdentifierEntry(tester, signup: signup);
+          final input = find.byType(EditableText);
+          await tester.enterText(input, '347555012');
+          await tester.pumpAndSettle();
+          expect(find.text('+84'), findsOneWidget);
+          await tester.enterText(input, '3475550123');
+          await tester.pumpAndSettle();
+          expect(find.text('+1'), findsOneWidget);
+          expect(controller.text, '3475550123');
+
+          await tester.tap(find.text('+1'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('🇻🇳  VN +84'));
+          await tester.pumpAndSettle();
+          expect(controller.text, '3475550123');
+          expect(find.text('+84'), findsOneWidget);
+          await tester.tap(find.text('+84'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('🇺🇸  US +1'));
+          await tester.pumpAndSettle();
+          expect(controller.text, '3475550123');
+          expect(find.text('+1'), findsOneWidget);
+
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pumpAndSettle();
+          await openIdentifierEntry(tester, signup: signup);
+          await tester.enterText(find.byType(EditableText), '1');
+          await tester.pumpAndSettle();
+          expect(find.text('+1'), findsNothing);
           expect(
             tester
-                .widget<TextField>(find.byType(TextField))
-                .decoration
-                ?.hintText,
-            AppStrings.current(AppKeys.loginNameHint),
+                .widget<EditableText>(find.byType(EditableText))
+                .controller
+                .text,
+            '1',
           );
         },
       );
     }
 
-    for (final signup in [false, true]) {
-      testWidgets(
-        'country code stays outside the phone field (signup=$signup)',
-        (tester) async {
-          // Previously saved Vietnam must not stop a fresh entry recognizing 1.
-          FlutterSecureStorage.setMockInitialValues({
-            'phone_region': 'vn',
-            'app_language': 'vi-VN',
-          });
-          final authService = _SignupLookupAuthService();
-          await tester.pumpWidget(NumiApp(authService: authService));
-          final entryButton = find.text(signup ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP');
-          await tester.ensureVisible(entryButton);
-          await tester.tap(entryButton);
-          await tester.pumpAndSettle();
-
-          final input = find.byType(EditableText);
-          expect(
-            tester
-                .widget<TextField>(find.byType(TextField))
-                .decoration
-                ?.hintText,
-            AppStrings.current(AppKeys.loginNameHint),
-          );
-          await tester.enterText(input, '1');
-          await tester.pumpAndSettle();
-          final controller = tester.widget<EditableText>(input).controller;
-          expect(find.text('+1'), findsOneWidget);
-          expect(controller.text, isEmpty);
-          expect(
-            tester
-                .widget<TextField>(find.byType(TextField))
-                .decoration
-                ?.hintText,
-            '202 555 0101',
-          );
-          expect(
-            tester
-                .widget<ElevatedButton>(find.byType(ElevatedButton))
-                .onPressed,
-            isNull,
-          );
-
-          for (final digit in '2025550101'.split('')) {
-            final text = '${controller.text}$digit';
-            tester.testTextInput.updateEditingValue(
-              TextEditingValue(
-                text: text,
-                selection: TextSelection.collapsed(offset: text.length),
-              ),
-            );
-            await tester.pump();
-          }
-          expect(controller.text.replaceAll(' ', ''), '2025550101');
-          await tester.enterText(input, '');
-          await tester.pumpAndSettle();
-          expect(find.text('+1'), findsNothing);
-          expect(
-            tester
-                .widget<TextField>(find.byType(TextField))
-                .decoration
-                ?.hintText,
-            AppStrings.current(AppKeys.loginNameHint),
-          );
-
-          await tester.enterText(input, '+84 90 123 4567');
-          await tester.pumpAndSettle();
-          expect(find.text('+84'), findsOneWidget);
-          expect(controller.text.replaceAll(' ', ''), '901234567');
-
-          await tester.enterText(input, '+1 (202) 555-0101');
-          await tester.pumpAndSettle();
-          expect(find.text('+1'), findsOneWidget);
-          expect(controller.text.replaceAll(' ', ''), '2025550101');
-          if (signup) {
-            await tester.tap(find.byType(ElevatedButton));
-            await tester.pumpAndSettle();
-            expect(authService.lookedUpNames, ['+12025550101']);
-          }
-        },
-      );
+    for (final (raw, canonical) in [
+      ('+1 (202) 555-0101', '+12025550101'),
+      ('0901234567', '+84901234567'),
+    ]) {
+      testWidgets('signup normalizes $raw only when submitted', (tester) async {
+        final service = _SignupLookupAuthService();
+        final controller = await openIdentifierEntry(
+          tester,
+          signup: true,
+          authService: service,
+        );
+        await tester.enterText(find.byType(EditableText), raw);
+        await tester.pumpAndSettle();
+        expect(controller.text, raw);
+        expect(service.lookedUpNames, isEmpty);
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pumpAndSettle();
+        expect(service.lookedUpNames, [canonical]);
+      });
     }
 
     testWidgets('shows login failures below the input instead of a dialog', (

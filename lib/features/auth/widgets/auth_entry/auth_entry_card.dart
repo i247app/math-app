@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:numi/core/theme/app_colors.dart';
@@ -7,7 +6,6 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
-import 'package:numi/core/utils/auth/login_name_input_formatter.dart';
 import 'package:numi/core/utils/phone/phone_region.dart';
 import 'package:numi/features/auth/controllers/auth_state.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_action_button.dart';
@@ -30,7 +28,7 @@ class AuthEntryCard extends StatefulWidget {
     required this.onLoginWithPin,
     required this.onIdentifierChanged,
     this.identifierErrorText,
-    this.allowBareCountryInference = true,
+    this.onIdentifierBlurred,
   });
 
   final TextEditingController controller;
@@ -47,7 +45,7 @@ class AuthEntryCard extends StatefulWidget {
   final VoidCallback onLoginWithPin;
   final ValueChanged<String> onIdentifierChanged;
   final String? identifierErrorText;
-  final bool allowBareCountryInference;
+  final VoidCallback? onIdentifierBlurred;
 
   @override
   State<AuthEntryCard> createState() => _AuthEntryCardState();
@@ -58,17 +56,11 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   final _actionKey = GlobalKey();
   double _keyboardInset = 0;
   bool _revealScheduled = false;
-  late final LoginNameInputFormatter _inputFormatter;
 
   @override
   void initState() {
     super.initState();
-    _inputFormatter = LoginNameInputFormatter(
-      widget.region,
-      allowBareCountryInference: widget.allowBareCountryInference,
-      onRegionDetected: (region) => widget.onRegionChanged(region),
-    );
-    _inputFocus.addListener(_revealAction);
+    _inputFocus.addListener(_handleFocusChanged);
   }
 
   @override
@@ -84,13 +76,6 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   void didUpdateWidget(covariant AuthEntryCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _inputFormatter.region = widget.region;
-    _inputFormatter.allowBareCountryInference =
-        widget.allowBareCountryInference;
-    if (widget.mode != oldWidget.mode ||
-        widget.controller != oldWidget.controller) {
-      _inputFormatter.reset();
-    }
     if (widget.identifierErrorText != oldWidget.identifierErrorText) {
       _revealAction();
     }
@@ -98,8 +83,17 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
 
   @override
   void dispose() {
+    _inputFocus.removeListener(_handleFocusChanged);
     _inputFocus.dispose();
     super.dispose();
+  }
+
+  void _handleFocusChanged() {
+    if (_inputFocus.hasFocus) {
+      _revealAction();
+    } else {
+      widget.onIdentifierBlurred?.call();
+    }
   }
 
   void _revealAction() {
@@ -123,9 +117,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final isPhoneInput =
-        widget.showPhoneRegion ||
-        (_inputFormatter.hasCountryCodeOnly && widget.controller.text.isEmpty);
+    final isPhoneInput = widget.showPhoneRegion;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,10 +135,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
               if (isPhoneInput) ...[
                 PhoneRegionMenu(
                   region: widget.region,
-                  onChanged: (region) {
-                    _inputFormatter.reset();
-                    widget.onRegionChanged(region);
-                  },
+                  onChanged: widget.onRegionChanged,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -165,7 +154,6 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
                   enableIMEPersonalizedLearning: false,
                   smartDashesType: SmartDashesType.disabled,
                   smartQuotesType: SmartQuotesType.disabled,
-                  inputFormatters: <TextInputFormatter>[_inputFormatter],
                   onChanged: widget.onIdentifierChanged,
                   decoration: InputDecoration(
                     hintText: isPhoneInput

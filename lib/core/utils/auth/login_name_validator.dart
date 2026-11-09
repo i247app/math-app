@@ -15,16 +15,22 @@ class LoginNameValidationResult {
     required this.loginName,
     required this.kind,
     required this.errorKey,
+    this.phoneRegion,
+    this.phonePreviewRegion,
   });
 
   const LoginNameValidationResult.empty()
     : loginName = null,
       kind = null,
-      errorKey = null;
+      errorKey = null,
+      phoneRegion = null,
+      phonePreviewRegion = null;
 
   final String? loginName;
   final LoginNameKind? kind;
   final String? errorKey;
+  final PhoneRegion? phoneRegion;
+  final PhoneRegion? phonePreviewRegion;
 
   bool get isValid => loginName != null && errorKey == null;
 }
@@ -54,6 +60,7 @@ LoginNameValidationResult normalizeLoginNameInput(
   String rawValue, {
   bool phoneOnly = false,
   bool emailOnly = false,
+  bool inferPhoneRegion = false,
 }) {
   final value = rawValue.trim();
   final kind = detectLoginNameKind(
@@ -74,10 +81,27 @@ LoginNameValidationResult normalizeLoginNameInput(
     );
   }
 
-  final phone = normalizePhoneInput(region, value);
+  final detectedRegion = detectPhoneRegion(
+    value,
+    preferredRegion: inferPhoneRegion ? null : region,
+  );
+  final previewRegion = previewPhoneRegion(
+    value,
+    preferredRegion: inferPhoneRegion ? null : region,
+  );
+  var validationRegion = detectedRegion ?? previewRegion ?? region;
+  if (value.startsWith('+')) {
+    final compact = value.replaceAll(RegExp(r'[\s()-]'), '');
+    for (final candidate in PhoneRegion.values) {
+      if (compact.startsWith(candidate.code)) validationRegion = candidate;
+    }
+  }
+  final phone = normalizePhoneInput(validationRegion, value);
   return LoginNameValidationResult(
     loginName: phone.phone,
     kind: kind,
     errorKey: phone.errorKey,
+    phoneRegion: detectedRegion,
+    phonePreviewRegion: previewRegion,
   );
 }

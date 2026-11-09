@@ -48,8 +48,13 @@ class _AppFlowState extends State<AppFlow> {
   LoginNameValidationResult _normalizedLoginNameInput(
     PhoneRegion region,
     AuthEntryMode mode,
+    bool inferPhoneRegion,
   ) {
-    return normalizeLoginNameInput(region, loginNameController.text);
+    return normalizeLoginNameInput(
+      region,
+      loginNameController.text,
+      inferPhoneRegion: inferPhoneRegion,
+    );
   }
 
   @override
@@ -116,14 +121,28 @@ class _AppFlowState extends State<AppFlow> {
         _loginNameSubmitAttempted = true;
       });
     }
-    final normalized = _normalizedLoginNameInput(region, mode);
+    final normalized = _normalizedLoginNameInput(
+      region,
+      mode,
+      cubit.allowBareCountryInference,
+    );
     if (!normalized.isValid) {
       HapticFeedback.selectionClick();
       return;
     }
 
+    final phoneRegion = normalized.phoneRegion;
+    if (phoneRegion != null && phoneRegion != cubit.state.phoneRegion) {
+      cubit.selectPhoneRegion(phoneRegion, isManual: false);
+    }
+
     FocusScope.of(context).unfocus();
     cubit.submitAuthIdentifier(normalized.loginName!);
+  }
+
+  void validateLoginNameInput() {
+    if (!_loginNameHasInput || _loginNameSubmitAttempted) return;
+    setState(() => _loginNameSubmitAttempted = true);
   }
 
   @override
@@ -352,6 +371,7 @@ class _AppFlowState extends State<AppFlow> {
                       normalizedLoginNameInput: _normalizedLoginNameInput,
                       handleLoginNameInputChanged: handleLoginNameInputChanged,
                       submitAuthIdentifier: submitAuthIdentifier,
+                      validateLoginNameInput: validateLoginNameInput,
                     ),
                   ),
                 ),
