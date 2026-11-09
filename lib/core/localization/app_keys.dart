@@ -47,6 +47,7 @@ class AppKeys {
   static const phoneRequired = 'phone_required';
   static const invalidPhone = 'invalid_phone';
   static const invalidEmail = 'invalid_email';
+  static const emailMustStartWithLetter = 'email_must_start_with_letter';
   static const phoneTooShort = 'phone_too_short';
   static const restoringSession = 'restoring_session';
   static const signup = 'signup';

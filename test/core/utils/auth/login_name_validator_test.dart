@@ -61,8 +61,44 @@ void main() {
       );
       expect(invalid.kind, LoginNameKind.email);
       expect(invalid.isValid, isFalse);
-      expect(invalid.errorKey, AppKeys.invalidEmail);
+      expect(invalid.errorKey, AppKeys.emailMustStartWithLetter);
     });
+
+    for (final email in [
+      'a@example.com',
+      'A123@example.com',
+      'a23432432@gmail.com',
+      'a1231231232@hotmail.com',
+      'user.name+tag@outlook.com',
+    ]) {
+      test('accepts a letter at the start of $email', () {
+        expect(isValidEmailInput(email), isTrue);
+        expect(normalizeLoginNameInput(PhoneRegion.vn, email).loginName, email);
+      });
+    }
+
+    for (final email in [
+      '23432432@gmail.com',
+      '1231231232@hotmail.com',
+      '12345678@outlook.com',
+      '1a@example.com',
+      '_name@example.com',
+      '.name@example.com',
+      '+name@example.com',
+    ]) {
+      test('rejects $email because the first character is not a letter', () {
+        expect(isValidEmailInput(email), isFalse);
+        final result = normalizeLoginNameInput(
+          PhoneRegion.vn,
+          email,
+          inferPhoneRegion: true,
+        );
+        expect(result.kind, LoginNameKind.email);
+        expect(result.loginName, isNull);
+        expect(result.phonePreviewRegion, isNull);
+        expect(result.errorKey, AppKeys.emailMustStartWithLetter);
+      });
+    }
   });
 
   group('complete phone candidates', () {
@@ -234,7 +270,7 @@ void main() {
       }
     });
 
-    test('every intermediate prefix remains intact when a numeric username becomes email', () {
+    test('numeric usernames are detected as email but rejected by the app first-letter rule', () {
       for (final email in [
         '123456789012345678901234567890@example.com',
         '901234567@example.com',
@@ -254,10 +290,11 @@ void main() {
           email,
           inferPhoneRegion: true,
         );
-        expect(result.isValid, isTrue);
+        expect(result.isValid, isFalse);
         expect(result.kind, LoginNameKind.email);
         expect(result.phoneRegion, isNull);
-        expect(result.loginName, email);
+        expect(result.loginName, isNull);
+        expect(result.errorKey, AppKeys.emailMustStartWithLetter);
       }
     });
   });

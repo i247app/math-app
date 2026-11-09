@@ -27,7 +27,7 @@ extension AuthFlowSignup on AuthFlowCubit {
         state.copyWith(
           authError: AppStrings.current(
             kind == LoginNameKind.email
-                ? AppKeys.invalidEmail
+                ? emailInputErrorKey(identifier) ?? AppKeys.invalidEmail
                 : AppKeys.signupFailed,
           ),
         ),

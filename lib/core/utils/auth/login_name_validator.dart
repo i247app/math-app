@@ -5,9 +5,20 @@ import 'package:numi/core/utils/phone/phone_region.dart';
 enum LoginNameKind { phone, email }
 
 final RegExp _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+final RegExp _emailInitialLetter = RegExp(r'^[A-Za-z]');
 
 bool isValidEmailInput(String rawValue) {
-  return _emailPattern.hasMatch(rawValue.trim());
+  return emailInputErrorKey(rawValue) == null;
+}
+
+/// App policy: email addresses must begin with an ASCII letter. This is a
+/// product constraint, not a restriction shared by all email providers.
+String? emailInputErrorKey(String rawValue) {
+  final value = rawValue.trim();
+  if (value.isNotEmpty && !_emailInitialLetter.hasMatch(value)) {
+    return AppKeys.emailMustStartWithLetter;
+  }
+  return _emailPattern.hasMatch(value) ? null : AppKeys.invalidEmail;
 }
 
 class LoginNameValidationResult {
@@ -73,11 +84,11 @@ LoginNameValidationResult normalizeLoginNameInput(
   }
 
   if (kind == LoginNameKind.email) {
-    final isValidEmail = isValidEmailInput(value);
+    final errorKey = emailInputErrorKey(value);
     return LoginNameValidationResult(
-      loginName: isValidEmail ? value : null,
+      loginName: errorKey == null ? value : null,
       kind: kind,
-      errorKey: isValidEmail ? null : AppKeys.invalidEmail,
+      errorKey: errorKey,
     );
   }
 

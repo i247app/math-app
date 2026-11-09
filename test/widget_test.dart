@@ -1234,7 +1234,7 @@ void main() {
       );
 
       testWidgets(
-        'numeric email usernames remain intact while typing (signup=$signup)',
+        'numeric email input is preserved but requires a letter first on validation (signup=$signup)',
         (tester) async {
           final service = _SignupLookupAuthService();
           final controller = await openIdentifierEntry(
@@ -1276,6 +1276,26 @@ void main() {
             );
           }
           expect(service.lookedUpNames, isEmpty);
+          final original = controller.text;
+          FocusManager.instance.primaryFocus?.unfocus();
+          await tester.pumpAndSettle();
+          expect(
+            find.text(AppStrings.current(AppKeys.emailMustStartWithLetter)),
+            findsOneWidget,
+          );
+          expect(controller.text, original);
+          await tester.tap(find.byType(ElevatedButton));
+          await tester.pumpAndSettle();
+          expect(service.lookedUpNames, isEmpty);
+
+          final corrected = 'a$original';
+          await tester.enterText(input, corrected);
+          await tester.pumpAndSettle();
+          expect(controller.text, corrected);
+          expect(
+            find.byKey(const ValueKey('auth-identifier-error')),
+            findsNothing,
+          );
           if (signup) {
             final expected = controller.text;
             await tester.tap(find.byType(ElevatedButton));

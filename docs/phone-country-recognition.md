@@ -31,7 +31,11 @@ not a different country. It could also reflect an explicit manual US selection.
 ## Application policy
 
 1. Preserve the original input while typing. Email takes priority when `@`
-   appears; numeric usernames are never truncated or reformatted.
+   appears; numeric usernames are never truncated or reformatted. The app's
+   email policy requires the first character to be an ASCII letter (`a-z` or
+   `A-Z`). A numeric-leading email stays intact but is rejected on blur/submit
+   with a specific first-letter error. Digits after the initial letter are valid.
+   This is an app policy, not a universal email syntax or provider rule.
 2. Recognize existing supported phone ranges first. Otherwise, any complete
    nine-digit national input starting with 1–9 defaults to a Vietnam country
    hint when no different country was explicitly chosen. This is a product
