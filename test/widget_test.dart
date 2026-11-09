@@ -1269,12 +1269,19 @@ void main() {
           expect(find.text('+84'), findsOneWidget);
           expect(controller.text, '1');
 
-          // An explicit international prefix can override the current choice.
+          // An explicit international prefix also updates the empty-field hint.
           for (final code in ['+1', '+84']) {
             await tester.enterText(input, code);
             await tester.pumpAndSettle();
             expect(find.text(code), findsOneWidget);
             expect(controller.text, isEmpty);
+            expect(
+              tester
+                  .widget<TextField>(find.byType(TextField))
+                  .decoration
+                  ?.hintText,
+              code == '+1' ? '202 555 0101' : '090 123 4567',
+            );
           }
 
           await tester.enterText(input, 'learner@example.com');
@@ -1282,6 +1289,13 @@ void main() {
           expect(find.text('+1'), findsNothing);
           expect(find.text('+84'), findsNothing);
           expect(controller.text, 'learner@example.com');
+          expect(
+            tester
+                .widget<TextField>(find.byType(TextField))
+                .decoration
+                ?.hintText,
+            AppStrings.current(AppKeys.loginNameHint),
+          );
         },
       );
     }
@@ -1303,11 +1317,25 @@ void main() {
           await tester.pumpAndSettle();
 
           final input = find.byType(EditableText);
+          expect(
+            tester
+                .widget<TextField>(find.byType(TextField))
+                .decoration
+                ?.hintText,
+            AppStrings.current(AppKeys.loginNameHint),
+          );
           await tester.enterText(input, '1');
           await tester.pumpAndSettle();
           final controller = tester.widget<EditableText>(input).controller;
           expect(find.text('+1'), findsOneWidget);
           expect(controller.text, isEmpty);
+          expect(
+            tester
+                .widget<TextField>(find.byType(TextField))
+                .decoration
+                ?.hintText,
+            '202 555 0101',
+          );
           expect(
             tester
                 .widget<ElevatedButton>(find.byType(ElevatedButton))
@@ -1329,6 +1357,13 @@ void main() {
           await tester.enterText(input, '');
           await tester.pumpAndSettle();
           expect(find.text('+1'), findsNothing);
+          expect(
+            tester
+                .widget<TextField>(find.byType(TextField))
+                .decoration
+                ?.hintText,
+            AppStrings.current(AppKeys.loginNameHint),
+          );
 
           await tester.enterText(input, '+84 90 123 4567');
           await tester.pumpAndSettle();

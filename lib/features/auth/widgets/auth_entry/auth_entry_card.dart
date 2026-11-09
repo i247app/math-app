@@ -123,6 +123,9 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final isPhoneInput =
+        widget.showPhoneRegion ||
+        (_inputFormatter.hasCountryCodeOnly && widget.controller.text.isEmpty);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -137,9 +140,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
           ),
           child: Row(
             children: [
-              if (widget.showPhoneRegion ||
-                  (_inputFormatter.hasCountryCodeOnly &&
-                      widget.controller.text.isEmpty)) ...[
+              if (isPhoneInput) ...[
                 PhoneRegionMenu(
                   region: widget.region,
                   onChanged: (region) {
@@ -167,7 +168,9 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
                   inputFormatters: <TextInputFormatter>[_inputFormatter],
                   onChanged: widget.onIdentifierChanged,
                   decoration: InputDecoration(
-                    hintText: context.getText(AppKeys.loginNameHint),
+                    hintText: isPhoneInput
+                        ? widget.region.hint
+                        : context.getText(AppKeys.loginNameHint),
                     hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: colors.inputHint,
                       fontWeight: FontWeight.w500,
