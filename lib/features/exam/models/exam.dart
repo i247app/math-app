@@ -350,8 +350,10 @@ class ExamQuestion {
   bool get isNumericInput => questionKind == 'NUMERIC_INPUT';
   bool get isTrueFalse => questionKind == 'TRUE_FALSE';
 
-  bool get isFraction =>
-      questionTags.any((tag) => tag.trim().toLowerCase() == 'fraction');
+  bool get isFraction => questionTags.any((tag) {
+    final normalized = tag.trim().toLowerCase();
+    return normalized == 'fraction' || normalized == 'fraction-decimal';
+  });
 
   ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
     questionText: questionText,

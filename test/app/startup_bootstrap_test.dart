@@ -123,6 +123,25 @@ void main() {
     expect(await storage.read(key: GuestAccountStore.guestUserKey), isNull);
   });
 
+  test('reopening reloads the selected profile name from the server', () async {
+    for (final name in ['Old profile name', 'Updated profile name']) {
+      // Keep secure storage across launches, including the active profile ID.
+      // Each launch gets a fresh API response for the same account/profile.
+      final services = AppServices(
+        authService: _FakeAuthService(const LoginUser(id: 7)),
+        profileService: _FakeProfileService([
+          UserProfile(profileId: 71, userId: 7, name: name, isDefault: true),
+        ]),
+        passcodeService: _FakePasscodeService(),
+      );
+      final result = await StartupBootstrap(services: services).run();
+      expect(result.initialSession?.activeProfile?.profileId, 71);
+      expect(result.initialSession?.activeProfile?.name, name);
+      result.lingoProvider.dispose();
+      result.themeController.dispose();
+    }
+  });
+
   test('returns no initial session when no login can be restored', () async {
     final authService = _FakeAuthService(null);
     final profileService = _FakeProfileService(const <UserProfile>[]);

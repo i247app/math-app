@@ -70,6 +70,9 @@ void main() {
       for (final (tags, expected) in <(List<String>, bool)>[
         (['measurement', 'fraction'], true),
         ([' FRACTION '], true),
+        (['measurement', 'fraction-decimal'], true),
+        ([' FRACTION-DECIMAL '], true),
+        (['fraction-decimal-extra'], false),
         (['length', 'measurement'], false),
         (['fractional', 'unit_fraction'], false),
         ([], false),
