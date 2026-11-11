@@ -372,6 +372,11 @@ void main() {
         find.byType(AssessmentProgressionChart),
       );
       expect(chart.chartHeight, 150);
+      expect(chart.showDataPoints, hasAssessment);
+      expect(
+        find.byKey(const ValueKey('placement-progression-plot')),
+        paintsExactlyCountTimes(#drawCircle, hasAssessment ? 2 : 0),
+      );
       expect(find.text('Lớp'), findsOneWidget);
       expect(find.text('Trend'), findsOneWidget);
       expect(find.text('LỚP'), findsOneWidget);

@@ -19,6 +19,7 @@ class AssessmentProgressionChart extends StatefulWidget {
   const AssessmentProgressionChart({
     super.key,
     required this.finalGrade,
+    this.showDataPoints = true,
     this.previousGrades = const <int>[],
     this.testNumbers,
     this.firstTestNumber = 1,
@@ -32,6 +33,7 @@ class AssessmentProgressionChart extends StatefulWidget {
   }) : assert(maxVisiblePoints > 0);
 
   final int finalGrade;
+  final bool showDataPoints;
   final List<int> previousGrades;
   final List<int>? testNumbers;
   final int firstTestNumber;
@@ -79,6 +81,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
       return;
     }
     if (!oldWidget.animate ||
+        oldWidget.showDataPoints != widget.showDataPoints ||
         oldWidget.finalGrade != widget.finalGrade ||
         !listEquals(oldWidget.previousGrades, widget.previousGrades) ||
         !listEquals(oldWidget.testNumbers, widget.testNumbers) ||
@@ -95,6 +98,7 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
   }
 
   List<double> _resolvePoints(int visibleCount) {
+    if (!widget.showDataPoints) return const [];
     final historyLimit = visibleCount - 1;
     final history = widget.previousGrades.length > historyLimit
         ? widget.previousGrades.sublist(

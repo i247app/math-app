@@ -469,6 +469,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                       order: 1,
                       child: AssessmentProgressionChart(
                         key: const ValueKey('parent-home-progress-chart'),
+                        showDataPoints: _chart.hasProgress,
                         finalGrade: _chart.finalGrade,
                         gradeTitle: context.getText(AppKeys.homeChartLevel),
                         activityTitle: context.getText(
