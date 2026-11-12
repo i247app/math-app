@@ -284,6 +284,10 @@ void main() {
 
     for (final grades in <(int?, int?, bool)>[
       (2, 0, true),
+      (2, 1, true),
+      (1, null, true),
+      (0, 1, true),
+      (1, 2, false),
       (0, 2, false),
       (0, null, true),
       (2, null, false),
@@ -349,7 +353,7 @@ void main() {
             ExamQuestion(
               questionText: questions.last.questionText,
               questionNumber: 2,
-              questionGrade: 1,
+              questionGrade: 2,
               options: questions.last.options,
             ),
           ],

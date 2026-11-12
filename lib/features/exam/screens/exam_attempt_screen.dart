@@ -108,7 +108,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       !_controller.isSubmittingExam &&
       !_isCompletingAssessment &&
       _controller.errorMessage == null &&
-      _questionGrade == 0 &&
+      (_questionGrade == 0 || _questionGrade == 1) &&
       questionSpeechText(_controller.currentQuestion?.questionText ?? '') !=
           null;
   final GuardedExitController<ExamAttemptResult> _exitController =
