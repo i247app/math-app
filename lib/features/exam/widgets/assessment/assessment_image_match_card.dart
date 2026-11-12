@@ -7,8 +7,6 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/data/exam_image_cache.dart';
 
-import 'assessment_question_speaker.dart';
-
 /// A single-choice question presented as a number-to-picture connection.
 class AssessmentImageMatchCard extends StatelessWidget {
   const AssessmentImageMatchCard({
@@ -17,16 +15,12 @@ class AssessmentImageMatchCard extends StatelessWidget {
     required this.selectedOptionIds,
     required this.onSelected,
     this.feedbackCorrect,
-    this.grade,
-    this.onReadQuestion,
   });
 
   final ExamQuestion question;
   final Set<String> selectedOptionIds;
   final ValueChanged<ExamAnswer> onSelected;
   final bool? feedbackCorrect;
-  final int? grade;
-  final VoidCallback? onReadQuestion;
 
   static bool supports(ExamQuestion question) =>
       question.questionKind == 'SINGLE_CHOICE' &&
@@ -63,26 +57,6 @@ class AssessmentImageMatchCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              if (grade == 0) ...[
-                AssessmentQuestionSpeaker(onPressed: onReadQuestion),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Text(
-                  context.getText(AppKeys.examMatchNumberToImage),
-                  style: TextStyle(
-                    color: colors.brand,
-                    fontSize: FontSize.large,
-                    fontWeight: FontWeight.w800,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
           LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;

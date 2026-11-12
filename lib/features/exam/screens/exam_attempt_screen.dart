@@ -863,17 +863,11 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                             )) ...[
                                           AssessmentImageMatchCard(
                                             question: currentQuestion,
-                                            grade: _questionGrade,
                                             selectedOptionIds:
                                                 _controller.selectedOptionIds,
                                             feedbackCorrect: _controller
                                                 .selectedAnswerFeedbackCorrect,
                                             onSelected: selectAnswer,
-                                            onReadQuestion: _canReadQuestion
-                                                ? () => _readQuestion(
-                                                    manual: true,
-                                                  )
-                                                : null,
                                           ),
                                           const SizedBox(height: 24),
                                         ] else if (setTransitionKind ==

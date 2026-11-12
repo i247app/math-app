@@ -104,7 +104,7 @@ void main() {
   ) async {
     await _pumpAssessment(
       tester,
-      initialGrade: 1,
+      initialGrade: 0,
       examType: examTypeAssessment,
       questions: const [
         ExamQuestion(
@@ -127,6 +127,8 @@ void main() {
     );
     final card = find.byType(AssessmentImageMatchCard);
     expect(card, findsOneWidget);
+    expect(find.text('Nối số với nhóm hình tương ứng'), findsNothing);
+    expect(find.text('10'), findsOneWidget);
     expect(find.byType(AssessmentAnswerGrid), findsNothing);
     expect(find.byKey(const ValueKey('read-question')), findsNothing);
     final continueButton = find.widgetWithText(
