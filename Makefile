@@ -52,6 +52,7 @@ project: $(PROJECT_DEPENDENCIES)
 pods:
 ifeq ($(HOST_OS),macos)
 	cd ios && pod install
+	flutter build ios --config-only
 else
 	@echo "Skipping CocoaPods: pod install is only required on macOS."
 endif
@@ -78,13 +79,13 @@ ifeq ($(HOST_OS),windows)
 	@echo "Cleaning iOS artifacts..."
 	powershell.exe -NoProfile -Command "@('ios/Pods', 'ios/.symlinks', 'ios/Flutter/Flutter.framework') | Where-Object { Test-Path -LiteralPath $$_ } | ForEach-Object { Remove-Item -LiteralPath $$_ -Recurse -Force }"
 else
-	find . -name "*.g.dart" -type f -print0 | xargs -0 rm -fv
+	find . -name "*.g.dart" -type f -print0 | xargs -0 /bin/rm -fv
 	@echo "Cleaning .dart_tool..."
-	rm -rf .dart_tool/
+	/bin/rm -rf .dart_tool/
 	@echo "Cleaning lock files..."
-	rm -fv pubspec.lock ios/Podfile.lock macos/Podfile.lock
+	/bin/rm -fv pubspec.lock ios/Podfile.lock macos/Podfile.lock
 	@echo "Cleaning iOS artifacts..."
-	rm -rf ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
+	/bin/rm -rf ios/Pods ios/.symlinks ios/Flutter/Flutter.framework
 endif
 	@echo "Cleaning completed successfully."
 
