@@ -448,7 +448,7 @@ void main() {
     }
 
     testWidgets(
-      'emoji question keeps its speaker disabled without starting narration',
+      'emoji question hides its speaker without starting narration',
       (tester) async {
         await _pumpAssessment(
           tester,
@@ -462,11 +462,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         final speaker = find.byKey(const ValueKey('read-question'));
-        expect(tester.widget<IconButton>(speaker).onPressed, isNull);
-        expect(calls.where((c) => c.method == 'speak'), isEmpty);
-        calls.clear();
-        await tester.tap(speaker);
-        await tester.pumpAndSettle();
+        expect(speaker, findsNothing);
         expect(calls.where((c) => c.method == 'speak'), isEmpty);
         expect(tester.takeException(), isNull);
       },

@@ -40,7 +40,7 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final showSpeaker = grade == 0 || grade == 1;
+    final showSpeaker = (grade == 0 || grade == 1) && onReadQuestion != null;
     final displayQuestion = normalizeAssessmentText(question);
     final questionImageUrl = imageUrl?.trim();
     if (questionImageUrl != null && questionImageUrl.isNotEmpty) {
