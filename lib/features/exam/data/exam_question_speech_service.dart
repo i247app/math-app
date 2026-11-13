@@ -3,8 +3,29 @@ import 'package:flutter_tts/flutter_tts.dart';
 enum QuestionSpeechResult { started, unavailable, cancelled }
 
 /// Uses the API's wording without inferring objects, answers or missing numbers.
-String? questionSpeechText(String text) {
+String? questionSpeechText(String text, {String language = 'vi-VN'}) {
   final normalized = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+  // Only translate complete arithmetic expressions, never infer an answer.
+  const number = r'[-−]?\s*\d+(?:[.,]\d+)?';
+  if (RegExp('^$number(?:\\s*[+−×xX*÷:/-]\\s*$number)+(?:\\s*=\\s*\\??)?\$')
+      .hasMatch(normalized)) {
+    final english = language.toLowerCase().startsWith('en');
+    final words = <String, String>{
+      '+': english ? 'plus' : 'cộng',
+      '-': english ? 'minus' : 'trừ',
+      '−': english ? 'minus' : 'trừ',
+      for (final symbol in ['×', 'x', 'X', '*'])
+        symbol: english ? 'times' : 'nhân',
+      for (final symbol in ['÷', ':', '/'])
+        symbol: english ? 'divided by' : 'chia',
+      '=': english ? 'equals' : 'bằng',
+      '?': english ? 'what' : 'bao nhiêu',
+    };
+    return normalized
+        .replaceAllMapped(RegExp(r'[+−×xX*÷:/=?-]'), (m) => ' ${words[m[0]]} ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
   if (!RegExp(r'\p{L}{2,}', unicode: true).hasMatch(normalized) ||
       RegExp(
         <String>[
@@ -36,7 +57,7 @@ class ExamQuestionSpeechService {
   Future<QuestionSpeechResult> read(String text, {required String language}) {
     if (_disposed) return Future.value(QuestionSpeechResult.cancelled);
     final revision = ++_revision;
-    final spokenText = questionSpeechText(text);
+    final spokenText = questionSpeechText(text, language: language);
     final result = _pending.then((_) async {
       bool isCurrent() => !_disposed && revision == _revision;
       if (!isCurrent()) return QuestionSpeechResult.cancelled;

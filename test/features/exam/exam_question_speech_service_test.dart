@@ -30,7 +30,7 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('keeps natural wording and blocks emoji, LaTeX and math-only text', () {
+  test('keeps natural wording and blocks emoji, LaTeX and incomplete text', () {
     expect(
       questionSpeechText('  Con hãy\nđếm số quả táo.  '),
       'Con hãy đếm số quả táo.',
@@ -39,7 +39,6 @@ void main() {
       '',
       '🍎🍎',
       '4 ? 6',
-      '2 + 3 = ?',
       r'Tính $\frac{1}{2}$',
       'Con đếm 🍎 nhé',
       '1️⃣2️⃣',
@@ -47,6 +46,22 @@ void main() {
       expect(questionSpeechText(text), isNull, reason: text);
     }
     expect(questionSpeechText(' \n '), isNull);
+  });
+
+  test('reads arithmetic symbols in the requested language', () async {
+    expect(questionSpeechText('9 + 5'), '9 cộng 5');
+    expect(questionSpeechText('2 + 3 = ?'), '2 cộng 3 bằng bao nhiêu');
+    expect(questionSpeechText('8 × 2 - 4 ÷ 2'), '8 nhân 2 trừ 4 chia 2');
+    expect(questionSpeechText('9 +'), isNull);
+    expect(questionSpeechText('10'), isNull);
+    await speech.read('9 + 5', language: 'en-US');
+    expect(calls.last.arguments, '9 plus 5');
+    expect(
+      calls.firstWhere((c) => c.method == 'setLanguage').arguments,
+      'en-US',
+    );
+    await speech.read('9 + 5', language: 'vi-VN');
+    expect(calls.last.arguments, '9 cộng 5');
   });
 
   test(

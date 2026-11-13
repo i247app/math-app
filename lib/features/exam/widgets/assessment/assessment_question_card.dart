@@ -36,6 +36,7 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
+    final showSpeaker = grade == 0 || grade == 1;
     final displayQuestion = normalizeAssessmentText(question);
     final questionImageUrl = imageUrl?.trim();
     if (questionImageUrl != null && questionImageUrl.isNotEmpty) {
@@ -43,7 +44,7 @@ class AssessmentQuestionCard extends StatelessWidget {
         question: displayQuestion,
         imageUrl: questionImageUrl,
         renderLatex: renderLatex,
-        showSpeaker: grade == 0,
+        showSpeaker: showSpeaker,
         onReadQuestion: onReadQuestion,
       );
     }
@@ -83,8 +84,8 @@ class AssessmentQuestionCard extends StatelessWidget {
           isPictorialQuestion: isPictorialQuestion,
         ),
       ),
-      alignment: grade == 0 ? Alignment.topCenter : Alignment.center,
-      padding: grade == 0
+      alignment: showSpeaker ? Alignment.topCenter : Alignment.center,
+      padding: showSpeaker
           ? const EdgeInsets.all(16)
           : EdgeInsets.symmetric(
               horizontal: 24,
@@ -96,7 +97,7 @@ class AssessmentQuestionCard extends StatelessWidget {
         border: Border.all(color: colors.border),
         boxShadow: AppShadows.card(colors),
       ),
-      child: grade == 0
+      child: showSpeaker
           ? Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
