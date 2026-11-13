@@ -2,26 +2,18 @@ import Flutter
 import UIKit
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
   private var pendingAvatarResult: FlutterResult?
 
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-    configureAvatarPickerChannel()
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    configureAvatarPickerChannel(messenger: engineBridge.applicationRegistrar.messenger())
   }
 
-  private func configureAvatarPickerChannel() {
-    guard let controller = window?.rootViewController as? FlutterViewController else {
-      return
-    }
-
+  private func configureAvatarPickerChannel(messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(
       name: "numi/avatar_picker",
-      binaryMessenger: controller.binaryMessenger
+      binaryMessenger: messenger
     )
     channel.setMethodCallHandler { [weak self] call, result in
       guard call.method == "pickAvatar" else {
@@ -56,11 +48,29 @@ import UIKit
       return
     }
 
+    guard let scene = UIApplication.shared.connectedScenes
+      .compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive }),
+      var presenter = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+      result(
+        FlutterError(
+          code: "picker_unavailable",
+          message: "No active window is available to present the photo library.",
+          details: nil
+        )
+      )
+      return
+    }
+
+    while let presented = presenter.presentedViewController {
+      presenter = presented
+    }
+
     pendingAvatarResult = result
     let picker = UIImagePickerController()
     picker.sourceType = .photoLibrary
     picker.delegate = self
-    window?.rootViewController?.present(picker, animated: true)
+    presenter.present(picker, animated: true)
   }
 
   func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
