@@ -17,6 +17,8 @@ class AssessmentAnswerButton extends StatelessWidget {
     this.compact = false,
     this.renderLatex = false,
     this.displayLabel,
+    this.dense = false,
+    this.denseHeight = 52,
   });
 
   final ExamAnswer answer;
@@ -26,6 +28,8 @@ class AssessmentAnswerButton extends StatelessWidget {
   final bool? feedbackCorrect;
   final bool compact;
   final bool renderLatex;
+  final bool dense;
+  final double denseHeight;
 
   static const double _borderRadius = 20;
 
@@ -56,7 +60,9 @@ class AssessmentAnswerButton extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
-          constraints: BoxConstraints(minHeight: isNumeric ? 90 : 76),
+          constraints: BoxConstraints(
+            minHeight: dense ? denseHeight : (isNumeric ? 90 : 76),
+          ),
           decoration: BoxDecoration(
             color: feedbackCorrect == true
                 ? colors.successSurface

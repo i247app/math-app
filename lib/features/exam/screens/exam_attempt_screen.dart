@@ -762,6 +762,54 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
           final isBusy =
               isGeneratingQuestion || isTransitioningSet || isSubmittingExam;
           final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+          final viewportHeight =
+              MediaQuery.sizeOf(context).height -
+              MediaQuery.paddingOf(context).top;
+          final compactAssessment =
+              _controller.isAssessment && viewportHeight - bottomInset < 800;
+          final questionGap = compactAssessment ? 16.0 : 32.0;
+          final progressHeight =
+              widget.showQuestionNavigation && !_controller.isGrade
+              ? 100.0
+              : 20.0;
+          // Reserve space for four answer rows regardless of the current answer type.
+          final answerHeightBudget = compactAssessment
+              ? 4 * AssessmentAnswerGrid.denseRowMinHeight +
+                    3 * AssessmentAnswerGrid.denseRowSpacing
+              : 4 * 76.0 + 3 * 8.0;
+          final questionMinimumHeight = _controller.isAssessment
+              ? (viewportHeight -
+                        bottomInset -
+                        AssessmentHeader.height -
+                        progressHeight -
+                        16 -
+                        questionGap -
+                        8 -
+                        AssessmentBottomBar.contentHeight -
+                        answerHeightBudget)
+                    .clamp(152.0, 220.0)
+                    .toDouble()
+              : null;
+          final denseAnswerRowHeight = compactAssessment
+              ? ((viewportHeight -
+                            bottomInset -
+                            AssessmentHeader.height -
+                            progressHeight -
+                            16 -
+                            questionMinimumHeight! -
+                            questionGap -
+                            8 -
+                            AssessmentBottomBar.contentHeight -
+                            3 * AssessmentAnswerGrid.denseRowSpacing -
+                            16) /
+                        4)
+                    .clamp(
+                      AssessmentAnswerGrid.denseRowMinHeight,
+                      AssessmentAnswerGrid.denseRowMaxHeight,
+                    )
+                    .toDouble()
+              : AssessmentAnswerGrid.denseRowMinHeight;
+
           final screen = Scaffold(
             backgroundColor: colors.surface,
             body: SafeArea(
@@ -875,6 +923,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                           AssessmentQuestionCard(
                                             question:
                                                 currentQuestion!.questionText,
+                                            minimumHeight:
+                                                questionMinimumHeight,
+                                            compact: compactAssessment,
                                             renderLatex:
                                                 currentQuestion.isFraction,
                                             imageUrl: currentQuestion
@@ -886,7 +937,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                                   )
                                                 : null,
                                           ),
-                                          const SizedBox(height: 32),
+                                          SizedBox(height: questionGap),
                                           if (currentQuestion.isNumericInput)
                                             ExamNumericInput(
                                               key: ValueKey(
@@ -910,6 +961,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                                 ),
                                               ),
                                             AssessmentAnswerGrid(
+                                              dense: compactAssessment,
+                                              denseRowHeight:
+                                                  denseAnswerRowHeight,
                                               options: currentQuestion.options,
                                               selectedOptionIds:
                                                   _controller.selectedOptionIds,

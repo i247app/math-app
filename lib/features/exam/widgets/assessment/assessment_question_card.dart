@@ -13,6 +13,8 @@ class AssessmentQuestionCard extends StatelessWidget {
   const AssessmentQuestionCard({
     super.key,
     required this.question,
+    this.minimumHeight,
+    this.compact = false,
     this.renderLatex = false,
     this.imageUrl,
     this.grade,
@@ -23,6 +25,8 @@ class AssessmentQuestionCard extends StatelessWidget {
   final String? imageUrl;
   final int? grade;
   final VoidCallback? onReadQuestion;
+  final double? minimumHeight;
+  final bool compact;
 
   static final RegExp _pictorialSymbolPattern = RegExp(
     <String>[
@@ -78,18 +82,20 @@ class AssessmentQuestionCard extends StatelessWidget {
 
     return Container(
       constraints: BoxConstraints(
-        minHeight: _minimumHeightFor(
-          displayQuestion,
-          isMathQuestion: mathQuestion != null,
-          isPictorialQuestion: isPictorialQuestion,
-        ),
+        minHeight:
+            minimumHeight ??
+            _minimumHeightFor(
+              displayQuestion,
+              isMathQuestion: mathQuestion != null,
+              isPictorialQuestion: isPictorialQuestion,
+            ),
       ),
       alignment: showSpeaker ? Alignment.topCenter : Alignment.center,
       padding: showSpeaker
           ? const EdgeInsets.all(16)
           : EdgeInsets.symmetric(
               horizontal: 24,
-              vertical: isPictorialQuestion ? 40 : 28,
+              vertical: compact ? 20 : (isPictorialQuestion ? 40 : 28),
             ),
       decoration: BoxDecoration(
         color: colors.elevatedSurface,
@@ -106,9 +112,9 @@ class AssessmentQuestionCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: AssessmentQuestionSpeaker(onPressed: onReadQuestion),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: compact ? 8 : 12),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: compact ? 0 : 16),
                   child: questionContent,
                 ),
               ],
@@ -194,7 +200,9 @@ class AssessmentQuestionCard extends StatelessWidget {
         textWidthBasis: TextWidthBasis.parent,
         style: TextStyle(
           color: colors.textPrimary,
-          fontSize: _fontSizeFor(displayQuestion),
+          fontSize: compact
+              ? _fontSizeFor(displayQuestion).clamp(0, FontSize.displayMedium)
+              : _fontSizeFor(displayQuestion),
           fontWeight: FontWeight.w600,
           height: 1.2,
           letterSpacing: 0,

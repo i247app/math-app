@@ -44,7 +44,7 @@ class AssessmentBottomBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(14, 12, 14, 24 + bottomInset),
       color: colors.surface,
       child: Row(
-        spacing: 48,
+        spacing: MediaQuery.sizeOf(context).width < 380 ? 16 : 48,
         children: [
           Expanded(
             child: AssessmentBottomActionButton(

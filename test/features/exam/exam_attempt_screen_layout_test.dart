@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -26,6 +27,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_set_transition_loader.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
 import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 
 class _UnusedExamService implements ExamService {
@@ -34,6 +36,229 @@ class _UnusedExamService implements ExamService {
 }
 
 void main() {
+  testWidgets('short assessments fit a 360 by 640 screen', (tester) async {
+    const answers = <ExamAnswer>[
+      ExamAnswer(id: 'A', text: '2'),
+      ExamAnswer(id: 'B', text: '3'),
+      ExamAnswer(id: 'C', text: '4'),
+      ExamAnswer(id: 'D', text: '5'),
+    ];
+    final questions = <ExamQuestion>[
+      const ExamQuestion(
+        questionText: '🍎 🍎 🍎 = ?',
+        questionNumber: 1,
+        options: answers,
+      ),
+      const ExamQuestion(
+        questionText: '4 = ?',
+        questionNumber: 1,
+        options: <ExamAnswer>[
+          ExamAnswer(id: 'A', text: '🍓🍓🍓'),
+          ExamAnswer(id: 'B', text: '🍓🍓🍓🍓'),
+          ExamAnswer(id: 'C', text: '🍓🍓🍓🍓🍓'),
+          ExamAnswer(id: 'D', text: '🍓🍓'),
+        ],
+      ),
+      const ExamQuestion(
+        questionText: '🐝 🐝 🐝 🐝 - 🐝 🐝 = ?',
+        questionNumber: 1,
+        options: answers,
+      ),
+      const ExamQuestion(
+        questionText: 'Chọn khác loại: 🍎 | 🍐 | 🍌 | 🐟',
+        questionNumber: 1,
+        options: <ExamAnswer>[
+          ExamAnswer(id: 'A', text: '🍎'),
+          ExamAnswer(id: 'B', text: '🍐'),
+          ExamAnswer(id: 'C', text: '🍌'),
+          ExamAnswer(id: 'D', text: '🐟'),
+        ],
+      ),
+    ];
+    final cardHeights = <double>[];
+
+    for (final question in questions) {
+      await _pumpAssessment(
+        tester,
+        viewportSize: const Size(360, 640),
+        topInset: 24,
+        bottomInset: 24,
+        examType: examTypeAssessment,
+        showQuestionNavigation: false,
+        questions: [question],
+      );
+
+      final scrollable = tester.state<ScrollableState>(
+        find
+            .descendant(
+              of: find.byKey(const ValueKey('question-content')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(
+        scrollable.position.maxScrollExtent,
+        0,
+        reason: question.questionText,
+      );
+      expect(find.byType(AssessmentAnswerButton), findsNWidgets(4));
+      expect(find.byType(AssessmentBottomBar), findsOneWidget);
+      final actionLabels = find.descendant(
+        of: find.byType(AssessmentBottomBar),
+        matching: find.byType(Text),
+      );
+      for (final label in actionLabels.evaluate()) {
+        expect(
+          tester
+              .renderObject<RenderParagraph>(find.byWidget(label.widget))
+              .didExceedMaxLines,
+          isFalse,
+          reason: question.questionText,
+        );
+      }
+      cardHeights.add(
+        tester.getSize(find.byType(AssessmentQuestionCard)).height,
+      );
+      expect(tester.takeException(), isNull, reason: question.questionText);
+    }
+
+    expect(
+      cardHeights.reduce((a, b) => a > b ? a : b) -
+          cardHeights.reduce((a, b) => a < b ? a : b),
+      lessThanOrEqualTo(24),
+    );
+  });
+
+  testWidgets('short list answers fit representative phone heights', (
+    tester,
+  ) async {
+    const question = ExamQuestion(
+      questionText: '4 = ?',
+      questionNumber: 1,
+      options: <ExamAnswer>[
+        ExamAnswer(id: 'A', text: '🍓🍓🍓'),
+        ExamAnswer(id: 'B', text: '🍓🍓🍓🍓'),
+        ExamAnswer(id: 'C', text: '🍓🍓🍓🍓🍓'),
+        ExamAnswer(id: 'D', text: '🍓🍓'),
+      ],
+    );
+    const devices = <(Size, double, double)>[
+      (Size(375, 667), 20, 0),
+      (Size(360, 780), 47, 34),
+      (Size(360, 800), 24, 24),
+      (Size(375, 812), 44, 34),
+      (Size(393, 852), 59, 34),
+      (Size(430, 932), 59, 34),
+      (Size(390, 844), 47, 34),
+      (Size(414, 896), 47, 34),
+    ];
+
+    for (final (size, topInset, bottomInset) in devices) {
+      await _pumpAssessment(
+        tester,
+        viewportSize: size,
+        topInset: topInset,
+        bottomInset: bottomInset,
+        examType: examTypeAssessment,
+        showQuestionNavigation: false,
+        questions: [question],
+      );
+
+      final scrollable = tester.state<ScrollableState>(
+        find
+            .descendant(
+              of: find.byKey(const ValueKey('question-content')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(scrollable.position.maxScrollExtent, 0, reason: '$size');
+      expect(find.byType(AssessmentBottomBar), findsOneWidget);
+      expect(tester.takeException(), isNull, reason: '$size');
+    }
+  });
+
+  testWidgets('list answers grow when a 360 by 800 screen has room', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      viewportSize: const Size(360, 800),
+      topInset: 36,
+      examType: examTypeAssessment,
+      showQuestionNavigation: false,
+      questions: const [
+        ExamQuestion(
+          questionText: '4 = ?',
+          questionNumber: 1,
+          options: <ExamAnswer>[
+            ExamAnswer(id: 'A', text: '🐟🐟'),
+            ExamAnswer(id: 'B', text: '🐟🐟🐟'),
+            ExamAnswer(id: 'C', text: '🐟🐟🐟🐟'),
+            ExamAnswer(id: 'D', text: '🐟🐟🐟🐟🐟'),
+          ],
+        ),
+      ],
+    );
+
+    for (final answer in find.byType(AssessmentAnswerButton).evaluate()) {
+      expect(tester.getSize(find.byWidget(answer.widget)).height, 76);
+    }
+    final scrollable = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('question-content')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(scrollable.position.maxScrollExtent, 0);
+    expect(
+      800 - tester.getBottomLeft(find.byType(AssessmentBottomBar)).dy,
+      lessThanOrEqualTo(32),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('long assessment content remains scrollable on a small screen', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      viewportSize: const Size(360, 640),
+      topInset: 24,
+      bottomInset: 24,
+      examType: examTypeAssessment,
+      showQuestionNavigation: false,
+      questions: [
+        ExamQuestion(
+          questionText: List.filled(
+            8,
+            'Một lớp có nhiều học sinh. Hãy đọc kỹ dữ kiện trước khi chọn.',
+          ).join(' '),
+          questionNumber: 1,
+          options: const <ExamAnswer>[
+            ExamAnswer(id: 'A', text: 'Đáp án thứ nhất'),
+            ExamAnswer(id: 'B', text: 'Đáp án thứ hai'),
+            ExamAnswer(id: 'C', text: 'Đáp án thứ ba'),
+            ExamAnswer(id: 'D', text: 'Đáp án thứ tư'),
+          ],
+        ),
+      ],
+    );
+
+    final scrollable = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byKey(const ValueKey('question-content')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(scrollable.position.maxScrollExtent, greaterThan(0));
+    expect(tester.takeException(), isNull);
+  });
+
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   testWidgets(
     'set transition remains visible until every new image is decoded',
@@ -1493,9 +1718,12 @@ List<ExamQuestion> _setQuestions(String setName) {
 
 Future<void> _pumpAssessment(
   WidgetTester tester, {
+  Size viewportSize = const Size(430, 844),
+  double topInset = 0,
   double bottomInset = 0,
   List<ExamQuestion>? questions,
   bool allowQuestionNavigation = true,
+  bool showQuestionNavigation = true,
   ExamService? examService,
   int? initialGrade = 0,
   String examType = examTypePractice,
@@ -1503,7 +1731,7 @@ Future<void> _pumpAssessment(
   bool isResumedAssessment = false,
   int? profileId,
 }) async {
-  tester.view.physicalSize = const Size(430, 844);
+  tester.view.physicalSize = viewportSize;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
@@ -1520,9 +1748,9 @@ Future<void> _pumpAssessment(
         ),
         home: MediaQuery(
           data: MediaQueryData(
-            size: const Size(430, 844),
-            padding: EdgeInsets.only(bottom: bottomInset),
-            viewPadding: EdgeInsets.only(bottom: bottomInset),
+            size: viewportSize,
+            padding: EdgeInsets.only(top: topInset, bottom: bottomInset),
+            viewPadding: EdgeInsets.only(top: topInset, bottom: bottomInset),
           ),
           child: ExamAttemptScreen(
             examService: examService ?? _UnusedExamService(),
@@ -1530,6 +1758,7 @@ Future<void> _pumpAssessment(
             profileId: profileId,
             isResumedAssessment: isResumedAssessment,
             allowQuestionNavigation: allowQuestionNavigation,
+            showQuestionNavigation: showQuestionNavigation,
             initialExam: GeneratedExam(
               id: 1,
               examId: 1,
