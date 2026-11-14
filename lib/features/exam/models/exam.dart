@@ -122,6 +122,7 @@ class ExamPagination {
 
 class GeneratedExam {
   const GeneratedExam({
+    this.lang,
     this.id,
     this.examId,
     this.profileId,
@@ -154,6 +155,7 @@ class GeneratedExam {
     required this.questions,
   });
 
+  final String? lang;
   final int? id;
   final int? examId;
   final int? profileId;
@@ -196,6 +198,7 @@ class GeneratedExam {
           const Duration(minutes: 55);
 
   GeneratedExam withRefreshedImages(GeneratedExam fresh) => GeneratedExam(
+    lang: lang,
     id: id,
     examId: examId,
     profileId: profileId,
@@ -315,6 +318,7 @@ class ExamGrading {
 
 class ExamQuestion {
   const ExamQuestion({
+    this.lang,
     required this.questionText,
     required this.questionNumber,
     required this.options,
@@ -331,6 +335,7 @@ class ExamQuestion {
     this.reviewIsCorrect,
   });
 
+  final String? lang;
   final String questionText;
   final int? questionGrade;
   final int questionNumber;
@@ -356,6 +361,7 @@ class ExamQuestion {
   });
 
   ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
+    lang: lang,
     questionText: questionText,
     questionGrade: questionGrade,
     questionNumber: questionNumber,

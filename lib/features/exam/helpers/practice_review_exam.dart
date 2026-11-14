@@ -23,6 +23,7 @@ GeneratedExam buildPracticeReviewExam({
     totalQuestions: totalQuestions,
   );
   return GeneratedExam(
+    lang: sourceExam.lang ?? submittedExam.lang,
     id: submittedExam.id ?? sourceExam.id,
     examId: submittedExam.examId ?? sourceExam.examId,
     profileId: submittedExam.profileId ?? sourceExam.profileId,

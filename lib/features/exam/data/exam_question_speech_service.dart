@@ -1,6 +1,15 @@
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:numi/core/localization/app_language.dart';
 
 enum QuestionSpeechResult { started, unavailable, cancelled }
+
+String? questionSpeechLanguage({String? questionLang, String? examLang}) {
+  for (final code in [questionLang, examLang]) {
+    final parsed = AppLanguageCode.tryParse(code);
+    if (parsed != null) return parsed.ttsCode;
+  }
+  return null;
+}
 
 /// Uses the API's wording without inferring objects, answers or missing numbers.
 String? questionSpeechText(String text, {String language = 'vi-VN'}) {
@@ -9,7 +18,7 @@ String? questionSpeechText(String text, {String language = 'vi-VN'}) {
   const number = r'[-−]?\s*\d+(?:[.,]\d+)?';
   if (RegExp('^$number(?:\\s*[+−×xX*÷:/-]\\s*$number)+(?:\\s*=\\s*\\??)?\$')
       .hasMatch(normalized)) {
-    final english = language.toLowerCase().startsWith('en');
+    final english = AppLanguage.fromCode(language) == AppLanguage.en;
     final words = <String, String>{
       '+': english ? 'plus' : 'cộng',
       '-': english ? 'minus' : 'trừ',
@@ -54,10 +63,21 @@ class ExamQuestionSpeechService {
 
   /// Serialize native commands and discard obsolete work after every await.
   /// Speaking returns when playback starts, so stopping never waits for narration.
-  Future<QuestionSpeechResult> read(String text, {required String language}) {
+  Future<QuestionSpeechResult> read(
+    String text, {
+    required String language,
+    String? contentLanguage,
+  }) {
     if (_disposed) return Future.value(QuestionSpeechResult.cancelled);
     final revision = ++_revision;
-    final spokenText = questionSpeechText(text, language: language);
+    final contentCode = AppLanguageCode.tryParse(contentLanguage)?.ttsCode;
+    final appCode =
+        (AppLanguageCode.tryParse(language) ?? AppLanguage.vi.localeCode)
+            .ttsCode;
+    final spokenText = questionSpeechText(
+      text,
+      language: contentCode ?? appCode,
+    );
     final result = _pending.then((_) async {
       bool isCurrent() => !_disposed && revision == _revision;
       if (!isCurrent()) return QuestionSpeechResult.cancelled;
@@ -67,12 +87,13 @@ class ExamQuestionSpeechService {
         if (!isCurrent()) return QuestionSpeechResult.cancelled;
         if (spokenText == null) return QuestionSpeechResult.unavailable;
         final locale =
-            RegExp(
-              r'[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]',
-              caseSensitive: false,
-            ).hasMatch(spokenText)
-            ? 'vi-VN'
-            : language;
+            contentCode ??
+            (RegExp(
+                  r'[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]',
+                  caseSensitive: false,
+                ).hasMatch(spokenText)
+                ? AppLanguage.vi.localeCode.ttsCode
+                : appCode);
         final available = await tts.isLanguageAvailable(locale);
         if (!isCurrent()) return QuestionSpeechResult.cancelled;
         if (available != true && available != 1) {

@@ -240,6 +240,7 @@ List<ExamPracticeTopicDto> _practiceTopicsFromJson(Object? value) {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
+    this.lang,
     required this.questionNumber,
     this.options = const <ExamAnswerDto>[],
     this.elinkId,
@@ -259,6 +260,7 @@ class ExamDetailAnswerDto {
     this.questionImageUrl,
   });
 
+  final String? lang;
   final int questionNumber;
   @JsonKey(name: 'options')
   final List<ExamAnswerDto> options;
@@ -507,6 +509,7 @@ class ExamProgressSummaryDto {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class GeneratedExamDto {
   const GeneratedExamDto({
+    this.lang,
     this.examId,
     this.elinkId,
     this.profileId,
@@ -524,6 +527,7 @@ class GeneratedExamDto {
     required this.questions,
   });
 
+  final String? lang;
   @JsonKey(name: 'exam_id', fromJson: _intFromJson)
   final int? examId;
   @JsonKey(name: 'elink_id', fromJson: _intFromJson)
@@ -580,6 +584,7 @@ class ExamResultDto {
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ExamQuestionDto {
   const ExamQuestionDto({
+    this.lang,
     required this.questionText,
     required this.questionNumber,
     required this.options,
@@ -592,6 +597,7 @@ class ExamQuestionDto {
     this.questionTags = const [],
   });
 
+  final String? lang;
   final String questionText;
   final int questionNumber;
   @JsonKey(defaultValue: <ExamAnswerDto>[])

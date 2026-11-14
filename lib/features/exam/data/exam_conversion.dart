@@ -30,6 +30,7 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
             ? const <String>[]
             : [correctAnswer!.value.toString()]);
     return ExamQuestion(
+      lang: lang,
       questionText: questionText,
       questionGrade: questionGrade,
       questionNumber: questionNumberOverride ?? questionNumber,
@@ -63,6 +64,7 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
   }
 
   ExamQuestion toQuestionModel({required int questionNumber}) => ExamQuestion(
+    lang: lang,
     questionText: questionText?.trim() ?? '',
     questionGrade: questionGrade,
     questionNumber: questionNumber,
@@ -105,6 +107,7 @@ extension GeneratedExamDtoConversion on GeneratedExamDto {
     int questionNumberOffset = 0,
     List<ExamPracticeTopic> practiceWeakTopics = const <ExamPracticeTopic>[],
   }) => GeneratedExam(
+    lang: lang,
     id: elinkId,
     // The app model still calls the assigned-set ID examId; the DTO uses elinkId.
     examId: elinkId,

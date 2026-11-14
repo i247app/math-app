@@ -5,6 +5,34 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 
 void main() {
+  test(
+    'retains paper and question language through JSON and image refresh',
+    () {
+      final dto = GeneratedExamDto.fromJson({
+        'lang': 'vi',
+        'questions': [
+          {
+            'question_number': 1,
+            'question_text': '9 + 5',
+            'lang': 'en',
+            'options': [],
+          },
+        ],
+      });
+      final model = dto.toModel();
+      final fresh = const GeneratedExamDto(questions: []).toModel();
+      expect(dto.toJson()['lang'], 'vi');
+      expect(dto.questions.single.toJson()['lang'], 'en');
+      expect(model.withRefreshedImages(fresh).lang, 'vi');
+      expect(model.withRefreshedImages(fresh).questions.single.lang, 'en');
+      final detail = ExamDetailAnswerDto.fromJson({
+        'question_number': 1,
+        'lang': 'vi',
+      });
+      expect(detail.toQuestionModel(questionNumber: 1).lang, 'vi');
+      expect(detail.toJson()['lang'], 'vi');
+    },
+  );
   test('keeps question tags through API conversion and image refresh', () {
     final json = <String, dynamic>{
       'question_number': 1,

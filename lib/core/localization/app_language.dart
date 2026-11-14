@@ -10,13 +10,10 @@ enum AppLanguage {
   final String lookupCode;
   final String displayName;
 
+  AppLanguageCode get localeCode => AppLanguageCode.tryParse(apiCode)!;
+
   static AppLanguage fromCode(String? code) {
-    final normalized = code?.trim().toLowerCase();
-    return switch (normalized) {
-      'en' || 'en-us' || 'en_us' => AppLanguage.en,
-      'vi' || 'vi-vn' || 'vi_vn' => AppLanguage.vi,
-      _ => AppLanguage.vi,
-    };
+    return AppLanguageCode.tryParse(code)?.language ?? AppLanguage.vi;
   }
 
   static AppLanguage fromDevice(Locale locale) {
@@ -25,6 +22,35 @@ enum AppLanguage {
       'vi' => AppLanguage.vi,
       _ => AppLanguage.vi,
     };
+  }
+}
+
+/// A supported language with its region, independent of a service's separator.
+class AppLanguageCode {
+  const AppLanguageCode._(this.language, this.region);
+
+  final AppLanguage language;
+  final String region;
+
+  String get languageCode => language.lookupCode;
+  String get languageTag => '$languageCode-$region';
+  String get underscoreCode => '${languageCode}_$region';
+  String get ttsCode => languageTag;
+
+  static AppLanguageCode? tryParse(String? value) {
+    final match = RegExp(
+      r'^([a-z]{2})(?:-([a-z]{2}|[0-9]{3}))?$',
+      caseSensitive: false,
+    ).firstMatch(value?.trim().replaceAll('_', '-') ?? '');
+    if (match == null) return null;
+    final language = switch (match[1]!.toLowerCase()) {
+      'vi' => AppLanguage.vi,
+      'en' => AppLanguage.en,
+      _ => null,
+    };
+    if (language == null) return null;
+    final region = match[2]?.toUpperCase() ?? language.apiCode.split('-').last;
+    return AppLanguageCode._(language, region);
   }
 }
 

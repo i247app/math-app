@@ -209,6 +209,8 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       _controller.questionIndex,
       question?.questionNumber,
       question?.questionText,
+      question?.lang,
+      _controller.exam?.lang,
       _questionGrade,
     );
     if (!_canReadQuestion) {
@@ -227,6 +229,10 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     final result = await _questionSpeech.read(
       _controller.currentQuestion!.questionText,
       language: AppLanguageState.currentApiCode,
+      contentLanguage: questionSpeechLanguage(
+        questionLang: _controller.currentQuestion!.lang,
+        examLang: _controller.exam?.lang,
+      ),
     );
     if (mounted && manual && result == QuestionSpeechResult.unavailable) {
       ScaffoldMessenger.of(context).showSnackBar(

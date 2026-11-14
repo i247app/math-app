@@ -5,6 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/exam/data/exam_question_speech_service.dart';
 
 void main() {
+  test('content language prioritizes question, paper, then app fallback', () {
+    expect(questionSpeechLanguage(questionLang: 'en', examLang: 'vi'), 'en-US');
+    expect(questionSpeechLanguage(examLang: 'vi'), 'vi-VN');
+    expect(questionSpeechLanguage(questionLang: ' VI_vn '), 'vi-VN');
+    expect(questionSpeechLanguage(questionLang: '', examLang: 'en'), 'en-US');
+    expect(questionSpeechLanguage(questionLang: 'fr', examLang: 'vi'), 'vi-VN');
+    expect(questionSpeechLanguage(), isNull);
+    expect(questionSpeechLanguage(questionLang: 'en_GB'), 'en-GB');
+  });
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('flutter_tts');
   final calls = <MethodCall>[];
@@ -96,6 +105,37 @@ void main() {
       'en-US',
     );
   });
+
+  test('explicit content language overrides app and text detection', () async {
+    await speech.read('9 + 5', language: 'en-US', contentLanguage: 'vi-VN');
+    expect(calls.last.arguments, '9 cộng 5');
+    expect(
+      calls.firstWhere((c) => c.method == 'setLanguage').arguments,
+      'vi-VN',
+    );
+    calls.clear();
+    await speech.read(
+      'Tính 9 + 5',
+      language: 'vi-VN',
+      contentLanguage: 'en-US',
+    );
+    expect(
+      calls.firstWhere((c) => c.method == 'setLanguage').arguments,
+      'en-US',
+    );
+  });
+
+  test(
+    'TTS preserves explicit region and normalizes underscore codes',
+    () async {
+      await speech.read('9 + 5', language: 'vi', contentLanguage: 'en_GB');
+      expect(calls.last.arguments, '9 plus 5');
+      expect(
+        calls.firstWhere((c) => c.method == 'setLanguage').arguments,
+        'en-GB',
+      );
+    },
+  );
 
   test('does not speak using a wrong or missing language', () async {
     handler = (call) async => call.method == 'isLanguageAvailable' ? false : 1;
