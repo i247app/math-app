@@ -447,26 +447,25 @@ void main() {
       });
     }
 
-    testWidgets(
-      'emoji question hides its speaker without starting narration',
-      (tester) async {
-        await _pumpAssessment(
-          tester,
-          questions: const [
-            ExamQuestion(
-              questionText: '😺😺😺😺😺 = ?',
-              questionNumber: 1,
-              options: [ExamAnswer(id: 'A', text: '5')],
-            ),
-          ],
-        );
-        await tester.pumpAndSettle();
-        final speaker = find.byKey(const ValueKey('read-question'));
-        expect(speaker, findsNothing);
-        expect(calls.where((c) => c.method == 'speak'), isEmpty);
-        expect(tester.takeException(), isNull);
-      },
-    );
+    testWidgets('emoji question hides its speaker without starting narration', (
+      tester,
+    ) async {
+      await _pumpAssessment(
+        tester,
+        questions: const [
+          ExamQuestion(
+            questionText: '😺😺😺😺😺 = ?',
+            questionNumber: 1,
+            options: [ExamAnswer(id: 'A', text: '5')],
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      final speaker = find.byKey(const ValueKey('read-question'));
+      expect(speaker, findsNothing);
+      expect(calls.where((c) => c.method == 'speak'), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets(
       'auto reads once, supports replay, and reads a newly selected question',
@@ -540,6 +539,36 @@ void main() {
           );
         },
       );
+    }
+
+    for (final grade in [0, 1, 2]) {
+      testWidgets('4 + 8 speech eligibility at question grade $grade', (
+        tester,
+      ) async {
+        await const ExamQuestionAudioSettings().saveEnabled(true);
+        await _pumpAssessment(
+          tester,
+          initialGrade: 0,
+          questions: [
+            ExamQuestion(
+              questionText: '4 + 8',
+              questionNumber: 7,
+              questionGrade: grade,
+              lang: 'vi',
+              options: const [ExamAnswer(id: 'a', text: '12')],
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('read-question')),
+          grade <= 1 ? findsOneWidget : findsNothing,
+        );
+        expect(
+          calls.where((c) => c.method == 'speak').map((c) => c.arguments),
+          grade <= 1 ? ['4 cộng 8'] : isEmpty,
+        );
+      });
     }
 
     testWidgets('background stops speech and returning allows manual replay', (

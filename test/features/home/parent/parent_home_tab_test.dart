@@ -34,6 +34,7 @@ import 'package:numi/features/home/screens/student/student_home_tab.dart';
 import 'package:numi/features/home/widgets/home_missing_student_dialog.dart';
 import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
 import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
+import 'package:numi/features/home/widgets/parent/home_progress_skeleton.dart';
 import 'package:numi/features/home/widgets/sections/banner/banner.dart';
 import 'package:numi/features/home/widgets/sections/learning_streak/learning_streak.dart';
 import 'package:numi/features/profile/data/grade_service.dart';
@@ -268,13 +269,39 @@ void main() {
         final refresh = state.loadHome(forceRefresh: true);
         await tester.pump();
         expect(find.byType(HomeContentSkeleton), findsNothing);
-        expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+        expect(find.byType(HomeProgressSkeleton), findsOneWidget);
+        expect(find.byType(AssessmentProgressionChart), findsNothing);
+        expect(
+          find.byKey(const ValueKey('parent-home-assessment-action')),
+          findsOneWidget,
+        );
 
         homeService.layout.completeError(Exception('Layout unavailable'));
         examService.progress.completeError(Exception('Progress unavailable'));
         await refresh;
         await tester.pumpAndSettle();
         expect(find.byType(HomeContentSkeleton), findsNothing);
+        expect(find.byType(HomeProgressSkeleton), findsNothing);
+        expect(find.byType(AssessmentProgressionChart), findsNothing);
+        expect(
+          find.byKey(const ValueKey('home-progress-error')),
+          findsOneWidget,
+        );
+
+        // Retry must keep stale data hidden until a successful response.
+        examService.progress = Completer<ExamProgressResponse>();
+        await tester.tap(find.byKey(const ValueKey('home-progress-retry')));
+        await tester.pump();
+        expect(find.byType(HomeProgressSkeleton), findsOneWidget);
+        expect(find.byType(AssessmentProgressionChart), findsNothing);
+        examService.progress.complete(
+          await _UpdatedProgressService().getExamProgress(
+            profileId: profileId,
+            fromDt: DateTime.utc(2026),
+            toDt: DateTime.now(),
+          ),
+        );
+        await tester.pumpAndSettle();
         expect(
           tester
               .widget<AssessmentProgressionChart>(
@@ -597,14 +624,31 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final requestsBeforeClose = service.progressProfileIds.length;
       service.latestGrade = 4;
+      final updatedProgress = await service.getExamProgress(
+        profileId: profileId,
+        fromDt: DateTime.utc(2026),
+        toDt: DateTime.now(),
+      );
+      service.pendingProgress = Completer<ExamProgressResponse>();
+      final requestsBeforeClose = service.progressProfileIds.length;
       await tester.tap(find.text('Close assessment result'));
+      await tester.pump();
+      expect(find.byType(AssessmentProgressionChart), findsNothing);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(HomeProgressSkeleton), findsOneWidget);
+      expect(find.byType(AssessmentProgressionChart), findsNothing);
+      expect(find.byType(AssessmentGradeRibbon), findsNothing);
+      expect(
+        find.byKey(const ValueKey('parent-home-assessment-action')),
+        findsOneWidget,
+      );
+      service.pendingProgress!.complete(updatedProgress);
       await tester.pumpAndSettle();
 
       expect(
         service.progressProfileIds.length,
-        greaterThan(requestsBeforeClose),
+        requestsBeforeClose + 1,
       );
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byKey(const ValueKey('parent-home-progress-chart')),
@@ -949,6 +993,7 @@ class _UpdatedProgressService extends _ExamService {
   _UpdatedProgressService() : super(true, hasActiveAssessment: true);
 
   int? latestGrade;
+  Completer<ExamProgressResponse>? pendingProgress;
 
   @override
   Future<ExamProgressResponse> getExamProgress({
@@ -957,6 +1002,10 @@ class _UpdatedProgressService extends _ExamService {
     required DateTime toDt,
     String examType = examTypeAssessment,
   }) async {
+    if (pendingProgress != null) {
+      progressProfileIds.add(profileId);
+      return pendingProgress!.future;
+    }
     final progress = await super.getExamProgress(
       profileId: profileId,
       fromDt: fromDt,

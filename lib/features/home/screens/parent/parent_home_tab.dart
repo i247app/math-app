@@ -28,6 +28,7 @@ import 'package:numi/features/home/helpers/parent/parent_child_dashboard_helpers
 import 'package:numi/features/home/widgets/parent/parent_home_action_button.dart';
 import 'package:numi/features/home/widgets/parent/home_assessment_list.dart';
 import 'package:numi/features/home/widgets/parent/home_content_skeleton.dart';
+import 'package:numi/features/home/widgets/parent/home_progress_skeleton.dart';
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/data/assessment_progress_chart_loader.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
@@ -135,6 +136,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   int _progressLoadRequestId = 0;
   bool _isLoadingProgress = false;
   bool _hasLoadedProgress = false;
+  bool _hasProgressError = false;
   bool? _wasRouteCurrent;
   AssessmentProgressChartData _chart = AssessmentProgressChartData.empty;
   final Set<ParentHomeEntranceMode> _playedEntrances = {};
@@ -188,6 +190,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       _progressLoadRequestId++;
       _isLoadingProgress = false;
       _hasLoadedProgress = false;
+      _hasProgressError = false;
       _chart = AssessmentProgressChartData.empty;
       isLoadingAssessments = false;
       activeAssessment = null;
@@ -229,11 +232,19 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   }
 
   Future<void> loadHome({bool forceRefresh = false}) async {
+    final profileId = profileStableId(widget.activeProfile);
+    await Future.wait([
+      // pushReplacement may finish a navigation future while Result still
+      // covers Home. Fetch progress when Home actually becomes current again.
+      if (profileId != null && profileId > 0 && _wasRouteCurrent != false)
+        _loadAssessmentProgress(profileId),
+      _loadHomeLayout(forceRefresh: forceRefresh),
+    ]);
+  }
+
+  Future<void> _loadHomeLayout({bool forceRefresh = false}) async {
     final requestId = ++_childLoadRequestId;
     final profileId = profileStableId(widget.activeProfile);
-    if (profileId != null && profileId > 0) {
-      unawaited(_loadAssessmentProgress(profileId));
-    }
     if (profileId == null || profileId <= 0) {
       _assessmentLoadRequestId++;
       _progressLoadRequestId++;
@@ -253,6 +264,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         assessmentLoadError = null;
         _isLoadingProgress = false;
         _hasLoadedProgress = true;
+        _hasProgressError = false;
         _chart = AssessmentProgressChartData.empty;
       });
       widget.onParentAssessmentStateChanged(false);
@@ -371,7 +383,10 @@ class ParentHomeContentState extends State<ParentHomeContent> {
 
   Future<void> _loadAssessmentProgress(int profileId) async {
     final requestId = ++_progressLoadRequestId;
-    setState(() => _isLoadingProgress = true);
+    setState(() {
+      _isLoadingProgress = true;
+      _hasProgressError = false;
+    });
     try {
       final chart = await loadRecentAssessmentChart(
         widget.examService,
@@ -383,7 +398,9 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         _chart = chart;
       });
     } catch (_) {
-      // Keep the last chart when progress is temporarily unavailable.
+      if (mounted && requestId == _progressLoadRequestId) {
+        setState(() => _hasProgressError = true);
+      }
     } finally {
       if (mounted && requestId == _progressLoadRequestId) {
         setState(() {
@@ -457,30 +474,63 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                   if (showInitialLoading)
                     const HomeContentSkeleton()
                   else ...[
-                    homeEntrance(
-                      mode: ParentHomeEntranceMode.gradeRibbon,
-                      child: AssessmentGradeRibbon(
-                        currentGrade: _chart.finalGrade,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    homeEntrance(
-                      mode: ParentHomeEntranceMode.progressChart,
-                      order: 1,
-                      child: AssessmentProgressionChart(
-                        key: const ValueKey('parent-home-progress-chart'),
-                        showDataPoints: _chart.hasProgress,
-                        finalGrade: _chart.finalGrade,
-                        gradeTitle: context.getText(AppKeys.homeChartLevel),
-                        activityTitle: context.getText(
-                          AppKeys.homeChartActivity,
+                    if (_isLoadingProgress)
+                      const HomeProgressSkeleton(
+                        key: ValueKey('home-progress-loading'),
+                      )
+                    else if (_hasProgressError)
+                      SizedBox(
+                        key: const ValueKey('home-progress-error'),
+                        height: 344,
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                context.getText(AppKeys.parentExamLoadFailed),
+                              ),
+                              TextButton(
+                                key: const ValueKey('home-progress-retry'),
+                                onPressed: () {
+                                  final id = profileStableId(
+                                    widget.activeProfile,
+                                  );
+                                  if (id != null && id > 0) {
+                                    unawaited(_loadAssessmentProgress(id));
+                                  }
+                                },
+                                child: Text(context.getText(AppKeys.retry)),
+                              ),
+                            ],
+                          ),
                         ),
-                        previousGrades: _chart.previousGrades,
-                        testNumbers: _chart.testNumbers,
-                        lastSubmittedAt: _chart.lastSubmittedAt,
-                        chartHeight: 150,
+                      )
+                    else ...[
+                      homeEntrance(
+                        mode: ParentHomeEntranceMode.gradeRibbon,
+                        child: AssessmentGradeRibbon(
+                          currentGrade: _chart.finalGrade,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 18),
+                      homeEntrance(
+                        mode: ParentHomeEntranceMode.progressChart,
+                        order: 1,
+                        child: AssessmentProgressionChart(
+                          key: const ValueKey('parent-home-progress-chart'),
+                          showDataPoints: _chart.hasProgress,
+                          finalGrade: _chart.finalGrade,
+                          gradeTitle: context.getText(AppKeys.homeChartLevel),
+                          activityTitle: context.getText(
+                            AppKeys.homeChartActivity,
+                          ),
+                          previousGrades: _chart.previousGrades,
+                          testNumbers: _chart.testNumbers,
+                          lastSubmittedAt: _chart.lastSubmittedAt,
+                          chartHeight: 150,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
