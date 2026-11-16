@@ -39,49 +39,23 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('keeps natural wording and blocks emoji, LaTeX and incomplete text', () {
+  test('normalizes prepared narration and ignores empty text', () {
     expect(
       questionSpeechText('  Con hãy\nđếm số quả táo.  '),
       'Con hãy đếm số quả táo.',
     );
-    for (final text in [
-      '',
-      '🍎🍎',
-      '4 ? 6',
-      r'Tính $\frac{1}{2}$',
-      'Con đếm 🍎 nhé',
-      '1️⃣2️⃣',
-    ]) {
-      expect(questionSpeechText(text), isNull, reason: text);
-    }
+    expect(questionSpeechText(''), isNull);
     expect(questionSpeechText(' \n '), isNull);
+    expect(questionSpeechText('10'), '10');
+    expect(questionSpeechText('9 + 5'), '9 + 5');
   });
 
-  test('reads arithmetic symbols in the requested language', () async {
-    expect(questionSpeechText('9 + 5'), '9 cộng 5');
-    expect(questionSpeechText('2 + 3 = ?'), '2 cộng 3 bằng bao nhiêu');
-    expect(questionSpeechText('8 × 2 - 4 ÷ 2'), '8 nhân 2 trừ 4 chia 2');
-    expect(questionSpeechText('9 +'), isNull);
-    expect(questionSpeechText('10'), isNull);
-    await speech.read('9 + 5', language: 'en-US');
-    expect(calls.last.arguments, '9 plus 5');
-    expect(
-      calls.firstWhere((c) => c.method == 'setLanguage').arguments,
-      'en-US',
-    );
-    await speech.read('9 + 5', language: 'vi-VN');
-    expect(calls.last.arguments, '9 cộng 5');
+  test('passes backend narration to TTS without rewriting it', () async {
+    await speech.read('Nine plus five', language: 'en-US');
+    expect(calls.last.arguments, 'Nine plus five');
+    await speech.read('Chín cộng năm', language: 'vi-VN');
+    expect(calls.last.arguments, 'Chín cộng năm');
   });
-
-  test(
-    'uses question grade before paper grade and preserves unknown grades',
-    () {
-      expect(questionSpeechGrade(questionGrade: 0, examGrade: 2), 0);
-      expect(questionSpeechGrade(questionGrade: 2, examGrade: 0), 2);
-      expect(questionSpeechGrade(questionGrade: null, examGrade: 0), 0);
-      expect(questionSpeechGrade(questionGrade: null, examGrade: null), isNull);
-    },
-  );
 
   test('reads Vietnamese wording with a slower Vietnamese voice', () async {
     expect(
@@ -108,7 +82,7 @@ void main() {
 
   test('explicit content language overrides app and text detection', () async {
     await speech.read('9 + 5', language: 'en-US', contentLanguage: 'vi-VN');
-    expect(calls.last.arguments, '9 cộng 5');
+    expect(calls.last.arguments, '9 + 5');
     expect(
       calls.firstWhere((c) => c.method == 'setLanguage').arguments,
       'vi-VN',
@@ -129,7 +103,7 @@ void main() {
     'TTS preserves explicit region and normalizes underscore codes',
     () async {
       await speech.read('9 + 5', language: 'vi', contentLanguage: 'en_GB');
-      expect(calls.last.arguments, '9 plus 5');
+      expect(calls.last.arguments, '9 + 5');
       expect(
         calls.firstWhere((c) => c.method == 'setLanguage').arguments,
         'en-GB',

@@ -8,9 +8,16 @@ import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/widgets/shared/exam_header_icon_button.dart';
 
 class AssessmentHeader extends StatelessWidget {
-  const AssessmentHeader({super.key, required this.onClose});
+  const AssessmentHeader({
+    super.key,
+    required this.onClose,
+    this.audioEnabled,
+    this.onToggleAudio,
+  });
 
   final VoidCallback onClose;
+  final bool? audioEnabled;
+  final VoidCallback? onToggleAudio;
 
   static const double height = 60;
 
@@ -51,12 +58,31 @@ class AssessmentHeader extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: ExamHeaderIconButton(
-              icon: Icons.help_outline_rounded,
-              color: colors.brandStrong,
-              circle: true,
-              onTap: HapticFeedback.selectionClick,
-            ),
+            child: audioEnabled != null
+                ? Semantics(
+                    toggled: audioEnabled,
+                    child: IconButton(
+                      key: const ValueKey('assessment-audio-toggle'),
+                      tooltip: context.getText(
+                        audioEnabled!
+                            ? AppKeys.examMuteAutoplay
+                            : AppKeys.examEnableAutoplay,
+                      ),
+                      color: colors.brandStrong,
+                      onPressed: onToggleAudio,
+                      icon: Icon(
+                        audioEnabled!
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_off_rounded,
+                      ),
+                    ),
+                  )
+                : ExamHeaderIconButton(
+                    icon: Icons.help_outline_rounded,
+                    color: colors.brandStrong,
+                    circle: true,
+                    onTap: HapticFeedback.selectionClick,
+                  ),
           ),
         ],
       ),

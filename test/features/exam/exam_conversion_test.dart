@@ -5,6 +5,28 @@ import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/models/grade_levels.dart';
 
 void main() {
+  test('preserves tts_text through question, detail and image refresh', () {
+    for (final text in <String?>['Bốn cộng tám', '', null]) {
+      final json = <String, dynamic>{
+        'question_number': 1,
+        'question_text': '4 + 8',
+        'tts_text': text,
+        'options': <Map<String, dynamic>>[],
+      };
+      final generated = ExamQuestionDto.fromJson(json);
+      final detail = ExamDetailAnswerDto.fromJson(json);
+      expect(generated.toJson()['tts_text'], text);
+      expect(detail.toJson()['tts_text'], text);
+      for (final question in [
+        generated.toModel(),
+        detail.toQuestionModel(questionNumber: 1),
+      ]) {
+        expect(question.ttsText, text);
+        expect(question.withRefreshedImages(null).ttsText, text);
+        expect(question.questionText, '4 + 8');
+      }
+    }
+  });
   test(
     'retains paper and question language through JSON and image refresh',
     () {

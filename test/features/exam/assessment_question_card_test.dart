@@ -144,19 +144,20 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('kindergarten speaker stays at top left above visual content', (
-    tester,
-  ) async {
+  testWidgets('play stays at top left above visual content', (tester) async {
     const prompt = '😺😺😺😺😺 = ?';
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData(
           extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
         ),
-        home: const Scaffold(
+        home: Scaffold(
           body: SizedBox(
             width: 320,
-            child: AssessmentQuestionCard(question: prompt, grade: 0),
+            child: AssessmentQuestionCard(
+              question: prompt,
+              onReadQuestion: () {},
+            ),
           ),
         ),
       ),
@@ -172,7 +173,7 @@ void main() {
       lessThan(tester.getTopLeft(content).dy),
     );
     expect(tester.getSize(content).width, 286);
-    expect(tester.widget<IconButton>(speaker).onPressed, isNull);
+    expect(tester.widget<IconButton>(speaker).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 

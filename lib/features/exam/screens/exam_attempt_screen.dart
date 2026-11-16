@@ -34,6 +34,7 @@ import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_progress_section.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_card.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_image_match_card.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_image_choice_card.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_question_skeleton.dart';
 import 'package:numi/features/exam/widgets/shared/attempt_exit_dialog.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
@@ -95,11 +96,6 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
   bool _speechSuspended = false;
   bool? _autoReadEnabled;
 
-  int? get _questionGrade => questionSpeechGrade(
-    questionGrade: _controller.currentQuestion?.questionGrade,
-    examGrade: _controller.exam?.grade,
-  );
-
   bool get _canReadQuestion =>
       !_speechSuspended &&
       !_imagePreloader.isPreparingSet &&
@@ -108,9 +104,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       !_controller.isSubmittingExam &&
       !_isCompletingAssessment &&
       _controller.errorMessage == null &&
-      (_questionGrade == 0 || _questionGrade == 1) &&
-      questionSpeechText(_controller.currentQuestion?.questionText ?? '') !=
-          null;
+      questionSpeechText(_controller.currentQuestion?.ttsText ?? '') != null;
   final GuardedExitController<ExamAttemptResult> _exitController =
       GuardedExitController<ExamAttemptResult>();
 
@@ -153,8 +147,20 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
   Future<void> _loadQuestionAudioSettings() async {
     final enabled = await const ExamQuestionAudioSettings().readEnabled();
     if (!mounted) return;
-    _autoReadEnabled = enabled;
+    setState(() => _autoReadEnabled = enabled);
     _syncQuestionSpeech();
+  }
+
+  void _toggleQuestionAudio() {
+    if (_autoReadEnabled == null) return;
+    HapticFeedback.selectionClick();
+    setState(() => _autoReadEnabled = !_autoReadEnabled!);
+    if (_autoReadEnabled == false) {
+      unawaited(_questionSpeech.stop());
+    } else {
+      _spokenQuestionKey = null;
+      _syncQuestionSpeech();
+    }
   }
 
   @override
@@ -208,10 +214,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       _controller.setNumber,
       _controller.questionIndex,
       question?.questionNumber,
-      question?.questionText,
+      question?.ttsText,
       question?.lang,
       _controller.exam?.lang,
-      _questionGrade,
     );
     if (!_canReadQuestion) {
       if (_spokenQuestionKey != key) _spokenQuestionKey = null;
@@ -227,7 +232,7 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
     if (!manual && _autoReadEnabled != true) return;
     if (!_canReadQuestion || ModalRoute.of(context)?.isCurrent == false) return;
     final result = await _questionSpeech.read(
-      _controller.currentQuestion!.questionText,
+      _controller.currentQuestion!.ttsText!,
       language: AppLanguageState.currentApiCode,
       contentLanguage: questionSpeechLanguage(
         questionLang: _controller.currentQuestion!.lang,
@@ -833,6 +838,12 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                             children: [
                               AssessmentHeader(
                                 onClose: _exitController.requestExit,
+                                audioEnabled: _controller.isAssessment
+                                    ? _autoReadEnabled ?? true
+                                    : null,
+                                onToggleAudio: _autoReadEnabled == null
+                                    ? null
+                                    : _toggleQuestionAudio,
                               ),
                               Expanded(
                                 child: AssessmentErrorState(
@@ -875,6 +886,12 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                   SliverToBoxAdapter(
                                     child: AssessmentHeader(
                                       onClose: _exitController.requestExit,
+                                      audioEnabled: _controller.isAssessment
+                                          ? _autoReadEnabled ?? true
+                                          : null,
+                                      onToggleAudio: _autoReadEnabled == null
+                                          ? null
+                                          : _toggleQuestionAudio,
                                     ),
                                   ),
                                   SliverPadding(
@@ -924,6 +941,25 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                             onSelected: selectAnswer,
                                           ),
                                           const SizedBox(height: 24),
+                                        ] else if (setTransitionKind == null &&
+                                            currentQuestion != null &&
+                                            AssessmentImageChoiceCard.supports(
+                                              currentQuestion,
+                                            )) ...[
+                                          AssessmentImageChoiceCard(
+                                            question: currentQuestion,
+                                            selectedOptionIds:
+                                                _controller.selectedOptionIds,
+                                            feedbackCorrect: _controller
+                                                .selectedAnswerFeedbackCorrect,
+                                            onSelected: selectAnswer,
+                                            onReadQuestion: _canReadQuestion
+                                                ? () => _readQuestion(
+                                                    manual: true,
+                                                  )
+                                                : null,
+                                          ),
+                                          const SizedBox(height: 24),
                                         ] else if (setTransitionKind ==
                                             null) ...[
                                           AssessmentQuestionCard(
@@ -936,7 +972,6 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                                 currentQuestion.isFraction,
                                             imageUrl: currentQuestion
                                                 .questionImageUrl,
-                                            grade: _questionGrade,
                                             onReadQuestion: _canReadQuestion
                                                 ? () => _readQuestion(
                                                     manual: true,

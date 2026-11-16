@@ -16,11 +16,12 @@ class AssessmentQuestionSpeaker extends StatelessWidget {
       tooltip: AppStrings.current(AppKeys.examReadQuestion),
       onPressed: onPressed,
       style: IconButton.styleFrom(
-        foregroundColor: colors.brand,
-        backgroundColor: colors.brand.withValues(alpha: 0.12),
+        foregroundColor: colors.onBrand,
+        backgroundColor: colors.brand,
         minimumSize: const Size(48, 48),
+        shape: const CircleBorder(),
       ),
-      icon: const Icon(Icons.volume_up_rounded, size: 28),
+      icon: const Icon(Icons.play_arrow_rounded, size: 28),
     );
   }
 }

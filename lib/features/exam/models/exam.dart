@@ -319,6 +319,7 @@ class ExamGrading {
 class ExamQuestion {
   const ExamQuestion({
     this.lang,
+    this.ttsText,
     required this.questionText,
     required this.questionNumber,
     required this.options,
@@ -336,6 +337,7 @@ class ExamQuestion {
   });
 
   final String? lang;
+  final String? ttsText;
   final String questionText;
   final int? questionGrade;
   final int questionNumber;
@@ -362,6 +364,7 @@ class ExamQuestion {
 
   ExamQuestion withRefreshedImages(ExamQuestion? fresh) => ExamQuestion(
     lang: lang,
+    ttsText: ttsText,
     questionText: questionText,
     questionGrade: questionGrade,
     questionNumber: questionNumber,

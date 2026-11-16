@@ -241,6 +241,7 @@ List<ExamPracticeTopicDto> _practiceTopicsFromJson(Object? value) {
 class ExamDetailAnswerDto {
   const ExamDetailAnswerDto({
     this.lang,
+    this.ttsText,
     required this.questionNumber,
     this.options = const <ExamAnswerDto>[],
     this.elinkId,
@@ -261,6 +262,7 @@ class ExamDetailAnswerDto {
   });
 
   final String? lang;
+  final String? ttsText;
   final int questionNumber;
   @JsonKey(name: 'options')
   final List<ExamAnswerDto> options;
@@ -585,6 +587,7 @@ class ExamResultDto {
 class ExamQuestionDto {
   const ExamQuestionDto({
     this.lang,
+    this.ttsText,
     required this.questionText,
     required this.questionNumber,
     required this.options,
@@ -598,6 +601,7 @@ class ExamQuestionDto {
   });
 
   final String? lang;
+  final String? ttsText;
   final String questionText;
   final int questionNumber;
   @JsonKey(defaultValue: <ExamAnswerDto>[])

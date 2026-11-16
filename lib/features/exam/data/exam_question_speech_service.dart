@@ -11,49 +11,11 @@ String? questionSpeechLanguage({String? questionLang, String? examLang}) {
   return null;
 }
 
-/// Uses the API's wording without inferring objects, answers or missing numbers.
-String? questionSpeechText(String text, {String language = 'vi-VN'}) {
+/// The API supplies narration separately from the displayed question.
+String? questionSpeechText(String text) {
   final normalized = text.replaceAll(RegExp(r'\s+'), ' ').trim();
-  // Only translate complete arithmetic expressions, never infer an answer.
-  const number = r'[-−]?\s*\d+(?:[.,]\d+)?';
-  if (RegExp('^$number(?:\\s*[+−×xX*÷:/-]\\s*$number)+(?:\\s*=\\s*\\??)?\$')
-      .hasMatch(normalized)) {
-    final english = AppLanguage.fromCode(language) == AppLanguage.en;
-    final words = <String, String>{
-      '+': english ? 'plus' : 'cộng',
-      '-': english ? 'minus' : 'trừ',
-      '−': english ? 'minus' : 'trừ',
-      for (final symbol in ['×', 'x', 'X', '*'])
-        symbol: english ? 'times' : 'nhân',
-      for (final symbol in ['÷', ':', '/'])
-        symbol: english ? 'divided by' : 'chia',
-      '=': english ? 'equals' : 'bằng',
-      '?': english ? 'what' : 'bao nhiêu',
-    };
-    return normalized
-        .replaceAllMapped(RegExp(r'[+−×xX*÷:/=?-]'), (m) => ' ${words[m[0]]} ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-  }
-  if (!RegExp(r'\p{L}{2,}', unicode: true).hasMatch(normalized) ||
-      RegExp(
-        <String>[
-          r'[\\$]',
-          r'\p{Extended_Pictographic}',
-          r'\p{Regional_Indicator}',
-          r'\u20E3',
-        ].join('|'),
-        unicode: true,
-      ).hasMatch(normalized)) {
-    return null;
-  }
-  return normalized;
+  return normalized.isEmpty ? null : normalized;
 }
-
-int? questionSpeechGrade({
-  required int? questionGrade,
-  required int? examGrade,
-}) => questionGrade ?? examGrade;
 
 class ExamQuestionSpeechService {
   FlutterTts? _tts;
@@ -74,10 +36,7 @@ class ExamQuestionSpeechService {
     final appCode =
         (AppLanguageCode.tryParse(language) ?? AppLanguage.vi.localeCode)
             .ttsCode;
-    final spokenText = questionSpeechText(
-      text,
-      language: contentCode ?? appCode,
-    );
+    final spokenText = questionSpeechText(text);
     final result = _pending.then((_) async {
       bool isCurrent() => !_disposed && revision == _revision;
       if (!isCurrent()) return QuestionSpeechResult.cancelled;

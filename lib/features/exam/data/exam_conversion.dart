@@ -31,6 +31,7 @@ extension ExamQuestionDtoConversion on ExamQuestionDto {
             : [correctAnswer!.value.toString()]);
     return ExamQuestion(
       lang: lang,
+      ttsText: ttsText,
       questionText: questionText,
       questionGrade: questionGrade,
       questionNumber: questionNumberOverride ?? questionNumber,
@@ -65,6 +66,7 @@ extension ExamDetailAnswerDtoConversion on ExamDetailAnswerDto {
 
   ExamQuestion toQuestionModel({required int questionNumber}) => ExamQuestion(
     lang: lang,
+    ttsText: ttsText,
     questionText: questionText?.trim() ?? '',
     questionGrade: questionGrade,
     questionNumber: questionNumber,

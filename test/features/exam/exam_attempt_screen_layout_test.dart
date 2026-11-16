@@ -22,6 +22,7 @@ import 'package:numi/features/exam/screens/exam_attempt_screen.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_answer_grid.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_image_match_card.dart';
+import 'package:numi/features/exam/widgets/assessment/assessment_image_choice_card.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_bottom_bar.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_header.dart';
@@ -383,18 +384,75 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('picture choices show two columns, bottom labels and Play', (
+    tester,
+  ) async {
+    await _pumpAssessment(
+      tester,
+      initialGrade: 5,
+      examType: examTypeAssessment,
+      questions: [
+        ExamQuestion(
+          questionText: 'Nhóm nào có nhiều quả táo hơn?',
+          ttsText: 'Nhóm nào có nhiều quả táo hơn?',
+          questionNumber: 1,
+          options: [
+            for (final id in ['Bank-z', 'b', 'C-1', 'd'])
+              ExamAnswer(
+                id: id,
+                text: '',
+                imageUrl: 'https://example.test/$id.png',
+              ),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+    final card = find.byType(AssessmentImageChoiceCard);
+    expect(card, findsOneWidget);
+    expect(find.byType(AssessmentImageMatchCard), findsNothing);
+    expect(find.byType(AssessmentQuestionCard), findsNothing);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    expect(
+      find.descendant(of: card, matching: find.byIcon(Icons.volume_up_rounded)),
+      findsNothing,
+    );
+    final first = find.byKey(const ValueKey('image-choice-option-Bank-z'));
+    final second = find.byKey(const ValueKey('image-choice-option-b'));
+    final third = find.byKey(const ValueKey('image-choice-option-C-1'));
+    expect(tester.getTopLeft(first).dy, tester.getTopLeft(second).dy);
+    expect(
+      tester.getTopLeft(third).dy,
+      greaterThan(tester.getTopLeft(first).dy),
+    );
+    expect(
+      find.descendant(of: first, matching: find.text('A')),
+      findsOneWidget,
+    );
+    await tester.tap(second);
+    await tester.pump();
+    expect(tester.widget<AssessmentImageChoiceCard>(card).selectedOptionIds, {
+      'b',
+    });
+    final next = find.widgetWithText(AssessmentBottomActionButton, 'TIẾP TỤC');
+    expect(tester.widget<AssessmentBottomActionButton>(next).onTap, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
   group('question narration', () {
     const channel = MethodChannel('flutter_tts');
     final calls = <MethodCall>[];
     const questions = <ExamQuestion>[
       ExamQuestion(
         questionText: 'Con hãy đếm số quả táo.',
+        ttsText: 'Con hãy đếm số quả táo.',
         questionNumber: 1,
         options: [ExamAnswer(id: 'A', text: '2')],
         correctOptionIds: ['A'],
       ),
       ExamQuestion(
         questionText: 'Con hãy chọn hình tròn.',
+        ttsText: 'Con hãy chọn hình tròn.',
         questionNumber: 2,
         options: [ExamAnswer(id: 'A', text: '1')],
       ),
@@ -444,6 +502,82 @@ void main() {
         await _pumpAssessment(tester, questions: questions, examType: examType);
         await tester.pumpAndSettle();
         expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+      });
+    }
+
+    testWidgets(
+      'assessment header mutes this attempt and enables current narration',
+      (tester) async {
+        await const ExamQuestionAudioSettings().saveEnabled(true);
+        await _pumpAssessment(
+          tester,
+          questions: questions,
+          examType: examTypeAssessment,
+        );
+        await tester.pumpAndSettle();
+        final toggle = find.byKey(const ValueKey('assessment-audio-toggle'));
+        expect(toggle, findsOneWidget);
+        expect(find.byIcon(Icons.help_outline_rounded), findsNothing);
+        calls.clear();
+        await tester.tap(toggle);
+        await tester.pumpAndSettle();
+        expect(find.byIcon(Icons.volume_off_rounded), findsOneWidget);
+        expect(calls.last.method, 'stop');
+        expect(await const ExamQuestionAudioSettings().readEnabled(), isTrue);
+        await tester.tap(find.byKey(const ValueKey('read-question')));
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+        calls.clear();
+        tester
+            .widget<AssessmentProgressSection>(
+              find.byType(AssessmentProgressSection),
+            )
+            .onQuestionSelected!(1);
+        await tester.pumpAndSettle();
+        expect(calls.where((c) => c.method == 'speak'), isEmpty);
+        await tester.tap(toggle);
+        await tester.pumpAndSettle();
+        expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
+        expect(
+          calls.where((c) => c.method == 'speak').single.arguments,
+          questions.last.questionText,
+        );
+      },
+    );
+
+    for (final ttsText in <String?>[null, '', '   ', 'Bốn cộng tám']) {
+      testWidgets('narration uses only tts_text: $ttsText', (tester) async {
+        await _pumpAssessment(
+          tester,
+          initialGrade: 5,
+          questions: [
+            ExamQuestion(
+              questionText: '4 + 8',
+              ttsText: ttsText,
+              questionNumber: 1,
+              options: const [ExamAnswer(id: 'a', text: '12')],
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+        final enabled = ttsText?.trim().isNotEmpty ?? false;
+        expect(find.text('4 + 8'), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('read-question')),
+          enabled ? findsOneWidget : findsNothing,
+        );
+        expect(
+          calls.where((c) => c.method == 'speak').map((c) => c.arguments),
+          enabled ? ['Bốn cộng tám'] : isEmpty,
+        );
+        if (enabled) {
+          await tester.tap(find.byKey(const ValueKey('read-question')));
+          await tester.pumpAndSettle();
+          expect(
+            calls.where((c) => c.method == 'speak').last.arguments,
+            'Bốn cộng tám',
+          );
+        }
       });
     }
 
@@ -507,11 +641,11 @@ void main() {
       (2, 1, true),
       (1, null, true),
       (0, 1, true),
-      (1, 2, false),
-      (0, 2, false),
+      (1, 2, true),
+      (0, 2, true),
       (0, null, true),
-      (2, null, false),
-      (null, null, false),
+      (2, null, true),
+      (null, null, true),
     ]) {
       testWidgets(
         'paper ${grades.$1}, question ${grades.$2}: narration ${grades.$3}',
@@ -522,6 +656,7 @@ void main() {
             questions: [
               ExamQuestion(
                 questionText: questions.first.questionText,
+                ttsText: questions.first.ttsText,
                 questionNumber: 1,
                 questionGrade: grades.$2,
                 options: questions.first.options,
@@ -541,7 +676,7 @@ void main() {
       );
     }
 
-    for (final grade in [0, 1, 2]) {
+    for (final grade in List.generate(13, (index) => index)) {
       testWidgets('4 + 8 speech eligibility at question grade $grade', (
         tester,
       ) async {
@@ -552,6 +687,7 @@ void main() {
           questions: [
             ExamQuestion(
               questionText: '4 + 8',
+              ttsText: '4 cộng 8',
               questionNumber: 7,
               questionGrade: grade,
               lang: 'vi',
@@ -560,13 +696,10 @@ void main() {
           ],
         );
         await tester.pumpAndSettle();
-        expect(
-          find.byKey(const ValueKey('read-question')),
-          grade <= 1 ? findsOneWidget : findsNothing,
-        );
+        expect(find.byKey(const ValueKey('read-question')), findsOneWidget);
         expect(
           calls.where((c) => c.method == 'speak').map((c) => c.arguments),
-          grade <= 1 ? ['4 cộng 8'] : isEmpty,
+          ['4 cộng 8'],
         );
       });
     }
@@ -594,7 +727,7 @@ void main() {
     });
 
     testWidgets(
-      'changing to an older grade stops narration and returning reads again',
+      'changing grade continues narration and returning reads again',
       (tester) async {
         await _pumpAssessment(
           tester,
@@ -602,6 +735,7 @@ void main() {
             questions.first,
             ExamQuestion(
               questionText: questions.last.questionText,
+              ttsText: questions.last.ttsText,
               questionNumber: 2,
               questionGrade: 2,
               options: questions.last.options,
@@ -616,15 +750,18 @@ void main() {
             )
             .onQuestionSelected!(1);
         await tester.pumpAndSettle();
-        expect(calls.last.method, 'stop');
-        expect(find.byKey(const ValueKey('read-question')), findsNothing);
+        expect(
+          calls.where((c) => c.method == 'speak').single.arguments,
+          questions.last.ttsText,
+        );
+        expect(find.byKey(const ValueKey('read-question')), findsOneWidget);
         tester
             .widget<AssessmentProgressSection>(
               find.byType(AssessmentProgressSection),
             )
             .onQuestionSelected!(0);
         await tester.pumpAndSettle();
-        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+        expect(calls.where((c) => c.method == 'speak'), hasLength(2));
       },
     );
 

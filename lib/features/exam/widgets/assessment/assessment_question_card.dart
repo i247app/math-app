@@ -17,13 +17,11 @@ class AssessmentQuestionCard extends StatelessWidget {
     this.compact = false,
     this.renderLatex = false,
     this.imageUrl,
-    this.grade,
     this.onReadQuestion,
   });
   final String question;
   final bool renderLatex;
   final String? imageUrl;
-  final int? grade;
   final VoidCallback? onReadQuestion;
   final double? minimumHeight;
   final bool compact;
@@ -40,7 +38,7 @@ class AssessmentQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final showSpeaker = (grade == 0 || grade == 1) && onReadQuestion != null;
+    final showSpeaker = onReadQuestion != null;
     final displayQuestion = normalizeAssessmentText(question);
     final questionImageUrl = imageUrl?.trim();
     if (questionImageUrl != null && questionImageUrl.isNotEmpty) {
