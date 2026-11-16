@@ -18,10 +18,11 @@ class AssessmentQuestionSpeaker extends StatelessWidget {
       style: IconButton.styleFrom(
         foregroundColor: colors.onBrand,
         backgroundColor: colors.brand,
-        minimumSize: const Size(48, 48),
+        minimumSize: const Size(40, 40),
+        tapTargetSize: MaterialTapTargetSize.padded,
         shape: const CircleBorder(),
       ),
-      icon: const Icon(Icons.play_arrow_rounded, size: 28),
+      icon: const Icon(Icons.play_arrow_rounded, size: 24),
     );
   }
 }

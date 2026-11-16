@@ -165,6 +165,9 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       // An attempt can be replaced by its result, completing the original
       // navigation future before the user actually returns to Home.
       unawaited(_loadAssessmentProgress(profileId));
+      if (widget.showAssessmentList) {
+        _startAssessmentBackgroundRefresh(profileId: profileId);
+      }
     }
   }
 
@@ -589,6 +592,9 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                       mode: ParentHomeEntranceMode.assessmentList,
                       order: 4,
                       child: HomeAssessmentList(
+                        key: ValueKey(
+                          'learning-list-${profileStableId(widget.activeProfile)}',
+                        ),
                         assessments: learningListExams,
                         activeAssessment: activeAssessment,
                         isLoading: isLoadingAssessments,

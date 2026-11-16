@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 
+import 'home_progress_chart_skeleton.dart';
+
 /// Keeps the grade ribbon and chart space stable while progress is refreshed.
 class HomeProgressSkeleton extends StatelessWidget {
   const HomeProgressSkeleton({super.key});
@@ -24,12 +26,7 @@ class HomeProgressSkeleton extends StatelessWidget {
           const SizedBox(height: 2),
           AppSkeletonBlock(height: 40, radius: 20, color: color),
           const SizedBox(height: 18),
-          AppSkeletonBlock(
-            height: 236,
-            radius: 28,
-            color: color,
-            outlined: true,
-          ),
+          HomeProgressChartSkeleton(color: color),
         ],
       ),
     ),

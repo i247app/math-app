@@ -18,6 +18,7 @@ class SettingsThemeSwitchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.themeColors;
     final isDarkMode = controller.isDarkMode;
+    final isLightTheme = Theme.of(context).brightness == Brightness.light;
 
     return SettingsCardShell(
       child: Row(
@@ -77,6 +78,10 @@ class SettingsThemeSwitchCard extends StatelessWidget {
               value: isDarkMode,
               activeThumbColor: colors.brandStrong,
               activeTrackColor: colors.brandStrong.withValues(alpha: 0.34),
+              inactiveThumbColor: isLightTheme ? colors.brandStrong : null,
+              inactiveTrackColor: isLightTheme
+                  ? colors.brand.withValues(alpha: 0.16)
+                  : null,
               onChanged: (enabled) {
                 HapticFeedback.selectionClick();
                 controller.setDarkMode(enabled);

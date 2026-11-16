@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'animated_home_assessment_items.dart';
+
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/models/exam.dart';
@@ -39,6 +41,25 @@ class _HomeAssessmentListState extends State<HomeAssessmentList> {
   static const _pageSize = 5;
 
   int _page = 1;
+  late bool _hasLoaded;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasLoaded =
+        !widget.isLoading ||
+        widget.assessments.isNotEmpty ||
+        widget.activeAssessment != null;
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeAssessmentList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!widget.isLoading) _hasLoaded = true;
+  }
+
+  String _examKey(GeneratedExam exam) =>
+      '${exam.examType}:${exam.userExamId ?? exam.examId ?? exam.userAiExamId ?? exam.id ?? '${exam.createDt}:${exam.title}'}';
 
   @override
   Widget build(BuildContext context) {
@@ -53,16 +74,9 @@ class _HomeAssessmentListState extends State<HomeAssessmentList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (widget.isLoading)
+        if (widget.isLoading && !_hasLoaded)
           const ParentAssessmentListSkeleton()
         else ...[
-          if (widget.activeAssessment != null) ...[
-            ParentAssessmentActiveCard(
-              isLoading: widget.isOpeningActiveAssessment,
-              onTap: widget.onResumeExam,
-            ),
-            if (widget.assessments.isNotEmpty) const SizedBox(height: 14),
-          ],
           if (widget.errorMessage != null &&
               widget.assessments.isEmpty &&
               widget.activeAssessment == null)
@@ -79,32 +93,48 @@ class _HomeAssessmentListState extends State<HomeAssessmentList> {
               title: context.getText(AppKeys.noHistoryTitle),
               message: context.getText(AppKeys.noHistoryMessage),
               onTap: widget.onRetry,
-            )
-          else ...[
-            for (final exam in visible) ...[
-              AssessmentResultListItemCard(
-                exam: exam,
-                onTap:
-                    (exam.userExamId ??
-                            exam.examId ??
-                            exam.userAiExamId ??
-                            exam.id) ==
-                        null
-                    ? null
-                    : () => widget.onOpenExam(exam),
-              ),
-              const SizedBox(height: 14),
+            ),
+          AnimatedHomeAssessmentItems(
+            key: const ValueKey('learning-exam-items'),
+            items: [
+              if (widget.activeAssessment case final active?)
+                Padding(
+                  key: ValueKey('learning-active-${_examKey(active)}'),
+                  padding: EdgeInsets.only(
+                    bottom: widget.assessments.isNotEmpty ? 14 : 0,
+                  ),
+                  child: ParentAssessmentActiveCard(
+                    isLoading: widget.isOpeningActiveAssessment,
+                    onTap: widget.onResumeExam,
+                  ),
+                ),
+              for (final exam in visible)
+                Padding(
+                  key: ValueKey('learning-exam-${_examKey(exam)}'),
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: AssessmentResultListItemCard(
+                    exam: exam,
+                    onTap:
+                        (exam.userExamId ??
+                                exam.examId ??
+                                exam.userAiExamId ??
+                                exam.id) ==
+                            null
+                        ? null
+                        : () => widget.onOpenExam(exam),
+                  ),
+                ),
             ],
-            if (totalPages > 1)
-              ParentAssessmentPagination(
-                currentPage: currentPage,
-                totalPages: totalPages,
-                hasPrevious: currentPage > 1,
-                hasNext: currentPage < totalPages,
-                isLoading: widget.isLoading,
-                onPageSelected: (page) => setState(() => _page = page),
-              ),
-          ],
+          ),
+          if (totalPages > 1)
+            ParentAssessmentPagination(
+              currentPage: currentPage,
+              totalPages: totalPages,
+              hasPrevious: currentPage > 1,
+              hasNext: currentPage < totalPages,
+              isLoading: false,
+              onPageSelected: (page) => setState(() => _page = page),
+            ),
         ],
       ],
     );

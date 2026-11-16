@@ -125,11 +125,6 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
         context.getText(AppKeys.placementResultActivity);
     final gradeDescription =
         widget.gradeTitle ?? context.getText(AppKeys.placementResultChartGrade);
-    final headerTextStyle = GoogleFonts.andika(
-      color: textColor,
-      fontSize: 22,
-      fontWeight: FontWeight.w800,
-    );
     return LayoutBuilder(
       builder: (context, constraints) {
         // A narrow card leaves less space after the grade and vertical axis.
@@ -158,36 +153,9 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  _StairsIcon(
-                    color: isDark ? colors.info : const Color(0xFF2D9CC2),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 79,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.center,
-                      child: Text(
-                        gradeDescription,
-                        key: const ValueKey(
-                          'placement-progression-grade-title',
-                        ),
-                        style: headerTextStyle,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6 + 29 + 12),
-                  Expanded(
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(activityLabel, style: headerTextStyle),
-                      ),
-                    ),
-                  ),
-                ],
+              AssessmentProgressionChartHeader(
+                gradeTitle: gradeDescription,
+                activityTitle: activityLabel,
               ),
               const SizedBox(height: 18),
               Row(
@@ -342,6 +310,56 @@ class _AssessmentProgressionChartState extends State<AssessmentProgressionChart>
           ),
         );
       },
+    );
+  }
+}
+
+/// Shared header metrics keep Home placeholders aligned with the loaded chart.
+class AssessmentProgressionChartHeader extends StatelessWidget {
+  const AssessmentProgressionChartHeader({
+    super.key,
+    required this.gradeTitle,
+    required this.activityTitle,
+  });
+  final String gradeTitle;
+  final String activityTitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.themeColors;
+    final textColor = isDark ? colors.textPrimary : const Color(0xFF1C3A43);
+    final headerTextStyle = GoogleFonts.andika(
+      color: textColor,
+      fontSize: 22,
+      fontWeight: FontWeight.w800,
+    );
+    return Row(
+      children: [
+        _StairsIcon(color: isDark ? colors.info : const Color(0xFF2D9CC2)),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 79,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: Text(
+              gradeTitle,
+              key: const ValueKey('placement-progression-grade-title'),
+              style: headerTextStyle,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6 + 29 + 12),
+        Expanded(
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(activityTitle, style: headerTextStyle),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

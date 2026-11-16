@@ -263,6 +263,10 @@ void main() {
 
         homeService.layout = Completer<HomeLayout>();
         examService.progress = Completer<ExamProgressResponse>();
+        final action = find.byKey(
+          const ValueKey('parent-home-assessment-action'),
+        );
+        final actionTop = tester.getTopLeft(action).dy;
         final state = tester.state<ParentHomeContentState>(
           find.byType(isStudent ? StudentHomeContent : ParentHomeContent),
         );
@@ -270,6 +274,7 @@ void main() {
         await tester.pump();
         expect(find.byType(HomeContentSkeleton), findsNothing);
         expect(find.byType(HomeProgressSkeleton), findsOneWidget);
+        expect(tester.getTopLeft(action).dy, closeTo(actionTop, 0.01));
         expect(find.byType(AssessmentProgressionChart), findsNothing);
         expect(
           find.byKey(const ValueKey('parent-home-assessment-action')),
@@ -318,18 +323,23 @@ void main() {
   testWidgets('home skeleton fits a narrow screen with large text', (
     tester,
   ) async {
+    final lingo = LingoProvider();
+    addTearDown(lingo.dispose);
     await tester.binding.setSurfaceSize(const Size(280, 640));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark(),
-        home: const MediaQuery(
-          data: MediaQueryData(textScaler: TextScaler.linear(2)),
-          child: Scaffold(
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(14),
-                child: HomeContentSkeleton(),
+        home: LingoScope(
+          lingo: lingo,
+          child: const MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(2)),
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(14),
+                  child: HomeContentSkeleton(),
+                ),
               ),
             ),
           ),
@@ -646,10 +656,7 @@ void main() {
       service.pendingProgress!.complete(updatedProgress);
       await tester.pumpAndSettle();
 
-      expect(
-        service.progressProfileIds.length,
-        requestsBeforeClose + 1,
-      );
+      expect(service.progressProfileIds.length, requestsBeforeClose + 1);
       final chart = tester.widget<AssessmentProgressionChart>(
         find.byKey(const ValueKey('parent-home-progress-chart')),
       );

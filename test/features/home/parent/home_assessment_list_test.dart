@@ -62,7 +62,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('learning list shows skeleton until stats finish loading', (
+  testWidgets('learning list retains available stats during background loading', (
     tester,
   ) async {
     final lingo = LingoProvider();
@@ -87,9 +87,9 @@ void main() {
     );
 
     await tester.pumpWidget(buildList(true));
-    expect(find.byType(ParentAssessmentListSkeleton), findsOneWidget);
-    expect(find.byType(ParentAssessmentActiveCard), findsNothing);
-    expect(find.byType(AssessmentResultListItemCard), findsNothing);
+    expect(find.byType(ParentAssessmentListSkeleton), findsNothing);
+    expect(find.byType(ParentAssessmentActiveCard), findsOneWidget);
+    expect(find.byType(AssessmentResultListItemCard), findsOneWidget);
 
     await tester.pumpWidget(buildList(false));
     expect(find.byType(ParentAssessmentListSkeleton), findsNothing);
