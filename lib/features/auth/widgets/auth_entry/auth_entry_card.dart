@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -52,7 +54,10 @@ class AuthEntryCard extends StatefulWidget {
   State<AuthEntryCard> createState() => _AuthEntryCardState();
 }
 
-class _AuthEntryCardState extends State<AuthEntryCard> {
+class _AuthEntryCardState extends State<AuthEntryCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _errorAnimation;
+  bool _hasSubmitted = false;
   final _inputFocus = FocusNode();
   final _actionKey = GlobalKey();
   final _identifierFormatter = LoginNameInputFormatter();
@@ -62,6 +67,10 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
   @override
   void initState() {
     super.initState();
+    _errorAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 520),
+    );
     _inputFocus.addListener(_handleFocusChanged);
   }
 
@@ -81,12 +90,22 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
     if (widget.identifierErrorText != oldWidget.identifierErrorText) {
       _revealAction();
     }
+    if (widget.identifierErrorText == null) {
+      _errorAnimation.reset();
+    } else if (_hasSubmitted &&
+        (widget.identifierErrorText != oldWidget.identifierErrorText ||
+            ((oldWidget.isCheckingIdentifier || oldWidget.isSubmitting) &&
+                !widget.isCheckingIdentifier &&
+                !widget.isSubmitting))) {
+      _errorAnimation.forward(from: 0);
+    }
   }
 
   @override
   void dispose() {
     _inputFocus.removeListener(_handleFocusChanged);
     _inputFocus.dispose();
+    _errorAnimation.dispose();
     super.dispose();
   }
 
@@ -116,6 +135,12 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
     });
   }
 
+  void _submitIdentifier() {
+    _hasSubmitted = true;
+    if (widget.identifierErrorText != null) _errorAnimation.forward(from: 0);
+    widget.onSubmitIdentifier();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
@@ -124,69 +149,103 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: colors.inputSurface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colors.borderStrong, width: 1.5),
-          ),
-          child: Row(
-            children: [
-              if (isPhoneInput) ...[
-                PhoneRegionMenu(
-                  region: widget.region,
-                  onChanged: widget.onRegionChanged,
+        AnimatedBuilder(
+          animation: _errorAnimation,
+          builder: (context, _) {
+            final progress = _errorAnimation.value;
+            final active = _errorAnimation.isAnimating;
+            final shake = active && !MediaQuery.disableAnimationsOf(context)
+                ? math.sin(progress * math.pi * 6) * 6 * (1 - progress)
+                : 0.0;
+            final pulse = active
+                ? (progress < 0.55 ? 1.0 : (1 - progress) / 0.45)
+                : 0.0;
+            return Transform.translate(
+              key: const ValueKey('auth-identifier-shake'),
+              offset: Offset(shake, 0),
+              child: Container(
+                key: const ValueKey('auth-identifier-box'),
+                height: 64,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: colors.inputSurface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Color.lerp(
+                      colors.borderStrong,
+                      colors.error,
+                      pulse,
+                    )!,
+                    width: 1.5,
+                  ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Container(width: 1, height: 24, color: colors.border),
-                ),
-              ],
-              Expanded(
-                child: TextField(
-                  key: ValueKey('auth-identifier-${widget.mode.name}'),
-                  controller: widget.controller,
-                  focusNode: _inputFocus,
-                  keyboardType: TextInputType.emailAddress,
-                  inputFormatters: [_identifierFormatter],
-                  autofillHints: null,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  enableIMEPersonalizedLearning: false,
-                  smartDashesType: SmartDashesType.disabled,
-                  smartQuotesType: SmartQuotesType.disabled,
-                  onChanged: widget.onIdentifierChanged,
-                  decoration: InputDecoration(
-                    hintText: isPhoneInput
-                        ? widget.region.hint
-                        : context.getText(AppKeys.loginNameHint),
-                    hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: colors.inputHint,
-                      fontWeight: FontWeight.w500,
-                      fontSize: FontSize.large,
+                child: Row(
+                  children: [
+                    if (isPhoneInput) ...[
+                      PhoneRegionMenu(
+                        region: widget.region,
+                        onChanged: widget.onRegionChanged,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Container(
+                          width: 1,
+                          height: 24,
+                          color: colors.border,
+                        ),
+                      ),
+                    ],
+                    Expanded(
+                      child: TextField(
+                        key: ValueKey('auth-identifier-${widget.mode.name}'),
+                        controller: widget.controller,
+                        focusNode: _inputFocus,
+                        keyboardType: TextInputType.emailAddress,
+                        inputFormatters: [_identifierFormatter],
+                        autofillHints: null,
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        enableIMEPersonalizedLearning: false,
+                        smartDashesType: SmartDashesType.disabled,
+                        smartQuotesType: SmartQuotesType.disabled,
+                        onChanged: (value) {
+                          _hasSubmitted = false;
+                          _errorAnimation.reset();
+                          widget.onIdentifierChanged(value);
+                        },
+                        decoration: InputDecoration(
+                          hintText: isPhoneInput
+                              ? widget.region.hint
+                              : context.getText(AppKeys.loginNameHint),
+                          hintStyle: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(
+                                color: colors.inputHint,
+                                fontWeight: FontWeight.w500,
+                                fontSize: FontSize.large,
+                              ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          filled: false,
+                          isCollapsed: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: colors.textPrimary,
+                          fontSize: FontSize.xl,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0,
+                        ),
+                      ),
                     ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    filled: false,
-                    isCollapsed: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: colors.textPrimary,
-                    fontSize: FontSize.xl,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0,
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
@@ -220,7 +279,7 @@ class _AuthEntryCardState extends State<AuthEntryCard> {
               widget.canSubmit &&
                   !widget.isCheckingIdentifier &&
                   !widget.isSubmitting
-              ? widget.onSubmitIdentifier
+              ? _submitIdentifier
               : null,
           isBusy:
               widget.canSubmit &&
