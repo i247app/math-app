@@ -403,12 +403,10 @@ class _GradeRoadmapHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          if (selectedGrade == 0) ...[
-            const QuestionAudioToggle(
-              key: ValueKey('grade-roadmap-audio-toggle'),
-            ),
-            if (onBack != null) const SizedBox(width: 8),
-          ],
+          const QuestionAudioToggle(
+            key: ValueKey('grade-roadmap-audio-toggle'),
+          ),
+          if (onBack != null) const SizedBox(width: 8),
           if (onBack != null)
             IconButton(
               key: const ValueKey('grade-roadmap-close'),

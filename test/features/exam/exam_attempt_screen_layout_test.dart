@@ -505,80 +505,93 @@ void main() {
       });
     }
 
-    testWidgets(
-      'assessment header mutes this attempt and enables current narration',
-      (tester) async {
-        await const ExamQuestionAudioSettings().saveEnabled(true);
-        await _pumpAssessment(
-          tester,
-          questions: questions,
-          examType: examTypeAssessment,
-        );
-        await tester.pumpAndSettle();
-        final toggle = find.byKey(const ValueKey('assessment-audio-toggle'));
-        expect(toggle, findsOneWidget);
-        expect(find.byIcon(Icons.help_outline_rounded), findsNothing);
-        calls.clear();
-        await tester.tap(toggle);
-        await tester.pumpAndSettle();
-        expect(find.byIcon(Icons.volume_off_rounded), findsOneWidget);
-        expect(calls.last.method, 'stop');
-        expect(await const ExamQuestionAudioSettings().readEnabled(), isTrue);
-        await tester.tap(find.byKey(const ValueKey('read-question')));
-        await tester.pumpAndSettle();
-        expect(calls.where((c) => c.method == 'speak'), hasLength(1));
-        calls.clear();
-        tester
-            .widget<AssessmentProgressSection>(
-              find.byType(AssessmentProgressSection),
-            )
-            .onQuestionSelected!(1);
-        await tester.pumpAndSettle();
-        expect(calls.where((c) => c.method == 'speak'), isEmpty);
-        await tester.tap(toggle);
-        await tester.pumpAndSettle();
-        expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
-        expect(
-          calls.where((c) => c.method == 'speak').single.arguments,
-          questions.last.questionText,
-        );
-      },
-    );
-
-    for (final ttsText in <String?>[null, '', '   ', 'Bốn cộng tám']) {
-      testWidgets('narration uses only tts_text: $ttsText', (tester) async {
-        await _pumpAssessment(
-          tester,
-          initialGrade: 5,
-          questions: [
-            ExamQuestion(
-              questionText: '4 + 8',
-              ttsText: ttsText,
-              questionNumber: 1,
-              options: const [ExamAnswer(id: 'a', text: '12')],
-            ),
-          ],
-        );
-        await tester.pumpAndSettle();
-        final enabled = ttsText?.trim().isNotEmpty ?? false;
-        expect(find.text('4 + 8'), findsOneWidget);
-        expect(
-          find.byKey(const ValueKey('read-question')),
-          enabled ? findsOneWidget : findsNothing,
-        );
-        expect(
-          calls.where((c) => c.method == 'speak').map((c) => c.arguments),
-          enabled ? ['Bốn cộng tám'] : isEmpty,
-        );
-        if (enabled) {
+    for (final examType in [examTypeAssessment, examTypeGrade]) {
+      testWidgets(
+        '$examType header mutes this attempt and enables current narration',
+        (tester) async {
+          await const ExamQuestionAudioSettings().saveEnabled(true);
+          await _pumpAssessment(
+            tester,
+            questions: questions,
+            examType: examType,
+          );
+          await tester.pumpAndSettle();
+          final toggle = find.byKey(const ValueKey('assessment-audio-toggle'));
+          expect(toggle, findsOneWidget);
+          expect(find.byIcon(Icons.help_outline_rounded), findsNothing);
+          calls.clear();
+          await tester.tap(toggle);
+          await tester.pumpAndSettle();
+          expect(find.byIcon(Icons.volume_off_rounded), findsOneWidget);
+          expect(calls.last.method, 'stop');
+          expect(await const ExamQuestionAudioSettings().readEnabled(), isTrue);
           await tester.tap(find.byKey(const ValueKey('read-question')));
           await tester.pumpAndSettle();
+          expect(calls.where((c) => c.method == 'speak'), hasLength(1));
+          calls.clear();
+          if (examType == examTypeGrade) {
+            await tester.tap(find.byType(AssessmentAnswerButton).first);
+            await tester.pumpAndSettle();
+            await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          } else {
+            tester
+                .widget<AssessmentProgressSection>(
+                  find.byType(AssessmentProgressSection),
+                )
+                .onQuestionSelected!(1);
+          }
+          await tester.pumpAndSettle();
+          expect(calls.where((c) => c.method == 'speak'), isEmpty);
+          await tester.tap(toggle);
+          await tester.pumpAndSettle();
+          expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
           expect(
-            calls.where((c) => c.method == 'speak').last.arguments,
-            'Bốn cộng tám',
+            calls.where((c) => c.method == 'speak').single.arguments,
+            questions.last.questionText,
           );
-        }
-      });
+        },
+      );
+    }
+
+    for (final examType in [examTypeAssessment, examTypeGrade]) {
+      for (final ttsText in <String?>[null, '', '   ', 'Bốn cộng tám']) {
+        testWidgets('$examType narration uses only tts_text: $ttsText', (
+          tester,
+        ) async {
+          await _pumpAssessment(
+            tester,
+            initialGrade: 5,
+            examType: examType,
+            questions: [
+              ExamQuestion(
+                questionText: '4 + 8',
+                ttsText: ttsText,
+                questionNumber: 1,
+                options: const [ExamAnswer(id: 'a', text: '12')],
+              ),
+            ],
+          );
+          await tester.pumpAndSettle();
+          final enabled = ttsText?.trim().isNotEmpty ?? false;
+          expect(find.text('4 + 8'), findsOneWidget);
+          expect(
+            find.byKey(const ValueKey('read-question')),
+            enabled ? findsOneWidget : findsNothing,
+          );
+          expect(
+            calls.where((c) => c.method == 'speak').map((c) => c.arguments),
+            enabled ? ['Bốn cộng tám'] : isEmpty,
+          );
+          if (enabled) {
+            await tester.tap(find.byKey(const ValueKey('read-question')));
+            await tester.pumpAndSettle();
+            expect(
+              calls.where((c) => c.method == 'speak').last.arguments,
+              'Bốn cộng tám',
+            );
+          }
+        });
+      }
     }
 
     testWidgets('emoji question hides its speaker without starting narration', (

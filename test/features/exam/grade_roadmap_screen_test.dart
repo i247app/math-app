@@ -275,7 +275,7 @@ void main() {
           find.byKey(const ValueKey('grade-roadmap-resume-prompt')),
           findsNothing,
         );
-        await tester.ensureVisible(current);
+        await Scrollable.ensureVisible(tester.element(current), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(current);
         await tester.pumpAndSettle();
@@ -573,7 +573,7 @@ void main() {
     );
     await pumpRoadmap(tester, service);
     final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -609,7 +609,7 @@ void main() {
           passed ? findsNothing : findsOneWidget,
         );
         final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -720,7 +720,7 @@ void main() {
       findsOneWidget,
     );
     final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -811,7 +811,7 @@ void main() {
         ),
       );
       final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-      await tester.ensureVisible(level);
+      await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
       await tester.pumpAndSettle();
       await tester.tap(level);
       await tester.pumpAndSettle();
@@ -855,7 +855,7 @@ void main() {
       ),
     );
     final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -876,7 +876,7 @@ void main() {
         .widget<RefreshIndicator>(find.byType(RefreshIndicator))
         .onRefresh();
     await tester.pumpAndSettle();
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -952,7 +952,10 @@ void main() {
               findsOneWidget,
             );
             final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-            await tester.ensureVisible(level);
+            await Scrollable.ensureVisible(
+              tester.element(level),
+              alignment: 0.5,
+            );
             await tester.pumpAndSettle();
             await tester.tap(level);
             await tester.pumpAndSettle();
@@ -1033,7 +1036,7 @@ void main() {
         ),
       );
       final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-      await tester.ensureVisible(level);
+      await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
       await tester.pumpAndSettle();
       await tester.tap(level);
       await tester.pumpAndSettle();
@@ -1062,7 +1065,7 @@ void main() {
         );
         await pumpRoadmap(tester, service);
         final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1085,7 +1088,7 @@ void main() {
             .widget<RefreshIndicator>(find.byType(RefreshIndicator))
             .onRefresh();
         await tester.pumpAndSettle();
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1118,7 +1121,7 @@ void main() {
           await tester.pumpWidget(const SizedBox.shrink());
           await pumpRoadmap(tester, service);
           final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-          await tester.ensureVisible(level);
+          await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
           await tester.pumpAndSettle();
           await tester.tap(level);
           await tester.pumpAndSettle();
@@ -1216,7 +1219,7 @@ void main() {
           .scale,
       1.04,
     );
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -1235,7 +1238,7 @@ void main() {
         );
         await pumpRoadmap(tester, service);
         final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1263,7 +1266,7 @@ void main() {
           find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
           findsOneWidget,
         );
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1314,7 +1317,7 @@ void main() {
       );
       expect(find.byKey(const ValueKey('grade-roadmap-level-0')), findsNothing);
       final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-      await tester.ensureVisible(level);
+      await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
       await tester.pumpAndSettle();
       await tester.tap(level);
       await tester.pumpAndSettle();
@@ -1331,7 +1334,7 @@ void main() {
         final service = _FakeExamService();
         await pumpRoadmap(tester, service);
         final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1361,7 +1364,7 @@ void main() {
           find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
           findsOneWidget,
         );
-        await tester.ensureVisible(level);
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
         await tester.pumpAndSettle();
         await tester.tap(level);
         await tester.pumpAndSettle();
@@ -1450,7 +1453,7 @@ void main() {
           final level = find.byKey(
             ValueKey('grade-roadmap-level-$attemptedLevel'),
           );
-          await tester.ensureVisible(level);
+          await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
           await tester.pumpAndSettle();
           await tester.tap(level);
           await tester.pumpAndSettle();
@@ -1510,7 +1513,7 @@ void main() {
     final service = _FakeExamService(levelsByGrade: levels, questionCount: 10);
     await pumpRoadmap(tester, service);
     final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -1585,7 +1588,7 @@ void main() {
     final service = _FakeExamService(failCompletion: true);
     await pumpRoadmap(tester, service);
     final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -1620,7 +1623,7 @@ void main() {
       ),
     );
     final level = find.byKey(const ValueKey('grade-roadmap-level-6'));
-    await tester.ensureVisible(level);
+    await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.tap(level);
     await tester.pumpAndSettle();
@@ -1984,8 +1987,8 @@ void main() {
 
       expect(service.levelRequests, <int>[grade]);
       final audio = find.byKey(const ValueKey('grade-roadmap-audio-toggle'));
-      expect(audio, grade == 0 ? findsOneWidget : findsNothing);
-      if (grade == 0) {
+      expect(audio, findsOneWidget);
+      {
         expect(
           find.descendant(
             of: audio,

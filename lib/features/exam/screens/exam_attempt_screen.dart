@@ -838,7 +838,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                             children: [
                               AssessmentHeader(
                                 onClose: _exitController.requestExit,
-                                audioEnabled: _controller.isAssessment
+                                audioEnabled:
+                                    (_controller.isAssessment ||
+                                        _controller.isGrade)
                                     ? _autoReadEnabled ?? true
                                     : null,
                                 onToggleAudio: _autoReadEnabled == null
@@ -886,7 +888,9 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
                                   SliverToBoxAdapter(
                                     child: AssessmentHeader(
                                       onClose: _exitController.requestExit,
-                                      audioEnabled: _controller.isAssessment
+                                      audioEnabled:
+                                          (_controller.isAssessment ||
+                                              _controller.isGrade)
                                           ? _autoReadEnabled ?? true
                                           : null,
                                       onToggleAudio: _autoReadEnabled == null
