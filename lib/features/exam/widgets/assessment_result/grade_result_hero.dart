@@ -37,7 +37,6 @@ class GradeResultHero extends StatelessWidget {
         SizedBox(height: compact ? 8 : 12),
         PlacementCelebrationMascot(size: compact ? 84 : 104),
         GradeResultLevelTransition(
-          grade: grade,
           level: level,
           passed: passed,
           compact: compact,

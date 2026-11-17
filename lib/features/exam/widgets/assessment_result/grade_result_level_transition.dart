@@ -6,16 +6,15 @@ import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/core/theme/app_theme_colors.dart';
 import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 
-/// Passive progress illustration: these markers are not navigation controls.
+/// Illustrates progress before and after the attempted level, starting at zero.
+/// These markers are not navigation controls.
 class GradeResultLevelTransition extends StatelessWidget {
   const GradeResultLevelTransition({
     super.key,
-    required this.grade,
     required this.level,
     required this.passed,
     required this.compact,
   });
-  final int grade;
   final int level;
   final bool passed;
   final bool compact;
@@ -23,8 +22,7 @@ class GradeResultLevelTransition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.themeColors;
-    final target = GradeExamFlowPolicy.nextLevel(grade: grade, level: level);
-    final terminal = target.grade == grade && target.level == level;
+    final attemptedLevel = level.clamp(1, GradeExamFlowPolicy.maximumLevel);
     return SizedBox(
       key: const ValueKey('grade-result-level-transition'),
       height: compact ? 112 : 128,
@@ -34,66 +32,47 @@ class GradeResultLevelTransition extends StatelessWidget {
         children: [
           _LevelMarker(
             key: const ValueKey('grade-result-current-level'),
-            level: level,
+            level: attemptedLevel - 1,
             size: compact ? 70 : 76,
           ),
           const SizedBox(width: 12),
-          if (!terminal) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: CustomPaint(
-                size: Size(compact ? 52 : 64, 44),
-                painter: _LevelArrowPainter(
-                  colors.brandStrong.withValues(alpha: 0.45),
-                ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: CustomPaint(
+              size: Size(compact ? 52 : 64, 44),
+              painter: _LevelArrowPainter(
+                colors.brandStrong.withValues(alpha: 0.45),
               ),
             ),
-            const SizedBox(width: 12),
-          ],
-          if (terminal)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 22),
-              child: Text(
-                context.getText(
-                  passed
-                      ? AppKeys.gradeResultCompleted
-                      : AppKeys.gradeResultTryAgain,
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: compact ? 104 : 116,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _LevelMarker(
+                  key: const ValueKey('grade-result-next-level'),
+                  level: attemptedLevel,
+                  size: compact ? 88 : 96,
+                  locked: !passed,
                 ),
-                style: GoogleFonts.nunito(
-                  color: colors.brandStrong,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            )
-          else
-            SizedBox(
-              width: compact ? 104 : 116,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  _LevelMarker(
-                    key: const ValueKey('grade-result-next-level'),
-                    level: target.level,
-                    size: compact ? 88 : 96,
-                    locked: !passed,
-                    grade: target.grade != grade ? target.grade : null,
-                  ),
-                  if (passed)
-                    Positioned(
-                      right: 0,
-                      top: -18,
-                      child: Transform.rotate(
-                        angle: 0.35,
-                        child: Icon(
-                          Icons.auto_awesome_rounded,
-                          size: 28,
-                          color: colors.warning,
-                        ),
+                if (passed)
+                  Positioned(
+                    right: 0,
+                    top: -18,
+                    child: Transform.rotate(
+                      angle: 0.35,
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        size: 28,
+                        color: colors.warning,
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -106,12 +85,10 @@ class _LevelMarker extends StatelessWidget {
     required this.level,
     required this.size,
     this.locked = false,
-    this.grade,
   });
   final int level;
   final double size;
   final bool locked;
-  final int? grade;
 
   @override
   Widget build(BuildContext context) {
@@ -159,13 +136,9 @@ class _LevelMarker extends StatelessWidget {
                 )
               else
                 Text(
-                  grade == null
-                      ? context.getText(AppKeys.gradeResultLevelLabel)
-                      : context.formatText(AppKeys.placementResultGrade, {
-                          'grade': grade,
-                        }),
+                  context.getText(AppKeys.gradeResultLevelLabel),
                   style: GoogleFonts.nunito(
-                    fontSize: grade == null ? 14 : 10,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: foreground,
                     height: 1.1,

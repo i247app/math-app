@@ -905,6 +905,20 @@ void main() {
         const ValueKey('grade-result-level-transition'),
       );
       expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('grade-result-current-level')),
+          matching: find.text('0'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('grade-result-next-level')),
+          matching: find.text('1'),
+        ),
+        findsOneWidget,
+      );
+      expect(
         find.descendant(of: levels, matching: find.byType(InkWell)),
         findsNothing,
       );
@@ -999,6 +1013,20 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('GRADE 3'), findsOneWidget);
       expect(find.text('Try Again'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('grade-result-current-level')),
+          matching: find.text('6'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('grade-result-next-level')),
+          matching: find.text('7'),
+        ),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const ValueKey('grade-result-next-level-lock')),
         findsOneWidget,
