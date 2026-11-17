@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -165,20 +166,37 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
               final indicatorPosition = (swipePosition ?? activePosition)
                   .clamp(0.0, items.length - 1.0)
                   .toDouble();
+              final indicatorBounds = swipePosition == null
+                  ? Rect.fromLTWH(indicatorPosition, 0, 1, 1)
+                  : _DashboardIndicatorBoundsTween.swipeBounds(
+                      indicatorPosition,
+                    );
               return Stack(
                 fit: StackFit.expand,
                 clipBehavior: Clip.none,
                 children: [
                   if (activePosition >= 0 || swipePosition != null)
-                    AnimatedPositioned(
+                    TweenAnimationBuilder<Rect>(
+                      key: ValueKey(widget.activeRole),
                       duration: swipePosition == null
-                          ? _indicatorDuration
+                          ? _DashboardIndicatorBoundsTween.duration
                           : Duration.zero,
-                      curve: Curves.easeOutCubic,
-                      left: itemWidth * indicatorPosition,
-                      top: 0,
-                      bottom: 0,
-                      width: itemWidth,
+                      tween: _DashboardIndicatorBoundsTween(
+                        begin: indicatorBounds,
+                        end: indicatorBounds,
+                      ),
+                      builder: (context, bounds, child) => Positioned(
+                        key: const ValueKey('dashboard-active-indicator'),
+                        left:
+                            itemWidth *
+                            bounds.left
+                                .clamp(0.0, items.length - bounds.width)
+                                .toDouble(),
+                        top: 0,
+                        bottom: 0,
+                        width: itemWidth * bounds.width,
+                        child: child!,
+                      ),
                       child: _DashboardActiveIndicator(
                         teacherStyle: widget.activeRole == ProfileRole.teacher,
                       ),
@@ -190,6 +208,97 @@ class _DashboardBottomNavigationState extends State<DashboardBottomNavigation> {
           );
         },
       ),
+    );
+  }
+}
+
+// Preserve reference A's stretch and bounce within 800 ms.
+// Bounds are measured in tab widths.
+class _DashboardIndicatorBoundsTween extends Tween<Rect> {
+  _DashboardIndicatorBoundsTween({required Rect begin, required Rect end})
+    : super(begin: begin, end: end);
+
+  static const duration = Duration(milliseconds: 800);
+  static const _referenceDurationSeconds = 2.2;
+  static const _referenceTailDelaySeconds = 0.225;
+  static final _leadingSpring = SpringSimulation(
+    SpringDescription.withDampingRatio(
+      mass: 1,
+      stiffness: 22.5625,
+      ratio: 0.45,
+    ),
+    0,
+    1,
+    0,
+  );
+  static final _trailingSpring = SpringSimulation(
+    SpringDescription.withDampingRatio(
+      mass: 1,
+      stiffness: 37.8225,
+      ratio: 0.55,
+    ),
+    0,
+    1,
+    0,
+  );
+
+  // Scrubbing follows the finger without playing the timed spring or bounce.
+  static Rect swipeBounds(double position) {
+    final from = position.floorToDouble();
+    final progress = position - from;
+    final leading = const Interval(
+      0,
+      0.75,
+      curve: Curves.easeOutCubic,
+    ).transform(progress);
+    final trailing = const Interval(
+      0.25,
+      1,
+      curve: Curves.easeInOutCubic,
+    ).transform(progress);
+    return Rect.fromLTRB(from + trailing, 0, from + 1 + leading, 1);
+  }
+
+  static double _springProgress(
+    SpringSimulation spring,
+    double seconds,
+    double endSeconds,
+    double settle,
+  ) {
+    // Remove the small residual displacement smoothly, so the last frame lands
+    // exactly on the tab rather than snapping at the end of the spring.
+    return spring.x(seconds) + (1 - spring.x(endSeconds)) * settle;
+  }
+
+  @override
+  Rect lerp(double t) {
+    final from = begin!;
+    final to = end!;
+    final movingRight = to.center.dx >= from.center.dx;
+    final seconds = t * _referenceDurationSeconds;
+    final settle = Curves.easeInOut.transform(
+      ((t - 0.7) / 0.3).clamp(0.0, 1.0),
+    );
+    final leading = _springProgress(
+      _leadingSpring,
+      seconds,
+      _referenceDurationSeconds,
+      settle,
+    );
+    final trailing = _springProgress(
+      _trailingSpring,
+      (seconds - _referenceTailDelaySeconds).clamp(
+        0.0,
+        _referenceDurationSeconds,
+      ),
+      _referenceDurationSeconds - _referenceTailDelaySeconds,
+      settle,
+    );
+    return Rect.fromLTRB(
+      from.left + (to.left - from.left) * (movingRight ? trailing : leading),
+      0,
+      from.right + (to.right - from.right) * (movingRight ? leading : trailing),
+      1,
     );
   }
 }
@@ -253,6 +362,8 @@ class DashboardAnimatedNavItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(48),
           child: Container(
             height: 60,

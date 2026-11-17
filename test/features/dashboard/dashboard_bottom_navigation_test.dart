@@ -223,6 +223,154 @@ void main() {
     });
   }
 
+  for (final role in [ProfileRole.parent, ProfileRole.teacher]) {
+    testWidgets('$role indicator stretches and contracts in both directions', (
+      tester,
+    ) async {
+      await _pumpAnimatedNavigation(tester, role: role);
+      final indicator = find.byKey(
+        const ValueKey('dashboard-active-indicator'),
+      );
+      final items = find.byType(DashboardAnimatedNavItem);
+      final start = tester.getRect(indicator);
+
+      await tester.tap(items.at(1));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 111));
+      final stretchedRight = tester.getRect(indicator);
+      expect(stretchedRight.width, greaterThan(start.width * 1.45));
+      expect(stretchedRight.left, greaterThan(start.left));
+      expect(stretchedRight.left, lessThan(start.left + start.width * 0.5));
+      await tester.pump(const Duration(milliseconds: 689));
+      final next = tester.getRect(indicator);
+      expect(next.width, closeTo(start.width, 0.01));
+      expect(next.left, closeTo(start.right, 0.01));
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(tester.getRect(indicator), next);
+
+      await tester.tap(items.first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 111));
+      final stretchedLeft = tester.getRect(indicator);
+      expect(stretchedLeft.width, greaterThan(start.width * 1.45));
+      expect(stretchedLeft.right, lessThan(next.right));
+      expect(stretchedLeft.right, greaterThan(next.right - start.width * 0.5));
+      await tester.pump(const Duration(milliseconds: 689));
+      expect(tester.getRect(indicator), start);
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(tester.getRect(indicator), start);
+    });
+  }
+
+  testWidgets('indicator holds its tail, overshoots and springs back like A', (
+    tester,
+  ) async {
+    await _pumpAnimatedNavigation(tester);
+    final indicator = find.byKey(const ValueKey('dashboard-active-indicator'));
+    final items = find.byType(DashboardAnimatedNavItem);
+    final start = tester.getRect(indicator);
+
+    await tester.tap(items.at(2));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 55));
+    final pulling = tester.getRect(indicator);
+    expect(pulling.left, closeTo(start.left, 0.01));
+    expect(pulling.right, greaterThan(start.right));
+    expect(pulling.height, start.height);
+
+    await tester.pump(const Duration(milliseconds: 198));
+    final overshoot = tester.getRect(indicator);
+    final targetLeft = start.left + 2 * start.width;
+    expect(overshoot.left, greaterThan(targetLeft));
+    expect(overshoot.right, greaterThan(targetLeft + start.width));
+    expect(overshoot.width, lessThan(start.width * 1.3));
+    expect(overshoot.height, start.height);
+
+    await tester.pump(const Duration(milliseconds: 253));
+    expect(tester.getRect(indicator).left, lessThan(targetLeft));
+    await tester.pumpAndSettle();
+    final target = tester.getRect(indicator);
+    expect(target.left, closeTo(targetLeft, 0.01));
+    expect(target.width, closeTo(start.width, 0.01));
+
+    await tester.tap(items.at(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 253));
+    expect(tester.getRect(indicator).left, lessThan(start.right));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(indicator).left, closeTo(start.right, 0.01));
+  });
+
+  testWidgets('spring stays inside navbar when travelling to either end', (
+    tester,
+  ) async {
+    await _pumpAnimatedNavigation(tester);
+    final indicator = find.byKey(const ValueKey('dashboard-active-indicator'));
+    final items = find.byType(DashboardAnimatedNavItem);
+    final start = tester.getRect(indicator);
+    final maxRight = start.left + start.width * 4;
+    for (final target in [items.last, items.first]) {
+      await tester.tap(target);
+      await tester.pump();
+      for (var frame = 0; frame < 80; frame++) {
+        await tester.pump(const Duration(milliseconds: 10));
+        final bounds = tester.getRect(indicator);
+        expect(bounds.left, greaterThanOrEqualTo(start.left));
+        expect(bounds.right, lessThanOrEqualTo(maxRight + 0.01));
+        expect(bounds.width, greaterThan(0));
+      }
+    }
+  });
+
+  testWidgets('rapid tab changes continue from the visible stretched bounds', (
+    tester,
+  ) async {
+    await _pumpAnimatedNavigation(tester);
+    final indicator = find.byKey(const ValueKey('dashboard-active-indicator'));
+    final items = find.byType(DashboardAnimatedNavItem);
+    final start = tester.getRect(indicator);
+
+    await tester.tap(items.last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 49));
+    final beforeRetarget = tester.getRect(indicator);
+    expect(beforeRetarget.width, greaterThan(start.width));
+
+    await tester.tap(items.first);
+    await tester.pump();
+    final afterRetarget = tester.getRect(indicator);
+    expect(afterRetarget.left, closeTo(beforeRetarget.left, 0.01));
+    expect(afterRetarget.right, closeTo(beforeRetarget.right, 0.01));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(indicator), start);
+  });
+
+  testWidgets('swipe stretches the indicator and cancellation restores it', (
+    tester,
+  ) async {
+    final swipe = await _pumpAnimatedNavigation(tester);
+    final indicator = find.byKey(const ValueKey('dashboard-active-indicator'));
+    final start = tester.getRect(indicator);
+
+    swipe.value = 0.5;
+    await tester.pump();
+    final stretched = tester.getRect(indicator);
+    expect(stretched.width, greaterThan(start.width * 1.5));
+    expect(stretched.left, greaterThan(start.left));
+    expect(stretched.right, lessThan(start.right + start.width));
+
+    swipe.value = 1;
+    await tester.pump();
+    expect(tester.getRect(indicator).width, closeTo(start.width, 0.01));
+    expect(tester.getRect(indicator).left, closeTo(start.right, 0.01));
+
+    swipe.value = 0;
+    await tester.pump();
+    swipe.value = null;
+    await tester.pumpAndSettle();
+    expect(tester.getRect(indicator), start);
+  });
+
   testWidgets(
     'teacher navigation emits classroom, study and members identities',
     (tester) async {
@@ -296,4 +444,37 @@ void main() {
     await tester.pump();
     expect(find.text('Coming soon'), findsOneWidget);
   });
+}
+
+Future<ValueNotifier<double?>> _pumpAnimatedNavigation(
+  WidgetTester tester, {
+  ProfileRole role = ProfileRole.parent,
+}) async {
+  final lingo = LingoProvider();
+  final swipe = ValueNotifier<double?>(null);
+  addTearDown(lingo.dispose);
+  addTearDown(swipe.dispose);
+  var activeTab = DashboardTabId.home;
+  await tester.pumpWidget(
+    LingoScope(
+      lingo: lingo,
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        home: StatefulBuilder(
+          builder: (context, setState) => Scaffold(
+            bottomNavigationBar: DashboardBottomNavigation(
+              bottomInset: 0,
+              activeTab: activeTab,
+              activeRole: role,
+              user: null,
+              swipePosition: swipe,
+              onTabSelected: (tab) => setState(() => activeTab = tab),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  return swipe;
 }
