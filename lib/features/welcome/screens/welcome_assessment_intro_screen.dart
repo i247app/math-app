@@ -21,7 +21,6 @@ import 'package:numi/features/exam/widgets/assessment_result/assessment_progress
 import 'package:numi/features/welcome/widgets/welcome_primary_button.dart';
 import 'package:numi/features/welcome/widgets/welcome_intro_loading.dart';
 import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
-import 'package:numi/shared/widgets/app_back_button.dart';
 
 /// The guest assessment entry shown after the Welcome details carousel.
 class WelcomeAssessmentIntroScreen extends StatefulWidget {
@@ -163,16 +162,22 @@ class _WelcomeAssessmentIntroScreenState
       padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
       child: Row(
         children: [
-          AppBackButton(
-            key: const ValueKey('welcome-assessment-back'),
-            onPressed: () => Navigator.of(context).pop(),
-            color: Theme.of(context).brightness == Brightness.dark
-                ? context.themeColors.brandStrong
-                : AppColors.welcomeTeal,
-          ),
-          const Spacer(),
           const QuestionAudioToggle(
             key: ValueKey('welcome-assessment-audio-toggle'),
+          ),
+          const Spacer(),
+          IconButton(
+            key: const ValueKey('welcome-assessment-back'),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            onPressed: () => Navigator.of(context).pop(),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF256B6B),
+              side: const BorderSide(color: Color(0xFFE4EEEE)),
+              minimumSize: const Size.square(38),
+              maximumSize: const Size.square(38),
+            ),
+            icon: const Icon(Icons.close_rounded, size: 20),
           ),
         ],
       ),

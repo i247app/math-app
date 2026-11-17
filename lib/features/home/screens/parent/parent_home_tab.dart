@@ -135,6 +135,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
   int _lastAppliedAssessmentLoadRequestId = 0;
   int _progressLoadRequestId = 0;
   bool _isLoadingProgress = false;
+  bool _showProgressLoading = true;
   bool _hasLoadedProgress = false;
   bool _hasProgressError = false;
   bool? _wasRouteCurrent;
@@ -206,13 +207,13 @@ class ParentHomeContentState extends State<ParentHomeContent> {
       return;
     }
     if (!oldWidget.isActive && widget.isActive) {
-      loadHome();
+      loadHome(showProgressLoading: false);
       return;
     }
     if (!widget.isActive) {
       return;
     } else if (oldWidget.activeRefreshTick != widget.activeRefreshTick) {
-      loadHome(forceRefresh: true);
+      loadHome(forceRefresh: true, showProgressLoading: false);
     }
   }
 
@@ -234,13 +235,16 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     return studentProfiles(widget.profiles);
   }
 
-  Future<void> loadHome({bool forceRefresh = false}) async {
+  Future<void> loadHome({
+    bool forceRefresh = false,
+    bool showProgressLoading = true,
+  }) async {
     final profileId = profileStableId(widget.activeProfile);
     await Future.wait([
       // pushReplacement may finish a navigation future while Result still
       // covers Home. Fetch progress when Home actually becomes current again.
       if (profileId != null && profileId > 0 && _wasRouteCurrent != false)
-        _loadAssessmentProgress(profileId),
+        _loadAssessmentProgress(profileId, showLoading: showProgressLoading),
       _loadHomeLayout(forceRefresh: forceRefresh),
     ]);
   }
@@ -384,10 +388,18 @@ class ParentHomeContentState extends State<ParentHomeContent> {
     }
   }
 
-  Future<void> _loadAssessmentProgress(int profileId) async {
+  Future<void> _loadAssessmentProgress(
+    int profileId, {
+    bool showLoading = true,
+  }) async {
     final requestId = ++_progressLoadRequestId;
+    // Tab activation refreshes an existing chart quietly. Route returns and
+    // first loads hide it until fresh progress is available.
+    final showLoadingState =
+        showLoading || !_hasLoadedProgress || _hasProgressError;
     setState(() {
       _isLoadingProgress = true;
+      _showProgressLoading = showLoadingState;
       _hasProgressError = false;
     });
     try {
@@ -401,7 +413,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
         _chart = chart;
       });
     } catch (_) {
-      if (mounted && requestId == _progressLoadRequestId) {
+      if (mounted && requestId == _progressLoadRequestId && showLoadingState) {
         setState(() => _hasProgressError = true);
       }
     } finally {
@@ -477,7 +489,7 @@ class ParentHomeContentState extends State<ParentHomeContent> {
                   if (showInitialLoading)
                     const HomeContentSkeleton()
                   else ...[
-                    if (_isLoadingProgress)
+                    if (_isLoadingProgress && _showProgressLoading)
                       const HomeProgressSkeleton(
                         key: ValueKey('home-progress-loading'),
                       )

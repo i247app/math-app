@@ -18,7 +18,6 @@ import 'package:numi/features/exam/data/exam_question_audio_settings.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/welcome/screens/welcome_assessment_intro_screen.dart';
 import 'package:numi/features/welcome/widgets/welcome_assessment_background.dart';
-import 'package:numi/shared/widgets/app_back_button.dart';
 
 void main() {
   setUp(() {
@@ -159,11 +158,13 @@ void main() {
       );
       expect(
         tester
-            .widget<AppBackButton>(
+            .widget<IconButton>(
               find.byKey(const ValueKey('welcome-assessment-back')),
             )
-            .color,
-        colors.brandStrong,
+            .style!
+            .foregroundColor!
+            .resolve({}),
+        const Color(0xFF256B6B),
       );
       expect(
         tester
@@ -270,7 +271,14 @@ void main() {
       _expectBackVisible(tester);
       final back = find.byKey(const ValueKey('welcome-assessment-back'));
       final backRect = tester.getRect(back);
-      expect(backRect.top, 26);
+      expect(
+        backRect.center.dy,
+        tester
+            .getCenter(
+              find.byKey(const ValueKey('welcome-assessment-audio-toggle')),
+            )
+            .dy,
+      );
       final dots = find.descendant(
         of: _loading,
         matching: find.byType(Transform),
@@ -598,7 +606,17 @@ final _scrollable = find.descendant(
 
 void _expectBackVisible(WidgetTester tester) {
   final back = find.byKey(const ValueKey('welcome-assessment-back'));
+  final audio = find.byKey(const ValueKey('welcome-assessment-audio-toggle'));
   expect(back.hitTestable(), findsOneWidget);
+  expect(tester.getCenter(audio).dx, lessThan(tester.getCenter(back).dx));
+  expect(
+    tester.widget<IconButton>(back).style!.minimumSize!.resolve({}),
+    const Size.square(38),
+  );
+  expect(
+    find.descendant(of: back, matching: find.byIcon(Icons.close_rounded)),
+    findsOneWidget,
+  );
   expect(tester.getRect(back).top, greaterThanOrEqualTo(24));
   expect(find.byKey(const ValueKey('welcome-assessment-skip')), findsNothing);
 }

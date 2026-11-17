@@ -320,6 +320,126 @@ void main() {
     }
   }
 
+  for (final isStudent in [false, true]) {
+    for (final showAssessmentList in [false, true]) {
+      testWidgets('tab activation refreshes chart without skeleton '
+          '(student=$isStudent, learning=$showAssessmentList)', (tester) async {
+        const profileId = 94;
+        HomeProfileCache.instance.invalidateProfile(profileId);
+        addTearDown(
+          () => HomeProfileCache.instance.invalidateProfile(profileId),
+        );
+        final lingo = LingoProvider();
+        addTearDown(lingo.dispose);
+        final service = _DelayedProgressService();
+        final initialProgress = await _ExamService(true).getExamProgress(
+          profileId: profileId,
+          fromDt: DateTime.utc(2026),
+          toDt: DateTime.now(),
+        );
+        service.progress.complete(initialProgress);
+        var isActive = true;
+        var refreshTick = 0;
+        late StateSetter update;
+        final buildContent = isStudent
+            ? StudentHomeContent.new
+            : ParentHomeContent.new;
+        await tester.pumpWidget(
+          RepositoryProvider<HomeLayoutService>.value(
+            value: const _HomeService(),
+            child: LingoScope(
+              lingo: lingo,
+              child: MaterialApp(
+                theme: AppTheme.light(),
+                home: Scaffold(
+                  body: StatefulBuilder(
+                    builder: (context, setState) {
+                      update = setState;
+                      return buildContent(
+                        user: null,
+                        profiles: const [],
+                        activeProfile: const UserProfile(profileId: profileId),
+                        isActive: isActive,
+                        activeRefreshTick: refreshTick,
+                        initialGrades: const [],
+                        gradeService: _GradeService(),
+                        examService: service,
+                        onRefreshProfiles: _noopAsync,
+                        onActivateProfile: _noopActivate,
+                        onProfileSaved: _noop,
+                        onOpenProfileMenu: _noop,
+                        onOpenClassroomTab: _noop,
+                        onOpenGamesTab: _noop,
+                        onParentAssessmentStateChanged: _noopAssessmentState,
+                        bottomPadding: 0,
+                        showAssessmentList: showAssessmentList,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        update(() => isActive = false);
+        await tester.pumpAndSettle();
+        service.progress = Completer<ExamProgressResponse>();
+        final requestsBefore = service.progressProfileIds.length;
+        update(() => isActive = true);
+        await tester.pumpAndSettle();
+        expect(service.progressProfileIds.length, requestsBefore + 1);
+        expect(find.byType(HomeProgressSkeleton), findsNothing);
+        expect(find.byType(HomeContentSkeleton), findsNothing);
+        expect(find.byType(AssessmentProgressionChart), findsOneWidget);
+        expect(
+          tester
+              .widget<AssessmentProgressionChart>(
+                find.byType(AssessmentProgressionChart),
+              )
+              .finalGrade,
+          2,
+        );
+        final updated = _UpdatedProgressService()..latestGrade = 4;
+        service.progress.complete(
+          await updated.getExamProgress(
+            profileId: profileId,
+            fromDt: DateTime.utc(2026),
+            toDt: DateTime.now(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<AssessmentProgressionChart>(
+                find.byType(AssessmentProgressionChart),
+              )
+              .finalGrade,
+          4,
+        );
+
+        // Activation ticks also refresh quietly, and a background failure
+        // keeps the last successful chart instead of replacing it with error UI.
+        service.progress = Completer<ExamProgressResponse>();
+        update(() => refreshTick++);
+        await tester.pumpAndSettle();
+        expect(find.byType(HomeProgressSkeleton), findsNothing);
+        service.progress.completeError(Exception('Background refresh failed'));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('home-progress-error')), findsNothing);
+        expect(
+          tester
+              .widget<AssessmentProgressionChart>(
+                find.byType(AssessmentProgressionChart),
+              )
+              .finalGrade,
+          4,
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
   testWidgets('home skeleton fits a narrow screen with large text', (
     tester,
   ) async {
@@ -993,7 +1113,10 @@ class _DelayedProgressService extends _ExamService {
     required DateTime fromDt,
     required DateTime toDt,
     String examType = examTypeAssessment,
-  }) => progress.future;
+  }) {
+    progressProfileIds.add(profileId);
+    return progress.future;
+  }
 }
 
 class _UpdatedProgressService extends _ExamService {
