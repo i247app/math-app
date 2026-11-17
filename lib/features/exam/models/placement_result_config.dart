@@ -1,10 +1,8 @@
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 
-enum PlacementResultRibbon { assessmentGrade, gradeLevel }
-
 enum PlacementResultGenerationAction {
-  continueGrade(examTypeGrade, AppKeys.placementResultNext);
+  continueGrade(examTypeGrade, AppKeys.gradeResultNextLevel);
 
   const PlacementResultGenerationAction(this.examType, this.labelKey);
 
@@ -17,15 +15,17 @@ class PlacementResultConfig {
   const PlacementResultConfig._({
     required this.headingKey,
     this.headerTitleKey,
-    this.ribbon = PlacementResultRibbon.assessmentGrade,
+    this.showsGradeRibbon = true,
     this.showsAssessmentChart = false,
+    this.showsGradeResult = false,
     this.generationAction,
   });
 
   final String headingKey;
   final String? headerTitleKey;
-  final PlacementResultRibbon ribbon;
+  final bool showsGradeRibbon;
   final bool showsAssessmentChart;
+  final bool showsGradeResult;
   final PlacementResultGenerationAction? generationAction;
 
   static const _assessment = PlacementResultConfig._(
@@ -35,7 +35,8 @@ class PlacementResultConfig {
   );
   static const _grade = PlacementResultConfig._(
     headingKey: AppKeys.placementResultGradeHeading,
-    ribbon: PlacementResultRibbon.gradeLevel,
+    showsGradeRibbon: false,
+    showsGradeResult: true,
     generationAction: PlacementResultGenerationAction.continueGrade,
   );
   static const _other = PlacementResultConfig._(

@@ -25,6 +25,17 @@ class GradeExamFlowPolicy {
   static const int defaultLevel = 1;
   static const int maximumLevel = 10;
 
+  static ProfileGradeProgress nextLevel({
+    required int grade,
+    required int level,
+  }) => _advance(
+    ProfileGradeProgress(
+      grade: AssessmentFlowPolicy.clampGrade(grade),
+      level: level.clamp(minimumLevel, maximumLevel),
+    ),
+    1,
+  );
+
   static bool shouldSubmit(AssessmentSetScore score) {
     return score.areFirstQuestionsWrong(
           AssessmentFlowPolicy.earlyFailQuestionCount,

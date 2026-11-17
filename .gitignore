@@ -1,5 +1,8 @@
 # Custom Start Here
 
+# Generated previews, logs, and reports
+/output/
+
 # AI files
 .cursor/
 GEMINI.md

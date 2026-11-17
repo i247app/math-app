@@ -5,6 +5,7 @@ import 'package:numi/features/exam/controllers/placement_result_state.dart';
 import 'package:numi/features/exam/data/exam_cache.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/models/assessment_progress_chart_data.dart';
 import 'package:numi/features/exam/models/exam.dart';
 import 'package:numi/features/exam/models/placement_result_config.dart';
@@ -87,16 +88,22 @@ class PlacementResultController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<GeneratedExam?> generateNextExam() async {
+  Future<GeneratedExam?> generateNextExam({bool passed = false}) async {
     final action = config.generationAction;
     if (!_isCurrent || _state.isGenerating || action == null) return null;
     _state = _state.copyWith(isGenerating: true);
     notifyListeners();
     try {
+      final target = GradeExamFlowPolicy.nextLevel(
+        grade: _state.grade,
+        level: level ?? 1,
+      );
       final generated = await _examService.generateAssessmentExam(
         examType: action.examType,
-        gradeLabel: AssessmentFlowPolicy.gradeLabel(_state.grade),
-        level: (level ?? 1).clamp(1, 10),
+        gradeLabel: AssessmentFlowPolicy.gradeLabel(
+          passed ? target.grade : _state.grade,
+        ),
+        level: passed ? target.level : (level ?? 1).clamp(1, 10),
         profileId: profileId,
       );
       if (!_isCurrent) return null;

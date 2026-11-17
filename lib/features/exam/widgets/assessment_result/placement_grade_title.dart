@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,26 +21,60 @@ class PlacementGradeTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.themeColors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final label = grade == AssessmentFlowPolicy.minimumGrade
         ? context.getText(AppKeys.placementResultKindergarten)
         : context.formatText(AppKeys.placementResultGrade, {'grade': grade});
+    return PlacementResultTitle(label: label, compact: compact);
+  }
+}
+
+class PlacementResultTitle extends StatelessWidget {
+  const PlacementResultTitle({
+    super.key,
+    required this.label,
+    required this.compact,
+    this.containerKey = const ValueKey('placement-grade-container'),
+    this.labelKey = const ValueKey('placement-grade'),
+    this.fontSize,
+    this.arcHeight = 5,
+    this.arcAngle = 0.22,
+    this.textColor,
+  });
+
+  final String label;
+  final bool compact;
+  final Key containerKey;
+  final Key labelKey;
+  final double? fontSize;
+  final double arcHeight;
+  final double arcAngle;
+  final Color? textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final separatorIndex = label.lastIndexOf(' ');
-    final splitIndex = separatorIndex < 0
+    final splitIndex = label.contains('/')
+        ? label.indexOf('/')
+        : separatorIndex < 0
         ? (label.characters.length / 2).ceil()
         : label.characters.toList().indexOf(' ');
     final glyphs = label.characters.toList();
+    double glyphProgress(int index) =>
+        glyphs.length <= 1 ? 0.5 : index / (glyphs.length - 1);
     final textStyle = GoogleFonts.nunito(
-      fontSize: compact ? 34 : 38,
+      fontSize: fontSize ?? (compact ? 34 : 38),
       fontWeight: FontWeight.w900,
       height: 1,
       letterSpacing: 0.5,
     );
 
     return SizedBox(
-      key: const ValueKey('placement-grade-container'),
-      height: compact ? 44 : 48,
+      key: containerKey,
+      height: fontSize == null
+          ? (compact ? 44 : 48)
+          : fontSize! + arcHeight * 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Semantics(
@@ -49,10 +85,7 @@ class PlacementGradeTitle extends StatelessWidget {
               // Keeps the complete localized title available to finders and
               // accessibility tools while the visible glyphs follow an arc.
               ExcludeSemantics(
-                child: Opacity(
-                  opacity: 0,
-                  child: Text(label, key: const ValueKey('placement-grade')),
-                ),
+                child: Opacity(opacity: 0, child: Text(label, key: labelKey)),
               ),
               FittedBox(
                 fit: BoxFit.scaleDown,
@@ -65,23 +98,22 @@ class PlacementGradeTitle extends StatelessWidget {
                       Transform.translate(
                         offset: Offset(
                           0,
-                          -5.0 *
-                              (1 -
-                                  ((index / (glyphs.length - 1)) * 2 - 1)
-                                      .abs()),
+                          -arcHeight * math.sin(glyphProgress(index) * math.pi),
                         ),
                         child: Transform.rotate(
-                          angle: ((index / (glyphs.length - 1)) - 0.5) * 0.22,
+                          angle: (glyphProgress(index) - 0.5) * arcAngle,
                           child: Text(
                             glyphs[index],
                             style: textStyle.copyWith(
-                              color: index < splitIndex
-                                  ? (isDark
-                                        ? colors.brandStrong
-                                        : AppColors.teal600)
-                                  : (isDark
-                                        ? colors.accent
-                                        : AppColors.coral600),
+                              color:
+                                  textColor ??
+                                  (index < splitIndex
+                                      ? (isDark
+                                            ? colors.brandStrong
+                                            : AppColors.teal600)
+                                      : (isDark
+                                            ? colors.accent
+                                            : AppColors.coral600)),
                             ),
                           ),
                         ),

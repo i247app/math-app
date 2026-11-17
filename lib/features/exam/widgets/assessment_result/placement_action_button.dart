@@ -12,6 +12,9 @@ class PlacementActionButton extends StatelessWidget {
     required this.color,
     required this.onTap,
     this.outlined = false,
+    this.borderRadius = 14,
+    this.iconAtEnd = false,
+    this.gradient,
   });
 
   final String label;
@@ -19,6 +22,9 @@ class PlacementActionButton extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   final bool outlined;
+  final double borderRadius;
+  final bool iconAtEnd;
+  final Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -27,51 +33,65 @@ class PlacementActionButton extends StatelessWidget {
     final foregroundColor = outlined
         ? color
         : (isDark ? colors.onPrimaryAction : colors.onBrand);
-    final radius = BorderRadius.circular(14);
+    final radius = BorderRadius.circular(borderRadius);
 
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
+    return DecoratedBox(
+      decoration: BoxDecoration(
         borderRadius: radius,
-        child: Ink(
-          height: 50,
-          decoration: BoxDecoration(
-            color: outlined ? (isDark ? colors.surface : Colors.white) : color,
-            borderRadius: radius,
-            border: outlined ? Border.all(color: color, width: 1.5) : null,
-            boxShadow: outlined
-                ? null
-                : [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.2),
-                      blurRadius: 14,
-                      offset: const Offset(0, 7),
+        boxShadow: outlined
+            ? null
+            : [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.2),
+                  blurRadius: 14,
+                  offset: const Offset(0, 7),
+                ),
+              ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Ink(
+            height: 50,
+            decoration: BoxDecoration(
+              color: outlined
+                  ? (isDark ? colors.surface : Colors.white)
+                  : color,
+              gradient: outlined ? null : gradient,
+              borderRadius: radius,
+              border: outlined ? Border.all(color: color, width: 1.5) : null,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!iconAtEnd) ...[
+                      Icon(icon, color: foregroundColor, size: 19),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      label,
+                      maxLines: 1,
+                      softWrap: false,
+                      style: GoogleFonts.andika(
+                        color: foregroundColor,
+                        fontSize: FontSize.normal,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ),
                     ),
+                    if (iconAtEnd) ...[
+                      const SizedBox(width: 8),
+                      Icon(icon, color: foregroundColor, size: 19),
+                    ],
                   ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, color: foregroundColor, size: 19),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: GoogleFonts.andika(
-                      color: foregroundColor,
-                      fontSize: FontSize.normal,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

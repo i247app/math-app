@@ -84,42 +84,37 @@ void main() {
     },
   );
 
-  test(
-    'Grade mode skips progress, clamps generation and rejects duplicate taps',
-    () async {
-      final service = _ExamService();
-      final controller = createController(
-        service,
-        examType: ' grade ',
-        grade: 99,
-        level: 99,
-      );
-      await controller.initialize();
-      expect(service.progressCalls, 0);
-      expect(controller.state.progressResolved, isTrue);
-      expect(controller.config.ribbon, PlacementResultRibbon.gradeLevel);
-      expect(
-        controller.config.generationAction?.labelKey,
-        AppKeys.placementResultNext,
-      );
-      final generating = controller.generateNextExam();
-      expect(controller.state.isGenerating, isTrue);
-      expect(await controller.generateNextExam(), isNull);
-      expect(service.generationCalls, 1);
-      expect(service.generationExamType, examTypeGrade);
-      expect(service.gradeLabel, 'Lớp 5');
-      expect(service.level, 10);
-      expect(service.generationProfileId, 9);
-      expect(service.generationUserExamId, isNull);
-      service.generated.complete(
-        const GeneratedExam(examId: 401, questions: []),
-      );
-      expect((await generating)?.examId, 401);
-      expect(ExamCache.peekDetail(401)?.examId, 401);
-      // The screen keeps its loader until navigation consumes the generated exam.
-      expect(controller.state.isGenerating, isTrue);
-    },
-  );
+  test('Grade mode skips progress, clamps generation and rejects duplicate taps', () async {
+    final service = _ExamService();
+    final controller = createController(
+      service,
+      examType: ' grade ',
+      grade: 99,
+      level: 99,
+    );
+    await controller.initialize();
+    expect(service.progressCalls, 0);
+    expect(controller.state.progressResolved, isTrue);
+    expect(controller.config.showsGradeRibbon, isFalse);
+    expect(
+      controller.config.generationAction?.labelKey,
+      AppKeys.gradeResultNextLevel,
+    );
+    final generating = controller.generateNextExam();
+    expect(controller.state.isGenerating, isTrue);
+    expect(await controller.generateNextExam(), isNull);
+    expect(service.generationCalls, 1);
+    expect(service.generationExamType, examTypeGrade);
+    expect(service.gradeLabel, 'Lớp 5');
+    expect(service.level, 10);
+    expect(service.generationProfileId, 9);
+    expect(service.generationUserExamId, isNull);
+    service.generated.complete(const GeneratedExam(examId: 401, questions: []));
+    expect((await generating)?.examId, 401);
+    expect(ExamCache.peekDetail(401)?.examId, 401);
+    // The screen keeps its loader until navigation consumes the generated exam.
+    expect(controller.state.isGenerating, isTrue);
+  });
 
   test('generation failure returns to the result and allows retry', () async {
     final service = _ExamService();
@@ -135,6 +130,33 @@ void main() {
     service.generated.complete(const GeneratedExam(examId: 402, questions: []));
     expect((await retry)?.examId, 402);
   });
+
+  for (final (grade, level, passed, expectedGrade, expectedLevel) in [
+    (2, 1, true, 'Lớp 2', 2),
+    (2, 1, false, 'Lớp 2', 1),
+    (4, 10, true, 'Lớp 5', 1),
+    (4, 10, false, 'Lớp 4', 10),
+  ]) {
+    test(
+      'GRADE $grade level $level passed=$passed generates $expectedGrade level $expectedLevel',
+      () async {
+        final service = _ExamService();
+        final controller = createController(
+          service,
+          examType: examTypeGrade,
+          grade: grade,
+          level: level,
+        );
+        final generation = controller.generateNextExam(passed: passed);
+        expect(service.gradeLabel, expectedGrade);
+        expect(service.level, expectedLevel);
+        service.generated.complete(
+          const GeneratedExam(examId: 402, questions: []),
+        );
+        await generation;
+      },
+    );
+  }
 
   test(
     'results without a profile resolve immediately and normalize scores',

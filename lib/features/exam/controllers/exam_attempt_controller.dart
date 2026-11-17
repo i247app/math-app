@@ -237,13 +237,19 @@ class ExamAttemptController extends ChangeNotifier {
     }
     final revision = ++_operationRevision;
     final kind = _kind;
-    final initialGrade = _isAssessment && startAtKindergarten
+    final initialGrade = _isGrade
+        ? currentGrade
+        : _isAssessment && startAtKindergarten
         ? AssessmentFlowPolicy.minimumGrade
         : AssessmentFlowPolicy.gradeFromLabel(
             gradeLabel,
             fallback: _isAssessment ? 0 : 1,
           );
-    _flow.reset(grade: initialGrade, level: level ?? 1, kind: kind);
+    _flow.reset(
+      grade: initialGrade,
+      level: _isGrade ? currentLevel : level ?? 1,
+      kind: kind,
+    );
     _requests.reset();
     _answers.clear();
     _exam = null;
@@ -257,7 +263,7 @@ class ExamAttemptController extends ChangeNotifier {
     _isSubmittingExam = false;
     notifyListeners();
     final result = await _requests.generate(
-      gradeLabel: _isAssessment && startAtKindergarten
+      gradeLabel: _isGrade || (_isAssessment && startAtKindergarten)
           ? AssessmentFlowPolicy.gradeLabel(initialGrade)
           : gradeLabel,
       level: currentLevel,
@@ -278,6 +284,37 @@ class ExamAttemptController extends ChangeNotifier {
     }
     notifyListeners();
     return generated != null;
+  }
+
+  /// Start another grade paper within the same route after its result is closed.
+  void startGradeExam(
+    GeneratedExam exam, {
+    required int grade,
+    required int level,
+  }) {
+    if (_disposed || !_requests.isActive || !_isGrade) return;
+    _operationRevision++;
+    _requests.reset();
+    _answers.clear();
+    _flow.reset(
+      grade: AssessmentFlowPolicy.clampGrade(grade),
+      level: level,
+      kind: ExamAttemptKind.grade,
+    );
+    _exam = exam;
+    _questionIndex = 0;
+    _isGeneratingExam = false;
+    _isSubmittingExam = false;
+    _isTransitioningSet = false;
+    _isUpdatingExitStatus = false;
+    _needsNewPaper = exam.questions.isEmpty;
+    _errorStatus = null;
+    _errorMessage = _needsNewPaper
+        ? AppStrings.current(AppKeys.examPaperUnavailable)
+        : null;
+    _errorRetryAction = _needsNewPaper ? ExamAttemptRetryAction.generate : null;
+    _imageRefresher.schedule(exam);
+    notifyListeners();
   }
 
   Future<bool> retryGeneration() {

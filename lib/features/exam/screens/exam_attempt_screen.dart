@@ -20,6 +20,7 @@ import 'package:numi/features/exam/data/exam_image_preloader.dart';
 import 'package:numi/features/exam/data/exam_image_cache.dart';
 import 'package:numi/features/exam/data/profile_grade_progress_store.dart';
 import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/helpers/assessment_journey_completion.dart';
 import 'package:numi/features/exam/screens/practice_result_screen.dart';
 import 'package:numi/features/exam/screens/assessment_placement_result_screen.dart';
@@ -425,6 +426,22 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
       if (_controller.isGrade && gradeOutcome != null) {
         final resolvedProfileId =
             profileId ?? submittedExam.profileId ?? _controller.exam?.profileId;
+        if (practiceWeakTopics.isEmpty &&
+            submittedUserExamId != null &&
+            submittedUserExamId > 0) {
+          try {
+            final detail = await examService.getExamDetail(
+              submittedUserExamId,
+              profileId: resolvedProfileId,
+              userExamId: submittedUserExamId,
+              examType: examTypeGrade,
+            );
+            practiceWeakTopics = detail.practiceWeakTopics;
+          } catch (_) {
+            // Submission remains usable when the optional weakness detail is unavailable.
+          }
+        }
+        if (!mounted) return;
         if (gradeOutcome.passed) {
           try {
             await _gradeProgressStore.save(
@@ -457,8 +474,75 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen>
           outcome: gradeOutcome,
         );
         final onGradeCompleted = widget.onGradeCompleted;
+        final generated = await navigator.push<GeneratedExam>(
+          MaterialPageRoute<GeneratedExam>(
+            builder: (resultContext) => AssessmentPlacementResultScreen(
+              grade: completion.grade,
+              level: completion.level,
+              correctAnswers:
+                  submittedExam.grading?.correctNumber ?? correctAnswers,
+              totalQuestions:
+                  submittedExam.grading?.totalQuestions ?? totalQuestions,
+              wrongAnswers:
+                  ((submittedExam.grading?.totalQuestions ?? totalQuestions) -
+                          (submittedExam.grading?.skippedNumber ?? 0) -
+                          (submittedExam.grading?.correctNumber ??
+                              correctAnswers))
+                      .clamp(0, 1000000),
+              scorePercentage: submittedExam.grading?.scorePercentage,
+              passed: gradeOutcome.passed,
+              examType: examTypeGrade,
+              examService: examService,
+              profileId: resolvedProfileId,
+              userExamId: submittedUserExamId,
+              practiceWeakTopics: practiceWeakTopics,
+              onViewDetails: reviewDetailId == null
+                  ? null
+                  : () {
+                      Navigator.of(resultContext).push<void>(
+                        MaterialPageRoute<void>(
+                          builder: (_) => RepositoryProvider<ExamService>.value(
+                            value: examService,
+                            child: ExamReviewScreen(
+                              examId: submittedUserExamId == null
+                                  ? submittedExamId
+                                  : null,
+                              userExamId: submittedUserExamId,
+                              profileId: resolvedProfileId,
+                              examType: examTypeGrade,
+                              initialExam: submittedUserExamId == null
+                                  ? submittedExam
+                                  : null,
+                              allowPractice: widget.allowReviewPractice,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+              onTestAgainGenerated: (exam) =>
+                  Navigator.of(resultContext).pop(exam),
+              onBack: () => Navigator.of(resultContext).pop(),
+            ),
+          ),
+        );
+        if (!mounted) return;
+        onGradeCompleted?.call(completion);
+        if (generated != null) {
+          final target = GradeExamFlowPolicy.nextLevel(
+            grade: completion.grade,
+            level: completion.level,
+          );
+          _spokenQuestionKey = null;
+          _imageTransitionKind = null;
+          setState(() => _isCompletingAssessment = false);
+          _controller.startGradeExam(
+            generated,
+            grade: gradeOutcome.passed ? target.grade : completion.grade,
+            level: gradeOutcome.passed ? target.level : completion.level,
+          );
+          return;
+        }
         if (onGradeCompleted != null) {
-          onGradeCompleted(completion);
           await _exitController.exit();
         } else {
           navigator.pushReplacement(

@@ -18,6 +18,7 @@ import 'package:numi/features/exam/screens/assessment_placement_result_screen.da
 import 'package:numi/features/exam/screens/assessment_result_screen.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
+import 'package:numi/features/exam/widgets/assessment_result/placement_weak_topics_dropdown.dart';
 import 'package:numi/shared/layouts/page_header.dart';
 
 void main() {
@@ -595,11 +596,11 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('TIẾP THEO'), findsOneWidget);
+    expect(find.text('Cấp độ tiếp'), findsOneWidget);
 
     await lingo.setLanguage(AppLanguage.en);
     await tester.pump();
-    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('Next Level'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(const ValueKey('placement-continue-grade')),
@@ -610,12 +611,12 @@ void main() {
 
     expect(service.requestedExamType, examTypeGrade);
     expect(service.requestedGradeLabel, 'Lớp 4');
-    expect(service.requestedLevel, 7);
+    expect(service.requestedLevel, 8);
     expect(service.requestedProfileId, 21);
     expect(service.requestedUserExamId, isNull);
     expect(generatedExam?.examType, examTypeGrade);
     expect(generatedExam?.grade, 4);
-    expect(generatedExam?.level, 7);
+    expect(generatedExam?.level, 8);
     expect(tester.takeException(), isNull);
   });
 
@@ -846,78 +847,188 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('GRADE result uses its level ribbon without loading a chart', (
-    tester,
-  ) async {
-    final lingo = LingoProvider();
-    addTearDown(lingo.dispose);
-    final progressService = _MockProgressExamService();
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: const <ThemeExtension<dynamic>>[AppThemeColors.light],
-        ),
-        home: LingoScope(
-          lingo: lingo,
-          child: AssessmentPlacementResultScreen(
-            grade: 3,
-            level: 7,
-            correctAnswers: 5,
-            totalQuestions: 5,
-            examType: examTypeGrade,
-            profileId: 999,
-            previousGrade: 2,
-            examService: progressService,
+  testWidgets(
+    'GRADE result matches the level transition and answer statistics design',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      final service = _MockProgressExamService();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppThemeColors.light]),
+          home: LingoScope(
+            lingo: lingo,
+            child: AssessmentPlacementResultScreen(
+              grade: 5,
+              level: 1,
+              passed: true,
+              correctAnswers: 10,
+              totalQuestions: 16,
+              examType: examTypeGrade,
+              profileId: 999,
+              examService: service,
+              practiceWeakTopics: const [
+                ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
+      expect(service.requestedProfileId, isNull);
+      expect(find.text('LỚP 5'), findsOneWidget);
+      expect(find.byType(GradeExamLevelRibbon), findsNothing);
+      expect(find.byType(AssessmentProgressionChart), findsNothing);
+      expect(find.text('Your score'), findsNothing);
+      expect(find.byType(PlacementWeakTopicsDropdown), findsOneWidget);
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('grade-result-correct-count')),
+            )
+            .data,
+        '10',
+      );
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('grade-result-wrong-count')),
+            )
+            .data,
+        '6',
+      );
+      final levels = find.byKey(
+        const ValueKey('grade-result-level-transition'),
+      );
+      expect(
+        find.descendant(of: levels, matching: find.byType(InkWell)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: levels, matching: find.byType(GestureDetector)),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('grade-result-next-level-lock')),
+        findsNothing,
+      );
+      final mascot = find.byKey(const ValueKey('placement-mascot'));
+      final stats = find.byKey(const ValueKey('grade-result-answer-stats'));
+      final weak = find.byKey(const ValueKey('placement-weak-topics'));
+      final primary = find.byKey(const ValueKey('placement-continue-grade'));
+      final review = find.byKey(const ValueKey('placement-view-details'));
+      expect(
+        tester.getBottomLeft(mascot).dy,
+        lessThanOrEqualTo(tester.getTopLeft(levels).dy),
+      );
+      expect(
+        tester.getBottomLeft(levels).dy,
+        lessThan(tester.getTopLeft(stats).dy),
+      );
+      expect(
+        tester.getBottomLeft(stats).dy,
+        lessThan(tester.getTopLeft(weak).dy),
+      );
+      expect(
+        tester.getCenter(primary).dx,
+        lessThan(tester.getCenter(review).dx),
+      );
+      expect(find.text('Cấp độ tiếp'), findsOneWidget);
+      await tester.tap(
+        find.byKey(const ValueKey('placement-weak-topics-toggle')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Toán đố'), findsOneWidget);
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pumpAndSettle();
+      expect(find.text('GRADE 5'), findsOneWidget);
+      expect(find.text('Next Level'), findsOneWidget);
+      expect(find.text('Correct answers'), findsOneWidget);
+      expect(find.text('Wrong answers'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
-    expect(progressService.requestedProfileId, isNull);
-    expect(
-      find.byKey(const ValueKey('assessment-placement-progress-loading')),
-      findsNothing,
-    );
-    expect(find.byKey(const ValueKey('placement-grade-ribbon')), findsNothing);
-    final ribbon = find.byKey(const ValueKey('grade-exam-level-ribbon'));
-    final marker = find.byKey(
-      const ValueKey('grade-exam-current-level-marker'),
-    );
-    expect(ribbon, findsOneWidget);
-    final ribbonImage = tester.widget<Image>(
-      find.descendant(of: ribbon, matching: find.byType(Image)),
-    );
-    expect(
-      (ribbonImage.image as AssetImage).assetName,
-      'assets/images/grade-ribbon-levels-1-10.png',
-    );
-    expect(
-      tester.getCenter(marker).dx,
-      closeTo(
-        tester.getRect(ribbon).left + tester.getSize(ribbon).width * 0.6409,
-        1,
-      ),
-    );
-    expect(find.text('GRADE'), findsOneWidget);
-    expect(find.byType(AssessmentProgressionChart), findsNothing);
-    expect(
-      find.byKey(const ValueKey('placement-view-details')),
-      findsOneWidget,
-    );
-    expect(find.text('CHI TIẾT'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('placement-continue-grade')),
-      findsOneWidget,
-    );
-    expect(find.text('TIẾP THEO'), findsOneWidget);
-    await lingo.setLanguage(AppLanguage.en);
-    await tester.pump();
-    expect(find.text('REVIEW'), findsOneWidget);
-    expect(find.text('NEXT'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+  for (final brightness in [Brightness.light, Brightness.dark]) {
+    testWidgets('GRADE failure fits a small screen in $brightness', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final lingo = LingoProvider();
+      addTearDown(lingo.dispose);
+      await lingo.setLanguage(AppLanguage.en);
+      var continued = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            brightness: brightness,
+            extensions: [
+              brightness == Brightness.dark
+                  ? AppThemeColors.dark
+                  : AppThemeColors.light,
+            ],
+          ),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(1.3)),
+            child: child!,
+          ),
+          home: LingoScope(
+            lingo: lingo,
+            child: AssessmentPlacementResultScreen(
+              grade: 3,
+              level: 7,
+              correctAnswers: 4,
+              totalQuestions: 5,
+              scorePercentage: 80,
+              passed: false,
+              examType: examTypeGrade,
+              examService: const _UnusedExamService(),
+              onContinue: () => continued = true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('GRADE 3'), findsOneWidget);
+      expect(find.text('Try Again'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('grade-result-next-level-lock')),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('grade-result-correct-count')),
+            )
+            .data,
+        '4',
+      );
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('grade-result-wrong-count')),
+            )
+            .data,
+        '1',
+      );
+      expect(find.byKey(const ValueKey('placement-mascot')), findsOneWidget);
+      expect(find.byType(GradeExamLevelRibbon), findsNothing);
+      expect(find.byType(AssessmentProgressionChart), findsNothing);
+      final next = find.byKey(const ValueKey('placement-continue-grade'));
+      await tester.ensureVisible(next);
+      await tester.tap(next);
+      expect(continued, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   for (final level in [1, 10]) {
     testWidgets('GRADE ribbon keeps level $level aligned on a narrow screen', (
@@ -1258,6 +1369,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: const Scaffold(
@@ -1315,6 +1427,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: const Scaffold(
@@ -1353,6 +1466,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: Scaffold(
@@ -1398,6 +1512,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: const Scaffold(
@@ -1435,6 +1550,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: const Scaffold(
@@ -1473,6 +1589,7 @@ void main() {
 
     Future<void> showChart(double width) => tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: Scaffold(
@@ -1527,6 +1644,7 @@ void main() {
     await lingo.setLanguage(AppLanguage.en);
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(extensions: const [AppThemeColors.light]),
         home: LingoScope(
           lingo: lingo,
           child: const Scaffold(

@@ -13,12 +13,13 @@ import 'package:numi/features/exam/controllers/placement_result_controller.dart'
 import 'package:numi/features/exam/data/exam_exception.dart';
 import 'package:numi/features/exam/data/exam_service.dart';
 import 'package:numi/features/exam/helpers/exam_practice_topic_formatter.dart';
+import 'package:numi/features/exam/helpers/assessment_flow_policy.dart';
+import 'package:numi/features/exam/helpers/grade_exam_flow_policy.dart';
 import 'package:numi/features/exam/models/exam.dart';
-import 'package:numi/features/exam/models/placement_result_config.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_grade_ribbon.dart';
 import 'package:numi/features/exam/widgets/assessment_result/assessment_progression_chart.dart';
 import 'package:numi/features/exam/widgets/assessment_result/exit_to_grade_selection.dart';
-import 'package:numi/features/exam/widgets/assessment_result/grade_exam_level_ribbon.dart';
+import 'package:numi/features/exam/widgets/assessment_result/grade_result_hero.dart';
 import 'package:numi/features/exam/widgets/assessment_result/placement_action_button.dart';
 import 'package:numi/features/exam/widgets/assessment_result/placement_celebration_mascot.dart';
 import 'package:numi/features/exam/widgets/assessment_result/placement_grade_title.dart';
@@ -36,6 +37,9 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.level,
     required this.correctAnswers,
     required this.totalQuestions,
+    this.wrongAnswers,
+    this.scorePercentage,
+    this.passed,
     this.examType = examTypeAssessment,
     this.examService,
     this.profileId,
@@ -44,6 +48,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
     this.practiceWeakTopics = const <ExamPracticeTopic>[],
     this.onTestAgainGenerated,
     this.onViewDetails,
+    this.onContinue,
     this.onBack,
   });
 
@@ -51,6 +56,9 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final int? level;
   final int correctAnswers;
   final int totalQuestions;
+  final int? wrongAnswers;
+  final int? scorePercentage;
+  final bool? passed;
   final String examType;
   final ExamService? examService;
   final int? profileId;
@@ -59,6 +67,7 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
   final List<ExamPracticeTopic> practiceWeakTopics;
   final ValueChanged<GeneratedExam>? onTestAgainGenerated;
   final VoidCallback? onViewDetails;
+  final VoidCallback? onContinue;
   final VoidCallback? onBack;
 
   @override
@@ -69,6 +78,18 @@ class AssessmentPlacementResultScreen extends StatefulWidget {
 class _AssessmentPlacementResultScreenState
     extends State<AssessmentPlacementResultScreen> {
   late final PlacementResultController _controller;
+
+  bool get _passed =>
+      widget.passed ??
+      (widget.scorePercentage != null
+          ? widget.scorePercentage! >= 50
+          : _controller.totalQuestions > 0 &&
+                _controller.correctAnswers * 2 >= _controller.totalQuestions);
+
+  bool get _completedAllLevels =>
+      _controller.state.grade == AssessmentFlowPolicy.maximumGrade &&
+      (widget.level ?? 1) >= GradeExamFlowPolicy.maximumLevel &&
+      _passed;
 
   @override
   void initState() {
@@ -101,7 +122,7 @@ class _AssessmentPlacementResultScreenState
   Future<void> _generateNextExam() async {
     HapticFeedback.mediumImpact();
     try {
-      final generatedExam = await _controller.generateNextExam();
+      final generatedExam = await _controller.generateNextExam(passed: _passed);
       if (!mounted || generatedExam == null) return;
       final onGenerated = widget.onTestAgainGenerated;
       if (onGenerated != null) {
@@ -155,6 +176,50 @@ class _AssessmentPlacementResultScreenState
     if (onViewDetails != null) {
       onViewDetails();
     }
+  }
+
+  Widget _buildGradeActions(BuildContext context) {
+    final colors = context.themeColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final actionColor = isDark ? colors.accent : AppColors.coral600;
+    return Row(
+      children: [
+        Expanded(
+          child: PlacementActionButton(
+            key: const ValueKey('placement-continue-grade'),
+            label: context.getText(
+              _completedAllLevels
+                  ? AppKeys.gradeResultCompleted
+                  : _passed
+                  ? AppKeys.gradeResultNextLevel
+                  : AppKeys.gradeResultTryAgain,
+            ),
+            icon: _passed ? Icons.chevron_right_rounded : Icons.replay_rounded,
+            iconAtEnd: _passed,
+            color: actionColor,
+            gradient: isDark
+                ? null
+                : const LinearGradient(
+                    colors: [Color(0xFFFFA136), AppColors.coral600],
+                  ),
+            onTap: _completedAllLevels
+                ? _exitResult
+                : widget.onContinue ?? _generateNextExam,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: PlacementActionButton(
+            key: const ValueKey('placement-view-details'),
+            label: context.getText(AppKeys.placementResultReview),
+            icon: Icons.assignment_outlined,
+            color: isDark ? colors.accent : AppColors.resultCoral,
+            outlined: true,
+            onTap: _viewDetails,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -251,192 +316,242 @@ class _AssessmentPlacementResultScreenState
           physics: const BouncingScrollPhysics(),
           child: Semantics(
             label: resultSummary,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                PageHeader(
-                  scale: 0.9,
-                  title: config.headerTitleKey == null
-                      ? null
-                      : context.getText(config.headerTitleKey!),
-                  topInset: 0,
-                  backgroundColor: isDark
-                      ? colors.pageBackground
-                      : Colors.white,
-                  actionWidth: 44,
-                  horizontalPadding: 16,
-                  trailing: Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDark ? colors.surface : Colors.white,
-                        border: Border.all(
-                          color: isDark
-                              ? colors.borderStrong
-                              : const Color(0xFFB5EBF4),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF04A8B3)
-                                .withValues(alpha: 0.1),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ExamHeaderIconButton(
-                        key: const ValueKey('placement-result-close'),
-                        icon: Icons.close_rounded,
-                        color: isDark
-                            ? colors.brandStrong
-                            : const Color(0xFF04A8B3),
-                        size: 38,
-                        iconSize: 22,
-                        circle: true,
-                        onTap: _exitResult,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: isCompact ? 2.0 : 6.0),
-                Text(
-                  context.getText(config.headingKey),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.nunito(
-                    color: isDark
-                        ? colors.brandStrong
-                        : const Color(0xFF04A8B3),
-                    fontSize: FontSize.xxl,
-                    fontWeight: FontWeight.w800,
-                    height: 1.2,
-                  ),
-                ),
-                SizedBox(
-                  height: isVeryCompact ? 4.0 : (isCompact ? 8.0 : 10.0),
-                ),
-                PlacementGradeTitle(
-                  grade: _controller.state.grade,
-                  compact: isCompact,
-                ),
-                if (widget.level case final level?) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    context.formatText(AppKeys.placementResultGradeLevel, {
-                      'level': level,
-                    }),
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.nunito(
-                      color: colors.brandStrong,
-                      fontSize: FontSize.large,
-                      fontWeight: FontWeight.w800,
-                      height: 1.1,
-                    ),
-                  ),
-                ],
-                if (!isVeryCompact) ...[
-                  SizedBox(height: isCompact ? 2.0 : 4.0),
-                  PlacementCelebrationMascot(size: mascotSize),
-                  SizedBox(height: isCompact ? 2.0 : 4.0),
-                ],
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: 1),
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeOut,
-                  builder: (context, opacity, child) => Opacity(
-                    key: const ValueKey('assessment-placement-history-content'),
-                    opacity: opacity,
-                    child: child,
-                  ),
-                  child: Column(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: config.showsGradeResult
+                    ? (viewportHeight * 0.72).clamp(0.0, 620.0)
+                    : 0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: config.showsGradeResult
+                    ? MainAxisAlignment.spaceBetween
+                    : MainAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: config.ribbon == PlacementResultRibbon.gradeLevel
-                            ? GradeExamLevelRibbon(
-                                currentLevel: widget.level ?? 0,
-                              )
-                            : AssessmentGradeRibbon(
-                                currentGrade: _controller.state.grade,
+                      PageHeader(
+                        scale: 0.9,
+                        title: config.headerTitleKey == null
+                            ? null
+                            : context.getText(config.headerTitleKey!),
+                        topInset: 0,
+                        backgroundColor: isDark
+                            ? colors.pageBackground
+                            : Colors.white,
+                        actionWidth: 44,
+                        horizontalPadding: 16,
+                        trailing: Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark ? colors.surface : Colors.white,
+                              border: Border.all(
+                                color: isDark
+                                    ? colors.borderStrong
+                                    : const Color(0xFFB5EBF4),
+                                width: 1.5,
                               ),
-                      ),
-                      if (config.showsAssessmentChart) ...[
-                        SizedBox(height: sectionSpacing),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: AssessmentProgressionChart(
-                            finalGrade: _controller.state.grade,
-                            previousGrades: chart.previousGrades,
-                            testNumbers: chart.testNumbers,
-                            firstTestNumber: chart.firstTestNumber,
-                            lastSubmittedAt: chart.lastSubmittedAt,
-                            chartHeight: isCompact ? 90.0 : 115.0,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (weakTopics.isNotEmpty) ...[
-                  SizedBox(height: sectionSpacing),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: PlacementWeakTopicsDropdown(
-                      topics: weakTopics,
-                      maxExpandedHeight: viewportHeight * 0.25,
-                    ),
-                  ),
-                ],
-                SizedBox(height: sectionSpacing),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: SizedBox(
-                            width: generationAction != null
-                                ? double.infinity
-                                : 220,
-                            child: PlacementActionButton(
-                              key: const ValueKey('placement-view-details'),
-                              label: context.getText(
-                                AppKeys.placementResultReview,
-                              ),
-                              icon: Icons.assignment_outlined,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF04A8B3)
+                                      .withValues(alpha: 0.1),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ExamHeaderIconButton(
+                              key: const ValueKey('placement-result-close'),
+                              icon: Icons.close_rounded,
                               color: isDark
-                                  ? colors.accent
-                                  : AppColors.resultCoral,
-                              outlined: true,
-                              onTap: _viewDetails,
+                                  ? colors.brandStrong
+                                  : const Color(0xFF04A8B3),
+                              size: 38,
+                              iconSize: 22,
+                              circle: true,
+                              onTap: _exitResult,
                             ),
                           ),
                         ),
                       ),
-                      if (generationAction != null) ...[
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: PlacementActionButton(
-                            key: const ValueKey('placement-continue-grade'),
-                            label: context.getText(generationAction.labelKey),
-                            icon: Icons.arrow_forward_rounded,
+                      if (config.showsGradeResult)
+                        GradeResultHero(
+                          grade: _controller.state.grade,
+                          level: (widget.level ?? 1).clamp(1, 10),
+                          passed: _passed,
+                          correctAnswers: _controller.correctAnswers,
+                          wrongAnswers:
+                              (widget.wrongAnswers ??
+                                      _controller.totalQuestions -
+                                          _controller.correctAnswers)
+                                  .clamp(0, 1000000),
+                          compact: isCompact,
+                        )
+                      else ...[
+                        SizedBox(height: isCompact ? 2.0 : 6.0),
+                        Text(
+                          context.getText(config.headingKey),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.nunito(
                             color: isDark
-                                ? colors.primaryAction
-                                : AppColors.teal500,
-                            onTap: _generateNextExam,
+                                ? colors.brandStrong
+                                : const Color(0xFF04A8B3),
+                            fontSize: FontSize.xxl,
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
+                          ),
+                        ),
+                        SizedBox(
+                          height: isVeryCompact
+                              ? 4.0
+                              : (isCompact ? 8.0 : 10.0),
+                        ),
+                        PlacementGradeTitle(
+                          grade: _controller.state.grade,
+                          compact: isCompact,
+                        ),
+                        if (widget.level case final level?) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            context.formatText(
+                              AppKeys.placementResultGradeLevel,
+                              {'level': level},
+                            ),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(
+                              color: colors.brandStrong,
+                              fontSize: FontSize.large,
+                              fontWeight: FontWeight.w800,
+                              height: 1.1,
+                            ),
+                          ),
+                        ],
+                        if (!isVeryCompact) ...[
+                          SizedBox(height: isCompact ? 2.0 : 4.0),
+                          PlacementCelebrationMascot(size: mascotSize),
+                          SizedBox(height: isCompact ? 2.0 : 4.0),
+                        ],
+                      ],
+                      if (config.showsGradeRibbon ||
+                          config.showsAssessmentChart)
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0, end: 1),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOut,
+                          builder: (context, opacity, child) => Opacity(
+                            key: const ValueKey(
+                              'assessment-placement-history-content',
+                            ),
+                            opacity: opacity,
+                            child: child,
+                          ),
+                          child: Column(
+                            children: [
+                              if (config.showsGradeRibbon)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: AssessmentGradeRibbon(
+                                    currentGrade: _controller.state.grade,
+                                  ),
+                                ),
+                              if (config.showsAssessmentChart) ...[
+                                SizedBox(height: sectionSpacing),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: AssessmentProgressionChart(
+                                    finalGrade: _controller.state.grade,
+                                    previousGrades: chart.previousGrades,
+                                    testNumbers: chart.testNumbers,
+                                    firstTestNumber: chart.firstTestNumber,
+                                    lastSubmittedAt: chart.lastSubmittedAt,
+                                    chartHeight: isCompact ? 90.0 : 115.0,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      if (weakTopics.isNotEmpty) ...[
+                        SizedBox(
+                          height: config.showsGradeResult ? 14 : sectionSpacing,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: PlacementWeakTopicsDropdown(
+                            topics: weakTopics,
+                            maxExpandedHeight: viewportHeight * 0.25,
                           ),
                         ),
                       ],
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: isVeryCompact ? 4.0 : (isCompact ? 10.0 : 16.0),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      config.showsGradeResult ? 16 : sectionSpacing,
+                      20,
+                      isVeryCompact ? 4 : (isCompact ? 10 : 16),
+                    ),
+                    child: config.showsGradeResult
+                        ? _buildGradeActions(context)
+                        : Row(
+                            children: [
+                              Expanded(
+                                child: Center(
+                                  child: SizedBox(
+                                    width: generationAction != null
+                                        ? double.infinity
+                                        : 220,
+                                    child: PlacementActionButton(
+                                      key: const ValueKey(
+                                        'placement-view-details',
+                                      ),
+                                      label: context.getText(
+                                        AppKeys.placementResultReview,
+                                      ),
+                                      icon: Icons.assignment_outlined,
+                                      color: isDark
+                                          ? colors.accent
+                                          : AppColors.resultCoral,
+                                      outlined: true,
+                                      onTap: _viewDetails,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (generationAction != null) ...[
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: PlacementActionButton(
+                                    key: const ValueKey(
+                                      'placement-continue-grade',
+                                    ),
+                                    label: context.getText(
+                                      generationAction.labelKey,
+                                    ),
+                                    icon: Icons.arrow_forward_rounded,
+                                    color: isDark
+                                        ? colors.primaryAction
+                                        : AppColors.teal500,
+                                    onTap:
+                                        widget.onContinue ?? _generateNextExam,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

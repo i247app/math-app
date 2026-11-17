@@ -117,6 +117,35 @@ void main() {
     }
   }
 
+  Future<void> closeGradeResult(
+    WidgetTester tester, {
+    String exitAction = 'close',
+  }) async {
+    expect(find.byType(AssessmentPlacementResultScreen), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('grade-result-answer-stats')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('placement-progression-chart')),
+      findsNothing,
+    );
+    if (exitAction == 'back') {
+      await tester.binding.handlePopRoute();
+    } else {
+      await tester.tap(
+        find.byKey(
+          ValueKey(
+            exitAction == 'close'
+                ? 'placement-result-close'
+                : 'placement-continue-grade',
+          ),
+        ),
+      );
+    }
+    await tester.pumpAndSettle();
+  }
+
   for (final width in [320.0, 360.0, 390.0]) {
     for (final textScale in [1.0, 1.3]) {
       testWidgets(
@@ -1073,6 +1102,7 @@ void main() {
         await tester.pump();
         await tester.tap(find.byType(AssessmentBottomActionButton).last);
         await tester.pumpAndSettle();
+        await closeGradeResult(tester);
         expect(find.byType(GradeRoadmapScreen), findsOneWidget);
         roadmap.add(
           _roadmapSession(
@@ -1248,6 +1278,7 @@ void main() {
         await tester.pump();
         await tester.tap(find.byType(AssessmentBottomActionButton).last);
         await tester.pumpAndSettle();
+        await closeGradeResult(tester);
         expect(find.byType(GradeRoadmapScreen), findsOneWidget);
         expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
         expect(
@@ -1281,7 +1312,7 @@ void main() {
         } else {
           expect(find.byType(ExamReviewScreen), findsNothing);
           expect(find.byType(ExamAttemptScreen), findsOneWidget);
-          expect(service.detailRequests, isEmpty);
+          expect(service.detailRequests, [600]);
           expect(service.generatedLevels, [1, 1]);
         }
         expect(tester.takeException(), isNull);
@@ -1328,64 +1359,100 @@ void main() {
   );
 
   for (final passed in [true, false]) {
-    testWidgets(
-      'GRADE ${passed ? "pass" : "fail"} returns to roadmap without result',
-      (tester) async {
-        final service = _FakeExamService();
-        await pumpRoadmap(tester, service);
-        final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
-        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
-        await tester.pumpAndSettle();
-        await tester.tap(level);
-        await tester.pumpAndSettle();
-        expect(find.byType(ExamAttemptScreen), findsOneWidget);
-        final answers = find.byType(AssessmentAnswerButton);
-        await tester.tap(passed ? answers.first : answers.last);
-        await tester.pump();
-        await tester.tap(find.byType(AssessmentBottomActionButton).last);
-        await tester.pumpAndSettle();
-        expect(find.byType(GradeRoadmapScreen), findsOneWidget);
-        expect(find.byType(ExamAttemptScreen), findsNothing);
-        expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
-        expect(service.updatedStatuses, ['COMPLETE']);
-        expect(service.markedFlags, [passed]);
-        expect(service.levelRequests, [2, 2]);
-        expect(service.roadmapRequests, [2, 2]);
-        expect(service.statsRequests, 0);
-        expect(
-          find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
-          passed ? findsOneWidget : findsNothing,
-        );
-        expect(
-          find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
-          passed ? findsNothing : findsOneWidget,
-        );
-        expect(
-          find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
-          findsOneWidget,
-        );
-        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
-        await tester.pumpAndSettle();
-        await tester.tap(level);
-        await tester.pumpAndSettle();
-        if (passed) {
-          expect(find.byType(ExamReviewScreen), findsOneWidget);
+    for (final exitAction in ['close', 'back']) {
+      testWidgets(
+        'GRADE ${passed ? "pass" : "fail"} shows its score before $exitAction returns to roadmap',
+        (tester) async {
+          final service = _FakeExamService();
+          await pumpRoadmap(tester, service);
+          final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+          await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
+          await tester.pumpAndSettle();
+          await tester.tap(level);
+          await tester.pumpAndSettle();
+          expect(find.byType(ExamAttemptScreen), findsOneWidget);
+          final answers = find.byType(AssessmentAnswerButton);
+          await tester.tap(passed ? answers.first : answers.last);
+          await tester.pump();
+          await tester.tap(find.byType(AssessmentBottomActionButton).last);
+          await tester.pumpAndSettle();
           expect(
             tester
-                .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
-                .userExamId,
-            600,
+                .widget<Text>(
+                  find.byKey(const ValueKey('grade-result-correct-count')),
+                )
+                .data,
+            passed ? '1' : '0',
+          );
+          expect(
+            find.byKey(const ValueKey('grade-result-next-level-lock')),
+            passed ? findsNothing : findsOneWidget,
           );
           expect(service.generatedLevels, [1]);
-        } else {
-          expect(find.byType(ExamReviewScreen), findsNothing);
-          expect(find.byType(ExamAttemptScreen), findsOneWidget);
-          expect(service.detailRequests, isEmpty);
-          expect(service.generatedLevels, [1, 1]);
-        }
-        expect(tester.takeException(), isNull);
-      },
-    );
+          await tester.tap(
+            find.byKey(const ValueKey('placement-view-details')),
+          );
+          await tester.pumpAndSettle();
+          final review = tester.widget<ExamReviewScreen>(
+            find.byType(ExamReviewScreen),
+          );
+          expect(review.userExamId, 600);
+          expect(review.examType, examTypeGrade);
+          await tester.binding.handlePopRoute();
+          await tester.pumpAndSettle();
+          final detailRequestsAfterReview = List.of(service.detailRequests);
+          expect(
+            tester
+                .widget<Text>(
+                  find.byKey(const ValueKey('grade-result-correct-count')),
+                )
+                .data,
+            passed ? '1' : '0',
+          );
+          await closeGradeResult(tester, exitAction: exitAction);
+          expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+          expect(find.byType(ExamAttemptScreen), findsNothing);
+          expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
+          expect(service.updatedStatuses, ['COMPLETE']);
+          expect(service.markedFlags, [passed]);
+          expect(service.levelRequests, [2, 2]);
+          expect(service.roadmapRequests, [2, 2]);
+          expect(service.statsRequests, 0);
+          expect(
+            find.byKey(const ValueKey('grade-roadmap-level-1-completed')),
+            passed ? findsOneWidget : findsNothing,
+          );
+          expect(
+            find.byKey(const ValueKey('grade-roadmap-level-2-locked')),
+            passed ? findsNothing : findsOneWidget,
+          );
+          expect(
+            find.byKey(const ValueKey('grade-roadmap-level-3-locked')),
+            findsOneWidget,
+          );
+          await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
+          await tester.pumpAndSettle();
+          await tester.tap(level);
+          await tester.pumpAndSettle();
+          if (passed) {
+            expect(find.byType(ExamReviewScreen), findsOneWidget);
+            expect(
+              tester
+                  .widget<ExamReviewScreen>(find.byType(ExamReviewScreen))
+                  .userExamId,
+              600,
+            );
+            expect(service.generatedLevels, [1]);
+          } else {
+            expect(find.byType(ExamReviewScreen), findsNothing);
+            expect(find.byType(ExamAttemptScreen), findsOneWidget);
+            expect(service.detailRequests, detailRequestsAfterReview);
+            expect(service.generatedLevels, [1, 1]);
+          }
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   }
 
   testWidgets('a standalone GRADE attempt finishes at its own grade roadmap', (
@@ -1411,6 +1478,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byType(AssessmentBottomActionButton).last);
     await tester.pumpAndSettle();
+    await closeGradeResult(tester);
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
     expect(find.text('LỚP 2'), findsOneWidget);
@@ -1429,6 +1497,58 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  for (final passed in [true, false]) {
+    testWidgets(
+      'GRADE ${passed ? "Next Level" : "Try Again"} starts a fresh paper without leaving the route',
+      (tester) async {
+        final service = _FakeExamService();
+        await pumpRoadmap(tester, service);
+        final level = find.byKey(const ValueKey('grade-roadmap-level-1'));
+        await Scrollable.ensureVisible(tester.element(level), alignment: 0.5);
+        await tester.pumpAndSettle();
+        await tester.tap(level);
+        await tester.pumpAndSettle();
+        await tester.tap(
+          passed
+              ? find.byType(AssessmentAnswerButton).first
+              : find.byType(AssessmentAnswerButton).last,
+        );
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pumpAndSettle();
+        final result = tester.widget<AssessmentPlacementResultScreen>(
+          find.byType(AssessmentPlacementResultScreen),
+        );
+        expect(result.level, 1);
+        expect(result.practiceWeakTopics.single.topic, 'Toán đố');
+        expect(find.text(passed ? 'Cấp độ tiếp' : 'Thử lại'), findsOneWidget);
+        await tester.tap(
+          find.byKey(const ValueKey('placement-continue-grade')),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
+        expect(find.byType(ExamAttemptScreen), findsOneWidget);
+        expect(service.generatedLevels, [1, passed ? 2 : 1]);
+        expect(service.submittedAnswerCounts, [1]);
+        // The fake deliberately reuses its exam ID; the new answers still need a new submission.
+        await tester.tap(find.byType(AssessmentAnswerButton).last);
+        await tester.pump();
+        await tester.tap(find.byType(AssessmentBottomActionButton).last);
+        await tester.pumpAndSettle();
+        final repeated = tester.widget<AssessmentPlacementResultScreen>(
+          find.byType(AssessmentPlacementResultScreen),
+        );
+        expect(repeated.level, passed ? 2 : 1);
+        expect(repeated.correctAnswers, 0);
+        expect(service.submittedAnswerCounts, [1, 1]);
+        expect(service.markedFlags, [passed, false]);
+        await closeGradeResult(tester);
+        expect(find.byType(GradeRoadmapScreen), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   for (final attemptedLevel in [1, 7]) {
     for (final passed in [true, false]) {
@@ -1464,6 +1584,7 @@ void main() {
           await tester.pump();
           await tester.tap(find.byType(AssessmentBottomActionButton).last);
           await tester.pumpAndSettle();
+          await closeGradeResult(tester);
 
           final currentLevel = attemptedLevel == 7 && passed ? 8 : 7;
           void expectPreservedBaseline() {
@@ -1525,6 +1646,7 @@ void main() {
       await tester.tap(find.byType(AssessmentBottomActionButton).last);
       await tester.pumpAndSettle();
     }
+    await closeGradeResult(tester);
     expect(find.byType(ExamAttemptScreen), findsNothing);
     expect(find.byType(AssessmentPlacementResultScreen), findsNothing);
     expect(
@@ -1569,6 +1691,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.byType(AssessmentBottomActionButton).last);
       await tester.pumpAndSettle();
+      await closeGradeResult(tester);
       expect(find.byType(GradeRoadmapScreen), findsOneWidget);
       expect(
         find.byKey(const ValueKey('grade-roadmap-level-7-locked')),
@@ -1632,6 +1755,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byType(AssessmentBottomActionButton).last);
     await tester.pumpAndSettle();
+    await closeGradeResult(tester);
     expect(find.byType(GradeRoadmapScreen), findsOneWidget);
     expect(store.saved, isEmpty);
     expect(store.progress.level, 6);
@@ -2613,6 +2737,9 @@ class _FakeExamService implements ExamService {
     return const GeneratedExam(
       userExamId: 600,
       examStatus: 'COMPLETE',
+      practiceWeakTopics: [
+        ExamPracticeTopic(topic: 'Toán đố', answered: 2, wrong: 1),
+      ],
       examType: examTypeGrade,
       grade: 2,
       level: 1,
