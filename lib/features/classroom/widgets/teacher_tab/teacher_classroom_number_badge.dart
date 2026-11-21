@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/features/classroom/widgets/teacher_tab/teacher_classroom_number_helpers.dart';

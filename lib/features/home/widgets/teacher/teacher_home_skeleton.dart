@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:numi/features/home/widgets/teacher/teacher_assignments_loading_panel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_home_hero_skeleton.dart';

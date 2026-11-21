@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/features/home/widgets/teacher/shared/class_default_image.dart';

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -180,7 +180,7 @@ class _IntroHistoryExamService implements ExamService {
   }) async {
     expect(profileId, 421);
     expect(examType, examTypeAssessment);
-    expect(toDt.difference(fromDt), const Duration(days: 7));
+    expect(toDt.difference(fromDt), const Duration(days: 730));
     progressCalls++;
     return await (onGetProgress?.call(progressCalls) ?? Future.value(progress));
   }

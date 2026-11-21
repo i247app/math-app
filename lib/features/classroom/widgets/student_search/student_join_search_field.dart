@@ -1,5 +1,5 @@
 import 'package:numi/features/classroom/widgets/student_search/student_class_search_assets.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/core/theme/font_size.dart';
 
 import 'package:numi/core/extension/localization_extension.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_block.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_line.dart';
 import 'package:numi/features/exam/widgets/parent_assessment/parent_assessment_skeleton_pulse.dart';

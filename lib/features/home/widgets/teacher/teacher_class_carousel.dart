@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/features/classroom/models/classroom.dart';
 import 'package:numi/shared/widgets/app_horizontal_carousel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_class_card.dart';

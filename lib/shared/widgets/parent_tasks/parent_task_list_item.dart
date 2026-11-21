@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/shared/widgets/parent_tasks/parent_task_date_label.dart';
 import 'package:numi/shared/widgets/parent_tasks/parent_task_meta_badges.dart';
 import 'package:numi/shared/widgets/parent_tasks/parent_task_title.dart';

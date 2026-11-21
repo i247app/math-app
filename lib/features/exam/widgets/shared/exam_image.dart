@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/features/exam/data/exam_image_cache.dart';
 
 /// Image URLs are transient. The enclosing exam controller refreshes them.

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numi/features/exam/widgets/assessment/assessment_generating_loader.dart';
 import 'package:numi/features/exam/widgets/assessment/numi_assessment_mascot_animation.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Reconciles keyed cards without replaying entrances for unchanged exams.
 class AnimatedHomeAssessmentItems extends StatefulWidget {

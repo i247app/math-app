@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/features/home/widgets/sections/promo_actions/promo_action_group.dart';
 
 class PromoActionsSection extends StatelessWidget {

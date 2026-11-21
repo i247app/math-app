@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/features/classroom/widgets/parent_room/parent_room_loading_content.dart';
 import 'package:numi/shared/widgets/skeleton/app_skeleton_loader.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_skeleton_carousel.dart';
 import 'package:numi/features/home/widgets/teacher/teacher_assignment_skeleton_card.dart';
 

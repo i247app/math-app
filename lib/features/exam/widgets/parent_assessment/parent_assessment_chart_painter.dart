@@ -1,5 +1,5 @@
 import 'package:numi/features/exam/helpers/parent_assessment_helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:numi/core/theme/font_size.dart';
 import 'package:numi/features/exam/models/parent_assessment_entry.dart';
 

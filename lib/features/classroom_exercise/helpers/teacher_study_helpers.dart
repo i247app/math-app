@@ -1,6 +1,6 @@
 import 'package:numi/core/helpers/api_date_time.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:numi/features/classroom_exercise/models/classroom_exercise.dart';
 import 'package:numi/features/classroom_exercise/models/teacher_study_date_parts.dart';

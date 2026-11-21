@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A left-aligned horizontal line used as a text placeholder in skeletons.
 ///

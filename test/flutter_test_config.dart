@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' show FontStyle, FontWeight;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,6 +65,16 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   }
 
   installTestAssets();
+  // Load the stand-in fonts before widget tests start their fake clocks.
+  // Loading them during a test can schedule a relayout as the test ends.
+  for (final family in ['Andika', 'Nunito', 'Bagel Fat One']) {
+    for (final weight in FontWeight.values) {
+      for (final style in FontStyle.values) {
+        GoogleFonts.getFont(family, fontWeight: weight, fontStyle: style);
+      }
+    }
+  }
+  await GoogleFonts.pendingFonts();
   setUp(installTestAssets);
   await testMain();
 }

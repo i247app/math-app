@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AssessmentResultLevel {
   const AssessmentResultLevel({required this.titleKey, required this.color});

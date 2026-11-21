@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
+  cupertino_ui: ^1.1.7
   flutter_bloc: ^9.1.1
   cupertino_icons: ^2.0.0
   dio: ^5.11.1
@@ -19,18 +21,16 @@ dependencies:
   json_annotation: ^4.12.0
   google_fonts: ^9.0.0
   package_info_plus: ^10.2.2
-  flutter_svg: ^2.3.0
+  flutter_svg: ^2.5.0
   flutter_math_fork: ^0.7.4
-  cached_network_image: ^4.0.6
+  cached_network_image: ^4.0.7
   flutter_cache_manager: ^3.5.0
   audioplayers: ^6.8.1
   # Keep aligned with the Android built-in Kotlin compatibility patch.
   flutter_tts: 4.2.5
-  # Must match the reviewed Android patch in third_party/android_gradle/patches.json.
-  firebase_core: 5.1.0
-  firebase_messaging: 17.0.1
-  # 23.x requires compileSdk 37 and AGP 9.1.1; upgrade Android tooling together.
-  flutter_local_notifications: ^22.3.3
+  firebase_core: 5.2.0
+  firebase_messaging: 17.1.0
+  flutter_local_notifications: ^23.0.3
   url_launcher: ^6.3.3
 
 dev_dependencies:

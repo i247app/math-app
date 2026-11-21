@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
