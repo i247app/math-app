@@ -13,7 +13,8 @@ import 'package:numi/features/auth/screens/registration_profile_screen.dart';
 import 'package:numi/features/auth/screens/signup_screen.dart';
 import 'package:numi/features/auth/widgets/auth_entry/auth_entry_view.dart';
 import 'package:numi/features/auth/widgets/auth_header.dart';
-import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
+import 'package:numi/features/games/screens/star_game_tab.dart';
+import 'package:numi/features/games/widgets/star_game_entry_card.dart';
 import 'package:numi/features/welcome/screens/welcome_details_screen.dart';
 import 'package:numi/features/welcome/widgets/welcome_details_feature_grid.dart';
 import 'package:numi/shared/widgets/loading_screen.dart';
@@ -113,8 +114,8 @@ void main() {
             find.byType(WelcomeDetailsFeatureGrid),
           ),
           'games' => (
-            const GamesComingSoonTab(bottomPadding: 80),
-            find.byType(Image),
+            const StarGameTab(bottomPadding: 80),
+            find.byType(StarGameEntryCard),
           ),
           _ => (const LoadingScreen(), find.byType(Image)),
         };

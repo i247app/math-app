@@ -14,7 +14,7 @@ import 'package:numi/features/classroom/screens/student_classroom_tab.dart';
 import 'package:numi/features/classroom/screens/teacher_classroom_tab.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_factory.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_args.dart';
-import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
+import 'package:numi/features/games/screens/star_game_tab.dart';
 import 'package:numi/features/home/screens/parent/parent_home_tab.dart';
 import 'package:numi/features/home/screens/student/student_home_tab.dart';
 import 'package:numi/features/home/screens/teacher/teacher_home_tab.dart';
@@ -137,9 +137,7 @@ class AppDashboardTabFactory implements DashboardTabFactory {
         onCreateStudentProfile: (context) =>
             _openCreateStudentProfile(context, args),
       ),
-      DashboardTabId.games => GamesComingSoonTab(
-        bottomPadding: args.presentation.bottomPadding,
-      ),
+      DashboardTabId.games => _buildGames(args),
       DashboardTabId.settings => _buildSettings(args),
       DashboardTabId.learning => _buildLearning(
         context,
@@ -148,6 +146,22 @@ class AppDashboardTabFactory implements DashboardTabFactory {
       ),
       _ => const SizedBox.shrink(),
     };
+  }
+
+  Widget _buildGames(DashboardTabArgs args) {
+    final profileId = profileStableId(args.session.activeProfile);
+    final accountId = args.session.user?.id;
+    final storageKey = switch ((profileId, accountId)) {
+      (final profile?, _) when profile > 0 => 'star_game_v1_profile_$profile',
+      (_, final account?) when account > 0 => 'star_game_v1_account_$account',
+      _ => null,
+    };
+    return StarGameTab(
+      key: ValueKey(storageKey),
+      storageKey: storageKey,
+      isActive: args.isActive,
+      bottomPadding: args.presentation.bottomPadding,
+    );
   }
 
   Widget _buildLearning(

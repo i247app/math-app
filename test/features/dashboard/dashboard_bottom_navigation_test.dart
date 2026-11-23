@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:numi/core/animations/app_staggered_entrance.dart';
 import 'package:numi/features/dashboard/models/dashboard_tab_id.dart';
 import 'package:numi/core/localization/app_language.dart';
 import 'package:numi/core/localization/lingo_provider.dart';
@@ -9,7 +10,7 @@ import 'package:numi/core/localization/lingo_scope.dart';
 import 'package:numi/core/theme/app_theme.dart';
 import 'package:numi/features/dashboard/navigation/dashboard_tab_order.dart';
 import 'package:numi/features/dashboard/widgets/dashboard_bottom_navigation.dart';
-import 'package:numi/features/games/screens/games_coming_soon_tab.dart';
+import 'package:numi/features/games/screens/star_game_tab.dart';
 import 'package:numi/features/profile/models/profile_role.dart';
 
 void main() {
@@ -416,34 +417,77 @@ void main() {
     },
   );
 
-  testWidgets('Games placeholder shows only mascot and localized message', (
-    tester,
-  ) async {
-    final originalLanguage = AppLanguageState.current;
-    final lingo = LingoProvider();
-    addTearDown(() {
-      AppLanguageState.current = originalLanguage;
-      lingo.dispose();
-    });
+  testWidgets(
+    'Games card animates on first activation and opens the localized map',
+    (tester) async {
+      final originalLanguage = AppLanguageState.current;
+      final lingo = LingoProvider();
+      addTearDown(() {
+        AppLanguageState.current = originalLanguage;
+        lingo.dispose();
+      });
+      var isActive = false;
+      late StateSetter update;
 
-    await tester.pumpWidget(
-      LingoScope(
-        lingo: lingo,
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: const Scaffold(body: GamesComingSoonTab(bottomPadding: 88)),
+      await tester.pumpWidget(
+        LingoScope(
+          lingo: lingo,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: StatefulBuilder(
+              builder: (context, setState) {
+                update = setState;
+                return Scaffold(
+                  body: StarGameTab(bottomPadding: 88, isActive: isActive),
+                );
+              },
+            ),
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.text('Sắp ra mắt'), findsOneWidget);
-    expect(find.byType(Text), findsOneWidget);
+      expect(find.text('Games'), findsOneWidget);
+      expect(find.text('Bản đồ chòm sao'), findsNothing);
+      final entrance = find.byType(AppStaggeredEntrance);
+      expect(entrance, findsNothing);
+      await tester.pump(const Duration(milliseconds: 600));
+      update(() => isActive = true);
+      await tester.pump();
+      final scale = find.descendant(
+        of: entrance,
+        matching: find.byType(AnimatedScale),
+      );
+      expect(tester.widget<AnimatedScale>(scale).scale, lessThan(1));
+      await tester.pumpAndSettle();
+      expect(tester.widget<AnimatedScale>(scale).scale, 1);
 
-    await lingo.setLanguage(AppLanguage.en);
-    await tester.pump();
-    expect(find.text('Coming soon'), findsOneWidget);
-  });
+      await tester.tap(find.text('Vua tính nhẩm'));
+      await tester.pumpAndSettle();
+      expect(find.text('Games'), findsNothing);
+      expect(find.text('Vua tính nhẩm'), findsOneWidget);
+      expect(find.text('Bản đồ chòm sao'), findsOneWidget);
+      expect(find.text('Cánh Diều'), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Games'), findsOneWidget);
+      expect(find.text('Bản đồ chòm sao'), findsNothing);
+      update(() => isActive = false);
+      await tester.pump();
+      update(() => isActive = true);
+      await tester.pump();
+      expect(tester.widget<AnimatedScale>(scale).scale, 1);
+
+      await lingo.setLanguage(AppLanguage.en);
+      await tester.pump();
+      expect(find.text('Games'), findsOneWidget);
+      await tester.tap(find.text('Mental Math King'));
+      await tester.pumpAndSettle();
+      expect(find.text('Constellation map'), findsOneWidget);
+      expect(find.text('Mental Math King'), findsOneWidget);
+      expect(find.text('Kite'), findsOneWidget);
+    },
+  );
 }
 
 Future<ValueNotifier<double?>> _pumpAnimatedNavigation(
