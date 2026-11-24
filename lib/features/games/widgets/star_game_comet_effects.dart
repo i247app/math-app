@@ -58,17 +58,18 @@ class StarGameCometEffects extends StatelessWidget {
               if (elapsed >= launchAt && elapsed < fillAt)
                 Positioned(
                   key: const ValueKey('star-game-flying-number'),
-                  left: center.dx - 28,
-                  top: center.dy - 22,
-                  width: 56,
-                  height: 44,
+                  left: center.dx - 32,
+                  top: center.dy - 24,
+                  width: 64,
+                  height: 48,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       '$number',
                       style: const TextStyle(
                         color: Color(0xFFFFF2BA),
-                        fontSize: 34,
+                        fontFamily: starGameNumberFont,
+                        fontSize: starGameAnswerFontSize,
                         fontWeight: FontWeight.w900,
                         shadows: [
                           Shadow(color: Color(0xCC283359), blurRadius: 7),

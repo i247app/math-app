@@ -51,3 +51,9 @@ flutter:
     - assets/images/assessment_intro/
     - assets/icons/
     - assets/sounds/effects/
+    - assets/fonts/Roboto-LICENSE.txt
+  fonts:
+    - family: StarGameNumbers
+      fonts:
+        - asset: assets/fonts/Roboto-Black.ttf
+          weight: 900

@@ -9,6 +9,9 @@ import 'package:numi/features/games/widgets/star_game_answer_gem.dart';
 import 'package:numi/features/games/widgets/star_game_art.dart';
 import 'package:numi/features/games/widgets/star_game_comet_effects.dart';
 
+const _answerGap = 8.0;
+const _answerStagger = 10.0;
+
 class StarGamePlayView extends StatelessWidget {
   const StarGamePlayView({
     super.key,
@@ -129,7 +132,8 @@ class _PlayScene extends StatelessWidget {
     final expression = '${question.expression} =';
     final equationStyle = DefaultTextStyle.of(context).style.copyWith(
       color: Colors.white,
-      fontSize: 52,
+      fontFamily: starGameNumberFont,
+      fontSize: 60,
       fontWeight: FontWeight.w900,
       height: 1,
       shadows: [
@@ -168,9 +172,12 @@ class _PlayScene extends StatelessWidget {
           width - 6,
           height - 14,
         );
+        final columnLimit = (answerArea.width - 3 * _answerGap) / 4;
+        final rowLimit =
+            (answerArea.height - _answerGap - 2 * _answerStagger) / 2;
         final starSize = math
-            .min(width * .22, answerArea.height * .45)
-            .clamp(48.0, 86.0);
+            .min(width * .24, math.max(columnLimit, rowLimit))
+            .clamp(48.0, 94.0);
         // Keep a question's stars in place during feedback and after resuming.
         final starCenters = _scatterAnswers(
           answerArea.deflate(starSize / 2),
@@ -249,8 +256,8 @@ class _PlayScene extends StatelessWidget {
                 else ...[
                   Positioned(
                     left: equationLeft,
-                    top: slot.dy - 31,
-                    height: 62,
+                    top: slot.dy - 34,
+                    height: 68,
                     width: textWidth,
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -341,7 +348,7 @@ List<Offset> _scatterAnswers(Rect bounds, double size, int seed) {
   const count = 4;
   final random = math.Random(seed);
   final centers = <Offset>[];
-  final spacing = size + 8;
+  final spacing = size + _answerGap;
   for (var attempt = 0; attempt < 96 && centers.length < count; attempt++) {
     final candidate = Offset(
       bounds.left + random.nextDouble() * bounds.width,
@@ -349,7 +356,7 @@ List<Offset> _scatterAnswers(Rect bounds, double size, int seed) {
     );
     if (centers.every((center) {
       final delta = candidate - center;
-      return delta.dy.abs() >= 10 &&
+      return delta.dy.abs() >= _answerStagger &&
           (delta.dx.abs() >= spacing || delta.dy.abs() >= spacing);
     })) {
       centers.add(candidate);
@@ -362,7 +369,30 @@ List<Offset> _scatterAnswers(Rect bounds, double size, int seed) {
     }
   }
 
-  // Stagger independent columns when the available height limits placement.
+  if (bounds.width / (count - 1) < size + _answerGap / 2) {
+    final upperLeft = random.nextBool() ? 0.0 : _answerStagger;
+    final lowerLeft = random.nextBool() ? 0.0 : _answerStagger;
+    return [
+      Offset(
+        bounds.left + bounds.width * .10 * random.nextDouble(),
+        bounds.top + upperLeft,
+      ),
+      Offset(
+        bounds.left + bounds.width * (.10 + .08 * random.nextDouble()),
+        bounds.bottom - lowerLeft,
+      ),
+      Offset(
+        bounds.right - bounds.width * (.10 + .08 * random.nextDouble()),
+        bounds.top + _answerStagger - upperLeft,
+      ),
+      Offset(
+        bounds.right - bounds.width * .10 * random.nextDouble(),
+        bounds.bottom - _answerStagger + lowerLeft,
+      ),
+    ];
+  }
+
+  // Use independent columns when the answer area is shallow.
   final heights = [
     for (final base in [.65, .08, .88, .37]) base + random.nextDouble() * .02,
   ]..shuffle(random);
@@ -415,7 +445,8 @@ class _AnswerSlot extends StatelessWidget {
                 style: TextStyle(
                   color: accent,
                   fontWeight: FontWeight.w900,
-                  fontSize: 38,
+                  fontFamily: starGameNumberFont,
+                  fontSize: 44,
                 ),
               ),
             ),
@@ -505,7 +536,7 @@ class _AnswerStar extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: size * .56,
+                  width: size * .64,
                   child: Opacity(
                     opacity: flying ? 0 : 1,
                     child: FittedBox(
@@ -514,7 +545,8 @@ class _AnswerStar extends StatelessWidget {
                         '$value',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 29,
+                          fontFamily: starGameNumberFont,
+                          fontSize: starGameAnswerFontSize,
                           fontWeight: FontWeight.w900,
                           height: 1,
                           shadows: [

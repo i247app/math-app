@@ -290,7 +290,10 @@ void main() {
       expect(find.byIcon(Icons.volume_off_rounded), findsNothing);
       await tester.pump(const Duration(seconds: 3));
       final equation = find.byKey(const ValueKey('star-game-equation'));
-      final firstQuestion = tester.widget<Text>(equation).data;
+      final equationText = tester.widget<Text>(equation);
+      expect(equationText.style?.fontFamily, starGameNumberFont);
+      expect(equationText.style?.fontWeight, FontWeight.w900);
+      final firstQuestion = equationText.data;
       final clock = find.byKey(const ValueKey('star-game-clock'));
       expect(clock, findsOneWidget);
       expect(tester.getRect(clock).left, lessThan(64));
@@ -345,8 +348,8 @@ void main() {
         previousLayout = hitTargets;
         for (var i = 0; i < hitTargets.length; i++) {
           final target = hitTargets[i];
-          expect(target.width, greaterThanOrEqualTo(48));
-          expect(target.height, greaterThanOrEqualTo(48));
+          expect(target.width, greaterThanOrEqualTo(65));
+          expect(target.height, greaterThanOrEqualTo(65));
           expect(target.left, greaterThanOrEqualTo(0));
           expect(target.right, lessThanOrEqualTo(320));
           expect(target.bottom, lessThanOrEqualTo(548));

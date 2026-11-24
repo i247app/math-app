@@ -9,6 +9,8 @@ const starGamePanel = Color(0xFF202B56);
 const starGameLine = Color(0xFF394879);
 const starGameMuted = Color(0xFFC1CAE5);
 const starGameGold = Color(0xFFFFD879);
+const starGameNumberFont = 'StarGameNumbers';
+const starGameAnswerFontSize = 38.0;
 
 Color starGameAccent(StarGameLevel level) => switch (level) {
   StarGameLevel.kite => starGameGold,
