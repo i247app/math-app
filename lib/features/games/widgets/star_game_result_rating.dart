@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
+import 'package:numi/features/games/widgets/star_game_art.dart';
 
 const _firstArrival = 100;
 const _arrivalInterval = 350;
@@ -179,8 +180,8 @@ class _RewardStarPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * .46;
-    final rim = _starVertices(center, radius);
-    final outline = _roundedStar(rim);
+    final rim = starGameStarVertices(center, radius);
+    final outline = starGameRoundedStar(rim);
     final rect = Rect.fromCircle(center: center, radius: radius);
 
     if (!earned) {
@@ -201,7 +202,7 @@ class _RewardStarPainter extends CustomPainter {
           ).createShader(rect),
       );
       canvas.drawPath(
-        _roundedStar(_starVertices(center, radius * .85)),
+        starGameRoundedStar(starGameStarVertices(center, radius * .85)),
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1
@@ -244,7 +245,7 @@ class _RewardStarPainter extends CustomPainter {
       );
     }
     canvas.drawPath(
-      _roundedStar(_starVertices(center, radius * .88)),
+      starGameRoundedStar(starGameStarVertices(center, radius * .88)),
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = radius * .032
@@ -263,7 +264,7 @@ class _RewardStarPainter extends CustomPainter {
         ).createShader(rect),
     );
     final shine = center + Offset(-radius * .35, -radius * .38);
-    _drawGlint(canvas, shine, radius * .16, const Color(0xFFFFFCE0));
+    paintStarGameGlint(canvas, shine, radius * .16, const Color(0xFFFFFCE0));
     canvas.drawCircle(
       shine + Offset(-radius * .21, radius * .13),
       radius * .035,
@@ -306,49 +307,11 @@ class _ImpactPainter extends CustomPainter {
       final color =
           (index.isEven ? const Color(0xFFFFF9D2) : const Color(0xFFFFB94D))
               .withValues(alpha: fade);
-      _drawGlint(canvas, point, (index.isEven ? 5 : 3.2) * fade, color);
+      paintStarGameGlint(canvas, point, (index.isEven ? 5 : 3.2) * fade, color);
     }
   }
 
   @override
   bool shouldRepaint(_ImpactPainter oldDelegate) =>
       progress != oldDelegate.progress || finale != oldDelegate.finale;
-}
-
-List<Offset> _starVertices(Offset center, double radius) => [
-  for (var i = 0; i < 10; i++)
-    center +
-        Offset.fromDirection(
-          i * math.pi / 5 - math.pi / 2,
-          i.isEven ? radius : radius * .53,
-        ),
-];
-
-Path _roundedStar(List<Offset> vertices) {
-  final first = Offset.lerp(vertices.last, vertices.first, .86)!;
-  final path = Path()..moveTo(first.dx, first.dy);
-  for (var i = 0; i < vertices.length; i++) {
-    final tip = vertices[i];
-    final next = vertices[(i + 1) % vertices.length];
-    final exit = Offset.lerp(tip, next, .14)!;
-    final approach = Offset.lerp(tip, next, .86)!;
-    path
-      ..quadraticBezierTo(tip.dx, tip.dy, exit.dx, exit.dy)
-      ..lineTo(approach.dx, approach.dy);
-  }
-  return path..close();
-}
-
-void _drawGlint(Canvas canvas, Offset center, double radius, Color color) {
-  final path = Path()..moveTo(center.dx, center.dy - radius);
-  for (var i = 1; i < 8; i++) {
-    final point =
-        center +
-        Offset.fromDirection(
-          i * math.pi / 4 - math.pi / 2,
-          radius * (i.isEven ? 1 : .26),
-        );
-    path.lineTo(point.dx, point.dy);
-  }
-  canvas.drawPath(path..close(), Paint()..color = color);
 }

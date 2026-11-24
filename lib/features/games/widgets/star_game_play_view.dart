@@ -5,6 +5,7 @@ import 'package:numi/core/extension/localization_extension.dart';
 import 'package:numi/core/localization/app_keys.dart';
 import 'package:numi/features/games/controllers/star_game_round.dart';
 import 'package:numi/features/games/models/star_game.dart';
+import 'package:numi/features/games/widgets/star_game_answer_gem.dart';
 import 'package:numi/features/games/widgets/star_game_art.dart';
 import 'package:numi/features/games/widgets/star_game_comet_effects.dart';
 
@@ -34,10 +35,7 @@ class StarGamePlayView extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: _Clock(
-                  clock: round.clock,
-                  accent: starGameAccent(level),
-                ),
+                child: _Clock(clock: round.clock),
               ),
             ),
             const SizedBox(width: 8),
@@ -62,26 +60,24 @@ class StarGamePlayView extends StatelessWidget {
 }
 
 class _Clock extends StatelessWidget {
-  const _Clock({required this.clock, required this.accent});
+  const _Clock({required this.clock});
 
+  static const _foreground = Color(0xFFFFF7E7);
   final ValueNotifier<Duration> clock;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: ShapeDecoration(
-      color: starGameInk.withValues(alpha: .82),
-      shape: StadiumBorder(
-        side: BorderSide(color: accent.withValues(alpha: .44)),
-      ),
+    decoration: const ShapeDecoration(
+      color: Color(0xFFE04540),
+      shape: StadiumBorder(),
     ),
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.timer_outlined, color: accent, size: 17),
-          const SizedBox(width: 6),
+          const Icon(Icons.timer_outlined, color: _foreground, size: 19),
+          const SizedBox(width: 7),
           Flexible(
             child: ValueListenableBuilder(
               valueListenable: clock,
@@ -93,9 +89,10 @@ class _Clock extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
+                  color: _foreground,
+                  fontSize: 21,
                   fontWeight: FontWeight.w800,
+                  height: 1.1,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
@@ -132,17 +129,24 @@ class _PlayScene extends StatelessWidget {
     final expression = '${question.expression} =';
     final equationStyle = DefaultTextStyle.of(context).style.copyWith(
       color: Colors.white,
-      fontSize: 44,
+      fontSize: 52,
       fontWeight: FontWeight.w900,
       height: 1,
-      shadows: [Shadow(color: accent.withValues(alpha: .48), blurRadius: 17)],
+      shadows: [
+        const Shadow(
+          color: Color(0xAA101839),
+          offset: Offset(0, 2),
+          blurRadius: 7,
+        ),
+        Shadow(color: accent.withValues(alpha: .40), blurRadius: 21),
+      ],
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
-        final slotWidth = (width * .19).clamp(48.0, 66.0);
+        final slotWidth = (width * .20).clamp(50.0, 72.0);
         final textPainter = TextPainter(
           text: TextSpan(text: expression, style: equationStyle),
           textDirection: Directionality.of(context),
@@ -198,6 +202,9 @@ class _PlayScene extends StatelessWidget {
                 animated && elapsed >= launchAt && elapsed < fillAt;
             final reveal = feedback && (!animated || elapsed >= fillAt);
             final lightsUp = animated && elapsed >= lightAt;
+            final charge = math.sin(
+              math.pi * StarGameCometEffects.progress(elapsed, 0, fillAt),
+            );
             return Stack(
               children: [
                 Positioned.fromRect(
@@ -259,9 +266,9 @@ class _PlayScene extends StatelessWidget {
                   ),
                   Positioned(
                     left: slot.dx - slotWidth / 2,
-                    top: slot.dy - 27,
+                    top: slot.dy - 29,
                     width: slotWidth,
-                    height: 54,
+                    height: 58,
                     child: _AnswerSlot(
                       value: reveal ? question.answer : null,
                       accent: accent,
@@ -289,7 +296,10 @@ class _PlayScene extends StatelessWidget {
                         transformHitTests: false,
                         child: _AnswerStar(
                           value: question.choices[i],
-                          accent: accent,
+                          charge:
+                              animated && question.choices[i] == round.selected
+                              ? charge
+                              : 0,
                           correct:
                               reveal && question.choices[i] == question.answer,
                           wrong:
@@ -375,11 +385,15 @@ class _AnswerSlot extends StatelessWidget {
   Widget build(BuildContext context) => DecoratedBox(
     key: const ValueKey('star-game-answer-slot'),
     decoration: BoxDecoration(
-      color: accent.withValues(alpha: value == null ? .10 : .20),
+      color: starGameInk.withValues(alpha: value == null ? .30 : .46),
       border: Border.all(
-        color: accent.withValues(alpha: value == null ? .53 : .85),
+        color: accent.withValues(alpha: value == null ? .78 : 1),
+        width: 1.4,
       ),
       borderRadius: BorderRadius.circular(14),
+      boxShadow: [
+        BoxShadow(color: accent.withValues(alpha: .18), blurRadius: 12),
+      ],
     ),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
@@ -388,9 +402,9 @@ class _AnswerSlot extends StatelessWidget {
               label: context.getText(AppKeys.gamesAnswerBlank),
               child: Center(
                 child: Container(
-                  width: 20,
-                  height: 2,
-                  color: accent.withValues(alpha: .72),
+                  width: 24,
+                  height: 2.5,
+                  color: accent.withValues(alpha: .88),
                 ),
               ),
             )
@@ -401,7 +415,7 @@ class _AnswerSlot extends StatelessWidget {
                 style: TextStyle(
                   color: accent,
                   fontWeight: FontWeight.w900,
-                  fontSize: 34,
+                  fontSize: 38,
                 ),
               ),
             ),
@@ -450,7 +464,7 @@ class _Feedback extends StatelessWidget {
 class _AnswerStar extends StatelessWidget {
   const _AnswerStar({
     required this.value,
-    required this.accent,
+    required this.charge,
     required this.correct,
     required this.wrong,
     required this.flying,
@@ -458,7 +472,7 @@ class _AnswerStar extends StatelessWidget {
   });
 
   final int value;
-  final Color accent;
+  final double charge;
   final bool correct;
   final bool wrong;
   final bool flying;
@@ -466,16 +480,11 @@ class _AnswerStar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final outline = correct
-        ? const Color(0xFFA4F3C6)
+    final tone = correct
+        ? StarGameAnswerTone.correct
         : wrong
-        ? const Color(0xFFFFADC5)
-        : accent;
-    final fill = correct
-        ? const Color(0xFF204C47)
-        : wrong
-        ? const Color(0xFF592F52)
-        : Color.lerp(starGamePanel, accent, .13)!;
+        ? StarGameAnswerTone.wrong
+        : StarGameAnswerTone.sapphire;
     final button = Material(
       type: MaterialType.transparency,
       child: InkWell(
@@ -488,20 +497,15 @@ class _AnswerStar extends StatelessWidget {
             return Stack(
               alignment: Alignment.center,
               children: [
-                Icon(
-                  Icons.star_rounded,
-                  size: size,
-                  color: outline,
-                  shadows: [
-                    Shadow(
-                      color: outline.withValues(alpha: .44),
-                      blurRadius: 15,
+                Positioned.fill(
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: StarGameAnswerGem(tone: tone, charge: charge),
                     ),
-                  ],
+                  ),
                 ),
-                Icon(Icons.star_rounded, size: size - 5, color: fill),
                 SizedBox(
-                  width: size * .51,
+                  width: size * .56,
                   child: Opacity(
                     opacity: flying ? 0 : 1,
                     child: FittedBox(
@@ -512,6 +516,14 @@ class _AnswerStar extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 29,
                           fontWeight: FontWeight.w900,
+                          height: 1,
+                          shadows: [
+                            Shadow(
+                              color: Color(0xDD0A174C),
+                              blurRadius: 4,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -528,7 +540,7 @@ class _AnswerStar extends StatelessWidget {
                       ),
                       child: Icon(
                         correct ? Icons.check_rounded : Icons.close_rounded,
-                        color: outline,
+                        color: tone.rim,
                         size: 17,
                       ),
                     ),

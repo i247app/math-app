@@ -394,6 +394,49 @@ List<Offset> starGameConstellationPoints(StarGameLevel level, Size size) {
   return [for (final (x, y) in points) origin + Offset(x * width, y * height)];
 }
 
+List<Offset> starGameStarVertices(Offset center, double radius) => [
+  for (var i = 0; i < 10; i++)
+    center +
+        Offset.fromDirection(
+          i * pi / 5 - pi / 2,
+          i.isEven ? radius : radius * .53,
+        ),
+];
+
+Path starGameRoundedStar(List<Offset> vertices) {
+  final first = Offset.lerp(vertices.last, vertices.first, .86)!;
+  final path = Path()..moveTo(first.dx, first.dy);
+  for (var i = 0; i < vertices.length; i++) {
+    final tip = vertices[i];
+    final next = vertices[(i + 1) % vertices.length];
+    final exit = Offset.lerp(tip, next, .14)!;
+    final approach = Offset.lerp(tip, next, .86)!;
+    path
+      ..quadraticBezierTo(tip.dx, tip.dy, exit.dx, exit.dy)
+      ..lineTo(approach.dx, approach.dy);
+  }
+  return path..close();
+}
+
+void paintStarGameGlint(
+  Canvas canvas,
+  Offset center,
+  double radius,
+  Color color,
+) {
+  final path = Path()..moveTo(center.dx, center.dy - radius);
+  for (var i = 1; i < 8; i++) {
+    final point =
+        center +
+        Offset.fromDirection(
+          i * pi / 4 - pi / 2,
+          radius * (i.isEven ? 1 : .26),
+        );
+    path.lineTo(point.dx, point.dy);
+  }
+  canvas.drawPath(path..close(), Paint()..color = color);
+}
+
 Path _spark(Offset point, double radius) => Path()
   ..moveTo(point.dx, point.dy - radius)
   ..quadraticBezierTo(

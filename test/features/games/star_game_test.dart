@@ -9,6 +9,7 @@ import 'package:numi/features/games/controllers/star_game_progress.dart';
 import 'package:numi/features/games/controllers/star_game_round.dart';
 import 'package:numi/features/games/models/star_game.dart';
 import 'package:numi/features/games/screens/star_game_tab.dart';
+import 'package:numi/features/games/widgets/star_game_answer_gem.dart';
 import 'package:numi/features/games/widgets/star_game_art.dart';
 import 'package:numi/features/games/widgets/star_game_comet_effects.dart';
 import 'package:numi/features/games/widgets/star_game_result_rating.dart';
@@ -303,6 +304,23 @@ void main() {
             key.value.startsWith('star-game-answer-');
       });
       expect(stars, findsNWidgets(4));
+      StarGameAnswerGem gem(Finder star) =>
+          tester
+                  .widget<CustomPaint>(
+                    find.descendant(
+                      of: star,
+                      matching: find.byWidgetPredicate(
+                        (widget) =>
+                            widget is CustomPaint &&
+                            widget.painter is StarGameAnswerGem,
+                      ),
+                    ),
+                  )
+                  .painter!
+              as StarGameAnswerGem;
+      for (var index = 0; index < 4; index++) {
+        expect(gem(stars.at(index)).tone, StarGameAnswerTone.sapphire);
+      }
       List<Rect> starBounds() => [
         for (var i = 0; i < 4; i++) tester.getRect(stars.at(i)),
       ];
@@ -367,6 +385,7 @@ void main() {
           await tester.pump(const Duration(milliseconds: 120));
           expect(flight, findsOneWidget);
           expect(displayedAnswer, findsNothing);
+          expect(gem(correctChoice).charge, greaterThan(0));
           expect(
             tester.widget<StarGameConstellation>(constellation).lit,
             index,
@@ -374,6 +393,7 @@ void main() {
           await tester.pump(const Duration(milliseconds: 185));
           expect(flight, findsNothing);
           expect(displayedAnswer, findsOneWidget);
+          expect(gem(correctChoice).tone, StarGameAnswerTone.correct);
           expect(
             tester.widget<StarGameConstellation>(constellation).lit,
             index,
@@ -389,6 +409,8 @@ void main() {
           expect(flight, findsNothing);
           expect(displayedAnswer, findsOneWidget);
           expect(find.text('Đáp án đúng là $answer'), findsOneWidget);
+          expect(gem(chosen).tone, StarGameAnswerTone.wrong);
+          expect(gem(correctChoice).tone, StarGameAnswerTone.correct);
           await tester.pump(const Duration(milliseconds: 1150));
         }
       }
